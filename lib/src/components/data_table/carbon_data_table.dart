@@ -70,10 +70,15 @@ class CarbonTableColumn {
     required this.title,
     this.flex = 1,
     this.sortable = false,
+    this.aiLabel,
   });
 
   /// The header label.
   final String title;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered after
+  /// the header label per the upstream `column-ai-label-sort` story.
+  final Widget? aiLabel;
 
   /// The column's share of the available width.
   final int flex;
@@ -145,6 +150,7 @@ class CarbonDataTable extends StatelessWidget {
     this.stickyHeaderHeight = 320,
     this.title,
     this.description,
+    this.aiLabel,
     this.sortColumnIndex,
     this.sortDirection = CarbonSortDirection.none,
     this.onSort,
@@ -178,6 +184,10 @@ class CarbonDataTable extends StatelessWidget {
 
   /// An optional table title.
   final String? title;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered after
+  /// the table title per the upstream `ai-label-with-*` stories.
+  final Widget? aiLabel;
 
   /// An optional table description.
   final String? description;
@@ -388,11 +398,21 @@ class CarbonDataTable extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     if (title != null)
-                      Text(
-                        title!,
-                        style: CarbonTypeStyles.heading03.copyWith(
-                          color: theme.textPrimary,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            title!,
+                            style: CarbonTypeStyles.heading03.copyWith(
+                              color: theme.textPrimary,
+                            ),
+                          ),
+                          // The AI label flows after the table title.
+                          if (aiLabel != null) ...<Widget>[
+                            const SizedBox(width: CarbonSpacing.spacing03),
+                            aiLabel!,
+                          ],
+                        ],
                       ),
                     if (description != null)
                       Padding(
@@ -504,7 +524,7 @@ class _HeaderCellState extends State<_HeaderCell> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool active = widget.direction != CarbonSortDirection.none;
 
-    final Widget label = Text(
+    Widget label = Text(
       widget.column.title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -512,6 +532,17 @@ class _HeaderCellState extends State<_HeaderCell> {
         color: theme.textPrimary,
       ),
     );
+    // The AI label flows after the header label (column-ai-label-sort).
+    if (widget.column.aiLabel != null) {
+      label = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Flexible(child: label),
+          const SizedBox(width: CarbonSpacing.spacing03),
+          widget.column.aiLabel!,
+        ],
+      );
+    }
 
     if (widget.onSort == null) {
       return Padding(

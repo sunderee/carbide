@@ -172,10 +172,20 @@ class CarbonFormItem extends StatelessWidget {
 /// Used to group checkboxes or radios under one [legend] (`label-01`).
 class CarbonFormGroup extends StatelessWidget {
   /// Creates a form group.
-  const CarbonFormGroup({super.key, required this.legend, required this.child});
+  const CarbonFormGroup({
+    super.key,
+    required this.legend,
+    required this.child,
+    this.aiLabel,
+  });
 
   /// The group legend text.
   final String legend;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// inline after the legend (`--checkbox-group--decorator`,
+  /// 8px start margin) per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   /// The grouped controls.
   final Widget child;
@@ -194,11 +204,22 @@ class CarbonFormGroup extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing03),
-            child: Text(
-              legend,
-              style: CarbonTypeStyles.label01.copyWith(
-                color: theme.textSecondary,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  legend,
+                  style: CarbonTypeStyles.label01.copyWith(
+                    color: theme.textSecondary,
+                  ),
+                ),
+                // The AI label flows after the legend with an 8px margin
+                // (`margin-inline-start: $spacing-03`).
+                if (aiLabel != null) ...<Widget>[
+                  const SizedBox(width: CarbonSpacing.spacing03),
+                  aiLabel!,
+                ],
+              ],
             ),
           ),
           child,

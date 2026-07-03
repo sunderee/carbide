@@ -9,6 +9,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/layout.dart';
 import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
@@ -47,6 +48,7 @@ class CarbonExpandableTile extends StatelessWidget {
     this.collapseLabel = 'Collapse',
     this.focusNode,
     this.autofocus = false,
+    this.aiLabel,
   });
 
   /// Always-visible content.
@@ -81,6 +83,10 @@ class CarbonExpandableTile extends StatelessWidget {
   static const double chevronContainerSize = 48;
 
   void _toggle() => onExpandedChanged?.call(!expanded);
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), anchored to
+  /// the tile's top end per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +213,14 @@ class CarbonExpandableTile extends StatelessWidget {
                       child: Center(child: chevron),
                     ),
                   ),
+                  // The AI label anchors to the tile's top end
+                  // (`_tile.scss` $spacing-05 insets).
+                  if (aiLabel != null)
+                    PositionedDirectional(
+                      top: CarbonSpacing.spacing05,
+                      end: CarbonSpacing.spacing05,
+                      child: aiLabel!,
+                    ),
                 ],
               ),
             ),

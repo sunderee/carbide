@@ -9,6 +9,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
@@ -36,10 +37,16 @@ class CarbonCheckbox extends StatelessWidget {
     this.readOnly = false,
     this.focusNode,
     this.autofocus = false,
+    this.aiLabel,
   });
 
   /// The label beside the box.
   final String label;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// inline after the label text per upstream's `decorator` prop
+  /// (`--checkbox-wrapper--decorator`, 8px start margin).
+  final Widget? aiLabel;
 
   /// Whether the box is checked. Ignored visually when [indeterminate].
   final bool value;
@@ -138,6 +145,11 @@ class CarbonCheckbox extends StatelessWidget {
                   ),
                 ),
               ),
+              // The AI label flows after the label text with an 8px margin.
+              if (aiLabel != null) ...<Widget>[
+                const SizedBox(width: CarbonSpacing.spacing03),
+                aiLabel!,
+              ],
             ],
           );
         },
@@ -294,10 +306,15 @@ class CarbonCheckboxGroup extends StatelessWidget {
     this.invalidText,
     this.warn = false,
     this.warnText,
+    this.aiLabel,
   });
 
   /// The group legend.
   final String legend;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// inline after the group legend per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   /// The checkboxes.
   final List<Widget> children;
@@ -329,6 +346,7 @@ class CarbonCheckboxGroup extends StatelessWidget {
 
     return CarbonFormGroup(
       legend: legend,
+      aiLabel: aiLabel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
