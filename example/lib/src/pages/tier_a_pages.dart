@@ -89,6 +89,7 @@ class _ButtonPageState extends State<_ButtonPage> {
   CarbonButtonSize _size = CarbonButtonSize.lg;
   bool _withIcon = false;
   bool _enabled = true;
+  bool _expressive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +101,7 @@ class _ButtonPageState extends State<_ButtonPage> {
         kind: _kind,
         size: _size,
         icon: _withIcon ? CarbonIcons.add : null,
+        isExpressive: _expressive,
         onPressed: _enabled ? () {} : null,
       ),
       controls: <Widget>[
@@ -123,6 +125,11 @@ class _ButtonPageState extends State<_ButtonPage> {
           onChanged: (bool v) => setState(() => _withIcon = v),
         ),
         boolKnob(
+          label: 'Expressive',
+          value: _expressive,
+          onChanged: (bool v) => setState(() => _expressive = v),
+        ),
+        boolKnob(
           label: 'Enabled',
           value: _enabled,
           onChanged: (bool v) => setState(() => _enabled = v),
@@ -134,6 +141,7 @@ class _ButtonPageState extends State<_ButtonPage> {
           '  kind: CarbonButtonKind.${_kind.name},\n'
           '  size: CarbonButtonSize.${_size.name},\n'
           '${_withIcon ? '  icon: CarbonIcons.add,\n' : ''}'
+          '${_expressive ? '  isExpressive: true,\n' : ''}'
           '  onPressed: ${_enabled ? '() {}' : 'null'},\n'
           ');',
     );
