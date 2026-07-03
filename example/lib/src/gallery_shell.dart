@@ -91,6 +91,8 @@ class _Nav extends StatelessWidget {
   Widget build(BuildContext context) {
     return CarbonSideNav(
       expanded: expanded,
+      // A collapsed nav is a rail: it hover/focus-expands over the content.
+      rail: !expanded,
       items: <Widget>[
         CarbonSideNavLink(
           label: 'Overview',
