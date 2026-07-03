@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, v0.2]
   pull_request:
-    branches: [master]
+    branches: [master, v0.2]
 
 # Cancel superseded runs on the same ref.
 concurrency:
