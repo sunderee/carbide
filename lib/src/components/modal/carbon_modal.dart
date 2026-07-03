@@ -73,6 +73,7 @@ class CarbonModal extends StatefulWidget {
     this.size = CarbonModalSize.md,
     this.danger = false,
     this.passiveModal = false,
+    this.isFullWidth = false,
     this.preventCloseOnClickOutside = false,
     this.closeLabel = 'Close',
   });
@@ -106,6 +107,15 @@ class CarbonModal extends StatefulWidget {
 
   /// Whether to hide the footer buttons.
   final bool passiveModal;
+
+  /// Whether the body content stretches edge to edge, dropping the content
+  /// padding — used for data-dense content such as tables.
+  ///
+  /// Source: `Modal.tsx` `isFullWidth` and `_modal.scss`
+  /// `.cds--modal-container--full-width .cds--modal-content`
+  /// (`padding: 0; margin: 0`). The header and footer keep their spec
+  /// paddings; [isFullWidth] composes with [size].
+  final bool isFullWidth;
 
   /// Whether an outside tap is ignored.
   final bool preventCloseOnClickOutside;
@@ -231,6 +241,7 @@ class _CarbonModalState extends State<CarbonModal> {
                             label: widget.label,
                             danger: widget.danger,
                             passiveModal: widget.passiveModal,
+                            isFullWidth: widget.isFullWidth,
                             closeLabel: widget.closeLabel,
                             onClose: widget.onClose,
                             primaryButton: widget.primaryButton,
@@ -255,6 +266,7 @@ class _Dialog extends StatelessWidget {
     required this.label,
     required this.danger,
     required this.passiveModal,
+    required this.isFullWidth,
     required this.closeLabel,
     required this.onClose,
     required this.primaryButton,
@@ -266,6 +278,7 @@ class _Dialog extends StatelessWidget {
   final String? label;
   final bool danger;
   final bool passiveModal;
+  final bool isFullWidth;
   final String closeLabel;
   final VoidCallback? onClose;
   final CarbonModalAction? primaryButton;
@@ -337,16 +350,19 @@ class _Dialog extends StatelessWidget {
                 ],
               ),
             ),
-            // Body.
+            // Body. Full width drops the content padding entirely
+            // (`--full-width .cds--modal-content`: padding 0, margin 0).
             Flexible(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                    CarbonSpacing.spacing05,
-                    CarbonSpacing.spacing03,
-                    CarbonSpacing.spacing09,
-                    CarbonSpacing.spacing09,
-                  ),
+                  padding: isFullWidth
+                      ? EdgeInsets.zero
+                      : const EdgeInsetsDirectional.fromSTEB(
+                          CarbonSpacing.spacing05,
+                          CarbonSpacing.spacing03,
+                          CarbonSpacing.spacing09,
+                          CarbonSpacing.spacing09,
+                        ),
                   child: DefaultTextStyle.merge(
                     style: CarbonTypeStyles.body01.copyWith(
                       color: theme.textPrimary,
