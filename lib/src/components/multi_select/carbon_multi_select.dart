@@ -70,6 +70,8 @@ class CarbonMultiSelect<T> extends StatefulWidget {
     this.filterable = false,
     this.filterPlaceholder,
     this.aiLabel,
+    this.fluid = false,
+    this.condensed = false,
     this.aiRevert = false,
     this.focusNode,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
@@ -119,6 +121,14 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 
   /// The placeholder for the filter input when [filterable].
   final String? filterPlaceholder;
+
+  /// The fluid treatment: a 64px field with the title rendered inside
+  /// above the value, and 64px menu rows (`_fluid-list-box.scss`).
+  final bool fluid;
+
+  /// The condensed fluid variant: the field stays fluid but the menu rows
+  /// keep the standard height (`--list-box__wrapper--fluid--condensed`).
+  final bool condensed;
 
   /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
   /// field per upstream's `decorator` prop; adds the AI aura treatment.
@@ -293,7 +303,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel
+    final Widget? title = widget.hideLabel || widget.fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -350,6 +360,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           disabled: widget.disabled,
           aiLabel: widget.aiLabel,
           aiRevert: widget.aiRevert,
+          fluid: widget.fluid,
+          fluidLabel: widget.fluid ? widget.titleText : null,
           invalid: widget.invalid,
           warn: widget.warn,
           focused: _focus.hasFocus,
@@ -462,7 +474,11 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         child: TapRegion(
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(size: widget.size, children: rows),
+            child: CarbonListBoxMenu(
+              size: widget.size,
+              fluidRows: widget.fluid && !widget.condensed,
+              children: rows,
+            ),
           ),
         ),
       ),
@@ -478,6 +494,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(
           size: widget.size,
+          fluid: widget.fluid && !widget.condensed,
           isFirst: index == 0,
           isHighlighted: index == _highlighted,
           disabled: item.disabled,
