@@ -1970,6 +1970,23 @@ const CarbonIconData building = CarbonIconData(
   ],
 );
 
+/// The Carbon `building--electrical` icon data.
+const CarbonIconData buildingElectrical = CarbonIconData(
+  name: 'building--electrical',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M26.6074,30.5146l-1.7148-1.0293,2.0908-3.4854h-5l3.9092-6.5146,1.7148,1.0293-2.0908,3.4854h5l-3.9092,6.5146ZM20,30H6V4c0-1.103.897-2,2-2h16c1.1025,0,2,.897,2,2v12h-2V4H8v24h12v2ZM20,24h-2v-4h2v4ZM14,24h-2v-4h2v4ZM20,18h-2v-4h2v4ZM14,18h-2v-4h2v4ZM20,12h-2v-4h2v4ZM14,12h-2v-4h2v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `building--insights-1` icon data.
 const CarbonIconData buildingInsights1 = CarbonIconData(
   name: 'building--insights-1',

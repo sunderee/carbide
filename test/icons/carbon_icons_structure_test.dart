@@ -17,8 +17,8 @@ import '../spike/support.dart';
 import 'all_icons.dart';
 
 void main() {
-  test('the full Carbon registry is generated (2,673 icons)', () {
-    expect(allCarbonIcons, hasLength(2673));
+  test('the full Carbon registry is generated (2,715 icons)', () {
+    expect(allCarbonIcons, hasLength(2715));
   });
 
   test('asset counts match the source tree', () {
@@ -30,12 +30,12 @@ void main() {
         bySize[artwork.size] = (bySize[artwork.size] ?? 0) + 1;
       }
     }
-    expect(assets, 2767);
+    expect(assets, 2809);
     expect(bySize[null], 18, reason: 'bespoke glyph assets');
     expect(bySize[16], 68);
     expect(bySize[20], 9);
     expect(bySize[24], 8);
-    expect(bySize[32], 2664);
+    expect(bySize[32], 2706);
   });
 
   test('icon names are unique and artwork is ordered', () {

@@ -440,6 +440,23 @@ const CarbonIconData helicopter = CarbonIconData(
   ],
 );
 
+/// The Carbon `helmet` icon data.
+const CarbonIconData helmet = CarbonIconData(
+  name: 'helmet',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M30,24H2v-2h2.041c-.0273-.332-.041-.666-.041-1,0-5.0898,3.2534-9.6387,8-11.3169v-.6831c0-1.103.897-2,2-2h4c1.1025,0,2,.897,2,2v.6831c4.7471,1.6782,8,6.2271,8,11.3169,0,.334-.0137.668-.041,1h2.041v2ZM6.0493,22h19.9009c.0332-.332.0498-.666.0498-1,0-3.999-2.4102-7.5977-6-9.168v7.168h-2v-10h-4v10h-2v-7.168c-3.5903,1.5703-6,5.1689-6,9.168,0,.334.0166.6689.0493,1Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `help` icon data.
 const CarbonIconData help = CarbonIconData(
   name: 'help',
@@ -584,6 +601,23 @@ const CarbonIconData hexagonVerticalSolid = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'm16.5513,30.8508l11.9165-6.9641c.3301-.1926.5322-.5437.5322-.9224v-13.9287c0-.3787-.2021-.7297-.5322-.9224L16.5513,1.1492c-.3403-.199-.7622-.199-1.1025,0L3.5322,8.1133c-.3301.1926-.5322.5437-.5322.9224v13.9287c0,.3787.2021.7297.5322.9224l11.9165,6.9641c.3403.199.7622.199,1.1025,0Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `history` icon data.
+const CarbonIconData history = CarbonIconData(
+  name: 'history',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M18.3115,29.8096l-.3281-1.9727c5.8037-.9648,10.0166-5.9434,10.0166-11.8369,0-6.6167-5.3828-12-12-12s-12,5.3833-12,12h-2c0-7.7197,6.2803-14,14-14s14,6.2803,14,14c0,6.876-4.916,12.6836-11.6885,13.8096ZM13.5537,29.7861c-1.6157-.2842-3.1558-.8467-4.5767-1.6719l1.0039-1.7305c1.2178.707,2.5361,1.1895,3.9194,1.4336l-.3467,1.9688ZM5.293,25.0205c-1.0537-1.25-1.873-2.6582-2.4351-4.1846l1.877-.6914c.4814,1.3086,1.1836,2.5156,2.0874,3.5869l-1.5293,1.2891ZM20.5586,21.9727l-5.5586-5.5586V7h2v8.5859l4.9727,4.9727-1.4141,1.4141Z',
         ),
       ],
     ),

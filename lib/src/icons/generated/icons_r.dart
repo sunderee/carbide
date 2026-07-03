@@ -432,6 +432,23 @@ const CarbonIconData receipt = CarbonIconData(
   ],
 );
 
+/// The Carbon `receipt--verification` icon data.
+const CarbonIconData receiptVerification = CarbonIconData(
+  name: 'receipt--verification',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,2H7c-1.1,0-2,.9-2,2v25c0,.55.45,1,1,1h1c.31,0,.61-.15.8-.4l2.2-2.93,2.2,2.93c.17.23.44.38.73.4h.07v-2.67l-2.2-2.93c-.38-.5-1.22-.5-1.6,0l-2.2,2.93V4h18v14h2V4c0-1.1-.9-2-2-2ZM26.54,20.54l-6.54,6.55-2.79-2.8-1.42,1.42,3.5,3.5c.2.19.45.29.71.29s.51-.1.71-.29l7.25-7.25-1.42-1.42ZM21,16v2h2v-2h-2ZM9,16v2h8v-2h-8ZM21,12v2h2v-2h-2ZM9,12v2h8v-2h-8ZM9,8v2h14v-2h-14Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `recently-viewed` icon data.
 const CarbonIconData recentlyViewed = CarbonIconData(
   name: 'recently-viewed',
@@ -688,6 +705,23 @@ const CarbonIconData reflectVertical = CarbonIconData(
   ],
 );
 
+/// The Carbon `refrigerant` icon data.
+const CarbonIconData refrigerant = CarbonIconData(
+  name: 'refrigerant',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M23,30h-14c-1.103,0-2-.8975-2-2V10c0-1.103.897-2,2-2h2v-3h-2v-2h2c1.103,0,2,.897,2,2v3h2v-3h2v3h2v-3c0-1.103.8975-2,2-2h2v2h-2v3h2c1.1025,0,2,.897,2,2v18c0,1.1025-.8975,2-2,2ZM9,10v18h14V10h-14ZM19,22h-2v-2h-2v-2h-2v-2h2v2h2v2h2v2ZM15,22h-2v-2h2v2ZM19,18h-2v-2h2v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `reminder` icon data.
 const CarbonIconData reminder = CarbonIconData(
   name: 'reminder',
@@ -922,6 +956,23 @@ const CarbonIconData report = CarbonIconData(
   ],
 );
 
+/// The Carbon `report--chart` icon data.
+const CarbonIconData reportChart = CarbonIconData(
+  name: 'report--chart',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,30H7c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h3v-1c0-1.103.897-2,2-2h8c1.1025,0,2,.897,2,2v1h3c1.1025,0,2,.897,2,2v21c0,1.1025-.8975,2-2,2ZM7,7v21h18V7h-3v3h-12v-3h-3ZM12,8h8v-4h-8v4ZM16,26c-3.8599,0-7-3.1406-7-7s3.1401-7,7-7,7,3.1401,7,7-3.1406,7-7,7ZM15,14.1006c-2.2793.4644-4,2.4849-4,4.8994,0,2.7568,2.2432,5,5,5,2.415,0,4.4346-1.7207,4.8994-4h-3.8994c-1.103,0-2-.8975-2-2v-3.8994ZM17,14.1006v3.8994h3.8994c-.3984-1.9561-1.9434-3.501-3.8994-3.8994Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `report--data` icon data.
 const CarbonIconData reportData = CarbonIconData(
   name: 'report--data',
@@ -936,6 +987,23 @@ const CarbonIconData reportData = CarbonIconData(
         CarbonIconShape(d: 'M10,14 h2 v10 h-2 z'),
         CarbonIconShape(
           d: 'M25,5H22V4a2,2,0,0,0-2-2H12a2,2,0,0,0-2,2V5H7A2,2,0,0,0,5,7V28a2,2,0,0,0,2,2H25a2,2,0,0,0,2-2V7A2,2,0,0,0,25,5ZM12,4h8V8H12ZM25,28H7V7h3v3H22V7h3Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `report--growth` icon data.
+const CarbonIconData reportGrowth = CarbonIconData(
+  name: 'report--growth',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,30H7c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h3v-1c0-1.103.897-2,2-2h8c1.1025,0,2,.897,2,2v1h3c1.1025,0,2,.897,2,2v21c0,1.1025-.8975,2-2,2ZM7,7v21h18V7h-3v3h-12v-3h-3ZM12,8h8v-4h-8v4ZM12.707,23.707l-1.4141-1.4141,6.293-6.293h-4.5859v-2h8v8h-2v-4.5859l-6.293,6.293Z',
         ),
       ],
     ),

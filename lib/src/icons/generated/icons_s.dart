@@ -1032,6 +1032,23 @@ const CarbonIconData sendToBack = CarbonIconData(
   ],
 );
 
+/// The Carbon `sensor` icon data.
+const CarbonIconData sensor = CarbonIconData(
+  name: 'sensor',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M12.66,10.34l-1.42,1.42c1.14,1.13,1.76,2.64,1.76,4.24s-.62,3.11-1.76,4.24l1.42,1.42c1.51-1.51,2.34-3.52,2.34-5.66s-.83-4.15-2.34-5.66ZM16.9,6.1l-1.42,1.42c2.27,2.27,3.52,5.28,3.52,8.48s-1.25,6.21-3.52,8.48l1.42,1.42c2.64-2.65,4.1-6.16,4.1-9.9s-1.46-7.25-4.1-9.9ZM21.14,1.86l-1.42,1.42c3.41,3.39,5.28,7.91,5.28,12.72s-1.87,9.33-5.28,12.72l1.42,1.42c3.78-3.77,5.86-8.79,5.86-14.14s-2.08-10.37-5.86-14.14ZM9,16c0,1.1-.9,2-2,2v12h-2V2h2v12c1.1,0,2,.9,2,2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `sequential-palette` icon data.
 const CarbonIconData sequentialPalette = CarbonIconData(
   name: 'sequential-palette',

@@ -34,8 +34,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('structure', () {
-    test('the full pictogram registry is generated (1,564)', () {
-      expect(allCarbonPictograms, hasLength(1564));
+    test('the full pictogram registry is generated (1,572)', () {
+      expect(allCarbonPictograms, hasLength(1572));
     });
 
     test('names are unique; each has one 32-grid artwork', () {

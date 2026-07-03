@@ -124,6 +124,40 @@ const CarbonIconData dataAccessor = CarbonIconData(
   ],
 );
 
+/// The Carbon `data--add` icon data.
+const CarbonIconData dataAdd = CarbonIconData(
+  name: 'data--add',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M9,9c-.5523,0-1-.4477-1-1s.4477-1,1-1,1,.4477,1,1-.4477,1-1,1ZM10,16c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM10,24c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM24,25h4v-2h-4v-4h-2v4h-4v2h4v4h2v-4ZM15,27H6v-6h9v-2H6v-6h16v3h2V5c0-1.103-.8975-2-2-2H6c-1.103,0-2,.897-2,2v22c0,1.1025.897,2,2,2h9v-2ZM6,5h16v6H6v-6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `data--alert` icon data.
+const CarbonIconData dataAlert = CarbonIconData(
+  name: 'data--alert',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M11,9c-.5523,0-1-.4477-1-1s.4477-1,1-1,1,.4477,1,1-.4477,1-1,1ZM12,16c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM12,24c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM21,27h-13v-6h13v-2h-13v-6h16v3h2V5c0-1.103-.8975-2-2-2H8c-1.103,0-2,.897-2,2v22c0,1.1025.897,2,2,2h13v-2ZM8,5h16v6H8v-6ZM26,19h-2v7h2v-7ZM26.5,29.5c0-.8284-.6716-1.5-1.5-1.5s-1.5.6716-1.5,1.5.6716,1.5,1.5,1.5,1.5-.6716,1.5-1.5Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `data-analytics` icon data.
 const CarbonIconData dataAnalytics = CarbonIconData(
   name: 'data-analytics',
@@ -1437,6 +1471,23 @@ const CarbonIconData decline = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M30,14v10h-10v-2h6.58l-8.58-8.59-4.29,4.3c-.39.39-1.03.39-1.42,0L2.29,7.71l1.42-1.42,9.29,9.3,4.29-4.3c.39-.39,1.03-.39,1.42,0l9.29,9.29v-6.58h2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `delay` icon data.
+const CarbonIconData delay = CarbonIconData(
+  name: 'delay',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M17.62,27.89l.26,1.99c-.62.08-1.26.12-1.88.12-7.72,0-14-6.28-14-14S8.28,2,16,2c.63,0,1.26.04,1.88.12l-.27,1.99c-.53-.07-1.07-.11-1.61-.11-6.62,0-12,5.38-12,12s5.38,12,12,12c.54,0,1.08-.04,1.62-.11ZM24.5508,27.0859l-1.2227-1.584c-.8301.6416-1.7383,1.1709-2.6992,1.5723l.7734,1.8457c1.1201-.4697,2.1797-1.0869,3.1484-1.834ZM28.9404,21.3486l-1.8477-.7637c-.3984.9639-.9238,1.874-1.5596,2.7041l1.5879,1.2168c.7422-.9697,1.3545-2.0312,1.8193-3.1572ZM30,16c0-.605-.0391-1.2153-.1162-1.814l-1.9844.2568c.0674.5137.1006,1.0376.1006,1.5571,0,.5254-.0342,1.0527-.1006,1.5684l1.9824.2578c.0781-.6006.1182-1.2148.1182-1.8262ZM28.9463,10.6621c-.4639-1.1245-1.0762-2.187-1.8174-3.1577l-1.5898,1.2148c.6367.832,1.1611,1.7427,1.5596,2.7065l1.8477-.7637ZM24.5596,4.9209c-.9648-.7466-2.0234-1.3638-3.1455-1.8354l-.7754,1.8438c.9629.4043,1.8701.9336,2.6982,1.5737l1.2227-1.582ZM22.002,20.5879l-5.002-5.002V7h-2v9.4141l5.5879,5.5879,1.4141-1.4141Z',
         ),
       ],
     ),
@@ -3729,6 +3780,40 @@ const CarbonIconData doubleAxisChartColumn = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M28,2v26h-3V6h-7v22h-4v-14h-7v14h-3V2h-2v26c0,1.1046.8954,2,2,2h24c1.1046,0,2-.8954,2-2V2h-2ZM12,28h-3v-12h3v12ZM23,28h-3V8h3v20Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `double-chevron--left` icon data.
+const CarbonIconData doubleChevronLeft = CarbonIconData(
+  name: 'double-chevron--left',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M24.4854,25.8994l-9.8994-9.8994,9.8994-9.8994,1.4141,1.4141-8.4854,8.4854,8.4854,8.4854-1.4141,1.4141ZM15.9854,25.8994l-9.8994-9.8994L15.9854,6.1006l1.4141,1.4141-8.4854,8.4854,8.4854,8.4854-1.4141,1.4141Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `double-chevron--right` icon data.
+const CarbonIconData doubleChevronRight = CarbonIconData(
+  name: 'double-chevron--right',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16.0146,25.8994l-1.4141-1.4141,8.4854-8.4854L14.6006,7.5146l1.4141-1.4141,9.8994,9.8994-9.8994,9.8994ZM7.5146,25.8994l-1.4141-1.4141,8.4854-8.4854L6.1006,7.5146l1.4141-1.4141,9.8994,9.8994-9.8994,9.8994Z',
         ),
       ],
     ),
