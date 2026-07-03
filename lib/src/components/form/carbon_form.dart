@@ -222,7 +222,11 @@ class CarbonFormGroup extends StatelessWidget {
 /// * read-only → transparent bg, `border-subtle` bottom border;
 /// * invalid → 2px `support-error` outline (focus wins when focused) +
 ///   `ErrorFilled`;
-/// * warning → `WarningAltFilled` (the bottom border stays `border-strong`).
+/// * warning → `WarningAltFilled` (the bottom border stays `border-strong`);
+/// * with [aiLabel] → the bottom-anchored AI aura gradient and the
+///   `ai-border-strong` bottom border, with the label rendered nearest the
+///   end edge (the status icon shifts inward). [aiRevert] suppresses the
+///   aura while a revert control shows (`:not(:has(--revert))`).
 class CarbonField extends StatelessWidget {
   /// Creates a field surface.
   const CarbonField({
@@ -234,6 +238,8 @@ class CarbonField extends StatelessWidget {
     this.readOnly = false,
     this.focused = false,
     this.trailing,
+    this.aiLabel,
+    this.aiRevert = false,
   });
 
   /// The editable content (e.g. an `EditableText`) or display child.
@@ -258,11 +264,35 @@ class CarbonField extends StatelessWidget {
   /// number steppers), laid out after the status icon.
   final Widget? trailing;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// nearest the end edge with the AI aura gradient behind the field
+  /// (upstream's `decorator` prop).
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control
+  /// (`--ai-label--revert` drops the gradient upstream).
+  final bool aiRevert;
+
   /// Horizontal field padding (`layout.density('padding-inline')`).
   static const double paddingInline = 16;
 
   /// The status-icon size.
   static const double statusIconSize = 16;
+
+  /// The AI aura for a field: `ai-gradient('bottom', 50%)` — aura-start-sm
+  /// at the bottom edge blending to aura-end at 50%, transparent above. The
+  /// CSS 15% interpolation hint is approximated with a computed stop.
+  static Gradient aiFieldGradient(CarbonThemeData theme) => LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: <Color>[
+      theme.aiAuraStartSm,
+      Color.lerp(theme.aiAuraStartSm, theme.aiAuraEnd, 0.5)!,
+      theme.aiAuraEnd,
+      theme.aiAuraEnd.withValues(alpha: 0),
+    ],
+    stops: const <double>[0, 0.15, 0.5, 1],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -271,11 +301,17 @@ class CarbonField extends StatelessWidget {
     final bool invalid = status == CarbonFieldStatus.invalid;
     final bool warning = status == CarbonFieldStatus.warning;
 
+    // The AI treatment: the aura gradient over the field background and
+    // the ai-border-strong bottom border, unless a revert control shows.
+    final bool ai = aiLabel != null && !aiRevert && !readOnly;
+
     final Color background = readOnly ? const Color(0x00000000) : layer.field;
     final Color borderColor = disabled
         ? const Color(0x00000000)
         : readOnly
         ? layer.borderSubtle
+        : ai
+        ? theme.aiBorderStrong
         : theme.borderStrong01;
 
     final Widget? statusIcon = invalid
@@ -295,6 +331,7 @@ class CarbonField extends StatelessWidget {
     Widget field = DecoratedBox(
       decoration: BoxDecoration(
         color: background,
+        gradient: ai ? aiFieldGradient(theme) : null,
         border: Border(bottom: BorderSide(color: borderColor)),
       ),
       child: SizedBox(
@@ -306,14 +343,21 @@ class CarbonField extends StatelessWidget {
               Expanded(child: child),
               if (statusIcon != null)
                 Padding(
-                  padding: const EdgeInsetsDirectional.only(
+                  padding: EdgeInsetsDirectional.only(
                     start: CarbonSpacing.spacing03,
-                    end: paddingInline,
+                    // With an AI label the icon sits flush against it; the
+                    // label carries the 16px end inset.
+                    end: aiLabel == null ? paddingInline : 0,
                   ),
                   child: statusIcon,
                 ),
               ?trailing,
-              if (statusIcon == null && trailing == null)
+              // The AI label renders nearest the end edge, 16px in
+              // (`inset-inline-end: $spacing-05`).
+              if (aiLabel != null) ...<Widget>[
+                aiLabel!,
+                const SizedBox(width: paddingInline),
+              ] else if (statusIcon == null && trailing == null)
                 const SizedBox(width: paddingInline),
             ],
           ),
