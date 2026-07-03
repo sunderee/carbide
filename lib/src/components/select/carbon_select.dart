@@ -155,6 +155,10 @@ class CarbonSelect<T> extends StatefulWidget {
 }
 
 class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   FocusNode? _internalFocus;
@@ -340,7 +344,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     // a button would consume Enter/Space as activation before _onKey could
     // use them to select the highlighted item while the menu is open.
     final bool focused = _focus.hasFocus;
-    final Widget fieldChrome = widget.fluid
+    final Widget fieldChrome = _fluid
         ? _FluidSelectField(
             label: widget.labelText,
             status: _status,
@@ -407,7 +411,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? label = widget.hideLabel || widget.fluid
+    final Widget? label = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),

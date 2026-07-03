@@ -140,6 +140,10 @@ class CarbonComboBox<T> extends StatefulWidget {
 }
 
 class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final TextEditingController _controller;
@@ -309,7 +313,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel || widget.fluid
+    final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -376,7 +380,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
               child: AnimatedContainer(
                 duration: CarbonDuration.fast01,
                 curve: CarbonEasing.standardProductive,
-                height: widget.fluid ? 64 : widget.size.height,
+                height: _fluid ? 64 : widget.size.height,
                 decoration: BoxDecoration(
                   color: background,
                   gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
@@ -391,7 +395,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     Expanded(
                       // Fluid stacks the label-01 title above the input
                       // (the house centered-column fluid treatment).
-                      child: widget.fluid
+                      child: _fluid
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +469,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
           child: ExcludeFocus(
             child: CarbonListBoxMenu(
               size: widget.size,
-              fluidRows: widget.fluid && !widget.condensed,
+              fluidRows: _fluid && !widget.condensed,
               children: rows,
             ),
           ),
@@ -478,7 +482,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     final bool selected = item.value == widget.selectedItem;
     return CarbonListBoxMenuItem(
       size: widget.size,
-      fluid: widget.fluid && !widget.condensed,
+      fluid: _fluid && !widget.condensed,
       isFirst: index == 0,
       isActive: selected,
       isHighlighted: index == _highlighted,

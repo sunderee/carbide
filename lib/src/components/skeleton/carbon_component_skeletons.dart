@@ -13,21 +13,56 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../theme/carbon_layer.dart';
 import '../../foundations/layout.dart';
 import 'carbon_skeleton.dart';
 
 // A label placeholder bar (label-01 line) used above form fields.
 Widget _label() => const CarbonSkeleton(width: 75, height: 14);
 
-// A field-shaped skeleton: a label bar above a full-width field bar.
+// A field-shaped skeleton: a label bar above a full-width field bar. The
+// fluid variant is a single 64px field with the label bar inside (each
+// upstream Fluid* component ships a matching `.Skeleton`).
 class _FieldSkeleton extends StatelessWidget {
-  const _FieldSkeleton({this.fieldHeight = 40, this.hideLabel = false});
+  const _FieldSkeleton({
+    this.fieldHeight = 40,
+    this.hideLabel = false,
+    this.fluid = false,
+  });
 
   final double fieldHeight;
   final bool hideLabel;
+  final bool fluid;
 
   @override
   Widget build(BuildContext context) {
+    if (fluid) {
+      return SizedBox(
+        height: 64,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: CarbonLayer.of(context).field,
+            border: Border(
+              bottom: BorderSide(color: CarbonLayer.of(context).borderSubtle),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(
+              start: CarbonSpacing.spacing05,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _label(),
+                const SizedBox(height: CarbonSpacing.spacing03),
+                const CarbonSkeleton(width: 160, height: 14),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -45,13 +80,21 @@ class _FieldSkeleton extends StatelessWidget {
 /// A loading placeholder for a text input.
 class CarbonTextInputSkeleton extends StatelessWidget {
   /// Creates a text-input skeleton.
-  const CarbonTextInputSkeleton({super.key, this.hideLabel = false});
+  const CarbonTextInputSkeleton({
+    super.key,
+    this.hideLabel = false,
+    this.fluid = false,
+  });
 
   /// Whether to omit the label bar.
   final bool hideLabel;
 
+  /// The fluid variant: a single 64px field with the label bar inside.
+  final bool fluid;
+
   @override
-  Widget build(BuildContext context) => _FieldSkeleton(hideLabel: hideLabel);
+  Widget build(BuildContext context) =>
+      _FieldSkeleton(hideLabel: hideLabel, fluid: fluid);
 }
 
 /// A loading placeholder for a text area.
@@ -82,25 +125,41 @@ class CarbonNumberInputSkeleton extends StatelessWidget {
 /// A loading placeholder for a select.
 class CarbonSelectSkeleton extends StatelessWidget {
   /// Creates a select skeleton.
-  const CarbonSelectSkeleton({super.key, this.hideLabel = false});
+  const CarbonSelectSkeleton({
+    super.key,
+    this.hideLabel = false,
+    this.fluid = false,
+  });
 
   /// Whether to omit the label bar.
   final bool hideLabel;
 
+  /// The fluid variant: a single 64px field with the label bar inside.
+  final bool fluid;
+
   @override
-  Widget build(BuildContext context) => _FieldSkeleton(hideLabel: hideLabel);
+  Widget build(BuildContext context) =>
+      _FieldSkeleton(hideLabel: hideLabel, fluid: fluid);
 }
 
 /// A loading placeholder for a dropdown.
 class CarbonDropdownSkeleton extends StatelessWidget {
   /// Creates a dropdown skeleton.
-  const CarbonDropdownSkeleton({super.key, this.hideLabel = false});
+  const CarbonDropdownSkeleton({
+    super.key,
+    this.hideLabel = false,
+    this.fluid = false,
+  });
 
   /// Whether to omit the label bar.
   final bool hideLabel;
 
+  /// The fluid variant: a single 64px field with the label bar inside.
+  final bool fluid;
+
   @override
-  Widget build(BuildContext context) => _FieldSkeleton(hideLabel: hideLabel);
+  Widget build(BuildContext context) =>
+      _FieldSkeleton(hideLabel: hideLabel, fluid: fluid);
 }
 
 /// A loading placeholder for a date picker.

@@ -143,6 +143,10 @@ class CarbonTextArea extends StatefulWidget {
 }
 
 class _CarbonTextAreaState extends State<CarbonTextArea> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   TextEditingController? _internalController;
   FocusNode? _internalFocus;
 
@@ -259,7 +263,7 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
             horizontal: CarbonField.paddingInline,
             vertical: 11,
           ),
-          child: widget.fluid
+          child: _fluid
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -320,7 +324,7 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (!widget.fluid && (!widget.hideLabel || widget.enableCounter))
+        if (!_fluid && (!widget.hideLabel || widget.enableCounter))
           _LabelRow(
             label: widget.hideLabel ? null : widget.labelText,
             disabled: widget.disabled,
