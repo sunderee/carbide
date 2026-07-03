@@ -228,4 +228,153 @@ void main() {
       );
     });
   });
+
+  group('list-box passthroughs (_list-box.scss decorator)', () {
+    BoxDecoration listBoxDecoration(WidgetTester tester) =>
+        tester
+                .widget<AnimatedContainer>(
+                  find
+                      .descendant(
+                        of: find.byType(CarbonListBox),
+                        matching: find.byType(AnimatedContainer),
+                      )
+                      .first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    testWidgets('dropdown renders the aura, border, and pre-chevron label', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonDropdown<int>(
+            titleText: 'Model',
+            selectedItem: 1,
+            onChanged: (_) {},
+            aiLabel: _aiLabel(),
+            items: const <CarbonDropdownItem<int>>[
+              CarbonDropdownItem<int>(value: 1, label: 'One'),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(CarbonAILabel), findsOneWidget);
+      final BoxDecoration decoration = listBoxDecoration(tester);
+      expect(decoration.gradient, isNotNull);
+      expect((decoration.border! as Border).bottom.color, theme.aiBorderStrong);
+      // The label sits before the menu chevron.
+      final Rect label = tester.getRect(find.byType(CarbonAILabel));
+      final Rect chevron = tester.getRect(find.byType(CarbonListBoxMenuIcon));
+      expect(label.right <= chevron.left, isTrue);
+    });
+
+    testWidgets('multi-select and select render the aura too', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMultiSelect<int>(
+            titleText: 'Filters',
+            label: 'Choose',
+            selectedValues: const <int>{},
+            onChanged: (_) {},
+            aiLabel: _aiLabel(),
+            items: const <CarbonMultiSelectItem<int>>[
+              CarbonMultiSelectItem<int>(value: 1, label: 'One'),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(CarbonAILabel), findsOneWidget);
+      expect(listBoxDecoration(tester).gradient, isNotNull);
+
+      await tester.pumpWidget(
+        _host(
+          CarbonSelect<int>(
+            labelText: 'Region',
+            value: 1,
+            onChanged: (_) {},
+            aiLabel: _aiLabel(),
+            items: const <CarbonSelectEntry<int>>[
+              CarbonSelectItem<int>(value: 1, label: 'One'),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(CarbonAILabel), findsOneWidget);
+      expect(_fieldDecoration(tester).gradient, isNotNull);
+    });
+
+    testWidgets('combo box renders the aura and the pre-chevron label', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonComboBox<int>(
+            titleText: 'Country',
+            onChanged: (_) {},
+            aiLabel: _aiLabel(),
+            items: const <CarbonComboBoxItem<int>>[
+              CarbonComboBoxItem<int>(value: 1, label: 'One'),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(CarbonAILabel), findsOneWidget);
+      final BoxDecoration decoration =
+          tester
+                  .widget<AnimatedContainer>(
+                    find
+                        .descendant(
+                          of: find.byType(CarbonComboBox<int>),
+                          matching: find.byType(AnimatedContainer),
+                        )
+                        .first,
+                  )
+                  .decoration!
+              as BoxDecoration;
+      expect(decoration.gradient, isNotNull);
+      expect((decoration.border! as Border).bottom.color, theme.aiBorderStrong);
+    });
+
+    testWidgets('AI pickers across themes', (WidgetTester tester) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'ai_pickers',
+        containsText: true,
+        size: const Size(360, 260),
+        builder: (BuildContext context) => Center(
+          child: SizedBox(
+            width: 320,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                CarbonDropdown<int>(
+                  titleText: 'Model',
+                  selectedItem: 1,
+                  onChanged: (_) {},
+                  aiLabel: _aiLabel(),
+                  items: const <CarbonDropdownItem<int>>[
+                    CarbonDropdownItem<int>(value: 1, label: 'Suggested'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                CarbonSelect<int>(
+                  labelText: 'Region',
+                  value: 1,
+                  onChanged: (_) {},
+                  aiLabel: _aiLabel(),
+                  items: const <CarbonSelectEntry<int>>[
+                    CarbonSelectItem<int>(value: 1, label: 'Europe'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  });
 }

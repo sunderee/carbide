@@ -26,7 +26,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
-import '../form/carbon_form.dart' show CarbonFieldSize;
+import '../form/carbon_form.dart' show CarbonField, CarbonFieldSize;
 
 /// The drop shadow under a list-box menu (`box-shadow()`: `0 2px 6px $shadow`;
 /// `$shadow` is `rgba(0, 0, 0, 0.3)`).
@@ -54,6 +54,8 @@ class CarbonListBox extends StatefulWidget {
     this.focused = false,
     this.selection,
     this.onTap,
+    this.aiLabel,
+    this.aiRevert = false,
     super.key,
   }) : assert(!(invalid && warn), 'A field cannot be both invalid and warn.');
 
@@ -65,6 +67,14 @@ class CarbonListBox extends StatefulWidget {
 
   /// Whether the menu is open (rotates the chevron and softens the border).
   final bool expanded;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered before
+  /// the menu chevron per upstream's `decorator` prop (`_list-box.scss`
+  /// inset-inline-end calc($spacing-08 + 9px)); adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// Whether the control is disabled.
   final bool disabled;
@@ -106,12 +116,17 @@ class _CarbonListBoxState extends State<CarbonListBox> {
         ? theme.textDisabled
         : theme.textPrimary;
 
+    // The AI treatment: aura gradient + ai-border-strong bottom border.
+    final bool ai = widget.aiLabel != null && !widget.aiRevert;
+
     // bottom border: 1px $border-strong, $border-subtle when expanded,
     // transparent when disabled (_list-box.scss).
     final Color borderColor = widget.disabled
         ? const Color(0x00000000)
         : widget.expanded
         ? layer.borderSubtle
+        : ai
+        ? theme.aiBorderStrong
         : theme.borderStrong01;
 
     // invalid draws a 2px support-error ring on all sides (shared field
@@ -126,6 +141,9 @@ class _CarbonListBoxState extends State<CarbonListBox> {
       else if (widget.warn)
         CarbonIcon(CarbonIcons.warningAltFilled, color: theme.supportWarning),
       if (widget.selection != null) widget.selection!,
+      // The AI label sits before the menu chevron (`_list-box.scss`
+      // inset-inline-end calc($spacing-08 + 9px)).
+      ?widget.aiLabel,
       CarbonListBoxMenuIcon(open: widget.expanded, disabled: widget.disabled),
     ];
 
@@ -145,7 +163,11 @@ class _CarbonListBoxState extends State<CarbonListBox> {
             duration: CarbonDuration.fast01,
             curve: CarbonEasing.standardProductive,
             height: widget.size.height,
-            decoration: BoxDecoration(color: background, border: border),
+            decoration: BoxDecoration(
+              color: background,
+              gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
+              border: border,
+            ),
             padding: const EdgeInsetsDirectional.only(
               start: CarbonSpacing.spacing05,
               end: CarbonSpacing.spacing04,

@@ -68,6 +68,8 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.warn = false,
     this.warnText,
     this.hideLabel = false,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
@@ -112,6 +114,13 @@ class CarbonComboBox<T> extends StatefulWidget {
 
   /// Visually hides the title (kept for assistive technology).
   final bool hideLabel;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional external focus node for the input.
   final FocusNode? focusNode;
@@ -312,10 +321,14 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     final Color background = enabled && _hovered
         ? layer.fieldHover
         : layer.field;
+    // The AI treatment: aura gradient + ai-border-strong bottom border.
+    final bool ai = widget.aiLabel != null && !widget.aiRevert;
     final Color borderColor = widget.disabled
         ? const Color(0x00000000)
         : _overlay.isShowing
         ? layer.borderSubtle
+        : ai
+        ? theme.aiBorderStrong
         : theme.borderStrong01;
     final Border border = widget.invalid && enabled
         ? Border.all(color: theme.supportError, width: 2)
@@ -354,7 +367,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                 duration: CarbonDuration.fast01,
                 curve: CarbonEasing.standardProductive,
                 height: widget.size.height,
-                decoration: BoxDecoration(color: background, border: border),
+                decoration: BoxDecoration(
+                  color: background,
+                  gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
+                  border: border,
+                ),
                 padding: const EdgeInsetsDirectional.only(
                   start: CarbonSpacing.spacing05,
                   end: CarbonSpacing.spacing04,
@@ -365,6 +382,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     if (_controller.text.isNotEmpty && enabled) ...<Widget>[
                       const SizedBox(width: CarbonSpacing.spacing03),
                       CarbonListBoxSelection(onClear: _clear),
+                    ],
+                    // The AI label sits before the menu chevron
+                    // (`_list-box.scss` decorator placement).
+                    if (widget.aiLabel != null) ...<Widget>[
+                      const SizedBox(width: CarbonSpacing.spacing03),
+                      widget.aiLabel!,
                     ],
                     const SizedBox(width: CarbonSpacing.spacing03),
                     GestureDetector(

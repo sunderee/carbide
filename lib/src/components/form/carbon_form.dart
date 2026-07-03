@@ -351,13 +351,20 @@ class CarbonField extends StatelessWidget {
                   ),
                   child: statusIcon,
                 ),
-              ?trailing,
-              // The AI label renders nearest the end edge, 16px in
-              // (`inset-inline-end: $spacing-05`).
+              // The AI label renders 16px from the end edge
+              // (`inset-inline-end: $spacing-05`), or just before a
+              // trailing control (the select chevron / password toggle:
+              // `inset-inline-end: $spacing-08 + 8px` in _select.scss).
               if (aiLabel != null) ...<Widget>[
                 aiLabel!,
-                const SizedBox(width: paddingInline),
-              ] else if (statusIcon == null && trailing == null)
+                SizedBox(
+                  width: trailing == null
+                      ? paddingInline
+                      : CarbonSpacing.spacing03,
+                ),
+              ],
+              ?trailing,
+              if (aiLabel == null && statusIcon == null && trailing == null)
                 const SizedBox(width: paddingInline),
             ],
           ),

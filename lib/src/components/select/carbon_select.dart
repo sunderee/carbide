@@ -86,6 +86,8 @@ class CarbonSelect<T> extends StatefulWidget {
     this.hideLabel = false,
     this.inline = false,
     this.fluid = false,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(!(inline && fluid), 'inline and fluid are mutually exclusive');
@@ -134,6 +136,13 @@ class CarbonSelect<T> extends StatefulWidget {
 
   /// Uses the fluid treatment (label inside the field).
   final bool fluid;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional focus node.
   final FocusNode? focusNode;
@@ -344,6 +353,8 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
             size: widget.size,
             status: _status,
             disabled: widget.disabled,
+            aiLabel: widget.aiLabel,
+            aiRevert: widget.aiRevert,
             focused: focused,
             trailing: chevron,
             child: ExcludeSemantics(child: valueText),
