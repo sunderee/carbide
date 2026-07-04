@@ -485,7 +485,7 @@ class _NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Notification',
-      description: 'Inline, toast and actionable notifications.',
+      description: 'Inline, toast, actionable and callout notifications.',
       previewAlignment: Alignment.topLeft,
       preview: Column(
         mainAxisSize: MainAxisSize.min,
@@ -501,6 +501,21 @@ class _NotificationPage extends StatelessWidget {
                 onClose: () {},
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing05),
+            child: CarbonCallout(
+              title: 'Callout',
+              subtitle: 'A static, non-dismissible callout.',
+              actionLabel: 'Review',
+              onAction: () {},
+            ),
+          ),
+          const CarbonCallout(
+            kind: CarbonNotificationKind.warning,
+            title: 'Callout',
+            subtitle: 'A low-contrast warning callout.',
+            lowContrast: true,
+          ),
         ],
       ),
       code:

@@ -224,6 +224,45 @@ void main() {
     expect(CarbonThemeData.white.tagBorderCoolGray, CarbonColors.coolGray40);
     expect(CarbonThemeData.white.tagBorderWarmGray, CarbonColors.warmGray40);
     expect(
+      CarbonThemeData.white.notificationBackgroundError,
+      CarbonColors.red10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundSuccess,
+      CarbonColors.green10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundInfo,
+      CarbonColors.blue10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundWarning,
+      CarbonColors.yellow10,
+    );
+    expect(CarbonThemeData.white.notificationActionHover, CarbonColors.white0);
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverse,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseActive,
+      CarbonColors.gray30,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseHover,
+      CarbonColors.gray10,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseText,
+      CarbonColors.gray100,
+    );
+    expect(
+      CarbonThemeData
+          .white
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      _alpha(CarbonColors.white, 0.25),
+    );
+    expect(
       CarbonThemeData.white.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.1),
     );
@@ -491,6 +530,45 @@ void main() {
     expect(CarbonThemeData.gray10.tagBorderGray, CarbonColors.gray40);
     expect(CarbonThemeData.gray10.tagBorderCoolGray, CarbonColors.coolGray40);
     expect(CarbonThemeData.gray10.tagBorderWarmGray, CarbonColors.warmGray40);
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundError,
+      CarbonColors.red10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundSuccess,
+      CarbonColors.green10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundInfo,
+      CarbonColors.blue10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundWarning,
+      CarbonColors.yellow10,
+    );
+    expect(CarbonThemeData.gray10.notificationActionHover, CarbonColors.white0);
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverse,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseActive,
+      CarbonColors.gray30,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseHover,
+      CarbonColors.gray10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseText,
+      CarbonColors.gray100,
+    );
+    expect(
+      CarbonThemeData
+          .gray10
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      _alpha(CarbonColors.white, 0.25),
+    );
     expect(
       CarbonThemeData.gray10.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.1),
@@ -777,6 +855,48 @@ void main() {
     expect(CarbonThemeData.gray90.tagBorderGray, CarbonColors.gray50);
     expect(CarbonThemeData.gray90.tagBorderCoolGray, CarbonColors.coolGray50);
     expect(CarbonThemeData.gray90.tagBorderWarmGray, CarbonColors.warmGray50);
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundError,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundSuccess,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundInfo,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundWarning,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionHover,
+      CarbonColors.gray80Hover,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverse,
+      CarbonColors.blue60,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseActive,
+      CarbonColors.blue80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseHover,
+      const Color(0xFF0050E6),
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseText,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData
+          .gray90
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      CarbonColors.gray50,
+    );
     expect(
       CarbonThemeData.gray90.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.16),
@@ -1087,6 +1207,48 @@ void main() {
     expect(CarbonThemeData.gray100.tagBorderGray, CarbonColors.gray50);
     expect(CarbonThemeData.gray100.tagBorderCoolGray, CarbonColors.coolGray50);
     expect(CarbonThemeData.gray100.tagBorderWarmGray, CarbonColors.warmGray50);
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundError,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundSuccess,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundInfo,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundWarning,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionHover,
+      CarbonColors.gray90Hover,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverse,
+      CarbonColors.blue60,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseActive,
+      CarbonColors.blue80,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseHover,
+      const Color(0xFF0050E6),
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseText,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData
+          .gray100
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      CarbonColors.gray50,
+    );
     expect(
       CarbonThemeData.gray100.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.16),
