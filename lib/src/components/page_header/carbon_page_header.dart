@@ -10,8 +10,19 @@
 // A page-level header band: an optional breadcrumb row, a title (with optional
 // icon and a trailing page-action area), a subtitle and body, optional tags,
 // and an optional tabs row. Background `layer-01`, 1px `border-subtle-01`
-// bottom rule. Reuses Breadcrumb (#102) and a Tabs (#99) slot. The
-// sticky-on-scroll behaviour is a follow-up.
+// bottom rule. Reuses Breadcrumb (#102) and a Tabs (#99) slot.
+//
+// API posture (#222): this simpler constructor API is intentional. Upstream's
+// composable preview PageHeader (BreadcrumbBar/Content/HeroImage/TabBar) was
+// deprecated in @carbon/react at v11.111.0 and moved to @carbon/ibm-products
+// (carbon-design-system/carbon#21926), which is outside Carbide's porting
+// scope. The SCSS above remains in core and stays our citation. Re-evaluate
+// only if a PageHeader re-stabilizes inside Carbon core (checked at each
+// knowledge-base bump, per ADR 0002's cadence). The upstream-web behaviors
+// not ported — responsive page-action collapse, "+N" tag overflow, the
+// truncated-title tooltip, the hero-image slot (callers compose
+// CarbonAspectRatio) — are catalogued in the #222 gap table. No
+// sticky/condensed collapse-on-scroll exists upstream in core either.
 
 import 'package:flutter/widgets.dart';
 
