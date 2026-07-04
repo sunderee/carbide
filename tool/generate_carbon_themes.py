@@ -23,6 +23,9 @@ Ported token groups:
   `// Chat tokens`): gradient stops (aura/border), popover, skeleton, and caret
   colors. These are flat `Color`s — the gradients and shadows are composed by
   the consuming component (AI Label) from the stop colors.
+- the chat-button token subset (`chatButton*` from the `// Chat button
+  tokens` region) — the only chat tokens a shipped component (Chat Button)
+  consumes; the rest of the chat family stays out of scope.
 
 Syntax-highlighting and chat tokens, the remaining component-token groups
 (status, content-switcher — ported with their components), and the
@@ -221,6 +224,18 @@ def core_region(theme_file: Path) -> dict[str, str]:
 
 
 AI_MARKERS = ("//// AI - Experimental", "// Chat tokens")
+CHAT_BUTTON_MARKER = "// Chat button tokens"
+
+
+def chat_button_region(theme_file: Path) -> dict[str, str]:
+    """Parse the `chatButton*` tokens (the shipped Chat Button subset)."""
+    text = theme_file.read_text()
+    region = text[text.index(CHAT_BUTTON_MARKER) :]
+    return {
+        m.group(1): m.group(2).strip()
+        for m in EXPORT.finditer(region)
+        if m.group(1).startswith("chatButton")
+    }
 
 
 def ai_region(theme_file: Path) -> dict[str, str]:
@@ -259,7 +274,15 @@ def resolve(expr, tokens, colors, values) -> str:
         base = resolve_color(m.group(1), tokens, colors, values)
         return f"_alpha({base}, {num(m.group(2))})"
     if re.fullmatch(r"\w+", expr):
-        return resolve_color(expr, tokens, colors, values)
+        # A bare reference: a palette color, or another token — which may
+        # itself be an alpha/lightness composition (e.g. chatButtonHover →
+        # backgroundHover → rgba(gray50, 0.12)), so recurse through the
+        # full resolver rather than the plain-color-only helper.
+        if expr in colors:
+            return f"CarbonColors.{expr}"
+        if expr in tokens:
+            return resolve(tokens[expr], tokens, colors, values)
+        raise ValueError(f"unknown identifier: {expr}")
     raise ValueError(f"unhandled expr: {expr}")
 
 
@@ -285,12 +308,14 @@ def build():
     values = color_values()
     raw: dict[str, dict[str, str]] = {}
     ai_raw: dict[str, dict[str, str]] = {}
+    chat_raw: dict[str, dict[str, str]] = {}
     brightness: dict[str, str] = {}
     for field, slug in THEMES.items():
         region = core_region(THEME_DIR / f"{slug}.ts")
         brightness[field] = "light" if region.pop("colorScheme").strip("'") == "light" else "dark"
         raw[field] = region
         ai_raw[field] = ai_region(THEME_DIR / f"{slug}.ts")
+        chat_raw[field] = chat_button_region(THEME_DIR / f"{slug}.ts")
 
     order = list(raw["white"])
     for field, region in raw.items():
@@ -323,6 +348,18 @@ def build():
                 ai_raw[field][token], combined, colors, values
             )
     order += ai_order
+
+    # Chat-button tokens (all reference core tokens or palette colors).
+    chat_order = list(chat_raw["white"])
+    for field, region in chat_raw.items():
+        assert set(region) == set(chat_order), f"{field} chat set differs"
+    for field in resolved:
+        combined = {**raw[field], **chat_raw[field]}
+        for token in chat_order:
+            resolved[field][token] = resolve(
+                chat_raw[field][token], combined, colors, values
+            )
+    order += chat_order
     return order, brightness, resolved
 
 

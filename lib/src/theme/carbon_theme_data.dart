@@ -215,6 +215,12 @@ class CarbonThemeData {
     required this.aiPopoverCaretBottom,
     required this.aiPopoverCaretBottomBackgroundActions,
     required this.aiPopoverCaretBottomBackground,
+    required this.chatButton,
+    required this.chatButtonHover,
+    required this.chatButtonTextHover,
+    required this.chatButtonActive,
+    required this.chatButtonSelected,
+    required this.chatButtonTextSelected,
   });
 
   /// Whether this is a light or dark theme.
@@ -790,6 +796,24 @@ class CarbonThemeData {
   /// The `aiPopoverCaretBottomBackground` token.
   final Color aiPopoverCaretBottomBackground;
 
+  /// The `chatButton` token.
+  final Color chatButton;
+
+  /// The `chatButtonHover` token.
+  final Color chatButtonHover;
+
+  /// The `chatButtonTextHover` token.
+  final Color chatButtonTextHover;
+
+  /// The `chatButtonActive` token.
+  final Color chatButtonActive;
+
+  /// The `chatButtonSelected` token.
+  final Color chatButtonSelected;
+
+  /// The `chatButtonTextSelected` token.
+  final Color chatButtonTextSelected;
+
   /// The White theme.
   static final CarbonThemeData white = CarbonThemeData(
     brightness: Brightness.light,
@@ -986,6 +1010,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue40,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFFE9EFFA),
     aiPopoverCaretBottomBackground: const Color(0xFFEAF1FF),
+    chatButton: CarbonColors.blue60,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.12),
+    chatButtonTextHover: CarbonColors.blue70,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
+    chatButtonTextSelected: CarbonColors.gray70,
   );
 
   /// The Gray 10 theme.
@@ -1184,6 +1214,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue40,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFFE9EFFA),
     aiPopoverCaretBottomBackground: const Color(0xFFEAF1FF),
+    chatButton: CarbonColors.blue60,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.12),
+    chatButtonTextHover: CarbonColors.blue70,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
+    chatButtonTextSelected: CarbonColors.gray70,
   );
 
   /// The Gray 90 theme.
@@ -1379,6 +1415,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue50,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFF1E283A),
     aiPopoverCaretBottomBackground: const Color(0xFF202D45),
+    chatButton: CarbonColors.blue40,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.16),
+    chatButtonTextHover: CarbonColors.blue30,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
+    chatButtonTextSelected: CarbonColors.gray30,
   );
 
   /// The Gray 100 theme.
@@ -1574,6 +1616,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue50,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFF1E283A),
     aiPopoverCaretBottomBackground: const Color(0xFF202D45),
+    chatButton: CarbonColors.blue40,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.16),
+    chatButtonTextHover: CarbonColors.blue30,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
+    chatButtonTextSelected: CarbonColors.gray30,
   );
 
   /// A copy of this theme with the given tokens replaced.
@@ -1769,6 +1817,12 @@ class CarbonThemeData {
     Color? aiPopoverCaretBottom,
     Color? aiPopoverCaretBottomBackgroundActions,
     Color? aiPopoverCaretBottomBackground,
+    Color? chatButton,
+    Color? chatButtonHover,
+    Color? chatButtonTextHover,
+    Color? chatButtonActive,
+    Color? chatButtonSelected,
+    Color? chatButtonTextSelected,
   }) {
     return CarbonThemeData(
       brightness: brightness ?? this.brightness,
@@ -1997,6 +2051,13 @@ class CarbonThemeData {
           this.aiPopoverCaretBottomBackgroundActions,
       aiPopoverCaretBottomBackground:
           aiPopoverCaretBottomBackground ?? this.aiPopoverCaretBottomBackground,
+      chatButton: chatButton ?? this.chatButton,
+      chatButtonHover: chatButtonHover ?? this.chatButtonHover,
+      chatButtonTextHover: chatButtonTextHover ?? this.chatButtonTextHover,
+      chatButtonActive: chatButtonActive ?? this.chatButtonActive,
+      chatButtonSelected: chatButtonSelected ?? this.chatButtonSelected,
+      chatButtonTextSelected:
+          chatButtonTextSelected ?? this.chatButtonTextSelected,
     );
   }
 
@@ -2496,6 +2557,24 @@ class CarbonThemeData {
         b.aiPopoverCaretBottomBackground,
         t,
       )!,
+      chatButton: Color.lerp(a.chatButton, b.chatButton, t)!,
+      chatButtonHover: Color.lerp(a.chatButtonHover, b.chatButtonHover, t)!,
+      chatButtonTextHover: Color.lerp(
+        a.chatButtonTextHover,
+        b.chatButtonTextHover,
+        t,
+      )!,
+      chatButtonActive: Color.lerp(a.chatButtonActive, b.chatButtonActive, t)!,
+      chatButtonSelected: Color.lerp(
+        a.chatButtonSelected,
+        b.chatButtonSelected,
+        t,
+      )!,
+      chatButtonTextSelected: Color.lerp(
+        a.chatButtonTextSelected,
+        b.chatButtonTextSelected,
+        t,
+      )!,
     );
   }
 
@@ -2701,7 +2780,14 @@ class CarbonThemeData {
         other.aiPopoverCaretBottom == aiPopoverCaretBottom &&
         other.aiPopoverCaretBottomBackgroundActions ==
             aiPopoverCaretBottomBackgroundActions &&
-        other.aiPopoverCaretBottomBackground == aiPopoverCaretBottomBackground;
+        other.aiPopoverCaretBottomBackground ==
+            aiPopoverCaretBottomBackground &&
+        other.chatButton == chatButton &&
+        other.chatButtonHover == chatButtonHover &&
+        other.chatButtonTextHover == chatButtonTextHover &&
+        other.chatButtonActive == chatButtonActive &&
+        other.chatButtonSelected == chatButtonSelected &&
+        other.chatButtonTextSelected == chatButtonTextSelected;
   }
 
   @override
@@ -2897,6 +2983,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom,
     aiPopoverCaretBottomBackgroundActions,
     aiPopoverCaretBottomBackground,
+    chatButton,
+    chatButtonHover,
+    chatButtonTextHover,
+    chatButtonActive,
+    chatButtonSelected,
+    chatButtonTextSelected,
   ]);
 }
 
