@@ -97,6 +97,11 @@ final GalleryCategory tierCCategory = GalleryCategory(
       builder: () => const _ModalPage(),
     ),
     GalleryEntry(
+      slug: 'dialog',
+      title: 'Dialog',
+      builder: () => const _DialogPage(),
+    ),
+    GalleryEntry(
       slug: 'notification',
       title: 'Notification',
       builder: () => const _NotificationPage(),
@@ -555,6 +560,81 @@ class _ModalPageState extends State<_ModalPage> {
           "CarbonModal(open: true, title: '…', "
           '${_fullWidth ? 'isFullWidth: true, ' : ''}'
           "child: …);",
+    );
+  }
+}
+
+class _DialogPage extends StatefulWidget {
+  const _DialogPage();
+  @override
+  State<_DialogPage> createState() => _DialogPageState();
+}
+
+class _DialogPageState extends State<_DialogPage> {
+  bool _open = false;
+  bool _modal = true;
+  @override
+  Widget build(BuildContext context) {
+    return DemoScaffold(
+      title: 'Dialog',
+      description: 'The composable dialog, modal or non-modal.',
+      preview: Stack(
+        children: <Widget>[
+          CarbonButton(
+            label: 'Open dialog',
+            onPressed: () => setState(() => _open = true),
+          ),
+          CarbonDialog(
+            open: _open,
+            modal: _modal,
+            onRequestClose: () => setState(() => _open = false),
+            children: <Widget>[
+              CarbonDialogHeader(
+                controls: CarbonDialogControls(
+                  children: <Widget>[
+                    CarbonDialogCloseButton(
+                      onPressed: () => setState(() => _open = false),
+                    ),
+                  ],
+                ),
+                children: const <Widget>[
+                  CarbonDialogSubtitle('Account'),
+                  CarbonDialogTitle('Update billing details'),
+                ],
+              ),
+              const CarbonDialogBody(
+                child: Text(
+                  'Changing the billing contact updates every invoice '
+                  'issued after the change.',
+                ),
+              ),
+              CarbonDialogFooter(
+                children: <Widget>[
+                  CarbonButton(
+                    label: 'Cancel',
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.xl,
+                    onPressed: () => setState(() => _open = false),
+                  ),
+                  CarbonButton(
+                    label: 'Save',
+                    size: CarbonButtonSize.xl,
+                    onPressed: () => setState(() => _open = false),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Modal',
+          value: _modal,
+          onChanged: (bool v) => setState(() => _modal = v),
+        ),
+      ],
+      code: 'CarbonDialog(open: true, children: <Widget>[…]);',
     );
   }
 }
