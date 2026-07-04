@@ -53,6 +53,7 @@ export 'src/components/link/carbon_link.dart';
 export 'src/components/data_table/carbon_data_table.dart';
 export 'src/components/data_table/carbon_table_toolbar.dart';
 export 'src/components/date_picker/carbon_date_picker.dart';
+export 'src/components/dialog/carbon_dialog.dart';
 export 'src/components/file_uploader/carbon_file_uploader.dart';
 export 'src/components/page_header/carbon_page_header.dart';
 export 'src/components/time_picker/carbon_time_picker.dart';
