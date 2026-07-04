@@ -250,10 +250,8 @@ class _StepWidgetState extends State<_Step> {
       enabled: widget.state != _StepState.disabled,
       child: ExcludeSemantics(
         child: Padding(
-          padding: EdgeInsets.only(
-            right: widget.vertical || widget.isLast
-                ? 0
-                : CarbonSpacing.spacing05,
+          padding: EdgeInsetsDirectional.only(
+            end: widget.vertical || widget.isLast ? 0 : CarbonSpacing.spacing05,
             bottom: widget.vertical && !widget.isLast
                 ? CarbonSpacing.spacing03
                 : 0,

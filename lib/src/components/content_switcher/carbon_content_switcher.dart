@@ -294,7 +294,9 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
                     color: background,
                     border: widget.isFirst
                         ? null
-                        : Border(left: BorderSide(color: theme.borderInverse)),
+                        : BorderDirectional(
+                            start: BorderSide(color: theme.borderInverse),
+                          ),
                   ),
                   child: AnimatedDefaultTextStyle(
                     duration: CarbonDuration.fast01,

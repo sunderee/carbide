@@ -10,6 +10,14 @@
 // Carbon's Popover is a floating surface anchored to a trigger. With no
 // Material we build it on OverlayPortal + CompositedTransformTarget/Follower,
 // the same anchoring pattern proven in Select (#70).
+//
+// RTL policy (#221): the primary alignment words are PHYSICAL sides —
+// `left*`/`right*` name the screen side the surface floats on in every
+// direction, matching upstream's physical `align="left-end"` prop values.
+// Only the `Start`/`End` cross-axis suffixes are LOGICAL: they resolve
+// against the ambient Directionality (surface anchors and caret inset
+// mirror together). Callers who want a direction-relative side pick
+// left/right themselves from Directionality.of(context).
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -501,10 +509,13 @@ class _Surface extends StatelessWidget {
 
     if (!caret) return box;
 
-    return Stack(clipBehavior: Clip.none, children: <Widget>[box, _caret()]);
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[box, _caret(context)],
+    );
   }
 
-  Widget _caret() {
+  Widget _caret(BuildContext context) {
     final _CaretDirection direction = _caretDirection;
     final bool vertical = align.isVertical;
     final Widget paint = CustomPaint(
@@ -536,16 +547,19 @@ class _Surface extends StatelessWidget {
       _ when _isEnd => inset,
       _ => null,
     };
+    // The horizontal cross axis is logical: Start insets from the left in
+    // LTR and from the right in RTL, mirroring the surface anchors.
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
     final double? left = switch (direction) {
       _CaretDirection.left => -_caretMain,
       _CaretDirection.right => null,
-      _ when _isStart => inset,
+      _ when (rtl ? _isEnd : _isStart) => inset,
       _ => null,
     };
     final double? right = switch (direction) {
       _CaretDirection.right => -_caretMain,
       _CaretDirection.left => null,
-      _ when _isEnd => inset,
+      _ when (rtl ? _isStart : _isEnd) => inset,
       _ => null,
     };
 

@@ -98,8 +98,9 @@ void main() {
                   .decoration
               as BoxDecoration;
       expect(deco.color, theme.layerSelected01);
-      expect((deco.border! as Border).left.width, 3);
-      expect((deco.border! as Border).left.color, theme.borderInteractive);
+      final BorderDirectional border = deco.border! as BorderDirectional;
+      expect(border.start.width, 3);
+      expect(border.start.color, theme.borderInteractive);
       expect(
         tester.widget<Text>(find.text('Home')).style!.fontWeight,
         FontWeight.w600,

@@ -63,6 +63,20 @@ between machines. Vector geometry renders identically across platforms, but
   `--update-goldens` on Linux and commits the result back to the branch. The
   bot commit does not retrigger CI; pull and push (or open the PR) afterwards.
 
+### RTL goldens
+
+`expectThemeGoldens` also takes a `directions` axis. The default `{ltr}`
+keeps the golden count flat; pass `{ltr, rtl}` (or `{rtl}` alone) to
+re-snapshot every theme under `Directionality(rtl)` as
+`goldens/<name>[.text].<variant>.rtl.png`. Add `.rtl` goldens only for
+components with direction-sensitive geometry — mirrored fills (slider,
+progress bar), side accents (side nav, data table selection, tab
+dividers), or overlay sides (submenus, overflow menus); direction-neutral
+components stay LTR-only. The repo-wide RTL smoke canvas lives in
+`test/rtl/carbon_rtl_test.dart` alongside the crash-guard sweep. Carbon
+icons do not mirror — only layout does — except the handful upstream
+itself flips (pagination carets, the submenu indicator).
+
 ### Icon fidelity sweep
 
 Every icon asset is verified on every PR against committed rasterizations of

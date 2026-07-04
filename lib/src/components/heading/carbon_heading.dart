@@ -79,13 +79,17 @@ class _CarbonHeadingScope extends InheritedWidget {
 /// [style] to override it without changing the semantic level.
 class CarbonHeading extends StatelessWidget {
   /// Creates a heading.
-  const CarbonHeading(this.text, {super.key, this.style});
+  const CarbonHeading(this.text, {super.key, this.style, this.textDirection});
 
   /// The heading text.
   final String text;
 
   /// Overrides the visual style; the semantic level is unaffected.
   final TextStyle? style;
+
+  /// Overrides the ambient [Directionality] for this heading, like
+  /// upstream `unstable_Text`'s per-element `dir`. Null inherits.
+  final TextDirection? textDirection;
 
   /// Carbide's default level → type-style mapping (h1 largest): heading-06
   /// down to heading-01. Upstream ships unstyled h-elements; this mapping
@@ -107,6 +111,7 @@ class CarbonHeading extends StatelessWidget {
       headingLevel: level,
       child: Text(
         text,
+        textDirection: textDirection,
         style: (style ?? styleForLevel(level)).copyWith(
           color: CarbonTheme.of(context).textPrimary,
         ),

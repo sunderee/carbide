@@ -66,6 +66,12 @@ enum CarbonThemeVariant {
 /// tests assert by token but never pin as pixels). It should settle any
 /// resulting animation itself (e.g. `await tester.pumpAndSettle()`). Pair it
 /// with `FocusHighlightStrategy.alwaysTraditional` so the ring actually paints.
+///
+/// [directions] adds a direction axis: the default `{ltr}` keeps the golden
+/// count flat repo-wide, while `{ltr, rtl}` re-snapshots every theme under
+/// `Directionality(rtl)` as `goldens/<name>[.text].<variant>.rtl.png`. Opt in
+/// for components with direction-sensitive geometry (mirrored fills, side
+/// accents, submenu sides); direction-neutral components stay LTR-only.
 Future<void> expectThemeGoldens(
   WidgetTester tester, {
   required String name,
@@ -74,44 +80,53 @@ Future<void> expectThemeGoldens(
   bool containsText = false,
   Duration? pumpBeforeSnapshot,
   Future<void> Function(WidgetTester tester)? afterPump,
+  Set<TextDirection> directions = const <TextDirection>{TextDirection.ltr},
 }) async {
+  assert(directions.isNotEmpty, 'directions must name at least one direction');
   await tester.binding.setSurfaceSize(size);
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
-  for (final CarbonThemeVariant variant in CarbonThemeVariant.values) {
-    final Key key = ValueKey<String>('carbide-golden-${variant.label}');
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: RepaintBoundary(
-          key: key,
-          child: MediaQuery(
-            data: const MediaQueryData(),
-            child: CarbonTheme(
-              data: variant.theme,
-              child: SizedBox.fromSize(
-                size: size,
-                child: ColoredBox(
-                  color: variant.background,
-                  child: Builder(builder: builder),
+  for (final TextDirection direction in directions) {
+    final String directionSuffix = direction == TextDirection.rtl ? '.rtl' : '';
+    for (final CarbonThemeVariant variant in CarbonThemeVariant.values) {
+      final Key key = ValueKey<String>(
+        'carbide-golden-${variant.label}$directionSuffix',
+      );
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: direction,
+          child: RepaintBoundary(
+            key: key,
+            child: MediaQuery(
+              data: const MediaQueryData(),
+              child: CarbonTheme(
+                data: variant.theme,
+                child: SizedBox.fromSize(
+                  size: size,
+                  child: ColoredBox(
+                    color: variant.background,
+                    child: Builder(builder: builder),
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    if (afterPump != null) {
-      await afterPump(tester);
+      );
+      await tester.pump();
+      if (afterPump != null) {
+        await afterPump(tester);
+      }
+      if (pumpBeforeSnapshot != null) {
+        await tester.pump(pumpBeforeSnapshot);
+      }
+      final String suffix = containsText ? '.text' : '';
+      await expectLater(
+        find.byKey(key),
+        matchesGoldenFile(
+          'goldens/$name$suffix.${variant.label}$directionSuffix.png',
+        ),
+      );
     }
-    if (pumpBeforeSnapshot != null) {
-      await tester.pump(pumpBeforeSnapshot);
-    }
-    final String suffix = containsText ? '.text' : '';
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('goldens/$name$suffix.${variant.label}.png'),
-    );
   }
 }

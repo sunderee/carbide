@@ -7,6 +7,8 @@
 //   styles/scss/components/slider/_slider.scss
 //   react/src/components/Slider/Slider.tsx
 
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -144,8 +146,12 @@ class _CarbonSliderState extends State<CarbonSlider> {
     widget.onUpperChanged?.call(snapped);
   }
 
-  num _valueAt(double dx, double width) =>
-      _snap(widget.min + (dx / width) * (widget.max - widget.min));
+  bool get _rtl => Directionality.of(context) == TextDirection.rtl;
+
+  num _valueAt(double dx, double width) {
+    final double forward = _rtl ? width - dx : dx;
+    return _snap(widget.min + (forward / width) * (widget.max - widget.min));
+  }
 
   void _onTrackPointer(
     Offset localPosition,
@@ -186,12 +192,26 @@ class _CarbonSliderState extends State<CarbonSlider> {
     final num current = upper ? widget.upperValue! : widget.value;
     final void Function(num) setter = upper ? _setUpper : _setLower;
     final num big = widget.step * 10;
+    // Horizontal arrows follow the visual direction: the increase key is
+    // Right in LTR and Left in RTL (the track mirrors).
+    final LogicalKeyboardKey increaseKey = _rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey decreaseKey = _rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
+    if (event.logicalKey == increaseKey) {
+      setter(current + widget.step);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == decreaseKey) {
+      setter(current - widget.step);
+      return KeyEventResult.handled;
+    }
     switch (event.logicalKey) {
-      case LogicalKeyboardKey.arrowRight:
       case LogicalKeyboardKey.arrowUp:
         setter(current + widget.step);
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowLeft:
       case LogicalKeyboardKey.arrowDown:
         setter(current - widget.step);
         return KeyEventResult.handled;
@@ -221,11 +241,23 @@ class _CarbonSliderState extends State<CarbonSlider> {
     final Widget track = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
-        final double lowerX = _fraction(widget.value) * width;
+        // Mirror the geometry in RTL: min sits at the physical right and
+        // the fill grows leftward.
+        double xOf(num v) {
+          final double fraction = _fraction(v);
+          return (_rtl ? 1 - fraction : fraction) * width;
+        }
+
+        final double lowerX = xOf(widget.value);
         final double upperX = widget._twoHandle
-            ? _fraction(widget.upperValue!) * width
+            ? xOf(widget.upperValue!)
             : lowerX;
-        final double fillStart = widget._twoHandle ? lowerX : 0;
+        final double fillLeft = widget._twoHandle
+            ? math.min(lowerX, upperX)
+            : (_rtl ? lowerX : 0);
+        final double fillRight = widget._twoHandle
+            ? math.max(lowerX, upperX)
+            : (_rtl ? width : lowerX);
 
         return GestureDetector(
           key: _trackKey,
@@ -248,8 +280,8 @@ class _CarbonSliderState extends State<CarbonSlider> {
                 ),
                 // The filled portion.
                 Positioned(
-                  left: fillStart,
-                  width: (upperX - fillStart).clamp(0, width),
+                  left: fillLeft,
+                  width: (fillRight - fillLeft).clamp(0, width),
                   child: Container(
                     height: CarbonSlider.trackHeight,
                     color: widget.disabled
