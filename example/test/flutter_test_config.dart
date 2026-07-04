@@ -23,6 +23,10 @@ const Map<String, List<String>> _fonts = <String, List<String>>{
     'packages/carbide/fonts/IBMPlexMono-Regular.ttf',
     'packages/carbide/fonts/IBMPlexMono-SemiBold.ttf',
   ],
+  CarbonFontFamily.serif: <String>[
+    'packages/carbide/fonts/IBMPlexSerif-Light.ttf',
+    'packages/carbide/fonts/IBMPlexSerif-Regular.ttf',
+  ],
 };
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
