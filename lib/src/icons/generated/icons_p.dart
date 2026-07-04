@@ -575,6 +575,23 @@ const CarbonIconData partUsage = CarbonIconData(
   ],
 );
 
+/// The Carbon `party-popper` icon data.
+const CarbonIconData partyPopper = CarbonIconData(
+  name: 'party-popper',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M5,28c-.2607,0-.5161-.1016-.707-.293-.2749-.2744-.3657-.6836-.2329-1.0488L12.0601,4.6582c.1172-.3213.3896-.5605.7231-.6343.3335-.0757.6821.0269.9238.269l14,14c.2422.2412.3428.5898.2695.9238-.0742.333-.3135.6064-.6348.7227L5.3418,27.9395c-.1113.041-.2271.0605-.3418.0605ZM9.1367,18.5508l-2.4648,6.7773,6.7773-2.4648-4.3125-4.3125ZM9.8906,16.4766l5.6328,5.6328,3.793-1.3789-8.0464-8.0464-1.3794,3.7925ZM12.0239,10.6099l9.3657,9.3657,3.793-1.3789L13.4033,6.8174l-1.3794,3.7925ZM30,13h-4v-2h4v2ZM25.0127,8.4019l-1.4141-1.4141,3.3926-3.3931,1.4141,1.4141-3.3926,3.3931ZM21,6h-2V2h2v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `passenger--drinks` icon data.
 const CarbonIconData passengerDrinks = CarbonIconData(
   name: 'passenger--drinks',
@@ -2863,6 +2880,40 @@ const CarbonIconData printer = CarbonIconData(
   ],
 );
 
+/// The Carbon `priority--high` icon data.
+const CarbonIconData priorityHigh = CarbonIconData(
+  name: 'priority--high',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M24,26h-5v-2h5V5.7588l-3.6035,3.6035-1.4141-1.4141,6.0176-6.0176,6.0176,6.0176-1.4141,1.4141-3.6035-3.6035v18.2412c0,1.1025-.8975,2-2,2ZM16,26H2v-2h14v2ZM16,20H2v-2h14v2ZM16,14H2v-2h14v2ZM16,8H2v-2h14v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `priority--low` icon data.
+const CarbonIconData priorityLow = CarbonIconData(
+  name: 'priority--low',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,30.0352l-6.0176-6.0176,1.4141-1.4141,3.6035,3.6035V8h-5v-2h5c1.1025,0,2,.897,2,2v18.207l3.6035-3.6035,1.4141,1.4141-6.0176,6.0176ZM16,26H2v-2h14v2ZM16,20H2v-2h14v2ZM16,14H2v-2h14v2ZM16,8H2v-2h14v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `private-network` icon data.
 const CarbonIconData privateNetwork = CarbonIconData(
   name: 'private-network',
@@ -2967,6 +3018,40 @@ const CarbonIconData productionService = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M6,6c0-.5522.4477-1,1-1s1,.4478,1,1-.4478,1-1,1-1-.4476-1-1ZM11,7c.5522,0,1-.4476,1-1s-.4478-1-1-1-1,.4478-1,1,.4477,1,1,1ZM30,4v12.0001h-2v-6.0001H4v18h7.9999v2h-7.9999c-1.1046,0-2-.8954-2-2V4c0-1.1046.8954-2,2-2h24c1.1046,0,2,.8954,2,2ZM28,4H4v4h24v-4ZM31,27.0001c0,1.6543-1.3457,3-3,3s-3-1.3457-3-3c0-.2228.0283-.4384.0746-.6475l-2.0746-1.1977-2.0746,1.1977c.0463.209.0746.4247.0746.6475,0,1.6543-1.3457,3-3,3s-3-1.3457-3-3,1.3457-3,3-3c.7037,0,1.343.2536,1.8551.6607l2.1449-1.2383v-1.6068c-1.1615-.4141-2-1.5137-2-2.8157,0-1.6543,1.3457-3,3-3s3,1.3457,3,3c0,1.3019-.8385,2.4016-2,2.8157v1.6067l2.1449,1.2383c.5121-.4071,1.1514-.6607,1.8551-.6607,1.6543,0,3,1.3457,3,3h0ZM19,27.0001c0-.5518-.4482-1-1-1s-1,.4482-1,1,.4482,1,1,1,1-.4482,1-1ZM22,19.0001c0,.5513.4482,1,1,1s1-.4487,1-1-.4482-1-1-1-1,.4487-1,1ZM29,27.0001c0-.5518-.4482-1-1-1s-1,.4482-1,1,.4482,1,1,1,1-.4482,1-1Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `program` icon data.
+const CarbonIconData program = CarbonIconData(
+  name: 'program',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M30,30H4c-1.103,0-2-.8975-2-2V2h2v26h26v2ZM18,24h-10v-2h10v2ZM28,18h-14v-2h14v2ZM24,12H8v-2h16v2ZM19,6h-9v-2h9v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `program--action` icon data.
+const CarbonIconData programAction = CarbonIconData(
+  name: 'program--action',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M3.4072,30.0068l-1.4141-1.4141,6.5928-6.5928h-4.5859v-2h8v8h-2v-4.5859l-6.5928,6.5928ZM30,30h-14v-2h14v2ZM28,18h-14v-2h14v2ZM4,16h-2V2h2v14ZM24,12H8v-2h16v2ZM19,6h-9v-2h9v2Z',
         ),
       ],
     ),

@@ -9,8 +9,15 @@
 //
 // Carbon's DatePicker wraps the flatpickr JS calendar, which is not portable.
 // Carbide builds a self-contained CarbonCalendar (no Material) opened from a
-// DatePickerInput via the Popover (#90). (Range selection is a follow-up.)
+// DatePickerInput via the Popover (#90), in single and range modes. The
+// range selection mirrors flatpickr's observable behavior: the first
+// activation starts a range, activating a later day commits it, activating
+// an earlier day restarts it, and hovering (or arrowing) previews the
+// in-between band. Day styling follows the _flatpickr.scss selectors —
+// committed ends on button-primary, in-range days on the highlight token,
+// and the preview end as a layer-01 cell with the 2px focus outline.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
@@ -38,22 +45,74 @@ const List<String> _weekdays = <String>[
   'Sa',
 ];
 
-/// A self-contained month calendar for picking a single date.
+/// An inclusive date range; [end] is null while a range is in progress.
+@immutable
+class CarbonDateRange {
+  /// Creates a range from [start] to an optional [end].
+  const CarbonDateRange(this.start, [this.end]);
+
+  /// The first day of the range.
+  final DateTime start;
+
+  /// The last day, or null while only the start has been picked.
+  final DateTime? end;
+
+  /// Whether both ends have been picked.
+  bool get isComplete => end != null;
+
+  @override
+  bool operator ==(Object other) =>
+      other is CarbonDateRange && other.start == start && other.end == end;
+
+  @override
+  int get hashCode => Object.hash(start, end);
+
+  @override
+  String toString() => 'CarbonDateRange($start, $end)';
+}
+
+/// A self-contained month calendar for picking a date or a date range.
+///
+/// Provide [onChanged] for single-date mode, or [onRangeChanged] for range
+/// mode (exactly one of the two). Arrow keys move the focused day (crossing
+/// month edges turns the page), Enter/Space activates it, and Escape calls
+/// [onEscape].
 class CarbonCalendar extends StatefulWidget {
   /// Creates a calendar.
   const CarbonCalendar({
-    required this.onChanged,
     super.key,
     this.value,
+    this.onChanged,
+    this.range,
+    this.onRangeChanged,
     this.firstDate,
     this.lastDate,
-  });
+    this.onEscape,
+    this.autofocus = false,
+  }) : assert(
+         (onChanged != null) ^ (onRangeChanged != null),
+         'Provide exactly one of onChanged (single) or onRangeChanged '
+         '(range).',
+       ),
+       assert(
+         range == null || onRangeChanged != null,
+         'range requires onRangeChanged.',
+       ),
+       assert(value == null || onChanged != null, 'value requires onChanged.');
 
-  /// The selected date.
+  /// The selected date (single mode).
   final DateTime? value;
 
-  /// Called with the picked date.
-  final ValueChanged<DateTime> onChanged;
+  /// Called with the picked date (single mode).
+  final ValueChanged<DateTime>? onChanged;
+
+  /// The selected range (range mode).
+  final CarbonDateRange? range;
+
+  /// Called as the range progresses (range mode): first with a start-only
+  /// range, then with the completed range — or with a new start-only range
+  /// when an earlier day restarts the selection.
+  final ValueChanged<CarbonDateRange>? onRangeChanged;
 
   /// The earliest selectable date (inclusive).
   final DateTime? firstDate;
@@ -61,17 +120,40 @@ class CarbonCalendar extends StatefulWidget {
   /// The latest selectable date (inclusive).
   final DateTime? lastDate;
 
+  /// Called when Escape is pressed on the day grid.
+  final VoidCallback? onEscape;
+
+  /// Whether the day grid takes focus when first built.
+  final bool autofocus;
+
   @override
   State<CarbonCalendar> createState() => _CarbonCalendarState();
 }
 
 class _CarbonCalendarState extends State<CarbonCalendar> {
-  late DateTime _month = DateTime(
-    (widget.value ?? DateTime.now()).year,
-    (widget.value ?? DateTime.now()).month,
+  late DateTime _month = _monthOf(_initialAnchor);
+  DateTime? _hoverDay;
+  late DateTime _focusedDay = _initialAnchor;
+  bool _gridFocused = false;
+  final FocusNode _gridNode = FocusNode(debugLabel: 'CarbonCalendar');
+
+  DateTime get _initialAnchor => _dayOnly(
+    widget.range?.end ?? widget.range?.start ?? widget.value ?? DateTime.now(),
   );
 
   static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+  static DateTime _monthOf(DateTime d) => DateTime(d.year, d.month);
+
+  bool get _rangeMode => widget.onRangeChanged != null;
+
+  bool get _rangeInProgress =>
+      _rangeMode && widget.range != null && !widget.range!.isComplete;
+
+  @override
+  void dispose() {
+    _gridNode.dispose();
+    super.dispose();
+  }
 
   bool _disabled(DateTime day) =>
       (widget.firstDate != null && day.isBefore(_dayOnly(widget.firstDate!))) ||
@@ -79,6 +161,65 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
 
   void _step(int months) =>
       setState(() => _month = DateTime(_month.year, _month.month + months));
+
+  void _activate(DateTime day) {
+    if (_disabled(day)) {
+      return;
+    }
+    if (!_rangeMode) {
+      widget.onChanged!(day);
+      return;
+    }
+    final CarbonDateRange? range = widget.range;
+    // The flatpickr machine: no range, a completed range, or an earlier day
+    // restarts with a new start; a later (or equal) day completes it.
+    if (range == null || range.isComplete || day.isBefore(range.start)) {
+      widget.onRangeChanged!(CarbonDateRange(day));
+    } else {
+      widget.onRangeChanged!(CarbonDateRange(range.start, day));
+    }
+  }
+
+  void _moveFocus(int days) {
+    final DateTime next = _focusedDay.add(Duration(days: days));
+    setState(() {
+      _focusedDay = _dayOnly(next);
+      _hoverDay = null;
+      if (_monthOf(_focusedDay) != _month) {
+        _month = _monthOf(_focusedDay);
+      }
+    });
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+    switch (event.logicalKey) {
+      case LogicalKeyboardKey.arrowRight:
+        _moveFocus(1);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+        _moveFocus(-1);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown:
+        _moveFocus(7);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        _moveFocus(-7);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.enter:
+      case LogicalKeyboardKey.space:
+        _activate(_focusedDay);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.escape:
+        if (widget.onEscape != null) {
+          widget.onEscape!();
+          return KeyEventResult.handled;
+        }
+    }
+    return KeyEventResult.ignored;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,21 +279,30 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
                   ),
               ],
             ),
-            for (int week = 0; week < 6; week++)
-              Row(
+            Focus(
+              focusNode: _gridNode,
+              autofocus: widget.autofocus,
+              onKeyEvent: _onKey,
+              onFocusChange: (bool f) => setState(() => _gridFocused = f),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  for (int wd = 0; wd < 7; wd++)
-                    _dayCell(
-                      context,
-                      theme,
-                      layer,
-                      today,
-                      firstWeekday,
-                      daysInMonth,
-                      week * 7 + wd,
+                  for (int week = 0; week < 6; week++)
+                    Row(
+                      children: <Widget>[
+                        for (int wd = 0; wd < 7; wd++)
+                          _dayCell(
+                            theme,
+                            today,
+                            firstWeekday,
+                            daysInMonth,
+                            week * 7 + wd,
+                          ),
+                      ],
                     ),
                 ],
               ),
+            ),
           ],
         ),
       ),
@@ -160,9 +310,7 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
   }
 
   Widget _dayCell(
-    BuildContext context,
     CarbonThemeData theme,
-    CarbonLayerTokens layer,
     DateTime today,
     int firstWeekday,
     int daysInMonth,
@@ -173,17 +321,41 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
       return const SizedBox(width: 40, height: 40);
     }
     final DateTime day = DateTime(_month.year, _month.month, dayNum);
-    final bool selected =
-        widget.value != null && _dayOnly(widget.value!) == day;
-    final bool isToday = day == today;
     final bool disabled = _disabled(day);
+
+    final CarbonDateRange? range = widget.range;
+    final DateTime? start = range == null ? null : _dayOnly(range.start);
+    final DateTime? end = range?.end == null ? null : _dayOnly(range!.end!);
+    // The preview end while a range is in progress: the hovered day, or the
+    // keyboard-focused day when the grid has focus.
+    final DateTime? preview = !_rangeInProgress
+        ? null
+        : _hoverDay ?? (_gridFocused ? _focusedDay : null);
+    final DateTime? bandEnd =
+        end ?? (preview != null && !preview.isBefore(start!) ? preview : null);
+
+    final bool selected = _rangeMode
+        ? day == start || day == end
+        : widget.value != null && _dayOnly(widget.value!) == day;
+    final bool inRange =
+        start != null &&
+        bandEnd != null &&
+        day.isAfter(start) &&
+        day.isBefore(bandEnd);
+    final bool previewEnd =
+        preview != null && day == preview && day != start && end == null;
 
     return _DayCell(
       day: dayNum,
       selected: selected,
-      isToday: isToday,
+      inRange: inRange,
+      previewEnd: previewEnd,
+      focused: _gridFocused && day == _focusedDay,
+      isToday: day == today,
       disabled: disabled,
-      onTap: disabled ? null : () => widget.onChanged(day),
+      onTap: disabled ? null : () => _activate(day),
+      onHover: (bool hovered) =>
+          setState(() => _hoverDay = hovered ? day : null),
     );
   }
 }
@@ -224,16 +396,24 @@ class _DayCell extends StatefulWidget {
   const _DayCell({
     required this.day,
     required this.selected,
+    required this.inRange,
+    required this.previewEnd,
+    required this.focused,
     required this.isToday,
     required this.disabled,
     required this.onTap,
+    required this.onHover,
   });
 
   final int day;
   final bool selected;
+  final bool inRange;
+  final bool previewEnd;
+  final bool focused;
   final bool isToday;
   final bool disabled;
   final VoidCallback? onTap;
+  final ValueChanged<bool> onHover;
 
   @override
   State<_DayCell> createState() => _DayCellState();
@@ -246,8 +426,15 @@ class _DayCellState extends State<_DayCell> {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    // Day fills per _flatpickr.scss: committed ends on button-primary,
+    // in-range days on the highlight token, the preview end on layer-01,
+    // hover on the layer-hover token.
     final Color background = widget.selected
         ? theme.buttonPrimary
+        : widget.previewEnd
+        ? theme.layer01
+        : widget.inRange
+        ? theme.highlight
         : _hovered && !widget.disabled
         ? layer.layerHover
         : const Color(0x00000000);
@@ -256,6 +443,9 @@ class _DayCellState extends State<_DayCell> {
         : widget.selected
         ? theme.textOnColor
         : theme.textPrimary;
+    // The 2px focus outline marks both the keyboard-focused day and the
+    // range preview end (focus-outline('outline')).
+    final bool outlined = widget.previewEnd || widget.focused;
 
     return Semantics(
       button: !widget.disabled,
@@ -267,15 +457,26 @@ class _DayCellState extends State<_DayCell> {
           cursor: widget.disabled
               ? SystemMouseCursors.basic
               : SystemMouseCursors.click,
-          onEnter: (_) => setState(() => _hovered = true),
-          onExit: (_) => setState(() => _hovered = false),
+          onEnter: (_) {
+            setState(() => _hovered = true);
+            widget.onHover(true);
+          },
+          onExit: (_) {
+            setState(() => _hovered = false);
+            widget.onHover(false);
+          },
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
             child: SizedBox.square(
               dimension: 40,
-              child: ColoredBox(
+              child: Container(
                 color: background,
+                foregroundDecoration: outlined
+                    ? BoxDecoration(
+                        border: Border.all(color: theme.focus, width: 2),
+                      )
+                    : null,
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
@@ -334,10 +535,24 @@ class CarbonDatePicker extends StatefulWidget {
     this.invalid = false,
     this.invalidText,
     this.helperText,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
   });
 
   /// The field label.
   final String labelText;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-date-picker.scss`): a 64px field with the
+  /// label rendered inside above the value.
+  final bool fluid;
 
   /// The selected date.
   final DateTime? value;
@@ -373,48 +588,20 @@ class CarbonDatePicker extends StatefulWidget {
   State<CarbonDatePicker> createState() => _CarbonDatePickerState();
 }
 
+String _format(DateTime d) =>
+    '${d.month.toString().padLeft(2, '0')}/'
+    '${d.day.toString().padLeft(2, '0')}/${d.year}';
+
 class _CarbonDatePickerState extends State<CarbonDatePicker> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   bool _open = false;
   final Object _group = UniqueKey();
 
-  String _format(DateTime d) =>
-      '${d.month.toString().padLeft(2, '0')}/'
-      '${d.day.toString().padLeft(2, '0')}/${d.year}';
-
   @override
   Widget build(BuildContext context) {
-    final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool empty = widget.value == null;
-    final Color textColor = widget.disabled
-        ? theme.textDisabled
-        : empty
-        ? theme.textPlaceholder
-        : theme.textPrimary;
-
-    final Widget field = CarbonField(
-      size: widget.size,
-      disabled: widget.disabled,
-      status: widget.invalid
-          ? CarbonFieldStatus.invalid
-          : CarbonFieldStatus.none,
-      trailing: Padding(
-        padding: const EdgeInsetsDirectional.only(end: CarbonSpacing.spacing05),
-        child: CarbonIcon(
-          CarbonIcons.calendar,
-          color: widget.disabled ? theme.iconDisabled : theme.iconPrimary,
-        ),
-      ),
-      child: ExcludeSemantics(
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            empty ? widget.placeholder : _format(widget.value!),
-            style: CarbonTypeStyles.bodyCompact01.copyWith(color: textColor),
-          ),
-        ),
-      ),
-    );
-
     final Widget trigger = Semantics(
       button: true,
       label: widget.labelText,
@@ -429,6 +616,8 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
           value: widget.value,
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
+          autofocus: true,
+          onEscape: () => setState(() => _open = false),
           onChanged: (DateTime d) {
             widget.onChanged(d);
             setState(() => _open = false);
@@ -441,7 +630,16 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
             onTap: widget.disabled
                 ? null
                 : () => setState(() => _open = !_open),
-            child: field,
+            child: _DateField(
+              size: widget.size,
+              disabled: widget.disabled,
+              invalid: widget.invalid,
+              text: widget.value == null ? null : _format(widget.value!),
+              placeholder: widget.placeholder,
+              aiLabel: widget.aiLabel,
+              aiRevert: widget.aiRevert,
+              fluidLabel: _fluid ? widget.labelText : null,
+            ),
           ),
         ),
       ),
@@ -457,12 +655,302 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ExcludeSemantics(
-          child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
-        ),
+        if (!_fluid)
+          ExcludeSemantics(
+            child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
+          ),
         trigger,
         ?message,
       ],
+    );
+  }
+}
+
+/// A Carbon date range picker: two fields sharing one range [CarbonCalendar].
+///
+/// The calendar keeps the flatpickr machine: picking a day starts the range
+/// (the popover stays open), picking a later day completes it (the popover
+/// closes), picking an earlier day restarts it. Escape restores the value
+/// from when the popover opened, so an in-progress pick never clobbers a
+/// committed range.
+///
+/// ```dart
+/// CarbonDateRangePicker(
+///   value: _range,
+///   onChanged: (CarbonDateRange r) => setState(() => _range = r),
+/// )
+/// ```
+class CarbonDateRangePicker extends StatefulWidget {
+  /// Creates a date range picker.
+  const CarbonDateRangePicker({
+    required this.onChanged,
+    super.key,
+    this.value,
+    this.startLabelText = 'Start date',
+    this.endLabelText = 'End date',
+    this.firstDate,
+    this.lastDate,
+    this.placeholder = 'mm/dd/yyyy',
+    this.size = CarbonFieldSize.md,
+    this.disabled = false,
+    this.invalid = false,
+    this.invalidText,
+    this.helperText,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
+  });
+
+  /// The selected range; null when nothing has been picked.
+  final CarbonDateRange? value;
+
+  /// Called as the range progresses (start picked, completed, restarted).
+  final ValueChanged<CarbonDateRange> onChanged;
+
+  /// The label above the start field.
+  final String startLabelText;
+
+  /// The label above the end field.
+  final String endLabelText;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-date-picker.scss`): a 64px field with the
+  /// label rendered inside above the value.
+  final bool fluid;
+
+  /// The earliest selectable date.
+  final DateTime? firstDate;
+
+  /// The latest selectable date.
+  final DateTime? lastDate;
+
+  /// The placeholder shown in an empty field.
+  final String placeholder;
+
+  /// The field size.
+  final CarbonFieldSize size;
+
+  /// Whether disabled.
+  final bool disabled;
+
+  /// Whether invalid.
+  final bool invalid;
+
+  /// The error message.
+  final String? invalidText;
+
+  /// Helper text.
+  final String? helperText;
+
+  @override
+  State<CarbonDateRangePicker> createState() => _CarbonDateRangePickerState();
+}
+
+class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
+  bool _open = false;
+  CarbonDateRange? _beforeOpen;
+  final Object _group = UniqueKey();
+
+  /// The two range inputs are a fixed 143.5px wide with a 1px gap
+  /// (`_date-picker.scss` `--date-picker--range`).
+  static const double _inputWidth = 143.5;
+
+  void _toggle() {
+    if (widget.disabled) {
+      return;
+    }
+    setState(() {
+      _open = !_open;
+      if (_open) {
+        _beforeOpen = widget.value;
+      }
+    });
+  }
+
+  void _cancel() {
+    // Escape restores the committed value from when the popover opened.
+    if (widget.value != _beforeOpen && _beforeOpen != null) {
+      widget.onChanged(_beforeOpen!);
+    }
+    setState(() => _open = false);
+  }
+
+  Widget _labelledField(String label, DateTime? date) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      if (!_fluid)
+        ExcludeSemantics(
+          child: CarbonFormLabel(label, disabled: widget.disabled),
+        ),
+      Semantics(
+        button: true,
+        label: label,
+        value: date == null ? null : _format(date),
+        child: SizedBox(
+          width: _inputWidth,
+          child: _DateField(
+            size: widget.size,
+            disabled: widget.disabled,
+            invalid: widget.invalid,
+            text: date == null ? null : _format(date),
+            placeholder: widget.placeholder,
+            aiLabel: widget.aiLabel,
+            aiRevert: widget.aiRevert,
+            fluidLabel: _fluid ? label : null,
+          ),
+        ),
+      ),
+    ],
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget fields = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _labelledField(widget.startLabelText, widget.value?.start),
+        const SizedBox(width: 1),
+        _labelledField(widget.endLabelText, widget.value?.end),
+      ],
+    );
+
+    final Widget trigger = CarbonPopover(
+      open: _open,
+      align: CarbonPopoverAlignment.bottomStart,
+      caret: false,
+      tapRegionGroupId: _group,
+      onRequestClose: () => setState(() => _open = false),
+      content: CarbonCalendar(
+        range: widget.value,
+        firstDate: widget.firstDate,
+        lastDate: widget.lastDate,
+        autofocus: true,
+        onEscape: _cancel,
+        onRangeChanged: (CarbonDateRange r) {
+          widget.onChanged(r);
+          if (r.isComplete) {
+            setState(() => _open = false);
+          }
+        },
+      ),
+      child: TapRegion(
+        groupId: _group,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _toggle,
+          child: fields,
+        ),
+      ),
+    );
+
+    final Widget? message = widget.invalid && widget.invalidText != null
+        ? CarbonFieldRequirement(widget.invalidText!)
+        : widget.helperText != null
+        ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[trigger, ?message],
+    );
+  }
+}
+
+/// The shared read-only field chrome of the date pickers.
+class _DateField extends StatelessWidget {
+  const _DateField({
+    required this.size,
+    required this.disabled,
+    required this.invalid,
+    required this.text,
+    required this.placeholder,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluidLabel,
+  });
+
+  final CarbonFieldSize size;
+  final bool disabled;
+  final bool invalid;
+  final String? text;
+  final String placeholder;
+  final Widget? aiLabel;
+  final bool aiRevert;
+
+  /// When set, renders the 64px fluid field with this label inside
+  /// (`_fluid-date-picker.scss`, the house fluid column).
+  final String? fluidLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final CarbonThemeData theme = CarbonTheme.of(context);
+    final Color textColor = disabled
+        ? theme.textDisabled
+        : text == null
+        ? theme.textPlaceholder
+        : theme.textPrimary;
+    return CarbonField(
+      size: size,
+      disabled: disabled,
+      status: invalid ? CarbonFieldStatus.invalid : CarbonFieldStatus.none,
+      aiLabel: aiLabel,
+      aiRevert: aiRevert,
+      fluid: fluidLabel != null,
+      trailing: Padding(
+        padding: const EdgeInsetsDirectional.only(end: CarbonSpacing.spacing05),
+        child: CarbonIcon(
+          CarbonIcons.calendar,
+          color: disabled ? theme.iconDisabled : theme.iconPrimary,
+        ),
+      ),
+      child: ExcludeSemantics(
+        child: fluidLabel == null
+            ? Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  text ?? placeholder,
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(
+                    color: textColor,
+                  ),
+                ),
+              )
+            // Fluid stacks the label-01 label above the value (the house
+            // fluid column shared with the other fluid fields).
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    fluidLabel!,
+                    style: CarbonTypeStyles.label01.copyWith(
+                      color: disabled
+                          ? theme.textDisabled
+                          : theme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    text ?? placeholder,
+                    style: CarbonTypeStyles.bodyCompact01.copyWith(
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 }

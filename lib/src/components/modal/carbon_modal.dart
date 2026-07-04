@@ -73,8 +73,11 @@ class CarbonModal extends StatefulWidget {
     this.size = CarbonModalSize.md,
     this.danger = false,
     this.passiveModal = false,
+    this.isFullWidth = false,
     this.preventCloseOnClickOutside = false,
     this.closeLabel = 'Close',
+    this.aiLabel,
+    this.aiRevert = false,
   });
 
   /// Whether the modal is shown.
@@ -107,11 +110,32 @@ class CarbonModal extends StatefulWidget {
   /// Whether to hide the footer buttons.
   final bool passiveModal;
 
+  /// Whether the body content stretches edge to edge, dropping the content
+  /// padding — used for data-dense content such as tables.
+  ///
+  /// Source: `Modal.tsx` `isFullWidth` and `_modal.scss`
+  /// `.cds--modal-container--full-width .cds--modal-content`
+  /// (`padding: 0; margin: 0`). The header and footer keep their spec
+  /// paddings; [isFullWidth] composes with [size].
+  final bool isFullWidth;
+
   /// Whether an outside tap is ignored.
   final bool preventCloseOnClickOutside;
 
   /// The accessible label for the close button.
   final String closeLabel;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// header before the close button per upstream's `decorator` prop. When
+  /// set (and not [aiRevert]), the scrim uses the `ai-overlay` token and the
+  /// dialog surface takes the AI popover treatment: the bottom-up aura over
+  /// the layer, the `ai-border-start` border (the upstream border gradient
+  /// and inset shadow have no Flutter box-model equivalent — the same
+  /// simplifications as the AI Label callout), and the ai drop shadow.
+  final Widget? aiLabel;
+
+  /// Suppresses the AI treatment while the label shows its revert control.
+  final bool aiRevert;
 
   @override
   State<CarbonModal> createState() => _CarbonModalState();
@@ -212,7 +236,11 @@ class _CarbonModalState extends State<CarbonModal> {
                   onTap: widget.preventCloseOnClickOutside
                       ? null
                       : widget.onClose,
-                  child: ColoredBox(color: theme.overlay),
+                  child: ColoredBox(
+                    color: widget.aiLabel != null && !widget.aiRevert
+                        ? theme.aiOverlay
+                        : theme.overlay,
+                  ),
                 ),
               ),
               LayoutBuilder(
@@ -231,6 +259,9 @@ class _CarbonModalState extends State<CarbonModal> {
                             label: widget.label,
                             danger: widget.danger,
                             passiveModal: widget.passiveModal,
+                            isFullWidth: widget.isFullWidth,
+                            aiLabel: widget.aiLabel,
+                            aiRevert: widget.aiRevert,
                             closeLabel: widget.closeLabel,
                             onClose: widget.onClose,
                             primaryButton: widget.primaryButton,
@@ -255,6 +286,9 @@ class _Dialog extends StatelessWidget {
     required this.label,
     required this.danger,
     required this.passiveModal,
+    required this.isFullWidth,
+    required this.aiLabel,
+    required this.aiRevert,
     required this.closeLabel,
     required this.onClose,
     required this.primaryButton,
@@ -266,6 +300,9 @@ class _Dialog extends StatelessWidget {
   final String? label;
   final bool danger;
   final bool passiveModal;
+  final bool isFullWidth;
+  final Widget? aiLabel;
+  final bool aiRevert;
   final String closeLabel;
   final VoidCallback? onClose;
   final CarbonModalAction? primaryButton;
@@ -276,14 +313,43 @@ class _Dialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final bool ai = aiLabel != null && !aiRevert;
 
     return Semantics(
       scopesRoute: true,
       namesRoute: true,
       explicitChildNodes: true,
       label: title,
-      child: ColoredBox(
-        color: layer.layer,
+      child: DecoratedBox(
+        decoration: ai
+            ? BoxDecoration(
+                color: layer.layer,
+                // ai-popover-gradient('default', 0, 'layer'): the aura
+                // rising from the bottom edge over the layer.
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: <Color>[
+                    theme.aiAuraStart,
+                    Color.lerp(theme.aiAuraStart, theme.aiAuraEnd, 0.5)!,
+                    theme.aiAuraEnd,
+                    theme.aiAuraEnd.withValues(alpha: 0),
+                  ],
+                  stops: const <double>[0, 0.15, 0.5, 1],
+                ),
+                border: Border.all(color: theme.aiBorderStart),
+                boxShadow: <BoxShadow>[
+                  // 0 24px 40px -24px $ai-drop-shadow (the inset shadow has
+                  // no Flutter equivalent).
+                  BoxShadow(
+                    color: theme.aiDropShadow,
+                    offset: const Offset(0, 24),
+                    blurRadius: 40,
+                    spreadRadius: -24,
+                  ),
+                ],
+              )
+            : BoxDecoration(color: layer.layer),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -327,6 +393,15 @@ class _Dialog extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // The AI label sits before the close button
+                  // (--modal--decorator header placement).
+                  if (aiLabel != null)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        end: CarbonSpacing.spacing03,
+                      ),
+                      child: aiLabel!,
+                    ),
                   CarbonButton.iconOnly(
                     icon: CarbonIcons.close,
                     iconDescription: closeLabel,
@@ -337,16 +412,19 @@ class _Dialog extends StatelessWidget {
                 ],
               ),
             ),
-            // Body.
+            // Body. Full width drops the content padding entirely
+            // (`--full-width .cds--modal-content`: padding 0, margin 0).
             Flexible(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                    CarbonSpacing.spacing05,
-                    CarbonSpacing.spacing03,
-                    CarbonSpacing.spacing09,
-                    CarbonSpacing.spacing09,
-                  ),
+                  padding: isFullWidth
+                      ? EdgeInsets.zero
+                      : const EdgeInsetsDirectional.fromSTEB(
+                          CarbonSpacing.spacing05,
+                          CarbonSpacing.spacing03,
+                          CarbonSpacing.spacing09,
+                          CarbonSpacing.spacing09,
+                        ),
                   child: DefaultTextStyle.merge(
                     style: CarbonTypeStyles.body01.copyWith(
                       color: theme.textPrimary,

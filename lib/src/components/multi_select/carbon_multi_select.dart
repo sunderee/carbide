@@ -69,6 +69,10 @@ class CarbonMultiSelect<T> extends StatefulWidget {
     this.hideLabel = false,
     this.filterable = false,
     this.filterPlaceholder,
+    this.aiLabel,
+    this.fluid = false,
+    this.condensed = false,
+    this.aiRevert = false,
     this.focusNode,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
@@ -118,6 +122,21 @@ class CarbonMultiSelect<T> extends StatefulWidget {
   /// The placeholder for the filter input when [filterable].
   final String? filterPlaceholder;
 
+  /// The fluid treatment: a 64px field with the title rendered inside
+  /// above the value, and 64px menu rows (`_fluid-list-box.scss`).
+  final bool fluid;
+
+  /// The condensed fluid variant: the field stays fluid but the menu rows
+  /// keep the standard height (`--list-box__wrapper--fluid--condensed`).
+  final bool condensed;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
   /// An optional external focus node for the field.
   final FocusNode? focusNode;
 
@@ -126,6 +145,10 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 }
 
 class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   final TextEditingController _filter = TextEditingController();
@@ -284,7 +307,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel
+    final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -339,6 +362,10 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           size: widget.size,
           expanded: _overlay.isShowing,
           disabled: widget.disabled,
+          aiLabel: widget.aiLabel,
+          aiRevert: widget.aiRevert,
+          fluid: _fluid,
+          fluidLabel: _fluid ? widget.titleText : null,
           invalid: widget.invalid,
           warn: widget.warn,
           focused: _focus.hasFocus,
@@ -451,7 +478,11 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         child: TapRegion(
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(size: widget.size, children: rows),
+            child: CarbonListBoxMenu(
+              size: widget.size,
+              fluidRows: _fluid && !widget.condensed,
+              children: rows,
+            ),
           ),
         ),
       ),
@@ -467,6 +498,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(
           size: widget.size,
+          fluid: _fluid && !widget.condensed,
           isFirst: index == 0,
           isHighlighted: index == _highlighted,
           disabled: item.disabled,

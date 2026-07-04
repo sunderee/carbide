@@ -11,6 +11,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icon_data.dart';
@@ -52,6 +53,8 @@ class CarbonNumberInput extends StatefulWidget {
     this.fluid = false,
     this.incrementLabel = 'Increment number',
     this.decrementLabel = 'Decrement number',
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   });
@@ -104,6 +107,14 @@ class CarbonNumberInput extends StatefulWidget {
   /// Visually hides the label.
   final bool hideLabel;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// before the steppers per upstream's `decorator` prop (inset-inline-end
+  /// $spacing-12); adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
   /// Hides the increment/decrement steppers.
   final bool hideSteppers;
 
@@ -127,6 +138,10 @@ class CarbonNumberInput extends StatefulWidget {
 }
 
 class _CarbonNumberInputState extends State<CarbonNumberInput> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   late final TextEditingController _controller = TextEditingController(
     text: widget.value?.toString() ?? '',
   );
@@ -303,7 +318,9 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       focused: _focus.hasFocus,
       editable: editable,
       steppers: steppers,
-      fluidLabel: widget.fluid && !widget.hideLabel ? widget.labelText : null,
+      aiLabel: widget.aiLabel,
+      aiRevert: widget.aiRevert,
+      fluidLabel: _fluid && !widget.hideLabel ? widget.labelText : null,
     );
 
     final Widget? message = widget.invalid && widget.invalidText != null
@@ -321,7 +338,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (!widget.fluid && !widget.hideLabel)
+        if (!_fluid && !widget.hideLabel)
           ExcludeSemantics(
             child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
           ),
@@ -343,6 +360,8 @@ class _NumberField extends StatelessWidget {
     required this.focused,
     required this.editable,
     required this.steppers,
+    required this.aiLabel,
+    required this.aiRevert,
     required this.fluidLabel,
   });
 
@@ -353,6 +372,8 @@ class _NumberField extends StatelessWidget {
   final bool focused;
   final Widget editable;
   final Widget? steppers;
+  final Widget? aiLabel;
+  final bool aiRevert;
   final String? fluidLabel;
 
   /// The fluid field height (`4rem`).
@@ -364,10 +385,14 @@ class _NumberField extends StatelessWidget {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool invalid = status == CarbonFieldStatus.invalid;
     final bool fluid = fluidLabel != null;
+    // The AI treatment: aura gradient + ai-border-strong bottom border.
+    final bool ai = aiLabel != null && !aiRevert && !readOnly;
     final Color border = disabled
         ? const Color(0x00000000)
         : readOnly
         ? layer.borderSubtle
+        : ai
+        ? theme.aiBorderStrong
         : theme.borderStrong01;
 
     final Widget content = Padding(
@@ -399,6 +424,7 @@ class _NumberField extends StatelessWidget {
     Widget box = DecoratedBox(
       decoration: BoxDecoration(
         color: readOnly ? const Color(0x00000000) : layer.field,
+        gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
         border: Border(bottom: BorderSide(color: border)),
       ),
       child: SizedBox(
@@ -416,6 +442,17 @@ class _NumberField extends StatelessWidget {
                     size: 16,
                     color: theme.supportError,
                   ),
+                ),
+              ),
+            // The AI label sits before the steppers (inset-inline-end
+            // $spacing-12 upstream, clearing the two stepper buttons).
+            if (aiLabel != null)
+              Align(
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    end: CarbonSpacing.spacing03,
+                  ),
+                  child: aiLabel,
                 ),
               ),
             ?steppers,

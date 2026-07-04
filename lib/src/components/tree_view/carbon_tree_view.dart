@@ -11,6 +11,10 @@
 // icons, hover / selected / active / disabled states, and full keyboard
 // roving (Up/Down, Left/Right collapse-expand, Home/End, Enter/Space). Reuses
 // the chevron + height-reveal pattern from the side nav and accordion.
+//
+// The controlled selection API (`selectedId` + `onSelect`) matches
+// upstream's `enable-treeview-controllable` flagged shape — Carbide was
+// written controlled-first, so the flag's fix was never needed (ADR 0002).
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';

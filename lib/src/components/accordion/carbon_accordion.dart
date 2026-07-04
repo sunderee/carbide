@@ -244,7 +244,7 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
       curve: CarbonEasing.standardProductive,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(
-          alignment: Alignment.topLeft,
+          alignment: AlignmentDirectional.topStart,
           heightFactor: t,
           child: Opacity(opacity: t, child: child),
         ),

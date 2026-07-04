@@ -214,10 +214,16 @@ class CarbonTag extends StatelessWidget {
     this.size = CarbonTagSize.md,
     this.icon,
     this.disabled = false,
+    this.aiLabel,
   });
 
   /// The tag text, truncated with an ellipsis past the 208px max width.
   final String label;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`, typically the
+  /// inline variant), rendered after the label per upstream's `decorator`
+  /// prop (`--tag--decorator`).
+  final Widget? aiLabel;
 
   /// The color type.
   final CarbonTagType type;
@@ -252,6 +258,7 @@ class CarbonTag extends StatelessWidget {
         : colors.background;
     final Color text = disabled ? theme.textDisabled : colors.text;
     return TagSurface(
+      aiLabel: aiLabel,
       size: size,
       background: background,
       text: text,
@@ -280,6 +287,7 @@ class TagSurface extends StatelessWidget {
     this.border,
     this.icon,
     this.trailing,
+    this.aiLabel,
     this.endPadding,
   });
 
@@ -306,6 +314,9 @@ class TagSurface extends StatelessWidget {
 
   /// An optional trailing widget (the dismiss button).
   final Widget? trailing;
+
+  /// An optional AI presence decorator, rendered after the label.
+  final Widget? aiLabel;
 
   /// Overrides the end padding (the dismiss button sits flush).
   final double? endPadding;
@@ -350,6 +361,8 @@ class TagSurface extends StatelessWidget {
               style: CarbonTag.labelStyle.copyWith(color: text),
             ),
           ),
+          // The AI label flows after the tag text (`--tag--decorator`).
+          if (aiLabel != null) ...<Widget>[const SizedBox(width: 4), aiLabel!],
           ?trailing,
         ],
       ),

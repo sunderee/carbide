@@ -95,6 +95,40 @@ const CarbonIconData gasStation = CarbonIconData(
   ],
 );
 
+/// The Carbon `gas-station--diesel` icon data.
+const CarbonIconData gasStationDiesel = CarbonIconData(
+  name: 'gas-station--diesel',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M8,10v2h7v-2h-7ZM29,9.41v15.09c0,1.93-1.57,3.5-3.5,3.5s-3.5-1.57-3.5-3.5v-7.5h-3v9h2v2h-9v-2h5V6H6v9h-2V5c0-.55.45-1,1-1h13c.55,0,1,.45,1,1v10h4c.55,0,1,.45,1,1v8.5c0,.83.67,1.5,1.5,1.5s1.5-.67,1.5-1.5v-10.5c-1.1,0-2-.9-2-2v-4.59l-3.01-3,1.42-1.42,5,5.01c.38.38.59.88.59,1.41ZM6,28H2v-10h4c1.6543,0,3,1.3457,3,3v4c0,1.6543-1.3457,3-3,3ZM4,26h2c.5513,0,1-.4482,1-1v-4c0-.5518-.4487-1-1-1h-2v6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `gas-station--eco` icon data.
+const CarbonIconData gasStationEco = CarbonIconData(
+  name: 'gas-station--eco',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M8,10v2h7v-2h-7ZM29,9.41v15.09c0,1.93-1.57,3.5-3.5,3.5s-3.5-1.57-3.5-3.5v-7.5h-3v9h2v2h-6v-2h2V6H6v9h-2V5c0-.55.45-1,1-1h13c.55,0,1,.45,1,1v10h4c.55,0,1,.45,1,1v8.5c0,.83.67,1.5,1.5,1.5s1.5-.67,1.5-1.5v-10.5c-1.1,0-2-.9-2-2v-4.59l-3.01-3,1.42-1.42,5,5.01c.38.38.59.88.59,1.41ZM6,28H2v-4c0-3.3086,2.6914-6,6-6h4v4c0,3.3086-2.6914,6-6,6ZM5.4141,26h.5859c2.2056,0,4-1.7939,4-4v-2h-2c-2.2056,0-4,1.7939-4,4v.5859l2.293-2.293,1.4141,1.4141-2.293,2.293Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `gas-station--filled` icon data.
 const CarbonIconData gasStationFilled = CarbonIconData(
   name: 'gas-station--filled',

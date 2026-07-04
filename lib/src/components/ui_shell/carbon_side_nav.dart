@@ -10,6 +10,11 @@
 //
 // The UI Shell side navigation: a 256px panel (48px rail when collapsed) of
 // links and collapsible menus. Uses the contextual `background` tokens.
+// Rail mode (upstream `isRail`) expands 48px → 256px as an overlay above the
+// page content — never reflowing it — on pointer enter, focus entering the
+// nav, or a click, and collapses on pointer leave, blur, or Escape. The
+// expansion animates inline-size over 0.11s cubic-bezier(0.2, 0, 1, 0.9)
+// (the hardcoded upstream transition), skipped under reduced motion.
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -51,35 +56,220 @@ class _SideNavScope extends InheritedWidget {
 ///   ],
 /// )
 /// ```
-class CarbonSideNav extends StatelessWidget {
+class CarbonSideNav extends StatefulWidget {
   /// Creates a side nav.
-  const CarbonSideNav({required this.items, super.key, this.expanded = true});
+  const CarbonSideNav({
+    required this.items,
+    super.key,
+    this.expanded = true,
+    this.rail = false,
+  });
 
   /// The nav items (links, menus, dividers).
   final List<Widget> items;
 
   /// Whether the panel is expanded (256px) or a rail (48px, icons only).
+  /// Ignored in [rail] mode, where expansion follows hover and focus.
   final bool expanded;
+
+  /// Rail mode (upstream `isRail`): a 48px rail that expands to a 256px
+  /// overlay above the page content on pointer enter, focus, or click, and
+  /// collapses on pointer leave, blur, or Escape.
+  final bool rail;
+
+  @override
+  State<CarbonSideNav> createState() => _CarbonSideNavState();
+}
+
+class _CarbonSideNavState extends State<CarbonSideNav> {
+  final OverlayPortalController _overlay = OverlayPortalController();
+  final LayerLink _link = LayerLink();
+  bool _overlayExpanded = false;
+  bool _pointerInside = false;
+  bool _focusWithin = false;
+  double? _height;
+
+  /// The upstream expansion transition: 0.11s cubic-bezier(0.2, 0, 1, 0.9)
+  /// (`_side-nav.scss`, "TODO: sync with motion work" — not a motion token).
+  static const Duration _expansion = Duration(milliseconds: 110);
+  static const Cubic _expansionCurve = Cubic(0.2, 0, 1, 0.9);
+
+  bool get _want => _pointerInside || _focusWithin;
+
+  bool get _reducedMotion =>
+      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+
+  void _pointer(bool inside) {
+    _pointerInside = inside;
+    _sync();
+  }
+
+  void _focus(bool within) {
+    _focusWithin = within;
+    _sync();
+  }
+
+  void _sync() {
+    if (_want) {
+      if (!_overlay.isShowing) {
+        _overlay.show();
+        // Mount the overlay at rail width first so the expansion animates.
+        setState(() => _overlayExpanded = false);
+        if (_reducedMotion) {
+          setState(() => _overlayExpanded = true);
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _want) {
+              setState(() => _overlayExpanded = true);
+            }
+          });
+        }
+      } else if (!_overlayExpanded) {
+        // The pointer crossed from the rail onto the overlay (or focus
+        // returned) mid-collapse: expand again.
+        setState(() => _overlayExpanded = true);
+      }
+    } else if (_overlay.isShowing) {
+      setState(() => _overlayExpanded = false);
+      if (_reducedMotion) {
+        _overlay.hide();
+      }
+    }
+  }
+
+  KeyEventResult _onEscape(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape &&
+        _overlay.isShowing) {
+      FocusManager.instance.primaryFocus?.unfocus();
+      _focusWithin = false;
+      _pointerInside = false;
+      _sync();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  Widget _panel({required bool expanded}) => _SideNavScope(
+    expanded: expanded,
+    child: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: widget.items,
+      ),
+    ),
+  );
+
+  Widget _buildOverlay(BuildContext context) {
+    final CarbonThemeData theme = CarbonTheme.of(context);
+    // Pin the flyout to the rail's start edge so the 256px expansion grows
+    // into the content area in both directions (follower anchors are
+    // physical-only, so resolve start against the ambient direction).
+    final Alignment startAnchor =
+        Directionality.of(context) == TextDirection.rtl
+        ? Alignment.topRight
+        : Alignment.topLeft;
+    return Positioned(
+      top: 0,
+      left: 0,
+      child: CompositedTransformFollower(
+        link: _link,
+        targetAnchor: startAnchor,
+        followerAnchor: startAnchor,
+        child: MouseRegion(
+          onEnter: (_) => _pointer(true),
+          onExit: (_) => _pointer(false),
+          child: Focus(
+            canRequestFocus: false,
+            skipTraversal: true,
+            onFocusChange: _focus,
+            onKeyEvent: _onEscape,
+            child: AnimatedContainer(
+              duration: _reducedMotion ? Duration.zero : _expansion,
+              curve: _expansionCurve,
+              onEnd: () {
+                if (!_overlayExpanded && !_want) {
+                  _overlay.hide();
+                }
+              },
+              width: _overlayExpanded ? 256 : 48,
+              height: _height,
+              color: theme.background,
+              // The expanding clip reveals the fixed 256px content, like
+              // the upstream overflow-hidden inline-size transition.
+              child: ClipRect(
+                child: OverflowBox(
+                  minWidth: 256,
+                  maxWidth: 256,
+                  alignment: AlignmentDirectional.topStart,
+                  child: _panel(expanded: true),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+
+    if (!widget.rail) {
+      return Semantics(
+        container: true,
+        explicitChildNodes: true,
+        label: 'Side navigation',
+        child: AnimatedContainer(
+          duration: CarbonDuration.moderate01,
+          curve: CarbonEasing.standardProductive,
+          width: widget.expanded ? 256 : 48,
+          color: theme.background,
+          child: _panel(expanded: widget.expanded),
+        ),
+      );
+    }
+
     return Semantics(
       container: true,
       explicitChildNodes: true,
       label: 'Side navigation',
-      child: _SideNavScope(
-        expanded: expanded,
-        child: AnimatedContainer(
-          duration: CarbonDuration.moderate01,
-          curve: CarbonEasing.standardProductive,
-          width: expanded ? 256 : 48,
-          color: theme.background,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: items,
+      child: OverlayPortal(
+        controller: _overlay,
+        overlayChildBuilder: _buildOverlay,
+        child: CompositedTransformTarget(
+          link: _link,
+          child: MouseRegion(
+            onEnter: (_) => _pointer(true),
+            onExit: (_) => _pointer(false),
+            child: Listener(
+              // A click on the rail expands it too (upstream onClick).
+              onPointerDown: (_) => _pointer(true),
+              child: Focus(
+                canRequestFocus: false,
+                skipTraversal: true,
+                onFocusChange: _focus,
+                onKeyEvent: _onEscape,
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    _height = constraints.maxHeight.isFinite
+                        ? constraints.maxHeight
+                        : null;
+                    return Container(
+                      width: 48,
+                      color: theme.background,
+                      // The rail beneath the overlay would duplicate
+                      // every item for assistive technology.
+                      child: ExcludeSemantics(
+                        excluding: _overlay.isShowing,
+                        child: _panel(expanded: false),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -161,8 +351,8 @@ class _NavRowState extends State<_NavRow> {
                   decoration: BoxDecoration(
                     color: background,
                     // The active 4px border-interactive selection marker.
-                    border: Border(
-                      left: BorderSide(
+                    border: BorderDirectional(
+                      start: BorderSide(
                         color: widget.current
                             ? theme.borderInteractive
                             : const Color(0x00000000),
@@ -349,7 +539,7 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
           curve: CarbonEasing.standardProductive,
           builder: (BuildContext context, double t, Widget? child) => ClipRect(
             child: Align(
-              alignment: Alignment.topLeft,
+              alignment: AlignmentDirectional.topStart,
               heightFactor: t,
               child: child,
             ),

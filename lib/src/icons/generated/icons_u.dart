@@ -948,6 +948,23 @@ const CarbonIconData userMilitary = CarbonIconData(
   ],
 );
 
+/// The Carbon `user--minus` icon data.
+const CarbonIconData userMinus = CarbonIconData(
+  name: 'user--minus',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,30h-2v-5c0-2.7568-2.2432-5-5-5h-6c-2.7568,0-5,2.2432-5,5v5h-2v-5c0-3.8594,3.1401-7,7-7h6c3.8594,0,7,3.1406,7,7v5ZM32,16h-10v-2h10v2ZM12,16c-3.8599,0-7-3.1401-7-7s3.1401-7,7-7,7,3.1401,7,7-3.1401,7-7,7ZM12,4c-2.7568,0-5,2.2432-5,5s2.2432,5,5,5,5-2.2432,5-5-2.2432-5-5-5Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `user--multiple` icon data.
 const CarbonIconData userMultiple = CarbonIconData(
   name: 'user--multiple',
@@ -1229,6 +1246,23 @@ const CarbonIconData userXRay = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M8,11a3,3,0,0,1,0,6,3,3,0,0,1,0-6M8,9A5,5,0,0,0,8,19,5,5,0,0,0,8,9Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `utility--expense` icon data.
+const CarbonIconData utilityExpense = CarbonIconData(
+  name: 'utility--expense',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,21v2h4c1.1,0,2,.9,2,2v2c0,1.1-.9,2-2,2h-1v2h-2v-2h-3v-2h6v-2h-4c-1.1,0-2-.9-2-2v-2c0-1.1.9-2,2-2h1v-2h2v2h3v2h-6ZM22.79,12.61l-13,17c-.19.25-.49.39-.79.39-.13,0-.27-.03-.39-.08-.42-.18-.67-.62-.6-1.07l.77-4.99,1.05-6.86h-4.83c-.3,0-.59-.14-.78-.38-.1899-.24-.2599-.55-.1899-.85L7.03,2.77c.1-.45.5-.77.97-.77h10c.3,0,.59.14.78.37.1899.24.2599.55.2.85l-1.34,6.01-.39,1.77h4.75c.38,0,.73.22.9.56.17.34.13.75-.11,1.05ZM19.98,13h-5.23l.27-1.22,1.73-7.78h-7.95l-2.54,11h5.91l-1.41,9.16-.18,1.12,9.4-12.28Z',
         ),
       ],
     ),

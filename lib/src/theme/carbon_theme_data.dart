@@ -184,6 +184,16 @@ class CarbonThemeData {
     required this.tagBorderGray,
     required this.tagBorderCoolGray,
     required this.tagBorderWarmGray,
+    required this.notificationBackgroundError,
+    required this.notificationBackgroundSuccess,
+    required this.notificationBackgroundInfo,
+    required this.notificationBackgroundWarning,
+    required this.notificationActionHover,
+    required this.notificationActionTertiaryInverse,
+    required this.notificationActionTertiaryInverseActive,
+    required this.notificationActionTertiaryInverseHover,
+    required this.notificationActionTertiaryInverseText,
+    required this.notificationActionTertiaryInverseTextOnColorDisabled,
     required this.aiInnerShadow,
     required this.aiAuraStartSm,
     required this.aiAuraStart,
@@ -205,6 +215,12 @@ class CarbonThemeData {
     required this.aiPopoverCaretBottom,
     required this.aiPopoverCaretBottomBackgroundActions,
     required this.aiPopoverCaretBottomBackground,
+    required this.chatButton,
+    required this.chatButtonHover,
+    required this.chatButtonTextHover,
+    required this.chatButtonActive,
+    required this.chatButtonSelected,
+    required this.chatButtonTextSelected,
   });
 
   /// Whether this is a light or dark theme.
@@ -687,6 +703,36 @@ class CarbonThemeData {
   /// The `tagBorderWarmGray` token.
   final Color tagBorderWarmGray;
 
+  /// The `notificationBackgroundError` token.
+  final Color notificationBackgroundError;
+
+  /// The `notificationBackgroundSuccess` token.
+  final Color notificationBackgroundSuccess;
+
+  /// The `notificationBackgroundInfo` token.
+  final Color notificationBackgroundInfo;
+
+  /// The `notificationBackgroundWarning` token.
+  final Color notificationBackgroundWarning;
+
+  /// The `notificationActionHover` token.
+  final Color notificationActionHover;
+
+  /// The `notificationActionTertiaryInverse` token.
+  final Color notificationActionTertiaryInverse;
+
+  /// The `notificationActionTertiaryInverseActive` token.
+  final Color notificationActionTertiaryInverseActive;
+
+  /// The `notificationActionTertiaryInverseHover` token.
+  final Color notificationActionTertiaryInverseHover;
+
+  /// The `notificationActionTertiaryInverseText` token.
+  final Color notificationActionTertiaryInverseText;
+
+  /// The `notificationActionTertiaryInverseTextOnColorDisabled` token.
+  final Color notificationActionTertiaryInverseTextOnColorDisabled;
+
   /// The `aiInnerShadow` token.
   final Color aiInnerShadow;
 
@@ -749,6 +795,24 @@ class CarbonThemeData {
 
   /// The `aiPopoverCaretBottomBackground` token.
   final Color aiPopoverCaretBottomBackground;
+
+  /// The `chatButton` token.
+  final Color chatButton;
+
+  /// The `chatButtonHover` token.
+  final Color chatButtonHover;
+
+  /// The `chatButtonTextHover` token.
+  final Color chatButtonTextHover;
+
+  /// The `chatButtonActive` token.
+  final Color chatButtonActive;
+
+  /// The `chatButtonSelected` token.
+  final Color chatButtonSelected;
+
+  /// The `chatButtonTextSelected` token.
+  final Color chatButtonTextSelected;
 
   /// The White theme.
   static final CarbonThemeData white = CarbonThemeData(
@@ -912,6 +976,19 @@ class CarbonThemeData {
     tagBorderGray: CarbonColors.gray40,
     tagBorderCoolGray: CarbonColors.coolGray40,
     tagBorderWarmGray: CarbonColors.warmGray40,
+    notificationBackgroundError: CarbonColors.red10,
+    notificationBackgroundSuccess: CarbonColors.green10,
+    notificationBackgroundInfo: CarbonColors.blue10,
+    notificationBackgroundWarning: CarbonColors.yellow10,
+    notificationActionHover: CarbonColors.white0,
+    notificationActionTertiaryInverse: CarbonColors.white,
+    notificationActionTertiaryInverseActive: CarbonColors.gray30,
+    notificationActionTertiaryInverseHover: CarbonColors.gray10,
+    notificationActionTertiaryInverseText: CarbonColors.gray100,
+    notificationActionTertiaryInverseTextOnColorDisabled: _alpha(
+      CarbonColors.white,
+      0.25,
+    ),
     aiInnerShadow: _alpha(CarbonColors.blue50, 0.1),
     aiAuraStartSm: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStart: _alpha(CarbonColors.blue50, 0.1),
@@ -933,6 +1010,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue40,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFFE9EFFA),
     aiPopoverCaretBottomBackground: const Color(0xFFEAF1FF),
+    chatButton: CarbonColors.blue60,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.12),
+    chatButtonTextHover: CarbonColors.blue70,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
+    chatButtonTextSelected: CarbonColors.gray70,
   );
 
   /// The Gray 10 theme.
@@ -1097,6 +1180,19 @@ class CarbonThemeData {
     tagBorderGray: CarbonColors.gray40,
     tagBorderCoolGray: CarbonColors.coolGray40,
     tagBorderWarmGray: CarbonColors.warmGray40,
+    notificationBackgroundError: CarbonColors.red10,
+    notificationBackgroundSuccess: CarbonColors.green10,
+    notificationBackgroundInfo: CarbonColors.blue10,
+    notificationBackgroundWarning: CarbonColors.yellow10,
+    notificationActionHover: CarbonColors.white0,
+    notificationActionTertiaryInverse: CarbonColors.white,
+    notificationActionTertiaryInverseActive: CarbonColors.gray30,
+    notificationActionTertiaryInverseHover: CarbonColors.gray10,
+    notificationActionTertiaryInverseText: CarbonColors.gray100,
+    notificationActionTertiaryInverseTextOnColorDisabled: _alpha(
+      CarbonColors.white,
+      0.25,
+    ),
     aiInnerShadow: _alpha(CarbonColors.blue50, 0.1),
     aiAuraStartSm: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStart: _alpha(CarbonColors.blue50, 0.1),
@@ -1118,6 +1214,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue40,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFFE9EFFA),
     aiPopoverCaretBottomBackground: const Color(0xFFEAF1FF),
+    chatButton: CarbonColors.blue60,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.12),
+    chatButtonTextHover: CarbonColors.blue70,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
+    chatButtonTextSelected: CarbonColors.gray70,
   );
 
   /// The Gray 90 theme.
@@ -1282,6 +1384,16 @@ class CarbonThemeData {
     tagBorderGray: CarbonColors.gray50,
     tagBorderCoolGray: CarbonColors.coolGray50,
     tagBorderWarmGray: CarbonColors.warmGray50,
+    notificationBackgroundError: CarbonColors.gray80,
+    notificationBackgroundSuccess: CarbonColors.gray80,
+    notificationBackgroundInfo: CarbonColors.gray80,
+    notificationBackgroundWarning: CarbonColors.gray80,
+    notificationActionHover: CarbonColors.gray80Hover,
+    notificationActionTertiaryInverse: CarbonColors.blue60,
+    notificationActionTertiaryInverseActive: CarbonColors.blue80,
+    notificationActionTertiaryInverseHover: const Color(0xFF0050E6),
+    notificationActionTertiaryInverseText: CarbonColors.white,
+    notificationActionTertiaryInverseTextOnColorDisabled: CarbonColors.gray50,
     aiInnerShadow: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStartSm: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStart: _alpha(CarbonColors.blue50, 0.1),
@@ -1303,6 +1415,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue50,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFF1E283A),
     aiPopoverCaretBottomBackground: const Color(0xFF202D45),
+    chatButton: CarbonColors.blue40,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.16),
+    chatButtonTextHover: CarbonColors.blue30,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
+    chatButtonTextSelected: CarbonColors.gray30,
   );
 
   /// The Gray 100 theme.
@@ -1467,6 +1585,16 @@ class CarbonThemeData {
     tagBorderGray: CarbonColors.gray50,
     tagBorderCoolGray: CarbonColors.coolGray50,
     tagBorderWarmGray: CarbonColors.warmGray50,
+    notificationBackgroundError: CarbonColors.gray90,
+    notificationBackgroundSuccess: CarbonColors.gray90,
+    notificationBackgroundInfo: CarbonColors.gray90,
+    notificationBackgroundWarning: CarbonColors.gray90,
+    notificationActionHover: CarbonColors.gray90Hover,
+    notificationActionTertiaryInverse: CarbonColors.blue60,
+    notificationActionTertiaryInverseActive: CarbonColors.blue80,
+    notificationActionTertiaryInverseHover: const Color(0xFF0050E6),
+    notificationActionTertiaryInverseText: CarbonColors.white,
+    notificationActionTertiaryInverseTextOnColorDisabled: CarbonColors.gray50,
     aiInnerShadow: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStartSm: _alpha(CarbonColors.blue50, 0.16),
     aiAuraStart: _alpha(CarbonColors.blue50, 0.1),
@@ -1488,6 +1616,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom: CarbonColors.blue50,
     aiPopoverCaretBottomBackgroundActions: const Color(0xFF1E283A),
     aiPopoverCaretBottomBackground: const Color(0xFF202D45),
+    chatButton: CarbonColors.blue40,
+    chatButtonHover: _alpha(CarbonColors.gray50, 0.16),
+    chatButtonTextHover: CarbonColors.blue30,
+    chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
+    chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
+    chatButtonTextSelected: CarbonColors.gray30,
   );
 
   /// A copy of this theme with the given tokens replaced.
@@ -1652,6 +1786,16 @@ class CarbonThemeData {
     Color? tagBorderGray,
     Color? tagBorderCoolGray,
     Color? tagBorderWarmGray,
+    Color? notificationBackgroundError,
+    Color? notificationBackgroundSuccess,
+    Color? notificationBackgroundInfo,
+    Color? notificationBackgroundWarning,
+    Color? notificationActionHover,
+    Color? notificationActionTertiaryInverse,
+    Color? notificationActionTertiaryInverseActive,
+    Color? notificationActionTertiaryInverseHover,
+    Color? notificationActionTertiaryInverseText,
+    Color? notificationActionTertiaryInverseTextOnColorDisabled,
     Color? aiInnerShadow,
     Color? aiAuraStartSm,
     Color? aiAuraStart,
@@ -1673,6 +1817,12 @@ class CarbonThemeData {
     Color? aiPopoverCaretBottom,
     Color? aiPopoverCaretBottomBackgroundActions,
     Color? aiPopoverCaretBottomBackground,
+    Color? chatButton,
+    Color? chatButtonHover,
+    Color? chatButtonTextHover,
+    Color? chatButtonActive,
+    Color? chatButtonSelected,
+    Color? chatButtonTextSelected,
   }) {
     return CarbonThemeData(
       brightness: brightness ?? this.brightness,
@@ -1848,6 +1998,31 @@ class CarbonThemeData {
       tagBorderGray: tagBorderGray ?? this.tagBorderGray,
       tagBorderCoolGray: tagBorderCoolGray ?? this.tagBorderCoolGray,
       tagBorderWarmGray: tagBorderWarmGray ?? this.tagBorderWarmGray,
+      notificationBackgroundError:
+          notificationBackgroundError ?? this.notificationBackgroundError,
+      notificationBackgroundSuccess:
+          notificationBackgroundSuccess ?? this.notificationBackgroundSuccess,
+      notificationBackgroundInfo:
+          notificationBackgroundInfo ?? this.notificationBackgroundInfo,
+      notificationBackgroundWarning:
+          notificationBackgroundWarning ?? this.notificationBackgroundWarning,
+      notificationActionHover:
+          notificationActionHover ?? this.notificationActionHover,
+      notificationActionTertiaryInverse:
+          notificationActionTertiaryInverse ??
+          this.notificationActionTertiaryInverse,
+      notificationActionTertiaryInverseActive:
+          notificationActionTertiaryInverseActive ??
+          this.notificationActionTertiaryInverseActive,
+      notificationActionTertiaryInverseHover:
+          notificationActionTertiaryInverseHover ??
+          this.notificationActionTertiaryInverseHover,
+      notificationActionTertiaryInverseText:
+          notificationActionTertiaryInverseText ??
+          this.notificationActionTertiaryInverseText,
+      notificationActionTertiaryInverseTextOnColorDisabled:
+          notificationActionTertiaryInverseTextOnColorDisabled ??
+          this.notificationActionTertiaryInverseTextOnColorDisabled,
       aiInnerShadow: aiInnerShadow ?? this.aiInnerShadow,
       aiAuraStartSm: aiAuraStartSm ?? this.aiAuraStartSm,
       aiAuraStart: aiAuraStart ?? this.aiAuraStart,
@@ -1876,6 +2051,13 @@ class CarbonThemeData {
           this.aiPopoverCaretBottomBackgroundActions,
       aiPopoverCaretBottomBackground:
           aiPopoverCaretBottomBackground ?? this.aiPopoverCaretBottomBackground,
+      chatButton: chatButton ?? this.chatButton,
+      chatButtonHover: chatButtonHover ?? this.chatButtonHover,
+      chatButtonTextHover: chatButtonTextHover ?? this.chatButtonTextHover,
+      chatButtonActive: chatButtonActive ?? this.chatButtonActive,
+      chatButtonSelected: chatButtonSelected ?? this.chatButtonSelected,
+      chatButtonTextSelected:
+          chatButtonTextSelected ?? this.chatButtonTextSelected,
     );
   }
 
@@ -2264,6 +2446,56 @@ class CarbonThemeData {
         b.tagBorderWarmGray,
         t,
       )!,
+      notificationBackgroundError: Color.lerp(
+        a.notificationBackgroundError,
+        b.notificationBackgroundError,
+        t,
+      )!,
+      notificationBackgroundSuccess: Color.lerp(
+        a.notificationBackgroundSuccess,
+        b.notificationBackgroundSuccess,
+        t,
+      )!,
+      notificationBackgroundInfo: Color.lerp(
+        a.notificationBackgroundInfo,
+        b.notificationBackgroundInfo,
+        t,
+      )!,
+      notificationBackgroundWarning: Color.lerp(
+        a.notificationBackgroundWarning,
+        b.notificationBackgroundWarning,
+        t,
+      )!,
+      notificationActionHover: Color.lerp(
+        a.notificationActionHover,
+        b.notificationActionHover,
+        t,
+      )!,
+      notificationActionTertiaryInverse: Color.lerp(
+        a.notificationActionTertiaryInverse,
+        b.notificationActionTertiaryInverse,
+        t,
+      )!,
+      notificationActionTertiaryInverseActive: Color.lerp(
+        a.notificationActionTertiaryInverseActive,
+        b.notificationActionTertiaryInverseActive,
+        t,
+      )!,
+      notificationActionTertiaryInverseHover: Color.lerp(
+        a.notificationActionTertiaryInverseHover,
+        b.notificationActionTertiaryInverseHover,
+        t,
+      )!,
+      notificationActionTertiaryInverseText: Color.lerp(
+        a.notificationActionTertiaryInverseText,
+        b.notificationActionTertiaryInverseText,
+        t,
+      )!,
+      notificationActionTertiaryInverseTextOnColorDisabled: Color.lerp(
+        a.notificationActionTertiaryInverseTextOnColorDisabled,
+        b.notificationActionTertiaryInverseTextOnColorDisabled,
+        t,
+      )!,
       aiInnerShadow: Color.lerp(a.aiInnerShadow, b.aiInnerShadow, t)!,
       aiAuraStartSm: Color.lerp(a.aiAuraStartSm, b.aiAuraStartSm, t)!,
       aiAuraStart: Color.lerp(a.aiAuraStart, b.aiAuraStart, t)!,
@@ -2323,6 +2555,24 @@ class CarbonThemeData {
       aiPopoverCaretBottomBackground: Color.lerp(
         a.aiPopoverCaretBottomBackground,
         b.aiPopoverCaretBottomBackground,
+        t,
+      )!,
+      chatButton: Color.lerp(a.chatButton, b.chatButton, t)!,
+      chatButtonHover: Color.lerp(a.chatButtonHover, b.chatButtonHover, t)!,
+      chatButtonTextHover: Color.lerp(
+        a.chatButtonTextHover,
+        b.chatButtonTextHover,
+        t,
+      )!,
+      chatButtonActive: Color.lerp(a.chatButtonActive, b.chatButtonActive, t)!,
+      chatButtonSelected: Color.lerp(
+        a.chatButtonSelected,
+        b.chatButtonSelected,
+        t,
+      )!,
+      chatButtonTextSelected: Color.lerp(
+        a.chatButtonTextSelected,
+        b.chatButtonTextSelected,
         t,
       )!,
     );
@@ -2494,6 +2744,21 @@ class CarbonThemeData {
         other.tagBorderGray == tagBorderGray &&
         other.tagBorderCoolGray == tagBorderCoolGray &&
         other.tagBorderWarmGray == tagBorderWarmGray &&
+        other.notificationBackgroundError == notificationBackgroundError &&
+        other.notificationBackgroundSuccess == notificationBackgroundSuccess &&
+        other.notificationBackgroundInfo == notificationBackgroundInfo &&
+        other.notificationBackgroundWarning == notificationBackgroundWarning &&
+        other.notificationActionHover == notificationActionHover &&
+        other.notificationActionTertiaryInverse ==
+            notificationActionTertiaryInverse &&
+        other.notificationActionTertiaryInverseActive ==
+            notificationActionTertiaryInverseActive &&
+        other.notificationActionTertiaryInverseHover ==
+            notificationActionTertiaryInverseHover &&
+        other.notificationActionTertiaryInverseText ==
+            notificationActionTertiaryInverseText &&
+        other.notificationActionTertiaryInverseTextOnColorDisabled ==
+            notificationActionTertiaryInverseTextOnColorDisabled &&
         other.aiInnerShadow == aiInnerShadow &&
         other.aiAuraStartSm == aiAuraStartSm &&
         other.aiAuraStart == aiAuraStart &&
@@ -2515,7 +2780,14 @@ class CarbonThemeData {
         other.aiPopoverCaretBottom == aiPopoverCaretBottom &&
         other.aiPopoverCaretBottomBackgroundActions ==
             aiPopoverCaretBottomBackgroundActions &&
-        other.aiPopoverCaretBottomBackground == aiPopoverCaretBottomBackground;
+        other.aiPopoverCaretBottomBackground ==
+            aiPopoverCaretBottomBackground &&
+        other.chatButton == chatButton &&
+        other.chatButtonHover == chatButtonHover &&
+        other.chatButtonTextHover == chatButtonTextHover &&
+        other.chatButtonActive == chatButtonActive &&
+        other.chatButtonSelected == chatButtonSelected &&
+        other.chatButtonTextSelected == chatButtonTextSelected;
   }
 
   @override
@@ -2680,6 +2952,16 @@ class CarbonThemeData {
     tagBorderGray,
     tagBorderCoolGray,
     tagBorderWarmGray,
+    notificationBackgroundError,
+    notificationBackgroundSuccess,
+    notificationBackgroundInfo,
+    notificationBackgroundWarning,
+    notificationActionHover,
+    notificationActionTertiaryInverse,
+    notificationActionTertiaryInverseActive,
+    notificationActionTertiaryInverseHover,
+    notificationActionTertiaryInverseText,
+    notificationActionTertiaryInverseTextOnColorDisabled,
     aiInnerShadow,
     aiAuraStartSm,
     aiAuraStart,
@@ -2701,6 +2983,12 @@ class CarbonThemeData {
     aiPopoverCaretBottom,
     aiPopoverCaretBottomBackgroundActions,
     aiPopoverCaretBottomBackground,
+    chatButton,
+    chatButtonHover,
+    chatButtonTextHover,
+    chatButtonActive,
+    chatButtonSelected,
+    chatButtonTextSelected,
   ]);
 }
 

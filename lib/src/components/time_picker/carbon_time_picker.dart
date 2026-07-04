@@ -14,6 +14,8 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../utils/focus_ring.dart';
+import '../../theme/carbon_layer.dart';
 import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
@@ -59,6 +61,7 @@ class CarbonTimePicker extends StatefulWidget {
     this.warnText,
     this.helperText,
     this.hideLabel = false,
+    this.fluid = false,
     this.focusNode,
     this.children = const <Widget>[],
   });
@@ -105,6 +108,12 @@ class CarbonTimePicker extends StatefulWidget {
   /// Whether to hide the visible label (still read by screen readers).
   final bool hideLabel;
 
+  /// The fluid treatment (`_fluid-time-picker.scss`): a 64px field with the
+  /// label rendered inside above the value. Attached
+  /// [CarbonTimePickerSelect]s pick the treatment up automatically when
+  /// hosted in a [CarbonFluidForm]; pass `fluid` to them otherwise.
+  final bool fluid;
+
   /// An external focus node for the text field.
   final FocusNode? focusNode;
 
@@ -122,6 +131,10 @@ class CarbonTimePicker extends StatefulWidget {
 }
 
 class _CarbonTimePickerState extends State<CarbonTimePicker> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   TextEditingController? _internalController;
   FocusNode? _internalFocus;
 
@@ -188,14 +201,22 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
       width: widget.invalid
           ? CarbonTimePicker.fieldWidthError
           : CarbonTimePicker.fieldWidth,
-      child: CarbonField(
-        size: widget.size,
-        status: _status,
-        disabled: widget.disabled,
-        readOnly: widget.readOnly,
-        focused: _focus.hasFocus,
-        child: editable,
-      ),
+      child: _fluid
+          ? _FluidTimeField(
+              label: widget.labelText,
+              status: _status,
+              disabled: widget.disabled,
+              focused: _focus.hasFocus,
+              editable: editable,
+            )
+          : CarbonField(
+              size: widget.size,
+              status: _status,
+              disabled: widget.disabled,
+              readOnly: widget.readOnly,
+              focused: _focus.hasFocus,
+              child: editable,
+            ),
     );
 
     final Widget? message = widget.invalid && widget.invalidText != null
@@ -213,7 +234,7 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (!widget.hideLabel)
+        if (!widget.hideLabel && !_fluid)
           ExcludeSemantics(
             child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
           ),
@@ -355,5 +376,75 @@ class CarbonTimePickerSelect<T> extends StatelessWidget {
         hideLabel: true,
       ),
     );
+  }
+}
+
+/// The fluid time field: a 64px box with the label-01 label stacked above
+/// the editable (the house fluid treatment shared with Select and Text
+/// Input; `_fluid-time-picker.scss`).
+class _FluidTimeField extends StatelessWidget {
+  const _FluidTimeField({
+    required this.label,
+    required this.status,
+    required this.disabled,
+    required this.focused,
+    required this.editable,
+  });
+
+  final String label;
+  final CarbonFieldStatus status;
+  final bool disabled;
+  final bool focused;
+  final Widget editable;
+
+  @override
+  Widget build(BuildContext context) {
+    final CarbonThemeData theme = CarbonTheme.of(context);
+    final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final bool invalid = status == CarbonFieldStatus.invalid;
+    Widget box = DecoratedBox(
+      decoration: BoxDecoration(
+        color: layer.field,
+        border: Border(
+          bottom: BorderSide(
+            color: disabled ? const Color(0x00000000) : theme.borderStrong01,
+          ),
+        ),
+      ),
+      child: SizedBox(
+        height: 64,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.only(start: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              ExcludeSemantics(
+                child: Text(
+                  label,
+                  style: CarbonTypeStyles.label01.copyWith(
+                    color: disabled ? theme.textDisabled : theme.textSecondary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              editable,
+            ],
+          ),
+        ),
+      ),
+    );
+    if (focused) {
+      box = CarbonFocusRing(visible: true, child: box);
+    } else if (invalid) {
+      box = DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.supportError, width: 2),
+        ),
+        child: box,
+      );
+    }
+    return box;
   }
 }

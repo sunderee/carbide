@@ -329,6 +329,23 @@ const CarbonIconData tank = CarbonIconData(
   ],
 );
 
+/// The Carbon `target` icon data.
+const CarbonIconData target = CarbonIconData(
+  name: 'target',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M17,30h-2v-2.041c-5.8208-.4824-10.4761-5.1387-10.9585-10.959h-2.0415v-2h2.0415c.4824-5.8208,5.1377-10.4761,10.9585-10.9585v-2.0415h2v2.0415c5.8203.4824,10.4766,5.1377,10.959,10.9585h2.041v2h-2.041c-.4824,5.8203-5.1387,10.4766-10.959,10.959v2.041ZM15,22h2v3.9502c4.7168-.4707,8.4795-4.2334,8.9502-8.9502h-3.9502v-2h3.9502c-.4707-4.7173-4.2334-8.48-8.9502-8.9502v3.9502h-2v-3.9502c-4.7173.4702-8.48,4.2329-8.9502,8.9502h3.9502v2h-3.9502c.4702,4.7168,4.2329,8.4795,8.9502,8.9502v-3.9502ZM18.8281,20.2422l-2.8286-2.8281-2.8281,2.8281-1.4141-1.4141,2.8281-2.8286-2.8281-2.8281,1.4141-1.4141,2.8281,2.8281,2.8286-2.8281,1.4141,1.4141-2.8281,2.8281,2.8281,2.8286-1.4141,1.4141Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `task` icon data.
 const CarbonIconData task = CarbonIconData(
   name: 'task',
@@ -412,6 +429,23 @@ const CarbonIconData taskAssetView = CarbonIconData(
   ],
 );
 
+/// The Carbon `task--blank` icon data.
+const CarbonIconData taskBlank = CarbonIconData(
+  name: 'task--blank',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,30H7c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h3v-1c0-1.103.897-2,2-2h8c1.1025,0,2,.897,2,2v1h3c1.1025,0,2,.897,2,2v21c0,1.1025-.8975,2-2,2ZM7,7v21h18V7h-3v3h-12v-3h-3ZM12,8h8v-4h-8v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `task--complete` icon data.
 const CarbonIconData taskComplete = CarbonIconData(
   name: 'task--complete',
@@ -426,6 +460,40 @@ const CarbonIconData taskComplete = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M25,5H22V4a2.0058,2.0058,0,0,0-2-2H12a2.0058,2.0058,0,0,0-2,2V5H7A2.0058,2.0058,0,0,0,5,7V28a2.0058,2.0058,0,0,0,2,2h9V28H7V7h3v3H22V7h3V18h2V7A2.0058,2.0058,0,0,0,25,5ZM20,8H12V4h8Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `task--edit` icon data.
+const CarbonIconData taskEdit = CarbonIconData(
+  name: 'task--edit',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,5h-3v-1c0-1.1-.9-2-2-2h-8c-1.1,0-2,.9-2,2v1h-3c-1.1,0-2,.9-2,2v21c0,1.1.9,2,2,2h5v-2h-5V7h3v3h12v-3h3v6h2v-6c0-1.1-.9-2-2-2ZM20,8h-8v-4h8v4ZM29.71,19.29l-3-3c-.39-.39-1.03-.39-1.42,0l-3,3-6.29,6.3v4.41h4.41l6.3-6.29,3-3c.39-.39.39-1.03,0-1.42ZM19.59,28h-1.59v-1.59l5-4.99,1.58,1.58-4.99,5ZM26,21.59l-1.59-1.59,1.59-1.59,1.59,1.59-1.59,1.59Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `task--hold` icon data.
+const CarbonIconData taskHold = CarbonIconData(
+  name: 'task--hold',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M27,30h-2v-9h2v9ZM23,30h-2v-9h2v9ZM17,30H7c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h3v-1c0-1.103.897-2,2-2h8c1.1025,0,2,.897,2,2v1h3c1.1025,0,2,.897,2,2v10h-2V7h-3v3h-12v-3h-3v21h10v2ZM12,8h8v-4h-8v4Z',
         ),
       ],
     ),
@@ -447,6 +515,23 @@ const CarbonIconData taskLocation = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M25,5H22V4a2.0058,2.0058,0,0,0-2-2H12a2.0058,2.0058,0,0,0-2,2V5H7A2.0058,2.0058,0,0,0,5,7V28a2.0058,2.0058,0,0,0,2,2h9V28H7V7h3v3H22V7h3v5h2V7A2.0058,2.0058,0,0,0,25,5ZM20,8H12V4h8Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `task--progress` icon data.
+const CarbonIconData taskProgress = CarbonIconData(
+  name: 'task--progress',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M25,5h-3v-1c0-1.1-.9-2-2-2h-8c-1.1,0-2,.9-2,2v1h-3c-1.1,0-2,.9-2,2v21c0,1.1.9,2,2,2h6v-2h-6V7h3v3h12v-3h3v6h2v-6c0-1.1-.9-2-2-2ZM20,8h-8v-4h8v4ZM23,16c-3.86,0-7,3.14-7,7s3.14,7,7,7,7-3.14,7-7-3.14-7-7-7ZM23,28v-10c2.76,0,5,2.24,5,5s-2.24,5-5,5Z',
         ),
       ],
     ),
@@ -2296,6 +2381,23 @@ const CarbonIconData timeFilled = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'm16,2c-7.6001,0-14,6.3999-14,14s6.3999,14,14,14,14-6.3999,14-14S23.6001,2,16,2Zm4.5872,20l-5.5872-5.5898V7h2v8.582l5,5.0044-1.4128,1.4136Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `timeline` icon data.
+const CarbonIconData timeline = CarbonIconData(
+  name: 'timeline',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,22h-2c-1.1025,0-2-.8975-2-2v-3h-4v3c0,1.1025-.897,2-2,2h-2c-1.103,0-2-.8975-2-2v-3h-4v2h-2v-6h2v2h4v-3c0-1.103.897-2,2-2h2c1.103,0,2,.897,2,2v3h4v-3c0-1.103.8975-2,2-2h2c1.1025,0,2,.897,2,2v3h4v-2h2v6h-2v-2h-4v3c0,1.1025-.8975,2-2,2ZM20,17v3h2v-8h-2v5ZM10,17v3h2v-8h-2v5Z',
         ),
       ],
     ),

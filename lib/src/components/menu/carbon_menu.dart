@@ -365,15 +365,20 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
       _activate();
       return KeyEventResult.handled;
     }
-    if (_hasSubmenu &&
-        event.logicalKey == LogicalKeyboardKey.arrowRight &&
-        !_submenu.isShowing) {
+    // Submenus open toward the end side, so the expand/collapse arrows
+    // follow the ambient direction (Right expands in LTR, Left in RTL).
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    final LogicalKeyboardKey expandKey = rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey collapseKey = rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
+    if (_hasSubmenu && event.logicalKey == expandKey && !_submenu.isShowing) {
       _submenu.show();
       return KeyEventResult.handled;
     }
-    if (_hasSubmenu &&
-        event.logicalKey == LogicalKeyboardKey.arrowLeft &&
-        _submenu.isShowing) {
+    if (_hasSubmenu && event.logicalKey == collapseKey && _submenu.isShowing) {
       _submenu.hide();
       _node.requestFocus();
       return KeyEventResult.handled;
@@ -410,7 +415,14 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
       label: widget.label,
       foreground: foreground,
       trailing: _hasSubmenu
-          ? CarbonIcon(CarbonIcons.chevronRight, color: foreground)
+          // The indicator points toward the submenu side (upstream renders
+          // CaretLeft under RTL, MenuItem.tsx).
+          ? CarbonIcon(
+              Directionality.of(context) == TextDirection.rtl
+                  ? CarbonIcons.chevronLeft
+                  : CarbonIcons.chevronRight,
+              color: foreground,
+            )
           : widget.shortcut != null
           ? Text(
               widget.shortcut!,
@@ -456,16 +468,26 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
           top: 0,
           child: CompositedTransformFollower(
             link: _link,
-            targetAnchor: Alignment.topRight,
-            followerAnchor: Alignment.topLeft,
+            // Submenus open toward the end side (follower anchors are
+            // physical-only, so resolve against the ambient direction).
+            targetAnchor: Directionality.of(context) == TextDirection.rtl
+                ? Alignment.topLeft
+                : Alignment.topRight,
+            followerAnchor: Directionality.of(context) == TextDirection.rtl
+                ? Alignment.topRight
+                : Alignment.topLeft,
             child: Focus(
               skipTraversal: true,
               canRequestFocus: false,
-              // ArrowLeft anywhere in the submenu closes it and returns focus
-              // to the parent item (the submenu owns focus once open).
+              // The collapse arrow (Left in LTR, Right in RTL) anywhere in
+              // the submenu closes it and returns focus to the parent item
+              // (the submenu owns focus once open).
               onKeyEvent: (FocusNode node, KeyEvent event) {
-                if (event is KeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                final LogicalKeyboardKey collapseKey =
+                    Directionality.of(context) == TextDirection.rtl
+                    ? LogicalKeyboardKey.arrowRight
+                    : LogicalKeyboardKey.arrowLeft;
+                if (event is KeyDownEvent && event.logicalKey == collapseKey) {
                   _submenu.hide();
                   _node.requestFocus();
                   return KeyEventResult.handled;

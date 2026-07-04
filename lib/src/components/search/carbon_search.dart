@@ -90,6 +90,10 @@ class CarbonSearch extends StatefulWidget {
 }
 
 class _CarbonSearchState extends State<CarbonSearch> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   TextEditingController? _internalController;
   FocusNode? _internalFocus;
 
@@ -138,7 +142,7 @@ class _CarbonSearchState extends State<CarbonSearch> {
       labelText: widget.labelText,
       size: widget.size,
       disabled: widget.disabled,
-      fluid: widget.fluid,
+      fluid: _fluid,
       autofocus: widget.autofocus,
       onChanged: widget.onChanged,
       onClear: _clear,

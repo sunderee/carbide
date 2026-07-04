@@ -90,6 +90,10 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.warnText,
     this.hideLabel = false,
     this.inline = false,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
+    this.condensed = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
@@ -142,6 +146,21 @@ class CarbonDropdown<T> extends StatefulWidget {
   /// Places the title beside the field instead of above it.
   final bool inline;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-dropdown.scss`): a 64px field with the
+  /// title rendered inside above the value, and 64px menu rows.
+  final bool fluid;
+
+  /// The condensed fluid variant: the field stays fluid but the menu rows
+  /// keep the standard height (`--list-box__wrapper--fluid--condensed`).
+  final bool condensed;
+
   /// An optional external focus node for the trigger.
   final FocusNode? focusNode;
 
@@ -153,6 +172,10 @@ class CarbonDropdown<T> extends StatefulWidget {
 }
 
 class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   FocusNode? _internalFocus;
@@ -294,6 +317,10 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       invalid: widget.invalid,
       warn: widget.warn,
       focused: _focus.hasFocus,
+      aiLabel: widget.aiLabel,
+      aiRevert: widget.aiRevert,
+      fluid: _fluid,
+      fluidLabel: _fluid ? widget.titleText : null,
       onTap: _enabled ? _toggle : null,
       child: ExcludeSemantics(
         child: Text(
@@ -341,7 +368,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel
+    final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -398,7 +425,11 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           // Non-focusable so the trigger keeps keyboard focus (and its key
           // handler) while the menu is open; rows stay tappable.
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(size: widget.size, children: rows),
+            child: CarbonListBoxMenu(
+              size: widget.size,
+              fluidRows: _fluid && !widget.condensed,
+              children: rows,
+            ),
           ),
         ),
       ),
@@ -419,6 +450,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(
           size: widget.size,
+          fluid: _fluid && !widget.condensed,
           isFirst: index == 0,
           isActive: selected,
           isHighlighted: index == _highlighted,

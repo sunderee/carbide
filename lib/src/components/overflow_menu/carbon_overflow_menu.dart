@@ -11,6 +11,10 @@
 // labelled button (MenuButton) and a split action button (ComboButton). The
 // menu owns roving/type-ahead/Escape; these widgets own the trigger and the
 // overlay anchoring.
+//
+// The Menu-based architecture is upstream's `enable-v12-overflowmenu`
+// flagged behavior, adopted deliberately — the unflagged v10-style
+// OverflowMenu is what Carbon v12 removes (ADR 0002).
 
 import 'package:flutter/widgets.dart';
 
@@ -266,14 +270,20 @@ class _AnchoredMenuState extends State<_AnchoredMenu> {
   }
 
   Widget _buildMenu(BuildContext context) {
-    final bool end = widget.menuAlignment == CarbonMenuAlignment.end;
+    // CarbonMenuAlignment is logical (start/end), so resolve it against the
+    // ambient direction (follower anchors are physical-only).
+    final bool physicalRight =
+        (widget.menuAlignment == CarbonMenuAlignment.end) ^
+        (Directionality.of(context) == TextDirection.rtl);
     return Positioned(
       left: 0,
       top: 0,
       child: CompositedTransformFollower(
         link: _link,
-        targetAnchor: end ? Alignment.bottomRight : Alignment.bottomLeft,
-        followerAnchor: end ? Alignment.topRight : Alignment.topLeft,
+        targetAnchor: physicalRight
+            ? Alignment.bottomRight
+            : Alignment.bottomLeft,
+        followerAnchor: physicalRight ? Alignment.topRight : Alignment.topLeft,
         showWhenUnlinked: false,
         child: TapRegion(
           groupId: _group,

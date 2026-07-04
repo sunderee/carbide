@@ -224,6 +224,45 @@ void main() {
     expect(CarbonThemeData.white.tagBorderCoolGray, CarbonColors.coolGray40);
     expect(CarbonThemeData.white.tagBorderWarmGray, CarbonColors.warmGray40);
     expect(
+      CarbonThemeData.white.notificationBackgroundError,
+      CarbonColors.red10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundSuccess,
+      CarbonColors.green10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundInfo,
+      CarbonColors.blue10,
+    );
+    expect(
+      CarbonThemeData.white.notificationBackgroundWarning,
+      CarbonColors.yellow10,
+    );
+    expect(CarbonThemeData.white.notificationActionHover, CarbonColors.white0);
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverse,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseActive,
+      CarbonColors.gray30,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseHover,
+      CarbonColors.gray10,
+    );
+    expect(
+      CarbonThemeData.white.notificationActionTertiaryInverseText,
+      CarbonColors.gray100,
+    );
+    expect(
+      CarbonThemeData
+          .white
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      _alpha(CarbonColors.white, 0.25),
+    );
+    expect(
       CarbonThemeData.white.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.1),
     );
@@ -277,6 +316,21 @@ void main() {
       CarbonThemeData.white.aiPopoverCaretBottomBackground,
       const Color(0xFFEAF1FF),
     );
+    expect(CarbonThemeData.white.chatButton, CarbonColors.blue60);
+    expect(
+      CarbonThemeData.white.chatButtonHover,
+      _alpha(CarbonColors.gray50, 0.12),
+    );
+    expect(CarbonThemeData.white.chatButtonTextHover, CarbonColors.blue70);
+    expect(
+      CarbonThemeData.white.chatButtonActive,
+      _alpha(CarbonColors.gray50, 0.5),
+    );
+    expect(
+      CarbonThemeData.white.chatButtonSelected,
+      _alpha(CarbonColors.gray50, 0.2),
+    );
+    expect(CarbonThemeData.white.chatButtonTextSelected, CarbonColors.gray70);
   });
 
   test('gray10 theme tokens match the Carbon source', () {
@@ -492,6 +546,45 @@ void main() {
     expect(CarbonThemeData.gray10.tagBorderCoolGray, CarbonColors.coolGray40);
     expect(CarbonThemeData.gray10.tagBorderWarmGray, CarbonColors.warmGray40);
     expect(
+      CarbonThemeData.gray10.notificationBackgroundError,
+      CarbonColors.red10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundSuccess,
+      CarbonColors.green10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundInfo,
+      CarbonColors.blue10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationBackgroundWarning,
+      CarbonColors.yellow10,
+    );
+    expect(CarbonThemeData.gray10.notificationActionHover, CarbonColors.white0);
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverse,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseActive,
+      CarbonColors.gray30,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseHover,
+      CarbonColors.gray10,
+    );
+    expect(
+      CarbonThemeData.gray10.notificationActionTertiaryInverseText,
+      CarbonColors.gray100,
+    );
+    expect(
+      CarbonThemeData
+          .gray10
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      _alpha(CarbonColors.white, 0.25),
+    );
+    expect(
       CarbonThemeData.gray10.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.1),
     );
@@ -551,6 +644,21 @@ void main() {
       CarbonThemeData.gray10.aiPopoverCaretBottomBackground,
       const Color(0xFFEAF1FF),
     );
+    expect(CarbonThemeData.gray10.chatButton, CarbonColors.blue60);
+    expect(
+      CarbonThemeData.gray10.chatButtonHover,
+      _alpha(CarbonColors.gray50, 0.12),
+    );
+    expect(CarbonThemeData.gray10.chatButtonTextHover, CarbonColors.blue70);
+    expect(
+      CarbonThemeData.gray10.chatButtonActive,
+      _alpha(CarbonColors.gray50, 0.5),
+    );
+    expect(
+      CarbonThemeData.gray10.chatButtonSelected,
+      _alpha(CarbonColors.gray50, 0.2),
+    );
+    expect(CarbonThemeData.gray10.chatButtonTextSelected, CarbonColors.gray70);
   });
 
   test('gray90 theme tokens match the Carbon source', () {
@@ -778,6 +886,48 @@ void main() {
     expect(CarbonThemeData.gray90.tagBorderCoolGray, CarbonColors.coolGray50);
     expect(CarbonThemeData.gray90.tagBorderWarmGray, CarbonColors.warmGray50);
     expect(
+      CarbonThemeData.gray90.notificationBackgroundError,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundSuccess,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundInfo,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationBackgroundWarning,
+      CarbonColors.gray80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionHover,
+      CarbonColors.gray80Hover,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverse,
+      CarbonColors.blue60,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseActive,
+      CarbonColors.blue80,
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseHover,
+      const Color(0xFF0050E6),
+    );
+    expect(
+      CarbonThemeData.gray90.notificationActionTertiaryInverseText,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData
+          .gray90
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      CarbonColors.gray50,
+    );
+    expect(
       CarbonThemeData.gray90.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.16),
     );
@@ -843,6 +993,21 @@ void main() {
       CarbonThemeData.gray90.aiPopoverCaretBottomBackground,
       const Color(0xFF202D45),
     );
+    expect(CarbonThemeData.gray90.chatButton, CarbonColors.blue40);
+    expect(
+      CarbonThemeData.gray90.chatButtonHover,
+      _alpha(CarbonColors.gray50, 0.16),
+    );
+    expect(CarbonThemeData.gray90.chatButtonTextHover, CarbonColors.blue30);
+    expect(
+      CarbonThemeData.gray90.chatButtonActive,
+      _alpha(CarbonColors.gray50, 0.4),
+    );
+    expect(
+      CarbonThemeData.gray90.chatButtonSelected,
+      _alpha(CarbonColors.gray50, 0.24),
+    );
+    expect(CarbonThemeData.gray90.chatButtonTextSelected, CarbonColors.gray30);
   });
 
   test('gray100 theme tokens match the Carbon source', () {
@@ -1088,6 +1253,48 @@ void main() {
     expect(CarbonThemeData.gray100.tagBorderCoolGray, CarbonColors.coolGray50);
     expect(CarbonThemeData.gray100.tagBorderWarmGray, CarbonColors.warmGray50);
     expect(
+      CarbonThemeData.gray100.notificationBackgroundError,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundSuccess,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundInfo,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationBackgroundWarning,
+      CarbonColors.gray90,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionHover,
+      CarbonColors.gray90Hover,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverse,
+      CarbonColors.blue60,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseActive,
+      CarbonColors.blue80,
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseHover,
+      const Color(0xFF0050E6),
+    );
+    expect(
+      CarbonThemeData.gray100.notificationActionTertiaryInverseText,
+      CarbonColors.white,
+    );
+    expect(
+      CarbonThemeData
+          .gray100
+          .notificationActionTertiaryInverseTextOnColorDisabled,
+      CarbonColors.gray50,
+    );
+    expect(
       CarbonThemeData.gray100.aiInnerShadow,
       _alpha(CarbonColors.blue50, 0.16),
     );
@@ -1153,6 +1360,21 @@ void main() {
       CarbonThemeData.gray100.aiPopoverCaretBottomBackground,
       const Color(0xFF202D45),
     );
+    expect(CarbonThemeData.gray100.chatButton, CarbonColors.blue40);
+    expect(
+      CarbonThemeData.gray100.chatButtonHover,
+      _alpha(CarbonColors.gray50, 0.16),
+    );
+    expect(CarbonThemeData.gray100.chatButtonTextHover, CarbonColors.blue30);
+    expect(
+      CarbonThemeData.gray100.chatButtonActive,
+      _alpha(CarbonColors.gray50, 0.4),
+    );
+    expect(
+      CarbonThemeData.gray100.chatButtonSelected,
+      _alpha(CarbonColors.gray50, 0.24),
+    );
+    expect(CarbonThemeData.gray100.chatButtonTextSelected, CarbonColors.gray30);
   });
 
   test('themes carry the expected brightness', () {

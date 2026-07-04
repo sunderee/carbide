@@ -742,6 +742,9 @@ abstract final class CarbonIcons {
   /// The Carbon `building` icon.
   static const CarbonIconData building = b_.building;
 
+  /// The Carbon `building--electrical` icon.
+  static const CarbonIconData buildingElectrical = b_.buildingElectrical;
+
   /// The Carbon `building--insights-1` icon.
   static const CarbonIconData buildingInsights1 = b_.buildingInsights1;
 
@@ -1127,6 +1130,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `chart--parallel` icon.
   static const CarbonIconData chartParallel = c_.chartParallel;
+
+  /// The Carbon `chart--performance` icon.
+  static const CarbonIconData chartPerformance = c_.chartPerformance;
 
   /// The Carbon `chart--pie` icon.
   static const CarbonIconData chartPie = c_.chartPie;
@@ -1552,6 +1558,9 @@ abstract final class CarbonIcons {
   /// The Carbon `connect` icon.
   static const CarbonIconData connect = c_.connect;
 
+  /// The Carbon `connection` icon.
+  static const CarbonIconData connection = c_.connection;
+
   /// The Carbon `connection-flow--usage` icon.
   static const CarbonIconData connectionFlowUsage = c_.connectionFlowUsage;
 
@@ -1563,6 +1572,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `connection-signal` icon.
   static const CarbonIconData connectionSignal = c_.connectionSignal;
+
+  /// The Carbon `connection--signal--alt` icon.
+  static const CarbonIconData connectionSignalAlt = c_.connectionSignalAlt;
 
   /// The Carbon `connection-signal--off` icon.
   static const CarbonIconData connectionSignalOff = c_.connectionSignalOff;
@@ -1817,6 +1829,12 @@ abstract final class CarbonIcons {
   /// The Carbon `data-accessor` icon.
   static const CarbonIconData dataAccessor = d_.dataAccessor;
 
+  /// The Carbon `data--add` icon.
+  static const CarbonIconData dataAdd = d_.dataAdd;
+
+  /// The Carbon `data--alert` icon.
+  static const CarbonIconData dataAlert = d_.dataAlert;
+
   /// The Carbon `data-analytics` icon.
   static const CarbonIconData dataAnalytics = d_.dataAnalytics;
 
@@ -2005,6 +2023,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `decline` icon.
   static const CarbonIconData decline = d_.decline;
+
+  /// The Carbon `delay` icon.
+  static const CarbonIconData delay = d_.delay;
 
   /// The Carbon `delete` icon.
   static const CarbonIconData delete = d_.delete;
@@ -2391,6 +2412,12 @@ abstract final class CarbonIcons {
   /// The Carbon `double-axis-chart--column` icon.
   static const CarbonIconData doubleAxisChartColumn = d_.doubleAxisChartColumn;
 
+  /// The Carbon `double-chevron--left` icon.
+  static const CarbonIconData doubleChevronLeft = d_.doubleChevronLeft;
+
+  /// The Carbon `double-chevron--right` icon.
+  static const CarbonIconData doubleChevronRight = d_.doubleChevronRight;
+
   /// The Carbon `double-integer` icon.
   static const CarbonIconData doubleInteger = d_.doubleInteger;
 
@@ -2522,6 +2549,12 @@ abstract final class CarbonIcons {
   /// The Carbon `email--new` icon.
   static const CarbonIconData emailNew = e_.emailNew;
 
+  /// The Carbon `email--user` icon.
+  static const CarbonIconData emailUser = e_.emailUser;
+
+  /// The Carbon `emissions` icon.
+  static const CarbonIconData emissions = e_.emissions;
+
   /// The Carbon `emissions-management` icon.
   static const CarbonIconData emissionsManagement = e_.emissionsManagement;
 
@@ -2533,6 +2566,12 @@ abstract final class CarbonIcons {
 
   /// The Carbon `energy--renewable` icon.
   static const CarbonIconData energyRenewable = e_.energyRenewable;
+
+  /// The Carbon `energy--report` icon.
+  static const CarbonIconData energyReport = e_.energyReport;
+
+  /// The Carbon `energy--waste` icon.
+  static const CarbonIconData energyWaste = e_.energyWaste;
 
   /// The Carbon `enterprise` icon.
   static const CarbonIconData enterprise = e_.enterprise;
@@ -2569,6 +2608,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `event--incident` icon.
   static const CarbonIconData eventIncident = e_.eventIncident;
+
+  /// The Carbon `event--number` icon.
+  static const CarbonIconData eventNumber = e_.eventNumber;
 
   /// The Carbon `events` icon.
   static const CarbonIconData events = e_.events;
@@ -2672,6 +2714,13 @@ abstract final class CarbonIcons {
 
   /// The Carbon `face--wink--filled` icon.
   static const CarbonIconData faceWinkFilled = f_.faceWinkFilled;
+
+  /// The Carbon `facility--group` icon.
+  static const CarbonIconData facilityGroup = f_.facilityGroup;
+
+  /// The Carbon `facility--group--alternate` icon.
+  static const CarbonIconData facilityGroupAlternate =
+      f_.facilityGroupAlternate;
 
   /// The Carbon `factor` icon.
   static const CarbonIconData factor = f_.factor;
@@ -2925,6 +2974,9 @@ abstract final class CarbonIcons {
   /// The Carbon `fruit-bowl` icon.
   static const CarbonIconData fruitBowl = f_.fruitBowl;
 
+  /// The Carbon `fuel-can` icon.
+  static const CarbonIconData fuelCan = f_.fuelCan;
+
   /// The Carbon `function` icon.
   static const CarbonIconData function = f_.function;
 
@@ -2951,6 +3003,12 @@ abstract final class CarbonIcons {
 
   /// The Carbon `gas-station` icon.
   static const CarbonIconData gasStation = g_.gasStation;
+
+  /// The Carbon `gas-station--diesel` icon.
+  static const CarbonIconData gasStationDiesel = g_.gasStationDiesel;
+
+  /// The Carbon `gas-station--eco` icon.
+  static const CarbonIconData gasStationEco = g_.gasStationEco;
 
   /// The Carbon `gas-station--filled` icon.
   static const CarbonIconData gasStationFilled = g_.gasStationFilled;
@@ -3121,6 +3179,9 @@ abstract final class CarbonIcons {
   /// The Carbon `helicopter` icon.
   static const CarbonIconData helicopter = h_.helicopter;
 
+  /// The Carbon `helmet` icon.
+  static const CarbonIconData helmet = h_.helmet;
+
   /// The Carbon `help` icon.
   static const CarbonIconData help = h_.help;
 
@@ -3142,6 +3203,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `hexagon--vertical--solid` icon.
   static const CarbonIconData hexagonVerticalSolid = h_.hexagonVerticalSolid;
+
+  /// The Carbon `history` icon.
+  static const CarbonIconData history = h_.history;
 
   /// The Carbon `home` icon.
   static const CarbonIconData home = h_.home;
@@ -4428,6 +4492,9 @@ abstract final class CarbonIcons {
   /// The Carbon `location--filled` icon.
   static const CarbonIconData locationFilled = l_.locationFilled;
 
+  /// The Carbon `location--group` icon.
+  static const CarbonIconData locationGroup = l_.locationGroup;
+
   /// The Carbon `location--hazard` icon.
   static const CarbonIconData locationHazard = l_.locationHazard;
 
@@ -4460,6 +4527,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `location--star--filled` icon.
   static const CarbonIconData locationStarFilled = l_.locationStarFilled;
+
+  /// The Carbon `location--supplier` icon.
+  static const CarbonIconData locationSupplier = l_.locationSupplier;
 
   /// The Carbon `locked` icon.
   static const CarbonIconData locked = l_.locked;
@@ -5153,6 +5223,9 @@ abstract final class CarbonIcons {
   /// The Carbon `observed--lightning` icon.
   static const CarbonIconData observedLightning = o_.observedLightning;
 
+  /// The Carbon `offset--environmental` icon.
+  static const CarbonIconData offsetEnvironmental = o_.offsetEnvironmental;
+
   /// The Carbon `omega` icon.
   static const CarbonIconData omega = o_.omega;
 
@@ -5306,6 +5379,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `part--usage` icon.
   static const CarbonIconData partUsage = p_.partUsage;
+
+  /// The Carbon `party-popper` icon.
+  static const CarbonIconData partyPopper = p_.partyPopper;
 
   /// The Carbon `passenger--drinks` icon.
   static const CarbonIconData passengerDrinks = p_.passengerDrinks;
@@ -5636,6 +5712,12 @@ abstract final class CarbonIcons {
   /// The Carbon `printer` icon.
   static const CarbonIconData printer = p_.printer;
 
+  /// The Carbon `priority--high` icon.
+  static const CarbonIconData priorityHigh = p_.priorityHigh;
+
+  /// The Carbon `priority--low` icon.
+  static const CarbonIconData priorityLow = p_.priorityLow;
+
   /// The Carbon `private-network` icon.
   static const CarbonIconData privateNetwork = p_.privateNetwork;
 
@@ -5653,6 +5735,12 @@ abstract final class CarbonIcons {
 
   /// The Carbon `production-service` icon.
   static const CarbonIconData productionService = p_.productionService;
+
+  /// The Carbon `program` icon.
+  static const CarbonIconData program = p_.program;
+
+  /// The Carbon `program--action` icon.
+  static const CarbonIconData programAction = p_.programAction;
 
   /// The Carbon `progress-bar` icon.
   static const CarbonIconData progressBar = p_.progressBar;
@@ -5843,6 +5931,9 @@ abstract final class CarbonIcons {
   /// The Carbon `receipt` icon.
   static const CarbonIconData receipt = r_.receipt;
 
+  /// The Carbon `receipt--verification` icon.
+  static const CarbonIconData receiptVerification = r_.receiptVerification;
+
   /// The Carbon `recently-viewed` icon.
   static const CarbonIconData recentlyViewed = r_.recentlyViewed;
 
@@ -5883,6 +5974,9 @@ abstract final class CarbonIcons {
   /// The Carbon `reflect--vertical` icon.
   static const CarbonIconData reflectVertical = r_.reflectVertical;
 
+  /// The Carbon `refrigerant` icon.
+  static const CarbonIconData refrigerant = r_.refrigerant;
+
   /// The Carbon `reminder` icon.
   static const CarbonIconData reminder = r_.reminder;
 
@@ -5919,8 +6013,14 @@ abstract final class CarbonIcons {
   /// The Carbon `report` icon.
   static const CarbonIconData report = r_.report;
 
+  /// The Carbon `report--chart` icon.
+  static const CarbonIconData reportChart = r_.reportChart;
+
   /// The Carbon `report--data` icon.
   static const CarbonIconData reportData = r_.reportData;
+
+  /// The Carbon `report--growth` icon.
+  static const CarbonIconData reportGrowth = r_.reportGrowth;
 
   /// The Carbon `repo--source-code` icon.
   static const CarbonIconData repoSourceCode = r_.repoSourceCode;
@@ -6257,6 +6357,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `send-to-back` icon.
   static const CarbonIconData sendToBack = s_.sendToBack;
+
+  /// The Carbon `sensor` icon.
+  static const CarbonIconData sensor = s_.sensor;
 
   /// The Carbon `sequential-palette` icon.
   static const CarbonIconData sequentialPalette = s_.sequentialPalette;
@@ -6828,6 +6931,9 @@ abstract final class CarbonIcons {
   /// The Carbon `tank` icon.
   static const CarbonIconData tank = t_.tank;
 
+  /// The Carbon `target` icon.
+  static const CarbonIconData target = t_.target;
+
   /// The Carbon `task` icon.
   static const CarbonIconData task = t_.task;
 
@@ -6840,11 +6946,23 @@ abstract final class CarbonIcons {
   /// The Carbon `task--asset-view` icon.
   static const CarbonIconData taskAssetView = t_.taskAssetView;
 
+  /// The Carbon `task--blank` icon.
+  static const CarbonIconData taskBlank = t_.taskBlank;
+
   /// The Carbon `task--complete` icon.
   static const CarbonIconData taskComplete = t_.taskComplete;
 
+  /// The Carbon `task--edit` icon.
+  static const CarbonIconData taskEdit = t_.taskEdit;
+
+  /// The Carbon `task--hold` icon.
+  static const CarbonIconData taskHold = t_.taskHold;
+
   /// The Carbon `task--location` icon.
   static const CarbonIconData taskLocation = t_.taskLocation;
+
+  /// The Carbon `task--progress` icon.
+  static const CarbonIconData taskProgress = t_.taskProgress;
 
   /// The Carbon `task--remove` icon.
   static const CarbonIconData taskRemove = t_.taskRemove;
@@ -7105,6 +7223,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `time--filled` icon.
   static const CarbonIconData timeFilled = t_.timeFilled;
+
+  /// The Carbon `timeline` icon.
+  static const CarbonIconData timeline = t_.timeline;
 
   /// The Carbon `time-plot` icon.
   static const CarbonIconData timePlot = t_.timePlot;
@@ -7466,6 +7587,9 @@ abstract final class CarbonIcons {
   /// The Carbon `user--military` icon.
   static const CarbonIconData userMilitary = u_.userMilitary;
 
+  /// The Carbon `user--minus` icon.
+  static const CarbonIconData userMinus = u_.userMinus;
+
   /// The Carbon `user--multiple` icon.
   static const CarbonIconData userMultiple = u_.userMultiple;
 
@@ -7501,6 +7625,9 @@ abstract final class CarbonIcons {
 
   /// The Carbon `user--x-ray` icon.
   static const CarbonIconData userXRay = u_.userXRay;
+
+  /// The Carbon `utility--expense` icon.
+  static const CarbonIconData utilityExpense = u_.utilityExpense;
 
   /// The Carbon `uv-index` icon.
   static const CarbonIconData uvIndex = u_.uvIndex;

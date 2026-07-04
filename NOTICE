@@ -23,11 +23,14 @@ IBM Carbon Design System
 
 Portions of this software — including design tokens, color values, the type
 scale, spacing and layout scales, motion durations and easing curves, and
-component specifications — are derived from the Carbon Design System.
+component specifications — are derived from the Carbon Design System. The
+usage-pattern guidance under docs/patterns/ is adapted from the Carbon
+Design System website documentation.
 
     Copyright IBM Corp. 2014, 2026
     Licensed under the Apache License, Version 2.0.
     https://github.com/carbon-design-system/carbon
+    https://github.com/carbon-design-system/carbon-website
     https://www.apache.org/licenses/LICENSE-2.0
 
 The Apache-2.0 license is compatible with redistribution under the AGPL-3.0.

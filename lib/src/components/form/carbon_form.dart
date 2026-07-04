@@ -172,10 +172,20 @@ class CarbonFormItem extends StatelessWidget {
 /// Used to group checkboxes or radios under one [legend] (`label-01`).
 class CarbonFormGroup extends StatelessWidget {
   /// Creates a form group.
-  const CarbonFormGroup({super.key, required this.legend, required this.child});
+  const CarbonFormGroup({
+    super.key,
+    required this.legend,
+    required this.child,
+    this.aiLabel,
+  });
 
   /// The group legend text.
   final String legend;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// inline after the legend (`--checkbox-group--decorator`,
+  /// 8px start margin) per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   /// The grouped controls.
   final Widget child;
@@ -194,11 +204,22 @@ class CarbonFormGroup extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing03),
-            child: Text(
-              legend,
-              style: CarbonTypeStyles.label01.copyWith(
-                color: theme.textSecondary,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  legend,
+                  style: CarbonTypeStyles.label01.copyWith(
+                    color: theme.textSecondary,
+                  ),
+                ),
+                // The AI label flows after the legend with an 8px margin
+                // (`margin-inline-start: $spacing-03`).
+                if (aiLabel != null) ...<Widget>[
+                  const SizedBox(width: CarbonSpacing.spacing03),
+                  aiLabel!,
+                ],
+              ],
             ),
           ),
           child,
@@ -206,6 +227,32 @@ class CarbonFormGroup extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Opts every fluid-capable descendant field into the fluid treatment.
+///
+/// Upstream's `FluidForm` wraps a form so each input renders its fluid
+/// variant; here the scope is an inherited flag the fluid-capable
+/// components combine with their own `fluid` parameter.
+///
+/// ```dart
+/// CarbonFluidForm(
+///   child: Column(children: <Widget>[
+///     CarbonTextInput(labelText: 'Name'),
+///     CarbonDropdown<int>(titleText: 'Team', items: teams),
+///   ]),
+/// )
+/// ```
+class CarbonFluidForm extends InheritedWidget {
+  /// Creates a fluid form scope.
+  const CarbonFluidForm({super.key, required super.child});
+
+  /// Whether a [CarbonFluidForm] encloses [context].
+  static bool of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CarbonFluidForm>() != null;
+
+  @override
+  bool updateShouldNotify(CarbonFluidForm oldWidget) => false;
 }
 
 /// The presentational Carbon field surface (`cds--text-input` chrome).
@@ -222,7 +269,11 @@ class CarbonFormGroup extends StatelessWidget {
 /// * read-only → transparent bg, `border-subtle` bottom border;
 /// * invalid → 2px `support-error` outline (focus wins when focused) +
 ///   `ErrorFilled`;
-/// * warning → `WarningAltFilled` (the bottom border stays `border-strong`).
+/// * warning → `WarningAltFilled` (the bottom border stays `border-strong`);
+/// * with [aiLabel] → the bottom-anchored AI aura gradient and the
+///   `ai-border-strong` bottom border, with the label rendered nearest the
+///   end edge (the status icon shifts inward). [aiRevert] suppresses the
+///   aura while a revert control shows (`:not(:has(--revert))`).
 class CarbonField extends StatelessWidget {
   /// Creates a field surface.
   const CarbonField({
@@ -234,6 +285,9 @@ class CarbonField extends StatelessWidget {
     this.readOnly = false,
     this.focused = false,
     this.trailing,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
   });
 
   /// The editable content (e.g. an `EditableText`) or display child.
@@ -258,11 +312,39 @@ class CarbonField extends StatelessWidget {
   /// number steppers), laid out after the status icon.
   final Widget? trailing;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// nearest the end edge with the AI aura gradient behind the field
+  /// (upstream's `decorator` prop).
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control
+  /// (`--ai-label--revert` drops the gradient upstream).
+  final bool aiRevert;
+
+  /// The fluid treatment: the field renders at the 64px fluid height (the
+  /// consumer stacks its label inside the [child]).
+  final bool fluid;
+
   /// Horizontal field padding (`layout.density('padding-inline')`).
   static const double paddingInline = 16;
 
   /// The status-icon size.
   static const double statusIconSize = 16;
+
+  /// The AI aura for a field: `ai-gradient('bottom', 50%)` — aura-start-sm
+  /// at the bottom edge blending to aura-end at 50%, transparent above. The
+  /// CSS 15% interpolation hint is approximated with a computed stop.
+  static Gradient aiFieldGradient(CarbonThemeData theme) => LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: <Color>[
+      theme.aiAuraStartSm,
+      Color.lerp(theme.aiAuraStartSm, theme.aiAuraEnd, 0.5)!,
+      theme.aiAuraEnd,
+      theme.aiAuraEnd.withValues(alpha: 0),
+    ],
+    stops: const <double>[0, 0.15, 0.5, 1],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -271,11 +353,17 @@ class CarbonField extends StatelessWidget {
     final bool invalid = status == CarbonFieldStatus.invalid;
     final bool warning = status == CarbonFieldStatus.warning;
 
+    // The AI treatment: the aura gradient over the field background and
+    // the ai-border-strong bottom border, unless a revert control shows.
+    final bool ai = aiLabel != null && !aiRevert && !readOnly;
+
     final Color background = readOnly ? const Color(0x00000000) : layer.field;
     final Color borderColor = disabled
         ? const Color(0x00000000)
         : readOnly
         ? layer.borderSubtle
+        : ai
+        ? theme.aiBorderStrong
         : theme.borderStrong01;
 
     final Widget? statusIcon = invalid
@@ -295,10 +383,11 @@ class CarbonField extends StatelessWidget {
     Widget field = DecoratedBox(
       decoration: BoxDecoration(
         color: background,
+        gradient: ai ? aiFieldGradient(theme) : null,
         border: Border(bottom: BorderSide(color: borderColor)),
       ),
       child: SizedBox(
-        height: size.height,
+        height: fluid ? 64 : size.height,
         child: Padding(
           padding: const EdgeInsetsDirectional.only(start: paddingInline),
           child: Row(
@@ -306,14 +395,28 @@ class CarbonField extends StatelessWidget {
               Expanded(child: child),
               if (statusIcon != null)
                 Padding(
-                  padding: const EdgeInsetsDirectional.only(
+                  padding: EdgeInsetsDirectional.only(
                     start: CarbonSpacing.spacing03,
-                    end: paddingInline,
+                    // With an AI label the icon sits flush against it; the
+                    // label carries the 16px end inset.
+                    end: aiLabel == null ? paddingInline : 0,
                   ),
                   child: statusIcon,
                 ),
+              // The AI label renders 16px from the end edge
+              // (`inset-inline-end: $spacing-05`), or just before a
+              // trailing control (the select chevron / password toggle:
+              // `inset-inline-end: $spacing-08 + 8px` in _select.scss).
+              if (aiLabel != null) ...<Widget>[
+                aiLabel!,
+                SizedBox(
+                  width: trailing == null
+                      ? paddingInline
+                      : CarbonSpacing.spacing03,
+                ),
+              ],
               ?trailing,
-              if (statusIcon == null && trailing == null)
+              if (aiLabel == null && statusIcon == null && trailing == null)
                 const SizedBox(width: paddingInline),
             ],
           ),

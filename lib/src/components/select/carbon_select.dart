@@ -86,6 +86,8 @@ class CarbonSelect<T> extends StatefulWidget {
     this.hideLabel = false,
     this.inline = false,
     this.fluid = false,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(!(inline && fluid), 'inline and fluid are mutually exclusive');
@@ -135,6 +137,13 @@ class CarbonSelect<T> extends StatefulWidget {
   /// Uses the fluid treatment (label inside the field).
   final bool fluid;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
   /// An optional focus node.
   final FocusNode? focusNode;
 
@@ -146,6 +155,10 @@ class CarbonSelect<T> extends StatefulWidget {
 }
 
 class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   FocusNode? _internalFocus;
@@ -331,7 +344,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     // a button would consume Enter/Space as activation before _onKey could
     // use them to select the highlighted item while the menu is open.
     final bool focused = _focus.hasFocus;
-    final Widget fieldChrome = widget.fluid
+    final Widget fieldChrome = _fluid
         ? _FluidSelectField(
             label: widget.labelText,
             status: _status,
@@ -344,6 +357,8 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
             size: widget.size,
             status: _status,
             disabled: widget.disabled,
+            aiLabel: widget.aiLabel,
+            aiRevert: widget.aiRevert,
             focused: focused,
             trailing: chevron,
             child: ExcludeSemantics(child: valueText),
@@ -396,7 +411,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? label = widget.hideLabel || widget.fluid
+    final Widget? label = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),

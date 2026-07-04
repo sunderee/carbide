@@ -137,7 +137,9 @@ class CarbonPagination extends StatelessWidget {
                 Text('of $totalPages pages'),
                 divider(),
                 CarbonButton.iconOnly(
-                  icon: CarbonIcons.chevronLeft,
+                  icon: Directionality.of(context) == TextDirection.rtl
+                      ? CarbonIcons.chevronRight
+                      : CarbonIcons.chevronLeft,
                   iconDescription: backwardText,
                   kind: CarbonButtonKind.ghost,
                   size: CarbonButtonSize.lg,
@@ -147,7 +149,9 @@ class CarbonPagination extends StatelessWidget {
                 ),
                 divider(),
                 CarbonButton.iconOnly(
-                  icon: CarbonIcons.chevronRight,
+                  icon: Directionality.of(context) == TextDirection.rtl
+                      ? CarbonIcons.chevronLeft
+                      : CarbonIcons.chevronRight,
                   iconDescription: forwardText,
                   kind: CarbonButtonKind.ghost,
                   size: CarbonButtonSize.lg,

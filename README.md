@@ -157,6 +157,10 @@ uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 - [Getting started](docs/getting-started.md)
 - [Theming & layers](docs/theming-and-layers.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- Patterns: [Forms](docs/patterns/forms.md) ·
+  [Loading](docs/patterns/loading.md) ·
+  [Notifications](docs/patterns/notification.md) ·
+  [Status indicators](docs/patterns/status-indicator.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Licensing

@@ -21,6 +21,11 @@ final GalleryCategory tierCCategory = GalleryCategory(
       builder: () => const _AILabelPage(),
     ),
     GalleryEntry(
+      slug: 'chat-button',
+      title: 'Chat button',
+      builder: () => const _ChatButtonPage(),
+    ),
+    GalleryEntry(
       slug: 'contained-list',
       title: 'Contained list',
       builder: () => const _ContainedListPage(),
@@ -92,6 +97,11 @@ final GalleryCategory tierCCategory = GalleryCategory(
       builder: () => const _ModalPage(),
     ),
     GalleryEntry(
+      slug: 'dialog',
+      title: 'Dialog',
+      builder: () => const _DialogPage(),
+    ),
+    GalleryEntry(
       slug: 'notification',
       title: 'Notification',
       builder: () => const _NotificationPage(),
@@ -117,6 +127,8 @@ class _DropdownPage extends StatefulWidget {
 
 class _DropdownPageState extends State<_DropdownPage> {
   String _value = 'cyan';
+  bool _ai = false;
+  bool _fluid = false;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -129,6 +141,10 @@ class _DropdownPageState extends State<_DropdownPage> {
           titleText: 'Favourite colour',
           selectedItem: _value,
           onChanged: (String v) => setState(() => _value = v),
+          aiLabel: _ai
+              ? const CarbonAILabel(size: CarbonAILabelSize.mini)
+              : null,
+          fluid: _fluid,
           items: const <CarbonDropdownItem<String>>[
             CarbonDropdownItem<String>(value: 'cyan', label: 'Cyan'),
             CarbonDropdownItem<String>(value: 'magenta', label: 'Magenta'),
@@ -136,6 +152,18 @@ class _DropdownPageState extends State<_DropdownPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'AI label',
+          value: _ai,
+          onChanged: (bool v) => setState(() => _ai = v),
+        ),
+        boolKnob(
+          label: 'Fluid',
+          value: _fluid,
+          onChanged: (bool v) => setState(() => _fluid = v),
+        ),
+      ],
       code: 'CarbonDropdown<String>(titleText: \'…\', items: <…>[…]);',
     );
   }
@@ -275,8 +303,14 @@ class _OverflowMenuPage extends StatelessWidget {
   }
 }
 
-class _TabsPage extends StatelessWidget {
+class _TabsPage extends StatefulWidget {
   const _TabsPage();
+  @override
+  State<_TabsPage> createState() => _TabsPageState();
+}
+
+class _TabsPageState extends State<_TabsPage> {
+  bool _vertical = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
@@ -287,26 +321,48 @@ class _TabsPage extends StatelessWidget {
         style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
       ),
     );
+    const List<CarbonTab> tabs = <CarbonTab>[
+      CarbonTab(label: 'Overview'),
+      CarbonTab(label: 'Specs'),
+      CarbonTab(label: 'Reviews'),
+    ];
     return DemoScaffold(
       title: 'Tabs',
-      description: 'Line tabs switching between panels.',
+      description: 'Line, contained and vertical tabs switching panels.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
         width: 480,
-        child: CarbonTabs(
-          tabs: const <CarbonTab>[
-            CarbonTab(label: 'Overview'),
-            CarbonTab(label: 'Specs'),
-            CarbonTab(label: 'Reviews'),
-          ],
-          panels: <Widget>[
-            panel('Overview content.'),
-            panel('Technical specifications.'),
-            panel('Customer reviews.'),
-          ],
-        ),
+        child: _vertical
+            ? SizedBox(
+                height: 260,
+                child: CarbonTabsVertical(
+                  tabs: tabs,
+                  panels: const <Widget>[
+                    Text('Overview content.'),
+                    Text('Technical specifications.'),
+                    Text('Customer reviews.'),
+                  ],
+                ),
+              )
+            : CarbonTabs(
+                tabs: tabs,
+                panels: <Widget>[
+                  panel('Overview content.'),
+                  panel('Technical specifications.'),
+                  panel('Customer reviews.'),
+                ],
+              ),
       ),
-      code: 'CarbonTabs(tabs: <CarbonTab>[…], panels: <Widget>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Vertical',
+          value: _vertical,
+          onChanged: (bool v) => setState(() => _vertical = v),
+        ),
+      ],
+      code: _vertical
+          ? 'CarbonTabsVertical(tabs: <CarbonTab>[…], panels: <Widget>[…]);'
+          : 'CarbonTabs(tabs: <CarbonTab>[…], panels: <Widget>[…]);',
     );
   }
 }
@@ -442,6 +498,7 @@ class _ModalPage extends StatefulWidget {
 
 class _ModalPageState extends State<_ModalPage> {
   bool _open = false;
+  bool _fullWidth = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
@@ -456,25 +513,128 @@ class _ModalPageState extends State<_ModalPage> {
           ),
           CarbonModal(
             open: _open,
-            title: 'Delete service?',
+            title: _fullWidth ? 'Members' : 'Delete service?',
             onClose: () => setState(() => _open = false),
-            danger: true,
+            danger: !_fullWidth,
+            isFullWidth: _fullWidth,
             primaryButton: CarbonModalAction(
-              label: 'Delete',
+              label: _fullWidth ? 'Add member' : 'Delete',
               onPressed: () => setState(() => _open = false),
             ),
             secondaryButton: CarbonModalAction(
               label: 'Cancel',
               onPressed: () => setState(() => _open = false),
             ),
-            child: Text(
-              'This action cannot be undone.',
-              style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
-            ),
+            child: _fullWidth
+                ? const CarbonDataTable(
+                    columns: <CarbonTableColumn>[
+                      CarbonTableColumn(title: 'Name'),
+                      CarbonTableColumn(title: 'Role'),
+                    ],
+                    rows: <CarbonTableRow>[
+                      CarbonTableRow(
+                        cells: <Widget>[Text('Ada'), Text('Admin')],
+                      ),
+                      CarbonTableRow(
+                        cells: <Widget>[Text('Grace'), Text('Editor')],
+                      ),
+                    ],
+                  )
+                : Text(
+                    'This action cannot be undone.',
+                    style: CarbonTypeStyles.body01.copyWith(
+                      color: t.textPrimary,
+                    ),
+                  ),
           ),
         ],
       ),
-      code: 'CarbonModal(open: true, title: \'…\', child: Text(\'…\'));',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Full width',
+          value: _fullWidth,
+          onChanged: (bool v) => setState(() => _fullWidth = v),
+        ),
+      ],
+      code:
+          "CarbonModal(open: true, title: '…', "
+          '${_fullWidth ? 'isFullWidth: true, ' : ''}'
+          "child: …);",
+    );
+  }
+}
+
+class _DialogPage extends StatefulWidget {
+  const _DialogPage();
+  @override
+  State<_DialogPage> createState() => _DialogPageState();
+}
+
+class _DialogPageState extends State<_DialogPage> {
+  bool _open = false;
+  bool _modal = true;
+  @override
+  Widget build(BuildContext context) {
+    return DemoScaffold(
+      title: 'Dialog',
+      description: 'The composable dialog, modal or non-modal.',
+      preview: Stack(
+        children: <Widget>[
+          CarbonButton(
+            label: 'Open dialog',
+            onPressed: () => setState(() => _open = true),
+          ),
+          CarbonDialog(
+            open: _open,
+            modal: _modal,
+            onRequestClose: () => setState(() => _open = false),
+            children: <Widget>[
+              CarbonDialogHeader(
+                controls: CarbonDialogControls(
+                  children: <Widget>[
+                    CarbonDialogCloseButton(
+                      onPressed: () => setState(() => _open = false),
+                    ),
+                  ],
+                ),
+                children: const <Widget>[
+                  CarbonDialogSubtitle('Account'),
+                  CarbonDialogTitle('Update billing details'),
+                ],
+              ),
+              const CarbonDialogBody(
+                child: Text(
+                  'Changing the billing contact updates every invoice '
+                  'issued after the change.',
+                ),
+              ),
+              CarbonDialogFooter(
+                children: <Widget>[
+                  CarbonButton(
+                    label: 'Cancel',
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.xl,
+                    onPressed: () => setState(() => _open = false),
+                  ),
+                  CarbonButton(
+                    label: 'Save',
+                    size: CarbonButtonSize.xl,
+                    onPressed: () => setState(() => _open = false),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Modal',
+          value: _modal,
+          onChanged: (bool v) => setState(() => _modal = v),
+        ),
+      ],
+      code: 'CarbonDialog(open: true, children: <Widget>[…]);',
     );
   }
 }
@@ -485,7 +645,7 @@ class _NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Notification',
-      description: 'Inline, toast and actionable notifications.',
+      description: 'Inline, toast, actionable and callout notifications.',
       previewAlignment: Alignment.topLeft,
       preview: Column(
         mainAxisSize: MainAxisSize.min,
@@ -501,6 +661,21 @@ class _NotificationPage extends StatelessWidget {
                 onClose: () {},
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing05),
+            child: CarbonCallout(
+              title: 'Callout',
+              subtitle: 'A static, non-dismissible callout.',
+              actionLabel: 'Review',
+              onAction: () {},
+            ),
+          ),
+          const CarbonCallout(
+            kind: CarbonNotificationKind.warning,
+            title: 'Callout',
+            subtitle: 'A low-contrast warning callout.',
+            lowContrast: true,
+          ),
         ],
       ),
       code:
@@ -609,6 +784,83 @@ class _AILabelPageState extends State<_AILabelPage> {
         ),
       ],
       code: "CarbonAILabel(content: Text('…'));",
+    );
+  }
+}
+
+class _ChatButtonPage extends StatefulWidget {
+  const _ChatButtonPage();
+  @override
+  State<_ChatButtonPage> createState() => _ChatButtonPageState();
+}
+
+class _ChatButtonPageState extends State<_ChatButtonPage> {
+  static const List<CarbonButtonKind> _kinds = <CarbonButtonKind>[
+    CarbonButtonKind.primary,
+    CarbonButtonKind.secondary,
+    CarbonButtonKind.tertiary,
+    CarbonButtonKind.ghost,
+  ];
+
+  CarbonButtonKind _kind = CarbonButtonKind.primary;
+  CarbonChatButtonSize _size = CarbonChatButtonSize.lg;
+  bool _quickAction = false;
+  bool _selected = false;
+  bool _icon = false;
+  bool _disabled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return DemoScaffold(
+      title: 'Chat button',
+      description: 'The AI chat pill button, with a quick-action mode.',
+      preview: CarbonChatButton(
+        label: _quickAction ? 'Summarize the chat' : 'Ask a question',
+        kind: _kind,
+        size: _size,
+        quickAction: _quickAction,
+        isSelected: _quickAction && _selected,
+        icon: _icon ? CarbonIcons.send : null,
+        onPressed: _disabled ? null : () {},
+      ),
+      controls: <Widget>[
+        choiceKnob<CarbonButtonKind>(
+          label: 'Kind',
+          value: _kind,
+          options: _kinds,
+          labelOf: (CarbonButtonKind kind) => kind.name,
+          onChanged: (CarbonButtonKind kind) => setState(() => _kind = kind),
+        ),
+        choiceKnob<CarbonChatButtonSize>(
+          label: 'Size',
+          value: _size,
+          options: CarbonChatButtonSize.values,
+          labelOf: (CarbonChatButtonSize size) => size.name,
+          onChanged: (CarbonChatButtonSize size) =>
+              setState(() => _size = size),
+        ),
+        boolKnob(
+          label: 'Quick action',
+          value: _quickAction,
+          onChanged: (bool value) => setState(() => _quickAction = value),
+        ),
+        boolKnob(
+          label: 'Selected',
+          value: _selected,
+          onChanged: (bool value) => setState(() => _selected = value),
+        ),
+        boolKnob(
+          label: 'Icon',
+          value: _icon,
+          onChanged: (bool value) => setState(() => _icon = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
+      code: "CarbonChatButton(label: 'Ask a question', onPressed: ask);",
     );
   }
 }

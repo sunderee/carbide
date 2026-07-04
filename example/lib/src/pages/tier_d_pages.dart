@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
 import '../demo_scaffold.dart';
+import '../knobs.dart';
 import '../registry.dart';
 
 /// Tier D — complex and data-dense components.
@@ -121,21 +122,40 @@ class _DatePickerPage extends StatefulWidget {
 
 class _DatePickerPageState extends State<_DatePickerPage> {
   DateTime? _value = DateTime(2026, 6, 16);
+  CarbonDateRange? _range = CarbonDateRange(
+    DateTime(2026, 6, 10),
+    DateTime(2026, 6, 19),
+  );
+  bool _rangeMode = false;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Date picker',
-      description: 'A self-contained calendar in a field.',
+      description: 'A self-contained calendar in single and range modes.',
       previewAlignment: Alignment.topCenter,
-      preview: SizedBox(
-        width: 288,
-        child: CarbonDatePicker(
-          labelText: 'Appointment date',
-          value: _value,
-          onChanged: (DateTime d) => setState(() => _value = d),
+      preview: _rangeMode
+          ? CarbonDateRangePicker(
+              value: _range,
+              onChanged: (CarbonDateRange r) => setState(() => _range = r),
+            )
+          : SizedBox(
+              width: 288,
+              child: CarbonDatePicker(
+                labelText: 'Appointment date',
+                value: _value,
+                onChanged: (DateTime d) => setState(() => _value = d),
+              ),
+            ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Range',
+          value: _rangeMode,
+          onChanged: (bool v) => setState(() => _rangeMode = v),
         ),
-      ),
-      code: 'CarbonDatePicker(labelText: \'…\', onChanged: …);',
+      ],
+      code: _rangeMode
+          ? 'CarbonDateRangePicker(value: _range, onChanged: …);'
+          : 'CarbonDatePicker(labelText: \'…\', onChanged: …);',
     );
   }
 }

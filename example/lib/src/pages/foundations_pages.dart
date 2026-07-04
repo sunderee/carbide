@@ -6,6 +6,8 @@
 import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
+import '../demo_scaffold.dart' show kDemoPreviewKey;
+import '../knobs.dart';
 import '../registry.dart';
 
 /// The Foundations category: tokens that everything else builds on.
@@ -24,6 +26,11 @@ final GalleryCategory foundationsCategory = GalleryCategory(
       builder: () => const _TypographyPage(),
     ),
     GalleryEntry(
+      slug: 'fluid-type',
+      title: 'Fluid typography',
+      builder: () => const _FluidTypePage(),
+    ),
+    GalleryEntry(
       slug: 'spacing',
       title: 'Spacing',
       builder: () => const _SpacingPage(),
@@ -32,6 +39,11 @@ final GalleryCategory foundationsCategory = GalleryCategory(
       slug: 'icons',
       title: 'Icons',
       builder: () => const _IconsPage(),
+    ),
+    GalleryEntry(
+      slug: 'pictograms',
+      title: 'Pictograms',
+      builder: () => const _PictogramsPage(),
     ),
     GalleryEntry(
       slug: 'motion',
@@ -318,6 +330,195 @@ class _MotionPageState extends State<_MotionPage> {
 }
 
 /// A simple scrolling page wrapper with a title and description.
+class _FluidTypePage extends StatefulWidget {
+  const _FluidTypePage();
+
+  @override
+  State<_FluidTypePage> createState() => _FluidTypePageState();
+}
+
+class _FluidTypePageState extends State<_FluidTypePage> {
+  double _width = 1056;
+
+  static const List<(String, CarbonFluidTextStyle)> _styles =
+      <(String, CarbonFluidTextStyle)>[
+        ('expressiveHeading01', CarbonFluidTypeStyles.expressiveHeading01),
+        ('expressiveHeading02', CarbonFluidTypeStyles.expressiveHeading02),
+        ('expressiveHeading03', CarbonFluidTypeStyles.expressiveHeading03),
+        ('expressiveHeading04', CarbonFluidTypeStyles.expressiveHeading04),
+        ('expressiveHeading05', CarbonFluidTypeStyles.expressiveHeading05),
+        ('expressiveHeading06', CarbonFluidTypeStyles.expressiveHeading06),
+        ('expressiveParagraph01', CarbonFluidTypeStyles.expressiveParagraph01),
+        ('quotation01', CarbonFluidTypeStyles.quotation01),
+        ('quotation02', CarbonFluidTypeStyles.quotation02),
+        ('display01', CarbonFluidTypeStyles.display01),
+        ('display02', CarbonFluidTypeStyles.display02),
+        ('display03', CarbonFluidTypeStyles.display03),
+        ('display04', CarbonFluidTypeStyles.display04),
+      ];
+
+  static const List<(String, CarbonFluidTextStyle)> _samples =
+      <(String, CarbonFluidTextStyle)>[
+        ('expressiveHeading04', CarbonFluidTypeStyles.expressiveHeading04),
+        ('expressiveHeading06', CarbonFluidTypeStyles.expressiveHeading06),
+        ('quotation02', CarbonFluidTypeStyles.quotation02),
+        ('display02', CarbonFluidTypeStyles.display02),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final CarbonThemeData t = CarbonTheme.of(context);
+    final CarbonBreakpoint active = CarbonBreakpoint.of(_width);
+    return _ScrollPage(
+      title: 'Fluid typography',
+      description:
+          'Fluid styles interpolate across the Carbon breakpoints. Drag the '
+          'width to watch each style resolve for that viewport.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          sliderKnob(
+            label: 'Viewport width',
+            value: _width,
+            min: 320,
+            max: 1584,
+            step: 16,
+            onChanged: (double v) => setState(() => _width = v),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing03),
+          Text(
+            '${_width.round()}px · breakpoint ${active.name}',
+            style: CarbonTypeStyles.code01.copyWith(color: t.textSecondary),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing06),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: _width,
+              padding: const EdgeInsets.all(CarbonSpacing.spacing05),
+              decoration: BoxDecoration(
+                border: Border.all(color: t.borderSubtle01),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  for (final (String, CarbonFluidTextStyle) sample
+                      in _samples) ...<Widget>[
+                    Text(
+                      '${sample.$1} · '
+                      '${sample.$2.resolve(_width).fontSize!.round()}px',
+                      style: CarbonTypeStyles.code01.copyWith(
+                        color: t.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: CarbonSpacing.spacing02),
+                    Text(
+                      'Carbide is carbon, fluid.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: sample.$2
+                          .resolve(_width)
+                          .copyWith(color: t.textPrimary),
+                    ),
+                    const SizedBox(height: CarbonSpacing.spacing06),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing07),
+          Text(
+            'All fluid styles at ${_width.round()}px',
+            style: CarbonTypeStyles.heading02.copyWith(color: t.textPrimary),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing04),
+          for (final (String, CarbonFluidTextStyle) style
+              in _styles) ...<Widget>[
+            Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 220,
+                  child: Text(
+                    style.$1,
+                    style: CarbonTypeStyles.code01.copyWith(
+                      color: t.textSecondary,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${style.$2.resolve(_width).fontSize!.round()}px',
+                  style: CarbonTypeStyles.code01.copyWith(color: t.textPrimary),
+                ),
+              ],
+            ),
+            const SizedBox(height: CarbonSpacing.spacing03),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PictogramsPage extends StatelessWidget {
+  const _PictogramsPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final CarbonThemeData t = CarbonTheme.of(context);
+    final List<(String, CarbonIconData)> pictograms =
+        <(String, CarbonIconData)>[
+          ('accessibility', CarbonPictograms.accessibility),
+          ('agriculture', CarbonPictograms.agriculture),
+          ('cloud', CarbonPictograms.cloud),
+          ('confidentialComputing', CarbonPictograms.confidentialComputing),
+          ('connectedDevices', CarbonPictograms.connectedDevices),
+          ('globe', CarbonPictograms.globe),
+          ('hospital', CarbonPictograms.hospital),
+          ('hurricane', CarbonPictograms.hurricane),
+          ('hybridCloud', CarbonPictograms.hybridCloud),
+          ('processAutomation', CarbonPictograms.processAutomation),
+          ('productivity', CarbonPictograms.productivity),
+          ('solarPanel', CarbonPictograms.solarPanel),
+          ('virtualServer', CarbonPictograms.virtualServer),
+          ('virus', CarbonPictograms.virus),
+          ('vision', CarbonPictograms.vision),
+          ('windPower', CarbonPictograms.windPower),
+        ];
+    return _ScrollPage(
+      title: 'Pictograms',
+      description:
+          'A sample from the 1,572 Carbon pictograms. Pictograms render at '
+          '48px or larger (the CarbonPictogram minimum, per Carbon guidance) '
+          'in the ambient icon colour.',
+      child: Wrap(
+        spacing: CarbonSpacing.spacing06,
+        runSpacing: CarbonSpacing.spacing06,
+        children: <Widget>[
+          for (final (String, CarbonIconData) pictogram in pictograms)
+            SizedBox(
+              width: 148,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CarbonPictogram(pictogram.$2, size: 64),
+                  const SizedBox(height: CarbonSpacing.spacing03),
+                  Text(
+                    pictogram.$1,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CarbonTypeStyles.code01.copyWith(
+                      color: t.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ScrollPage extends StatelessWidget {
   const _ScrollPage({
     required this.title,
@@ -332,20 +533,30 @@ class _ScrollPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing09),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(title, style: CarbonTypeStyles.productiveHeading05),
-          const SizedBox(height: CarbonSpacing.spacing03),
-          Text(
-            description,
-            style: CarbonTypeStyles.body01.copyWith(color: t.textSecondary),
-          ),
-          const SizedBox(height: CarbonSpacing.spacing07),
-          child,
-        ],
+    // The boundary carries the demo preview key so the contact-sheet test
+    // captures foundations pages too (viewport-sized, like a screenshot).
+    return RepaintBoundary(
+      key: kDemoPreviewKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing09),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              title,
+              style: CarbonTypeStyles.productiveHeading05.copyWith(
+                color: t.textPrimary,
+              ),
+            ),
+            const SizedBox(height: CarbonSpacing.spacing03),
+            Text(
+              description,
+              style: CarbonTypeStyles.body01.copyWith(color: t.textSecondary),
+            ),
+            const SizedBox(height: CarbonSpacing.spacing07),
+            child,
+          ],
+        ),
       ),
     );
   }

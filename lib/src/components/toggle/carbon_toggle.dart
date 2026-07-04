@@ -6,6 +6,11 @@
 // Spec sources (Apache-2.0 Carbon Design System; see NOTICE):
 //   styles/scss/components/toggle/_toggle.scss
 //   react/src/components/{Toggle,ToggleSmall}
+//
+// The 8px gap between the top label and the control is upstream's
+// `enable-v12-toggle-reduced-label-spacing` flagged value, adopted
+// deliberately: the label is the shared CarbonFormLabel, and the v11
+// 16px gap would break the cross-component label rhythm (ADR 0002).
 
 import 'package:flutter/widgets.dart';
 

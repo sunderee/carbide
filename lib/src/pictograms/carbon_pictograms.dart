@@ -58,6 +58,9 @@ abstract final class CarbonPictograms {
   /// The Carbon `active--server` pictogram.
   static const CarbonIconData activeServer = a_.activeServer;
 
+  /// The Carbon `add-comments--mobile` pictogram.
+  static const CarbonIconData addCommentsMobile = a_.addCommentsMobile;
+
   /// The Carbon `add--device` pictogram.
   static const CarbonIconData addDevice = a_.addDevice;
 
@@ -957,6 +960,10 @@ abstract final class CarbonPictograms {
   /// The Carbon `commercial--financing--02` pictogram.
   static const CarbonIconData commercialFinancing02 = c_.commercialFinancing02;
 
+  /// The Carbon `complete-work--technician` pictogram.
+  static const CarbonIconData completeWorkTechnician =
+      c_.completeWorkTechnician;
+
   /// The Carbon `compliant` pictogram.
   static const CarbonIconData compliant = c_.compliant;
 
@@ -1116,6 +1123,9 @@ abstract final class CarbonPictograms {
 
   /// The Carbon `crab` pictogram.
   static const CarbonIconData crab = c_.crab;
+
+  /// The Carbon `create-work` pictogram.
+  static const CarbonIconData createWork = c_.createWork;
 
   /// The Carbon `credit--card` pictogram.
   static const CarbonIconData creditCard = c_.creditCard;
@@ -3619,6 +3629,9 @@ abstract final class CarbonPictograms {
   /// The Carbon `report` pictogram.
   static const CarbonIconData report = r_.report;
 
+  /// The Carbon `report-time--technician` pictogram.
+  static const CarbonIconData reportTimeTechnician = r_.reportTimeTechnician;
+
   /// The Carbon `research` pictogram.
   static const CarbonIconData research = r_.research;
 
@@ -3657,6 +3670,9 @@ abstract final class CarbonPictograms {
 
   /// The Carbon `retrieve--and--rank` pictogram.
   static const CarbonIconData retrieveAndRank = r_.retrieveAndRank;
+
+  /// The Carbon `review-checklist` pictogram.
+  static const CarbonIconData reviewChecklist = r_.reviewChecklist;
 
   /// The Carbon `rich--text--format` pictogram.
   static const CarbonIconData richTextFormat = r_.richTextFormat;
@@ -4049,6 +4065,9 @@ abstract final class CarbonPictograms {
   /// The Carbon `start-ups` pictogram.
   static const CarbonIconData startUps = s_.startUps;
 
+  /// The Carbon `start-work--technician` pictogram.
+  static const CarbonIconData startWorkTechnician = s_.startWorkTechnician;
+
   /// The Carbon `stationary--bicycle` pictogram.
   static const CarbonIconData stationaryBicycle = s_.stationaryBicycle;
 
@@ -4126,6 +4145,12 @@ abstract final class CarbonPictograms {
 
   /// The Carbon `sunny--hazy` pictogram.
   static const CarbonIconData sunnyHazy = s_.sunnyHazy;
+
+  /// The Carbon `supervisor` pictogram.
+  static const CarbonIconData supervisor = s_.supervisor;
+
+  /// The Carbon `supervisor-close--work` pictogram.
+  static const CarbonIconData supervisorCloseWork = s_.supervisorCloseWork;
 
   /// The Carbon `supply-chain--01` pictogram.
   static const CarbonIconData supplyChain01 = s_.supplyChain01;

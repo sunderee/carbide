@@ -8,17 +8,28 @@ Reads the four Carbon theme files (Apache-2.0) and emits:
 Ported token groups:
 - the core semantic color tokens: the region from `colorScheme` up to (but
   not including) the syntax-highlighting section;
-- the button and tag component tokens (themes/src/component-tokens/{button,
-  tag}/tokens.ts), folded into CarbonThemeData exactly as Carbon v11 folds
-  component tokens into the theme zone;
+- the button, tag, and notification component tokens
+  (themes/src/component-tokens/{button,tag,notification}/tokens.ts), folded
+  into CarbonThemeData exactly as Carbon v11 folds component tokens into the
+  theme zone. The notification tokens reference the button tertiary tokens
+  cross-theme (an inverse notification surface hosts the "opposite" theme's
+  tertiary button) and per-theme core tokens via aliased imports
+  (`textInverse as textInverseG100`, …); both forms are resolved here. The
+  `notificationActionHover` block omits g90/g100 upstream — the SCSS overlay
+  (styles/scss/components/notification/_tokens.scss) supplies
+  `theme.$layer-hover` for those themes, which is mirrored in
+  MISSING_KEY_CORE_FALLBACKS;
 - the AI token group (the `ai-*` tokens between `//// AI - Experimental` and
   `// Chat tokens`): gradient stops (aura/border), popover, skeleton, and caret
   colors. These are flat `Color`s — the gradients and shadows are composed by
   the consuming component (AI Label) from the stop colors.
+- the chat-button token subset (`chatButton*` from the `// Chat button
+  tokens` region) — the only chat tokens a shipped component (Chat Button)
+  consumes; the rest of the chat family stays out of scope.
 
 Syntax-highlighting and chat tokens, the remaining component-token groups
-(notification, status, content-switcher — ported with their components), and
-the type/layout re-exports are out of scope here.
+(status, content-switcher — ported with their components), and the
+type/layout re-exports are out of scope here.
 
 Run from the repository root:  python3 tool/generate_carbon_themes.py
 Re-run when bumping the Carbon submodule; review the diff.
@@ -44,15 +55,28 @@ RGBA_STR = re.compile(r"^'rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)'$")
 HEX_LITERAL = re.compile(r"^'#([0-9a-fA-F]{6})'$")
 
 # Component-token sources folded into the theme (Carbon v11 semantics).
+# Order matters: notification/tokens.ts references buttonTertiary* blocks,
+# so button/tokens.ts must be parsed first.
 COMPONENT_TOKEN_FILES = (
     THEME_DIR / "component-tokens/button/tokens.ts",
     THEME_DIR / "component-tokens/tag/tokens.ts",
+    THEME_DIR / "component-tokens/notification/tokens.ts",
 )
 COMPONENT_THEME_KEYS = {
     "white": "whiteTheme",
     "gray10": "g10",
     "gray90": "g90",
     "gray100": "g100",
+}
+# Aliased per-theme core-token imports used by notification/tokens.ts
+# (`textInverse as textInverseG100`, …). Suffix → theme field.
+ALIAS_THEMES = {"White": "white", "G10": "gray10", "G90": "gray90", "G100": "gray100"}
+# Keys a component-token block omits upstream, filled from the theme's own
+# core tokens per the SCSS overlay in
+# styles/scss/components/notification/_tokens.scss (theme.$layer-hover).
+MISSING_KEY_CORE_FALLBACKS = {
+    ("notificationActionHover", "gray90"): "layerHover01",
+    ("notificationActionHover", "gray100"): "layerHover01",
 }
 CONST_BLOCK = re.compile(r"^(?:export )?const (\w+) = \{([^}]*)\};", re.M)
 BLOCK_ENTRY = re.compile(r"(\w+):\s*([^,\n]+)")
@@ -142,35 +166,54 @@ def hex_to_name(values: dict[str, str]) -> dict[str, str]:
     return reverse
 
 
-def component_token_expr(raw: str, colors: set, reverse: dict) -> str:
-    raw = raw.strip().rstrip(",").strip()
-    if raw.startswith("'") and raw.endswith("'"):
-        inner = raw.strip("'")
-        m = RGB_SLASH.match(inner)
-        if m:
-            r, g, b, pct = m.groups()
-            return f"const Color.fromRGBO({r}, {g}, {b}, {int(pct) / 100})"
-        assert inner.startswith("#"), f"unexpected literal: {inner}"
-        hexv = inner.lstrip("#").upper()
-        name = reverse.get(hexv)
-        return f"CarbonColors.{name}" if name else f"const Color(0xFF{hexv})"
-    assert re.fullmatch(r"\w+", raw) and raw in colors, f"unknown: {raw}"
-    return f"CarbonColors.{raw}"
+def parse_component_tokens(colors: set, reverse: dict, core_resolved: dict):
+    """Returns (order, {field: {token: dart_expr}}) for the component files.
 
-
-def parse_component_tokens(colors: set, reverse: dict):
-    """Returns (order, {field: {token: dart_expr}}) for the component files."""
+    [core_resolved] maps theme field → {core token: dart expr}; it backs the
+    theme-suffixed aliases (`textInverseG100`) and the missing-key fallbacks.
+    """
     order: list[str] = []
     resolved: dict[str, dict[str, str]] = {f: {} for f in THEMES}
+    blocks: dict[str, dict[str, str]] = {}
+
+    def expr(raw: str) -> str:
+        raw = raw.strip().rstrip(",").strip()
+        if raw.startswith("'") and raw.endswith("'"):
+            inner = raw.strip("'")
+            m = RGB_SLASH.match(inner)
+            if m:
+                r, g, b, pct = m.groups()
+                return f"const Color.fromRGBO({r}, {g}, {b}, {int(pct) / 100})"
+            assert inner.startswith("#"), f"unexpected literal: {inner}"
+            hexv = inner.lstrip("#").upper()
+            name = reverse.get(hexv)
+            return f"CarbonColors.{name}" if name else f"const Color(0xFF{hexv})"
+        m = re.fullmatch(r"(\w+)\.(\w+)", raw)
+        if m:
+            # Member access into an earlier block (buttonTertiary.g100).
+            block, key = m.group(1), m.group(2)
+            return expr(blocks[block][key])
+        assert re.fullmatch(r"\w+", raw), f"unhandled expr: {raw}"
+        if raw in colors:
+            return f"CarbonColors.{raw}"
+        m = re.fullmatch(r"(\w+?)(White|G10|G90|G100)", raw)
+        if m and m.group(1) in core_resolved[ALIAS_THEMES[m.group(2)]]:
+            # A theme-suffixed core-token alias (textInverseG100).
+            return core_resolved[ALIAS_THEMES[m.group(2)]][m.group(1)]
+        raise ValueError(f"unknown identifier: {raw}")
+
     for path in COMPONENT_TOKEN_FILES:
         for m in CONST_BLOCK.finditer(path.read_text()):
             name, body = m.group(1), m.group(2)
             entries = dict(BLOCK_ENTRY.findall(body))
+            blocks[name] = entries
             order.append(name)
             for field, key in COMPONENT_THEME_KEYS.items():
-                resolved[field][name] = component_token_expr(
-                    entries[key], colors, reverse
-                )
+                if key in entries:
+                    resolved[field][name] = expr(entries[key])
+                else:
+                    core = MISSING_KEY_CORE_FALLBACKS[(name, field)]
+                    resolved[field][name] = core_resolved[field][core]
     return order, resolved
 
 
@@ -181,6 +224,18 @@ def core_region(theme_file: Path) -> dict[str, str]:
 
 
 AI_MARKERS = ("//// AI - Experimental", "// Chat tokens")
+CHAT_BUTTON_MARKER = "// Chat button tokens"
+
+
+def chat_button_region(theme_file: Path) -> dict[str, str]:
+    """Parse the `chatButton*` tokens (the shipped Chat Button subset)."""
+    text = theme_file.read_text()
+    region = text[text.index(CHAT_BUTTON_MARKER) :]
+    return {
+        m.group(1): m.group(2).strip()
+        for m in EXPORT.finditer(region)
+        if m.group(1).startswith("chatButton")
+    }
 
 
 def ai_region(theme_file: Path) -> dict[str, str]:
@@ -219,7 +274,15 @@ def resolve(expr, tokens, colors, values) -> str:
         base = resolve_color(m.group(1), tokens, colors, values)
         return f"_alpha({base}, {num(m.group(2))})"
     if re.fullmatch(r"\w+", expr):
-        return resolve_color(expr, tokens, colors, values)
+        # A bare reference: a palette color, or another token — which may
+        # itself be an alpha/lightness composition (e.g. chatButtonHover →
+        # backgroundHover → rgba(gray50, 0.12)), so recurse through the
+        # full resolver rather than the plain-color-only helper.
+        if expr in colors:
+            return f"CarbonColors.{expr}"
+        if expr in tokens:
+            return resolve(tokens[expr], tokens, colors, values)
+        raise ValueError(f"unknown identifier: {expr}")
     raise ValueError(f"unhandled expr: {expr}")
 
 
@@ -245,12 +308,14 @@ def build():
     values = color_values()
     raw: dict[str, dict[str, str]] = {}
     ai_raw: dict[str, dict[str, str]] = {}
+    chat_raw: dict[str, dict[str, str]] = {}
     brightness: dict[str, str] = {}
     for field, slug in THEMES.items():
         region = core_region(THEME_DIR / f"{slug}.ts")
         brightness[field] = "light" if region.pop("colorScheme").strip("'") == "light" else "dark"
         raw[field] = region
         ai_raw[field] = ai_region(THEME_DIR / f"{slug}.ts")
+        chat_raw[field] = chat_button_region(THEME_DIR / f"{slug}.ts")
 
     order = list(raw["white"])
     for field, region in raw.items():
@@ -266,7 +331,7 @@ def build():
     }
 
     component_order, component_resolved = parse_component_tokens(
-        colors, hex_to_name(values)
+        colors, hex_to_name(values), resolved
     )
     order += component_order
     for field in resolved:
@@ -283,6 +348,18 @@ def build():
                 ai_raw[field][token], combined, colors, values
             )
     order += ai_order
+
+    # Chat-button tokens (all reference core tokens or palette colors).
+    chat_order = list(chat_raw["white"])
+    for field, region in chat_raw.items():
+        assert set(region) == set(chat_order), f"{field} chat set differs"
+    for field in resolved:
+        combined = {**raw[field], **chat_raw[field]}
+        for token in chat_order:
+            resolved[field][token] = resolve(
+                chat_raw[field][token], combined, colors, values
+            )
+    order += chat_order
     return order, brightness, resolved
 
 
