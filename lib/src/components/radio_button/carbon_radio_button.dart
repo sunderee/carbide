@@ -246,6 +246,7 @@ class CarbonRadioButtonGroup<T> extends StatefulWidget {
   const CarbonRadioButtonGroup({
     super.key,
     required this.legend,
+    this.aiLabel,
     required this.options,
     required this.value,
     this.onChanged,
@@ -261,6 +262,10 @@ class CarbonRadioButtonGroup<T> extends StatefulWidget {
 
   /// The group legend.
   final String legend;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered
+  /// inline after the group legend per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   /// The options as (value, label) pairs.
   final List<(T value, String label)> options;
@@ -414,6 +419,7 @@ class _CarbonRadioButtonGroupState<T> extends State<CarbonRadioButtonGroup<T>> {
 
     return CarbonFormGroup(
       legend: widget.legend,
+      aiLabel: widget.aiLabel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

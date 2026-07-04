@@ -41,15 +41,20 @@ abstract final class CarbonTileSpec {
 /// in `textPrimary`.
 class CarbonTile extends StatelessWidget {
   /// Creates a static tile.
-  const CarbonTile({super.key, required this.child});
+  const CarbonTile({super.key, required this.child, this.aiLabel});
 
   /// The tile content.
   final Widget child;
 
+  /// An optional AI presence decorator (a `CarbonAILabel`), anchored to the
+  /// tile's top end per upstream's `decorator` prop (`_tile.scss`
+  /// inset-block-start/inset-inline-end $spacing-05).
+  final Widget? aiLabel;
+
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    return Container(
+    final Widget tile = Container(
       constraints: const BoxConstraints(
         minHeight: CarbonTileSpec.minHeight,
         minWidth: CarbonTileSpec.minWidth,
@@ -62,6 +67,22 @@ class CarbonTile extends StatelessWidget {
         ),
         child: child,
       ),
+    );
+    if (aiLabel == null) {
+      return tile;
+    }
+    return Stack(
+      // Pass the incoming constraints through so the tile still fills a
+      // tight parent (a bare Stack would loosen them).
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        tile,
+        PositionedDirectional(
+          top: CarbonTileSpec.padding,
+          end: CarbonTileSpec.padding,
+          child: aiLabel!,
+        ),
+      ],
     );
   }
 }
@@ -81,10 +102,15 @@ class CarbonClickableTile extends StatelessWidget {
     this.icon,
     this.focusNode,
     this.autofocus = false,
+    this.aiLabel,
   });
 
   /// The tile content.
   final Widget child;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), anchored to
+  /// the tile's top end per upstream's `decorator` prop.
+  final Widget? aiLabel;
 
   /// Called on activation; null renders the disabled state.
   final VoidCallback? onPressed;
@@ -154,6 +180,10 @@ class CarbonClickableTile extends StatelessWidget {
                             : theme.iconDisabled,
                       ),
                     ),
+                  // The AI label anchors to the tile's top end, 16px in
+                  // (the Stack sits inside the 16px padding).
+                  if (aiLabel != null)
+                    PositionedDirectional(top: 0, end: 0, child: aiLabel!),
                 ],
               ),
             ),
