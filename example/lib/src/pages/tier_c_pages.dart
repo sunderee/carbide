@@ -275,8 +275,14 @@ class _OverflowMenuPage extends StatelessWidget {
   }
 }
 
-class _TabsPage extends StatelessWidget {
+class _TabsPage extends StatefulWidget {
   const _TabsPage();
+  @override
+  State<_TabsPage> createState() => _TabsPageState();
+}
+
+class _TabsPageState extends State<_TabsPage> {
+  bool _vertical = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
@@ -287,26 +293,48 @@ class _TabsPage extends StatelessWidget {
         style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
       ),
     );
+    const List<CarbonTab> tabs = <CarbonTab>[
+      CarbonTab(label: 'Overview'),
+      CarbonTab(label: 'Specs'),
+      CarbonTab(label: 'Reviews'),
+    ];
     return DemoScaffold(
       title: 'Tabs',
-      description: 'Line tabs switching between panels.',
+      description: 'Line, contained and vertical tabs switching panels.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
         width: 480,
-        child: CarbonTabs(
-          tabs: const <CarbonTab>[
-            CarbonTab(label: 'Overview'),
-            CarbonTab(label: 'Specs'),
-            CarbonTab(label: 'Reviews'),
-          ],
-          panels: <Widget>[
-            panel('Overview content.'),
-            panel('Technical specifications.'),
-            panel('Customer reviews.'),
-          ],
-        ),
+        child: _vertical
+            ? SizedBox(
+                height: 260,
+                child: CarbonTabsVertical(
+                  tabs: tabs,
+                  panels: const <Widget>[
+                    Text('Overview content.'),
+                    Text('Technical specifications.'),
+                    Text('Customer reviews.'),
+                  ],
+                ),
+              )
+            : CarbonTabs(
+                tabs: tabs,
+                panels: <Widget>[
+                  panel('Overview content.'),
+                  panel('Technical specifications.'),
+                  panel('Customer reviews.'),
+                ],
+              ),
       ),
-      code: 'CarbonTabs(tabs: <CarbonTab>[…], panels: <Widget>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Vertical',
+          value: _vertical,
+          onChanged: (bool v) => setState(() => _vertical = v),
+        ),
+      ],
+      code: _vertical
+          ? 'CarbonTabsVertical(tabs: <CarbonTab>[…], panels: <Widget>[…]);'
+          : 'CarbonTabs(tabs: <CarbonTab>[…], panels: <Widget>[…]);',
     );
   }
 }

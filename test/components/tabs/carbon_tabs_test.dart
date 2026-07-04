@@ -246,4 +246,248 @@ void main() {
       );
     });
   });
+
+  group('vertical (_tabs.scss --tabs--vertical, TabListVertical)', () {
+    Widget verticalHost({
+      double width = 640,
+      double height = 400,
+      List<CarbonTab> tabs = _tabs,
+      List<Widget> panels = _panels,
+      CarbonTabsVerticalSize size = CarbonTabsVerticalSize.xl,
+      int? selectedIndex,
+      ValueChanged<int>? onChanged,
+    }) => Directionality(
+      textDirection: TextDirection.ltr,
+      child: CarbonTheme(
+        data: CarbonThemeData.white,
+        child: Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: CarbonTabsVertical(
+              tabs: tabs,
+              panels: panels,
+              size: size,
+              selectedIndex: selectedIndex,
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // The outer (decorated) row container is the furthest Container
+    // ancestor of the label; the nearer one is the padding container.
+    Container rowOf(WidgetTester tester, String label) =>
+        tester.widget<Container>(
+          find
+              .ancestor(of: find.text(label), matching: find.byType(Container))
+              .last,
+        );
+
+    testWidgets('rows are 64px by default; the list spans a quarter width', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(verticalHost());
+      expect(tester.getSize(find.text('Overview').first).height, isNonZero);
+      final Finder overviewRow = find.ancestor(
+        of: find.text('Overview'),
+        matching: find.byType(Container),
+      );
+      expect(tester.getSize(overviewRow.last).height, 64);
+      // grid-column span 2 of 8 (span 4 of 16): a quarter of the width.
+      expect(tester.getSize(overviewRow.last).width, 160);
+    });
+
+    testWidgets('row heights follow the size; sm clamps labels to one line', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(verticalHost(size: CarbonTabsVerticalSize.sm));
+      final Finder overviewRow = find.ancestor(
+        of: find.text('Overview'),
+        matching: find.byType(Container),
+      );
+      expect(tester.getSize(overviewRow.last).height, 32);
+      expect(tester.widget<Text>(find.text('Overview')).maxLines, 1);
+
+      await tester.pumpWidget(verticalHost());
+      expect(tester.widget<Text>(find.text('Overview')).maxLines, 2);
+    });
+
+    testWidgets('selected row: interactive bar, heading label, no end border', (
+      WidgetTester tester,
+    ) async {
+      final CarbonThemeData theme = CarbonThemeData.white;
+      await tester.pumpWidget(verticalHost());
+
+      // The 3px start bar of the selected row is border-interactive.
+      final Finder selectedBar = find.descendant(
+        of: find.ancestor(
+          of: find.text('Overview'),
+          matching: find.byType(Container),
+        ),
+        matching: find.byType(ColoredBox),
+      );
+      expect(
+        tester.widget<ColoredBox>(selectedBar.first).color,
+        theme.borderInteractive,
+      );
+      expect(tester.getSize(selectedBar.first).width, 3);
+
+      final TextStyle selected = tester
+          .widget<Text>(find.text('Overview'))
+          .style!;
+      expect(selected.fontWeight, FontWeight.w600);
+
+      final BoxDecoration selectedDecoration =
+          rowOf(tester, 'Overview').decoration! as BoxDecoration;
+      final BorderDirectional border =
+          selectedDecoration.border! as BorderDirectional;
+      expect(border.end, BorderSide.none);
+      expect(border.bottom.color, theme.borderSubtle00);
+
+      // Unselected rows: subtle bar, layer-01 fill, 1px end border.
+      final BoxDecoration unselected =
+          rowOf(tester, 'Details').decoration! as BoxDecoration;
+      expect(unselected.color, theme.layer01);
+      expect(
+        (unselected.border! as BorderDirectional).end.color,
+        theme.borderSubtle00,
+      );
+      final Finder detailsBar = find.descendant(
+        of: find.ancestor(
+          of: find.text('Details'),
+          matching: find.byType(Container),
+        ),
+        matching: find.byType(ColoredBox),
+      );
+      expect(
+        tester.widget<ColoredBox>(detailsBar.first).color,
+        theme.borderSubtle00,
+      );
+    });
+
+    testWidgets('tap selects; Up/Down/Home/End rove, Left/Right ignored', (
+      WidgetTester tester,
+    ) async {
+      final List<int> changes = <int>[];
+      await tester.pumpWidget(verticalHost(onChanged: changes.add));
+      await tester.tap(find.text('Details'));
+      await tester.pumpAndSettle();
+      expect(changes, <int>[1]);
+      expect(find.text('Details panel'), findsOneWidget);
+
+      // Down from Details skips disabled Settings to Activity.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(changes, <int>[1, 3]);
+
+      // Left/Right do nothing in the vertical list.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(changes, <int>[1, 3]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.pumpAndSettle();
+      expect(changes, <int>[1, 3, 0]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pumpAndSettle();
+      expect(changes, <int>[1, 3, 0, 3]);
+    });
+
+    testWidgets('overflowing lists scroll, fade, and reveal the selection', (
+      WidgetTester tester,
+    ) async {
+      final List<CarbonTab> many = <CarbonTab>[
+        for (int i = 1; i <= 12; i++) CarbonTab(label: 'Tab $i'),
+      ];
+      final List<Widget> panels = <Widget>[
+        for (int i = 1; i <= 12; i++) Text('Panel $i'),
+      ];
+      await tester.pumpWidget(
+        verticalHost(tabs: many, panels: panels, height: 320),
+      );
+      await tester.pump();
+
+      // 12 × 64 = 768 in a 320 viewport: the bottom fade gradient shows.
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) =>
+              w is DecoratedBox &&
+              (w.decoration as BoxDecoration?)?.gradient != null,
+        ),
+        findsOneWidget,
+      );
+
+      // Selecting a far tab scrolls it into view ((index - 1) × height).
+      final ScrollController controller = tester
+          .widget<SingleChildScrollView>(find.byType(SingleChildScrollView))
+          .controller!;
+      await tester.tap(find.text('Tab 4'));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      // Tab 5 (index 4) sits below the 320px viewport → scrolled to 3 × 64.
+      expect(controller.offset, 192);
+      expect(find.text('Panel 5'), findsOneWidget);
+    });
+
+    testWidgets('dismissable tabs assert in the vertical variant', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        verticalHost(
+          tabs: const <CarbonTab>[CarbonTab(label: 'A', dismissable: true)],
+          panels: const <Widget>[Text('A panel')],
+        ),
+      );
+      expect(tester.takeException(), isAssertionError);
+    });
+
+    testWidgets('tabs expose selected button semantics', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(verticalHost());
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Overview')),
+        isSemantics(label: 'Overview', isButton: true, isSelected: true),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Details')),
+        isSemantics(label: 'Details', isButton: true, isSelected: false),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('vertical tabs across themes', (WidgetTester tester) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'tabs_vertical',
+        containsText: true,
+        size: const Size(640, 300),
+        builder: (BuildContext context) => Center(
+          child: SizedBox(
+            width: 600,
+            height: 260,
+            child: CarbonTabsVertical(
+              tabs: const <CarbonTab>[
+                CarbonTab(label: 'Overview'),
+                CarbonTab(label: 'Details'),
+                CarbonTab(label: 'Settings', disabled: true),
+                CarbonTab(label: 'A longer label that wraps to two lines'),
+              ],
+              panels: const <Widget>[
+                Text('Overview panel'),
+                Text('Details panel'),
+                Text('Settings panel'),
+                Text('Long panel'),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  });
 }
