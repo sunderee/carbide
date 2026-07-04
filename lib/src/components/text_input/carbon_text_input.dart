@@ -57,6 +57,8 @@ class CarbonTextInput extends StatefulWidget {
     this.obscureText = false,
     this.keyboardType,
     this.trailing,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(
@@ -121,6 +123,13 @@ class CarbonTextInput extends StatefulWidget {
 
   /// An optional trailing widget inside the field (e.g. a toggle button).
   final Widget? trailing;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in
+  /// the field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional external focus node.
   final FocusNode? focusNode;
@@ -238,6 +247,8 @@ class _CarbonTextInputState extends State<CarbonTextInput> {
       readOnly: widget.readOnly,
       focused: _focus.hasFocus,
       trailing: widget.trailing,
+      aiLabel: widget.aiLabel,
+      aiRevert: widget.aiRevert,
       child: editable,
     );
 
@@ -467,6 +478,8 @@ class CarbonPasswordInput extends StatefulWidget {
     this.warnText,
     this.showPasswordLabel = 'Show password',
     this.hidePasswordLabel = 'Hide password',
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   });
@@ -515,6 +528,13 @@ class CarbonPasswordInput extends StatefulWidget {
 
   /// The toggle's accessible label when the password is shown.
   final String hidePasswordLabel;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in
+  /// the field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional focus node.
   final FocusNode? focusNode;
@@ -571,6 +591,8 @@ class _CarbonPasswordInputState extends State<CarbonPasswordInput> {
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       trailing: toggle,
+      aiLabel: widget.aiLabel,
+      aiRevert: widget.aiRevert,
     );
   }
 }

@@ -72,6 +72,7 @@ class _TextInputPage extends StatefulWidget {
 class _TextInputPageState extends State<_TextInputPage> {
   bool _invalid = false;
   bool _disabled = false;
+  bool _ai = false;
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +89,9 @@ class _TextInputPageState extends State<_TextInputPage> {
           invalid: _invalid,
           invalidText: 'Enter a valid email.',
           disabled: _disabled,
+          aiLabel: _ai
+              ? const CarbonAILabel(size: CarbonAILabelSize.mini)
+              : null,
         ),
       ),
       controls: <Widget>[
@@ -95,6 +99,11 @@ class _TextInputPageState extends State<_TextInputPage> {
           label: 'Invalid',
           value: _invalid,
           onChanged: (bool v) => setState(() => _invalid = v),
+        ),
+        boolKnob(
+          label: 'AI label',
+          value: _ai,
+          onChanged: (bool v) => setState(() => _ai = v),
         ),
         boolKnob(
           label: 'Disabled',

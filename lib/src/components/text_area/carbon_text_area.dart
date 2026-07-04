@@ -55,6 +55,8 @@ class CarbonTextArea extends StatefulWidget {
     this.enableCounter = false,
     this.maxCount,
     this.counterMode = CarbonCounterMode.character,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(
@@ -119,6 +121,13 @@ class CarbonTextArea extends StatefulWidget {
 
   /// Whether the counter counts characters or words.
   final CarbonCounterMode counterMode;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), anchored to the
+  /// area's top end per upstream's `decorator` prop; adds the AI aura.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional focus node.
   final FocusNode? focusNode;
@@ -223,15 +232,22 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
       ),
     );
 
+    // The AI treatment: aura gradient + ai-border-strong bottom border.
+    final bool ai =
+        widget.aiLabel != null && !widget.aiRevert && !widget.readOnly;
+
     Widget box = DecoratedBox(
       decoration: BoxDecoration(
         color: widget.readOnly ? const Color(0x00000000) : layer.field,
+        gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
         border: Border(
           bottom: BorderSide(
             color: widget.disabled
                 ? const Color(0x00000000)
                 : widget.readOnly
                 ? layer.borderSubtle
+                : ai
+                ? theme.aiBorderStrong
                 : theme.borderStrong01,
           ),
         ),
@@ -263,6 +279,20 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
         ),
       ),
     );
+    if (widget.aiLabel != null) {
+      box = Stack(
+        children: <Widget>[
+          box,
+          // inset-block-start: 12px, inset-inline-end: 16px
+          // (`_text-area.scss` --slug/--decorator placement).
+          PositionedDirectional(
+            top: CarbonSpacing.spacing04,
+            end: CarbonSpacing.spacing05,
+            child: widget.aiLabel!,
+          ),
+        ],
+      );
+    }
     if (_focus.hasFocus) {
       box = CarbonFocusRing(visible: true, child: box);
     } else if (invalid) {
