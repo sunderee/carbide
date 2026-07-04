@@ -1,5 +1,67 @@
 # Changelog
 
+## 0.2.0
+
+Component-parity release (M10): the composable Dialog, the AI chat surface,
+AI decorator slots and fluid variants across the form components, and
+right-to-left (bidi) support across the library.
+
+### New components
+
+- **Dialog** — the composable dialog family (`CarbonDialog` with header,
+  controls, close button, title, subtitle, scrollable body, and footer
+  slots): modal and non-modal, focus trap and restore, Escape to dismiss,
+  width tiers, and entrance motion.
+- **Chat button** — the AI chat pill button (`CarbonChatButton`) in four
+  kinds and three sizes, plus the outlined quick-action mode with a
+  selected state; adds the six `chatButton*` theme tokens.
+- **AI skeletons** — `CarbonAISkeletonText`, `CarbonAISkeletonIcon`, and
+  `CarbonAISkeletonPlaceholder` with the AI shimmer sweep.
+- **Callout** — the contextual callout notification, plus the
+  `info-square` and `warning-alt` notification kinds.
+- **Vertical tabs** — `CarbonTabsVertical`, the always-contained vertical
+  tab list.
+
+### New component features
+
+- **AI decorator slots** — `aiLabel` / `aiRevert` and the AI field
+  gradient across text inputs, text area, number input, search, select,
+  dropdown, combo box, multi-select, date and time pickers, checkbox and
+  radio groups, form groups, tiles, data table, and the modal (AI scrim,
+  aura, and drop shadow).
+- **Fluid variants** — the contained field style for dropdown, combo box,
+  multi-select, time picker, and the date pickers, with `CarbonFluidForm`
+  applying it to a whole subtree; fluid skeletons included.
+- **Date picker** — range selection mode (`CarbonDateRangePicker`).
+- **Modal** — the full-width variant.
+- **Button** — expressive mode and link-style semantics.
+- **Side nav** — rail mode expands on hover or focus as an overlay.
+
+### Right-to-left support
+
+Every component now renders correctly under `Directionality(rtl)`:
+mirrored slider and progress geometry, logical side accents and dividers,
+direction-aware submenus, arrow keys, and pagination carets, and a logical
+popover caret. `CarbonText` and `CarbonHeading` gain a `textDirection`
+override. RTL smoke goldens and a crash-guard sweep back it in CI.
+
+### Fixed
+
+- The determinate progress-bar fill (including the finished and error
+  states) never painted; it now fills from the start edge.
+
+### Docs
+
+- Usage-pattern guides under `docs/patterns/`: forms, loading,
+  notifications, and status indicators.
+- ADR 0002 records the Carbon v12 feature-flag posture; component headers
+  name the flagged behaviors Carbide deliberately tracks.
+- The gallery gains Fluid typography (live viewport-width slider) and
+  Pictograms foundations pages, plus pages for every new component.
+
+Every component ships with spec-lock, state-matrix, semantics, and
+four-theme golden tests.
+
 ## 0.1.0
 
 Component parity release — closes the remaining gaps against IBM's official
