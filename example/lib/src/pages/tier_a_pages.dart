@@ -758,6 +758,17 @@ class _SkeletonsPage extends StatelessWidget {
             width: 280,
             child: CarbonDataTableSkeleton(rowCount: 3, columnCount: 3),
           ),
+          SizedBox(height: 24),
+          SizedBox(width: 240, child: CarbonAISkeletonText(paragraph: true)),
+          SizedBox(height: 24),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonAISkeletonIcon(),
+              SizedBox(width: 24),
+              CarbonAISkeletonPlaceholder(width: 64, height: 64),
+            ],
+          ),
         ],
       ),
       code: 'CarbonTextInputSkeleton();',

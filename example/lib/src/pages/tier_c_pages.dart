@@ -21,6 +21,11 @@ final GalleryCategory tierCCategory = GalleryCategory(
       builder: () => const _AILabelPage(),
     ),
     GalleryEntry(
+      slug: 'chat-button',
+      title: 'Chat button',
+      builder: () => const _ChatButtonPage(),
+    ),
+    GalleryEntry(
       slug: 'contained-list',
       title: 'Contained list',
       builder: () => const _ContainedListPage(),
@@ -699,6 +704,83 @@ class _AILabelPageState extends State<_AILabelPage> {
         ),
       ],
       code: "CarbonAILabel(content: Text('…'));",
+    );
+  }
+}
+
+class _ChatButtonPage extends StatefulWidget {
+  const _ChatButtonPage();
+  @override
+  State<_ChatButtonPage> createState() => _ChatButtonPageState();
+}
+
+class _ChatButtonPageState extends State<_ChatButtonPage> {
+  static const List<CarbonButtonKind> _kinds = <CarbonButtonKind>[
+    CarbonButtonKind.primary,
+    CarbonButtonKind.secondary,
+    CarbonButtonKind.tertiary,
+    CarbonButtonKind.ghost,
+  ];
+
+  CarbonButtonKind _kind = CarbonButtonKind.primary;
+  CarbonChatButtonSize _size = CarbonChatButtonSize.lg;
+  bool _quickAction = false;
+  bool _selected = false;
+  bool _icon = false;
+  bool _disabled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return DemoScaffold(
+      title: 'Chat button',
+      description: 'The AI chat pill button, with a quick-action mode.',
+      preview: CarbonChatButton(
+        label: _quickAction ? 'Summarize the chat' : 'Ask a question',
+        kind: _kind,
+        size: _size,
+        quickAction: _quickAction,
+        isSelected: _quickAction && _selected,
+        icon: _icon ? CarbonIcons.send : null,
+        onPressed: _disabled ? null : () {},
+      ),
+      controls: <Widget>[
+        choiceKnob<CarbonButtonKind>(
+          label: 'Kind',
+          value: _kind,
+          options: _kinds,
+          labelOf: (CarbonButtonKind kind) => kind.name,
+          onChanged: (CarbonButtonKind kind) => setState(() => _kind = kind),
+        ),
+        choiceKnob<CarbonChatButtonSize>(
+          label: 'Size',
+          value: _size,
+          options: CarbonChatButtonSize.values,
+          labelOf: (CarbonChatButtonSize size) => size.name,
+          onChanged: (CarbonChatButtonSize size) =>
+              setState(() => _size = size),
+        ),
+        boolKnob(
+          label: 'Quick action',
+          value: _quickAction,
+          onChanged: (bool value) => setState(() => _quickAction = value),
+        ),
+        boolKnob(
+          label: 'Selected',
+          value: _selected,
+          onChanged: (bool value) => setState(() => _selected = value),
+        ),
+        boolKnob(
+          label: 'Icon',
+          value: _icon,
+          onChanged: (bool value) => setState(() => _icon = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
+      code: "CarbonChatButton(label: 'Ask a question', onPressed: ask);",
     );
   }
 }
