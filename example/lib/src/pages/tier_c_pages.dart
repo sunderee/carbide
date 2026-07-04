@@ -442,6 +442,7 @@ class _ModalPage extends StatefulWidget {
 
 class _ModalPageState extends State<_ModalPage> {
   bool _open = false;
+  bool _fullWidth = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
@@ -456,25 +457,53 @@ class _ModalPageState extends State<_ModalPage> {
           ),
           CarbonModal(
             open: _open,
-            title: 'Delete service?',
+            title: _fullWidth ? 'Members' : 'Delete service?',
             onClose: () => setState(() => _open = false),
-            danger: true,
+            danger: !_fullWidth,
+            isFullWidth: _fullWidth,
             primaryButton: CarbonModalAction(
-              label: 'Delete',
+              label: _fullWidth ? 'Add member' : 'Delete',
               onPressed: () => setState(() => _open = false),
             ),
             secondaryButton: CarbonModalAction(
               label: 'Cancel',
               onPressed: () => setState(() => _open = false),
             ),
-            child: Text(
-              'This action cannot be undone.',
-              style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
-            ),
+            child: _fullWidth
+                ? const CarbonDataTable(
+                    columns: <CarbonTableColumn>[
+                      CarbonTableColumn(title: 'Name'),
+                      CarbonTableColumn(title: 'Role'),
+                    ],
+                    rows: <CarbonTableRow>[
+                      CarbonTableRow(
+                        cells: <Widget>[Text('Ada'), Text('Admin')],
+                      ),
+                      CarbonTableRow(
+                        cells: <Widget>[Text('Grace'), Text('Editor')],
+                      ),
+                    ],
+                  )
+                : Text(
+                    'This action cannot be undone.',
+                    style: CarbonTypeStyles.body01.copyWith(
+                      color: t.textPrimary,
+                    ),
+                  ),
           ),
         ],
       ),
-      code: 'CarbonModal(open: true, title: \'…\', child: Text(\'…\'));',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Full width',
+          value: _fullWidth,
+          onChanged: (bool v) => setState(() => _fullWidth = v),
+        ),
+      ],
+      code:
+          "CarbonModal(open: true, title: '…', "
+          '${_fullWidth ? 'isFullWidth: true, ' : ''}'
+          "child: …);",
     );
   }
 }

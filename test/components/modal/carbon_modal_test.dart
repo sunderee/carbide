@@ -213,4 +213,103 @@ void main() {
       );
     });
   });
+
+  group('full width (_modal.scss --full-width)', () {
+    const Key contentKey = Key('content');
+    Widget fullWidthModal({required bool isFullWidth}) => _host(
+      CarbonModal(
+        open: true,
+        title: 'Data',
+        isFullWidth: isFullWidth,
+        size: CarbonModalSize.sm,
+        passiveModal: true,
+        onClose: () {},
+        child: const SizedBox(
+          key: contentKey,
+          height: 40,
+          width: double.infinity,
+        ),
+      ),
+    );
+
+    // The dialog surface is the nearest ColoredBox above the title (the
+    // first ColoredBox in the tree is the scrim). Separate tests per mode:
+    // Overlay.initialEntries is honored only on first build.
+    final Finder surface = find
+        .ancestor(of: find.text('Data'), matching: find.byType(ColoredBox))
+        .first;
+
+    testWidgets('default body content keeps the spec padding', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(fullWidthModal(isFullWidth: false));
+      await tester.pumpAndSettle();
+      final Rect dialog = tester.getRect(surface);
+      final Rect padded = tester.getRect(find.byKey(contentKey));
+      // Default content padding: 16 start / 48 end.
+      expect(padded.left - dialog.left, 16);
+      expect(dialog.right - padded.right, 48);
+    });
+
+    testWidgets('full-width body content is flush; header keeps padding', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(fullWidthModal(isFullWidth: true));
+      await tester.pumpAndSettle();
+      final Rect dialog = tester.getRect(surface);
+      final Rect flush = tester.getRect(find.byKey(contentKey));
+      // Full width: padding 0, margin 0 — content edge to edge.
+      expect(flush.left, dialog.left);
+      expect(flush.right, dialog.right);
+      // The header title keeps its 16px inset.
+      expect(tester.getTopLeft(find.text('Data')).dx - dialog.left, 16);
+    });
+
+    testWidgets('full-width modal with a table across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'modal_full_width',
+        containsText: true,
+        size: const Size(720, 420),
+        builder: (BuildContext context) => Overlay(
+          initialEntries: <OverlayEntry>[
+            OverlayEntry(
+              builder: (BuildContext context) => CarbonModal(
+                open: true,
+                title: 'Members',
+                isFullWidth: true,
+                size: CarbonModalSize.sm,
+                onClose: () {},
+                primaryButton: CarbonModalAction(
+                  label: 'Add member',
+                  onPressed: () {},
+                ),
+                secondaryButton: CarbonModalAction(
+                  label: 'Cancel',
+                  onPressed: () {},
+                ),
+                child: const CarbonDataTable(
+                  columns: <CarbonTableColumn>[
+                    CarbonTableColumn(title: 'Name'),
+                    CarbonTableColumn(title: 'Role'),
+                  ],
+                  rows: <CarbonTableRow>[
+                    CarbonTableRow(cells: <Widget>[Text('Ada'), Text('Admin')]),
+                    CarbonTableRow(
+                      cells: <Widget>[Text('Grace'), Text('Editor')],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        afterPump: (WidgetTester tester) async {
+          await tester.pumpAndSettle();
+        },
+      );
+    });
+  });
 }
