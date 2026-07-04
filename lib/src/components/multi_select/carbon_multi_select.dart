@@ -69,6 +69,8 @@ class CarbonMultiSelect<T> extends StatefulWidget {
     this.hideLabel = false,
     this.filterable = false,
     this.filterPlaceholder,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
@@ -117,6 +119,13 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 
   /// The placeholder for the filter input when [filterable].
   final String? filterPlaceholder;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional external focus node for the field.
   final FocusNode? focusNode;
@@ -339,6 +348,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           size: widget.size,
           expanded: _overlay.isShowing,
           disabled: widget.disabled,
+          aiLabel: widget.aiLabel,
+          aiRevert: widget.aiRevert,
           invalid: widget.invalid,
           warn: widget.warn,
           focused: _focus.hasFocus,

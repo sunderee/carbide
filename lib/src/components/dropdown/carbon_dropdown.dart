@@ -90,6 +90,8 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.warnText,
     this.hideLabel = false,
     this.inline = false,
+    this.aiLabel,
+    this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
@@ -141,6 +143,13 @@ class CarbonDropdown<T> extends StatefulWidget {
 
   /// Places the title beside the field instead of above it.
   final bool inline;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
 
   /// An optional external focus node for the trigger.
   final FocusNode? focusNode;
@@ -294,6 +303,8 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       invalid: widget.invalid,
       warn: widget.warn,
       focused: _focus.hasFocus,
+      aiLabel: widget.aiLabel,
+      aiRevert: widget.aiRevert,
       onTap: _enabled ? _toggle : null,
       child: ExcludeSemantics(
         child: Text(

@@ -117,6 +117,7 @@ class _DropdownPage extends StatefulWidget {
 
 class _DropdownPageState extends State<_DropdownPage> {
   String _value = 'cyan';
+  bool _ai = false;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -129,6 +130,9 @@ class _DropdownPageState extends State<_DropdownPage> {
           titleText: 'Favourite colour',
           selectedItem: _value,
           onChanged: (String v) => setState(() => _value = v),
+          aiLabel: _ai
+              ? const CarbonAILabel(size: CarbonAILabelSize.mini)
+              : null,
           items: const <CarbonDropdownItem<String>>[
             CarbonDropdownItem<String>(value: 'cyan', label: 'Cyan'),
             CarbonDropdownItem<String>(value: 'magenta', label: 'Magenta'),
@@ -136,6 +140,13 @@ class _DropdownPageState extends State<_DropdownPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'AI label',
+          value: _ai,
+          onChanged: (bool v) => setState(() => _ai = v),
+        ),
+      ],
       code: 'CarbonDropdown<String>(titleText: \'…\', items: <…>[…]);',
     );
   }
