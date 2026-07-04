@@ -199,26 +199,21 @@ class _CarbonDialogState extends State<CarbonDialog> {
                 child: Semantics(
                   scopesRoute: widget.modal,
                   explicitChildNodes: true,
-                  child: Focus(
-                    onKeyEvent: _onKey,
-                    canRequestFocus: false,
-                    skipTraversal: true,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: layer.layer,
-                        border: Border.all(color: theme.borderSubtle01),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          for (final Widget child in widget.children)
-                            if (child is CarbonDialogBody)
-                              Flexible(child: child)
-                            else
-                              child,
-                        ],
-                      ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: layer.layer,
+                      border: Border.all(color: theme.borderSubtle01),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        for (final Widget child in widget.children)
+                          if (child is CarbonDialogBody)
+                            Flexible(child: child)
+                          else
+                            child,
+                      ],
                     ),
                   ),
                 ),
@@ -250,25 +245,31 @@ class _CarbonDialogState extends State<CarbonDialog> {
     }
 
     return Positioned.fill(
-      child: FocusScope(
-        node: _scope,
-        autofocus: true,
-        child: Stack(
-          children: <Widget>[
-            // ::backdrop — the overlay scrim; no outside-tap dismissal
-            // (the native dialog element does not close on backdrop
-            // clicks).
-            Positioned.fill(
-              child: AnimatedOpacity(
-                duration: reducedMotion
-                    ? Duration.zero
-                    : CarbonDuration.moderate02,
-                opacity: _entered ? 1 : 0,
-                child: ColoredBox(color: theme.overlay),
+      // Escape cancels a modal dialog (the native cancel event); the key
+      // handler must sit ABOVE the focus scope to see bubbled keys.
+      child: Focus(
+        onKeyEvent: _onKey,
+        canRequestFocus: false,
+        child: FocusScope(
+          node: _scope,
+          autofocus: true,
+          child: Stack(
+            children: <Widget>[
+              // ::backdrop — the overlay scrim; no outside-tap dismissal
+              // (the native dialog element does not close on backdrop
+              // clicks).
+              Positioned.fill(
+                child: AnimatedOpacity(
+                  duration: reducedMotion
+                      ? Duration.zero
+                      : CarbonDuration.moderate02,
+                  opacity: _entered ? 1 : 0,
+                  child: ColoredBox(color: theme.overlay),
+                ),
               ),
-            ),
-            surface,
-          ],
+              surface,
+            ],
+          ),
         ),
       ),
     );
