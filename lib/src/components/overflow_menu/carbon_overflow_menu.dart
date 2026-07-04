@@ -11,6 +11,10 @@
 // labelled button (MenuButton) and a split action button (ComboButton). The
 // menu owns roving/type-ahead/Escape; these widgets own the trigger and the
 // overlay anchoring.
+//
+// The Menu-based architecture is upstream's `enable-v12-overflowmenu`
+// flagged behavior, adopted deliberately — the unflagged v10-style
+// OverflowMenu is what Carbon v12 removes (ADR 0002).
 
 import 'package:flutter/widgets.dart';
 
