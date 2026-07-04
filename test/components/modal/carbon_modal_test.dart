@@ -232,11 +232,19 @@ void main() {
       ),
     );
 
-    // The dialog surface is the nearest ColoredBox above the title (the
-    // first ColoredBox in the tree is the scrim). Separate tests per mode:
+    // The dialog surface is the nearest decorated box above the title (a
+    // DecoratedBox since the AI treatment landed). Separate tests per mode:
     // Overlay.initialEntries is honored only on first build.
     final Finder surface = find
-        .ancestor(of: find.text('Data'), matching: find.byType(ColoredBox))
+        .ancestor(
+          of: find.text('Data'),
+          matching: find.byWidgetPredicate(
+            (Widget w) =>
+                w is DecoratedBox &&
+                w.position == DecorationPosition.background &&
+                (w.decoration as BoxDecoration?)?.color != null,
+          ),
+        )
         .first;
 
     testWidgets('default body content keeps the spec padding', (
