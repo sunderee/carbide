@@ -145,6 +145,10 @@ class CarbonTextInput extends StatefulWidget {
 }
 
 class _CarbonTextInputState extends State<CarbonTextInput> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   TextEditingController? _internalController;
   FocusNode? _internalFocus;
 
@@ -223,7 +227,7 @@ class _CarbonTextInputState extends State<CarbonTextInput> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    if (widget.fluid) {
+    if (_fluid) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

@@ -138,6 +138,10 @@ class CarbonNumberInput extends StatefulWidget {
 }
 
 class _CarbonNumberInputState extends State<CarbonNumberInput> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   late final TextEditingController _controller = TextEditingController(
     text: widget.value?.toString() ?? '',
   );
@@ -316,7 +320,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       steppers: steppers,
       aiLabel: widget.aiLabel,
       aiRevert: widget.aiRevert,
-      fluidLabel: widget.fluid && !widget.hideLabel ? widget.labelText : null,
+      fluidLabel: _fluid && !widget.hideLabel ? widget.labelText : null,
     );
 
     final Widget? message = widget.invalid && widget.invalidText != null
@@ -334,7 +338,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (!widget.fluid && !widget.hideLabel)
+        if (!_fluid && !widget.hideLabel)
           ExcludeSemantics(
             child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
           ),

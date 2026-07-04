@@ -145,6 +145,10 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 }
 
 class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   final TextEditingController _filter = TextEditingController();
@@ -303,7 +307,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel || widget.fluid
+    final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -360,8 +364,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           disabled: widget.disabled,
           aiLabel: widget.aiLabel,
           aiRevert: widget.aiRevert,
-          fluid: widget.fluid,
-          fluidLabel: widget.fluid ? widget.titleText : null,
+          fluid: _fluid,
+          fluidLabel: _fluid ? widget.titleText : null,
           invalid: widget.invalid,
           warn: widget.warn,
           focused: _focus.hasFocus,
@@ -476,7 +480,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           child: ExcludeFocus(
             child: CarbonListBoxMenu(
               size: widget.size,
-              fluidRows: widget.fluid && !widget.condensed,
+              fluidRows: _fluid && !widget.condensed,
               children: rows,
             ),
           ),
@@ -494,7 +498,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(
           size: widget.size,
-          fluid: widget.fluid && !widget.condensed,
+          fluid: _fluid && !widget.condensed,
           isFirst: index == 0,
           isHighlighted: index == _highlighted,
           disabled: item.disabled,

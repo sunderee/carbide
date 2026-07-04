@@ -229,6 +229,32 @@ class CarbonFormGroup extends StatelessWidget {
   }
 }
 
+/// Opts every fluid-capable descendant field into the fluid treatment.
+///
+/// Upstream's `FluidForm` wraps a form so each input renders its fluid
+/// variant; here the scope is an inherited flag the fluid-capable
+/// components combine with their own `fluid` parameter.
+///
+/// ```dart
+/// CarbonFluidForm(
+///   child: Column(children: <Widget>[
+///     CarbonTextInput(labelText: 'Name'),
+///     CarbonDropdown<int>(titleText: 'Team', items: teams),
+///   ]),
+/// )
+/// ```
+class CarbonFluidForm extends InheritedWidget {
+  /// Creates a fluid form scope.
+  const CarbonFluidForm({super.key, required super.child});
+
+  /// Whether a [CarbonFluidForm] encloses [context].
+  static bool of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CarbonFluidForm>() != null;
+
+  @override
+  bool updateShouldNotify(CarbonFluidForm oldWidget) => false;
+}
+
 /// The presentational Carbon field surface (`cds--text-input` chrome).
 ///
 /// Wraps a consumer-supplied [child] (the editable content) with the field
