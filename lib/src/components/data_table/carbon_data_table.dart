@@ -706,8 +706,8 @@ class _BodyRowState extends State<_BodyRow> {
     if (widget.selected) {
       content = DecoratedBox(
         decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(color: theme.borderInteractive, width: 3),
+          border: BorderDirectional(
+            start: BorderSide(color: theme.borderInteractive, width: 3),
           ),
         ),
         child: content,
@@ -823,7 +823,7 @@ class _ExpandedDetail extends StatelessWidget {
       curve: CarbonEasing.standardProductive,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(
-          alignment: Alignment.topLeft,
+          alignment: AlignmentDirectional.topStart,
           heightFactor: t,
           child: child,
         ),

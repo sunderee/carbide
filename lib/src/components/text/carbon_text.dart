@@ -37,6 +37,7 @@ class CarbonText extends StatelessWidget {
     this.overflow,
     this.softWrap,
     this.semanticsLabel,
+    this.textDirection,
   });
 
   /// The text to display.
@@ -64,6 +65,10 @@ class CarbonText extends StatelessWidget {
   /// An alternative label for accessibility, read instead of [data].
   final String? semanticsLabel;
 
+  /// Overrides the ambient [Directionality] for this run of text, like
+  /// upstream `unstable_Text`'s per-element `dir`. Null inherits.
+  final TextDirection? textDirection;
+
   @override
   Widget build(BuildContext context) {
     final Color resolved =
@@ -76,6 +81,7 @@ class CarbonText extends StatelessWidget {
       overflow: overflow,
       softWrap: softWrap,
       semanticsLabel: semanticsLabel,
+      textDirection: textDirection,
     );
   }
 }

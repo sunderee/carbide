@@ -790,14 +790,14 @@ class _TabButtonState extends State<_TabButton> {
                 : active
                 ? layer.layerAccentHover
                 : layer.layerAccent,
-            border: Border(
+            border: BorderDirectional(
               top: BorderSide(
                 color: widget.selected
                     ? theme.borderInteractive
                     : const Color(0x00000000),
                 width: 2,
               ),
-              right: BorderSide(color: layer.borderSubtle),
+              end: BorderSide(color: layer.borderSubtle),
             ),
           );
 

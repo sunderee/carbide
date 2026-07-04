@@ -138,9 +138,12 @@ class CarbonPaginationNav extends StatelessWidget {
     final _Cuts cuts = _calculateCuts(page, totalItems, displayed);
     final int startOffset = (displayed <= 4 && page > 1) ? 0 : 1;
 
+    // The prev/next carets point along the reading direction
+    // (`[dir='rtl'] svg { rotate(0.5turn) }` upstream).
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
     final List<Widget> items = <Widget>[
       _arrow(
-        icon: CarbonIcons.caretLeft,
+        icon: rtl ? CarbonIcons.caretRight : CarbonIcons.caretLeft,
         label: 'Previous page',
         onPressed: (loop || page > 0) ? () => _go(page - 1) : null,
       ),
@@ -165,7 +168,7 @@ class CarbonPaginationNav extends StatelessWidget {
 
     items.add(
       _arrow(
-        icon: CarbonIcons.caretRight,
+        icon: rtl ? CarbonIcons.caretLeft : CarbonIcons.caretRight,
         label: 'Next page',
         onPressed: (loop || page < totalItems - 1) ? () => _go(page + 1) : null,
       ),

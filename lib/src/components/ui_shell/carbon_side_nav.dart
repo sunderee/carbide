@@ -163,11 +163,20 @@ class _CarbonSideNavState extends State<CarbonSideNav> {
 
   Widget _buildOverlay(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+    // Pin the flyout to the rail's start edge so the 256px expansion grows
+    // into the content area in both directions (follower anchors are
+    // physical-only, so resolve start against the ambient direction).
+    final Alignment startAnchor =
+        Directionality.of(context) == TextDirection.rtl
+        ? Alignment.topRight
+        : Alignment.topLeft;
     return Positioned(
       top: 0,
       left: 0,
       child: CompositedTransformFollower(
         link: _link,
+        targetAnchor: startAnchor,
+        followerAnchor: startAnchor,
         child: MouseRegion(
           onEnter: (_) => _pointer(true),
           onExit: (_) => _pointer(false),
@@ -342,8 +351,8 @@ class _NavRowState extends State<_NavRow> {
                   decoration: BoxDecoration(
                     color: background,
                     // The active 4px border-interactive selection marker.
-                    border: Border(
-                      left: BorderSide(
+                    border: BorderDirectional(
+                      start: BorderSide(
                         color: widget.current
                             ? theme.borderInteractive
                             : const Color(0x00000000),
@@ -530,7 +539,7 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
           curve: CarbonEasing.standardProductive,
           builder: (BuildContext context, double t, Widget? child) => ClipRect(
             child: Align(
-              alignment: Alignment.topLeft,
+              alignment: AlignmentDirectional.topStart,
               heightFactor: t,
               child: child,
             ),

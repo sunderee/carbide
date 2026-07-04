@@ -346,6 +346,9 @@ class _Track extends StatelessWidget {
                     painter: _IndeterminatePainter(
                       progress: controller.value,
                       color: barColor,
+                      // The sweep travels along the reading direction
+                      // (`progress-bar-indeterminate-rtl` upstream).
+                      reverse: Directionality.of(context) == TextDirection.rtl,
                     ),
                   ),
                 )
@@ -359,6 +362,7 @@ class _Track extends StatelessWidget {
                             alignment: AlignmentDirectional.centerStart,
                             child: FractionallySizedBox(
                               widthFactor: width,
+                              heightFactor: 1,
                               child: child,
                             ),
                           ),
@@ -374,13 +378,20 @@ class _Track extends StatelessWidget {
 /// track, matching the upstream `progress-bar-indeterminate` keyframes
 /// (background-position-x 25% → −105% over a 200%-wide gradient).
 class _IndeterminatePainter extends CustomPainter {
-  const _IndeterminatePainter({required this.progress, required this.color});
+  const _IndeterminatePainter({
+    required this.progress,
+    required this.color,
+    required this.reverse,
+  });
 
   /// The 0–1 cycle position.
   final double progress;
 
   /// The stripe color.
   final Color color;
+
+  /// Travels right-to-left when set (the RTL reading direction).
+  final bool reverse;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -390,13 +401,16 @@ class _IndeterminatePainter extends CustomPainter {
     final double stripeWidth = size.width * stripeFraction;
     final double travel = size.width + stripeWidth;
     final double start = -stripeWidth + progress * travel;
+    final double left = reverse ? size.width - start - stripeWidth : start;
     canvas.drawRect(
-      Rect.fromLTWH(start, 0, stripeWidth, size.height),
+      Rect.fromLTWH(left, 0, stripeWidth, size.height),
       Paint()..color = color,
     );
   }
 
   @override
   bool shouldRepaint(_IndeterminatePainter oldDelegate) =>
-      progress != oldDelegate.progress || color != oldDelegate.color;
+      progress != oldDelegate.progress ||
+      color != oldDelegate.color ||
+      reverse != oldDelegate.reverse;
 }
