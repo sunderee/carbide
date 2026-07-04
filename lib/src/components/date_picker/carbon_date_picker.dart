@@ -535,10 +535,24 @@ class CarbonDatePicker extends StatefulWidget {
     this.invalid = false,
     this.invalidText,
     this.helperText,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
   });
 
   /// The field label.
   final String labelText;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-date-picker.scss`): a 64px field with the
+  /// label rendered inside above the value.
+  final bool fluid;
 
   /// The selected date.
   final DateTime? value;
@@ -579,6 +593,10 @@ String _format(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')}/${d.year}';
 
 class _CarbonDatePickerState extends State<CarbonDatePicker> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   bool _open = false;
   final Object _group = UniqueKey();
 
@@ -618,6 +636,9 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
               invalid: widget.invalid,
               text: widget.value == null ? null : _format(widget.value!),
               placeholder: widget.placeholder,
+              aiLabel: widget.aiLabel,
+              aiRevert: widget.aiRevert,
+              fluidLabel: _fluid ? widget.labelText : null,
             ),
           ),
         ),
@@ -634,9 +655,10 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ExcludeSemantics(
-          child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
-        ),
+        if (!_fluid)
+          ExcludeSemantics(
+            child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
+          ),
         trigger,
         ?message,
       ],
@@ -674,6 +696,9 @@ class CarbonDateRangePicker extends StatefulWidget {
     this.invalid = false,
     this.invalidText,
     this.helperText,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluid = false,
   });
 
   /// The selected range; null when nothing has been picked.
@@ -687,6 +712,17 @@ class CarbonDateRangePicker extends StatefulWidget {
 
   /// The label above the end field.
   final String endLabelText;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
+  /// field per upstream's `decorator` prop; adds the AI aura treatment.
+  final Widget? aiLabel;
+
+  /// Suppresses the aura while the AI label shows its revert control.
+  final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-date-picker.scss`): a 64px field with the
+  /// label rendered inside above the value.
+  final bool fluid;
 
   /// The earliest selectable date.
   final DateTime? firstDate;
@@ -717,6 +753,10 @@ class CarbonDateRangePicker extends StatefulWidget {
 }
 
 class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
+  /// The effective fluid flag: the widget's own, or an enclosing
+  /// [CarbonFluidForm] scope.
+  bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
   bool _open = false;
   CarbonDateRange? _beforeOpen;
   final Object _group = UniqueKey();
@@ -749,9 +789,10 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ExcludeSemantics(
-        child: CarbonFormLabel(label, disabled: widget.disabled),
-      ),
+      if (!_fluid)
+        ExcludeSemantics(
+          child: CarbonFormLabel(label, disabled: widget.disabled),
+        ),
       Semantics(
         button: true,
         label: label,
@@ -764,6 +805,9 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
             invalid: widget.invalid,
             text: date == null ? null : _format(date),
             placeholder: widget.placeholder,
+            aiLabel: widget.aiLabel,
+            aiRevert: widget.aiRevert,
+            fluidLabel: _fluid ? label : null,
           ),
         ),
       ),
@@ -833,6 +877,9 @@ class _DateField extends StatelessWidget {
     required this.invalid,
     required this.text,
     required this.placeholder,
+    this.aiLabel,
+    this.aiRevert = false,
+    this.fluidLabel,
   });
 
   final CarbonFieldSize size;
@@ -840,6 +887,12 @@ class _DateField extends StatelessWidget {
   final bool invalid;
   final String? text;
   final String placeholder;
+  final Widget? aiLabel;
+  final bool aiRevert;
+
+  /// When set, renders the 64px fluid field with this label inside
+  /// (`_fluid-date-picker.scss`, the house fluid column).
+  final String? fluidLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -853,6 +906,9 @@ class _DateField extends StatelessWidget {
       size: size,
       disabled: disabled,
       status: invalid ? CarbonFieldStatus.invalid : CarbonFieldStatus.none,
+      aiLabel: aiLabel,
+      aiRevert: aiRevert,
+      fluid: fluidLabel != null,
       trailing: Padding(
         padding: const EdgeInsetsDirectional.only(end: CarbonSpacing.spacing05),
         child: CarbonIcon(
@@ -861,13 +917,39 @@ class _DateField extends StatelessWidget {
         ),
       ),
       child: ExcludeSemantics(
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            text ?? placeholder,
-            style: CarbonTypeStyles.bodyCompact01.copyWith(color: textColor),
-          ),
-        ),
+        child: fluidLabel == null
+            ? Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  text ?? placeholder,
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(
+                    color: textColor,
+                  ),
+                ),
+              )
+            // Fluid stacks the label-01 label above the value (the house
+            // fluid column shared with the other fluid fields).
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    fluidLabel!,
+                    style: CarbonTypeStyles.label01.copyWith(
+                      color: disabled
+                          ? theme.textDisabled
+                          : theme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    text ?? placeholder,
+                    style: CarbonTypeStyles.bodyCompact01.copyWith(
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

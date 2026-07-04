@@ -287,6 +287,7 @@ class CarbonField extends StatelessWidget {
     this.trailing,
     this.aiLabel,
     this.aiRevert = false,
+    this.fluid = false,
   });
 
   /// The editable content (e.g. an `EditableText`) or display child.
@@ -319,6 +320,10 @@ class CarbonField extends StatelessWidget {
   /// Suppresses the aura while the AI label shows its revert control
   /// (`--ai-label--revert` drops the gradient upstream).
   final bool aiRevert;
+
+  /// The fluid treatment: the field renders at the 64px fluid height (the
+  /// consumer stacks its label inside the [child]).
+  final bool fluid;
 
   /// Horizontal field padding (`layout.density('padding-inline')`).
   static const double paddingInline = 16;
@@ -382,7 +387,7 @@ class CarbonField extends StatelessWidget {
         border: Border(bottom: BorderSide(color: borderColor)),
       ),
       child: SizedBox(
-        height: size.height,
+        height: fluid ? 64 : size.height,
         child: Padding(
           padding: const EdgeInsetsDirectional.only(start: paddingInline),
           child: Row(
