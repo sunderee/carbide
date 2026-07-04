@@ -5,10 +5,11 @@
 //
 // Spec sources (Apache-2.0 Carbon Design System; see NOTICE):
 //   styles/scss/components/button/{_button,_mixins,_vars}.scss
-//   react/src/components/Button/Button.tsx
-// Deliberately not implemented (deferred with their upstream features):
-// isExpressive, link-buttons (href), Button.Skeleton (#47), and the
-// tooltip-wrapped IconButton (lands with Tooltip, Tier C).
+//   react/src/components/Button/{Button,ButtonBase}.tsx
+// Once-deferred features that now live elsewhere: `CarbonButtonSkeleton` is
+// in the skeleton library (#47) and the tooltip-wrapped icon button is
+// `CarbonIconButton` (#188). Expressive mode and link semantics (upstream
+// `isExpressive` / `href`) are implemented here (#213).
 
 import 'package:flutter/widgets.dart';
 
@@ -102,6 +103,8 @@ class CarbonButton extends StatelessWidget {
     this.size = CarbonButtonSize.lg,
     this.icon,
     this.isSelected = false,
+    this.isExpressive = false,
+    this.link = false,
     this.focusNode,
     this.autofocus = false,
   }) : iconOnly = false,
@@ -123,6 +126,8 @@ class CarbonButton extends StatelessWidget {
     this.kind = CarbonButtonKind.primary,
     this.size = CarbonButtonSize.lg,
     this.isSelected = false,
+    this.isExpressive = false,
+    this.link = false,
     this.focusNode,
     this.autofocus = false,
   }) : label = iconDescription,
@@ -153,6 +158,23 @@ class CarbonButton extends StatelessWidget {
   /// Selected state (ghost icon-only buttons).
   final bool isSelected;
 
+  /// Whether to use Carbon's expressive treatment: the `body-compact-02`
+  /// label (16px/22px line), the expressive block-padding formula, and
+  /// 20px icons. Geometry per size is otherwise unchanged.
+  ///
+  /// Source: `_button.scss` `.cds--btn--expressive` and
+  /// `_mixins.scss` `--temp-expressive-1lh`.
+  final bool isExpressive;
+
+  /// Whether the button carries link semantics instead of button semantics.
+  ///
+  /// This is upstream's `href` mode, where an enabled `Button` renders as an
+  /// `<a>` element (`ButtonBase.tsx`): the visuals are identical and only
+  /// the accessibility role changes. Navigation stays the caller's job via
+  /// [onPressed]. A disabled link renders with button semantics, matching
+  /// upstream's `href && !disabled` branch.
+  final bool link;
+
   /// An optional focus node to control focus externally.
   final FocusNode? focusNode;
 
@@ -162,20 +184,29 @@ class CarbonButton extends StatelessWidget {
   /// Carbon's button label type style (`body-compact-01`).
   static const TextStyle labelStyle = CarbonTypeStyles.bodyCompact01;
 
+  /// The expressive label type style (`body-compact-02`).
+  static const TextStyle expressiveLabelStyle = CarbonTypeStyles.bodyCompact02;
+
   /// The maximum button width per spec.
   static const double maxWidth = 320;
 
   static const double _border = 1;
   static const double _iconSize = 16;
+  static const double _expressiveIconSize = 20;
 
-  /// Vertical padding per spec: centers the 18px label line up to lg and
-  /// caps at the lg value (top alignment) above; −1px border compensation.
-  /// Source: `_mixins.scss` `--temp-padding-block-max` / `padding-block`.
-  static double _paddingBlock(CarbonButtonSize size) {
-    final double line =
-        CarbonButton.labelStyle.fontSize! * CarbonButton.labelStyle.height!;
+  /// Vertical padding per spec: centers the label line (18px, or 22px in
+  /// expressive mode) up to lg and caps at the lg value computed from the
+  /// default line (top alignment) above; −1px border compensation.
+  /// Source: `_mixins.scss` `--temp-padding-block-max` / `padding-block` and
+  /// `_button.scss` `.cds--btn--expressive` (the cap stays `--temp-1lh`
+  /// based in both modes).
+  static double _paddingBlock(CarbonButtonSize size, bool expressive) {
+    final TextStyle style = expressive ? expressiveLabelStyle : labelStyle;
+    final double line = style.fontSize! * style.height!;
     final double centered = (size.height - line) / 2 - _border;
-    final double max = (CarbonButtonSize.lg.height - line) / 2 - _border;
+    final double defaultLine =
+        labelStyle.fontSize! * CarbonButton.labelStyle.height!;
+    final double max = (CarbonButtonSize.lg.height - defaultLine) / 2 - _border;
     return centered < max ? centered : max;
   }
 
@@ -204,8 +235,12 @@ class CarbonButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final bool enabled = onPressed != null;
+    // Upstream renders an anchor only while enabled (`href && !disabled`),
+    // so a disabled link keeps button semantics.
+    final bool asLink = link && enabled;
     return Semantics(
-      button: true,
+      button: !asLink,
+      link: asLink,
       enabled: enabled,
       label: iconOnly ? label : null,
       child: CarbonInteraction(
@@ -226,6 +261,7 @@ class CarbonButton extends StatelessWidget {
             size: size,
             iconOnly: iconOnly,
             ghostLike: _isGhostLike,
+            expressive: isExpressive,
             label: label,
             icon: icon,
             theme: theme,
@@ -242,6 +278,7 @@ class _ButtonSurface extends StatelessWidget {
     required this.size,
     required this.iconOnly,
     required this.ghostLike,
+    required this.expressive,
     required this.label,
     required this.icon,
     required this.theme,
@@ -251,6 +288,7 @@ class _ButtonSurface extends StatelessWidget {
   final CarbonButtonSize size;
   final bool iconOnly;
   final bool ghostLike;
+  final bool expressive;
   final String label;
   final CarbonIconData? icon;
   final CarbonThemeData theme;
@@ -264,22 +302,37 @@ class _ButtonSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double padBlock = CarbonButton._paddingBlock(size);
+    final double padBlock = CarbonButton._paddingBlock(size, expressive);
     final CarbonIconData? iconData = icon;
+    // Expressive buttons render 20px icons; the icon inset formula stays
+    // 16px based in both modes (`.cds--btn--expressive .cds--btn__icon`
+    // overrides only the icon size).
+    final double iconSize = expressive
+        ? CarbonButton._expressiveIconSize
+        : CarbonButton._iconSize;
+    final TextStyle labelStyle = expressive
+        ? CarbonButton.expressiveLabelStyle
+        : CarbonButton.labelStyle;
 
     Widget content;
     if (iconOnly) {
-      content = Center(child: CarbonIcon(iconData!, color: style.icon));
+      content = Center(
+        child: CarbonIcon(iconData!, size: iconSize, color: style.icon),
+      );
     } else {
       final Widget text = Text(
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: CarbonButton.labelStyle.copyWith(color: style.text),
+        style: labelStyle.copyWith(color: style.text),
       );
       // The xs variant overrides padding-block-start to a flat 1.5px
-      // (`_button.scss` .cds--btn--xs rule) — a replacement, not an addition.
-      final double padTop = size == CarbonButtonSize.xs ? 1.5 : padBlock;
+      // (`_button.scss` .cds--btn--xs rule) — a replacement, not an
+      // addition. The class is dropped in expressive mode
+      // (`ButtonBase.tsx`: `size === 'xs' && !isExpressive`).
+      final double padTop = size == CarbonButtonSize.xs && !expressive
+          ? 1.5
+          : padBlock;
       if (ghostLike) {
         // Ghost icons flow inline after the label with an 8px gap.
         content = Padding(
@@ -295,7 +348,7 @@ class _ButtonSurface extends StatelessWidget {
               Flexible(child: text),
               if (iconData != null) ...<Widget>[
                 const SizedBox(width: 8),
-                CarbonIcon(iconData, color: style.icon),
+                CarbonIcon(iconData, size: iconSize, color: style.icon),
               ],
             ],
           ),
@@ -320,7 +373,7 @@ class _ButtonSurface extends StatelessWidget {
               PositionedDirectional(
                 end: _padStart,
                 top: CarbonButton._iconTop(size),
-                child: CarbonIcon(iconData, color: style.icon),
+                child: CarbonIcon(iconData, size: iconSize, color: style.icon),
               ),
           ],
         );

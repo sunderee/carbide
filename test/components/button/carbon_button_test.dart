@@ -9,6 +9,7 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -574,6 +575,207 @@ void main() {
           node.requestFocus();
           await tester.pumpAndSettle();
         },
+      );
+    });
+  });
+
+  group('expressive (_button.scss .cds--btn--expressive)', () {
+    testWidgets('label is body-compact-02', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(CarbonButton(label: 'B', isExpressive: true, onPressed: () {})),
+      );
+      await tester.pumpAndSettle();
+      final TextStyle style = tester.widget<Text>(find.text('B')).style!;
+      expect(style.fontSize, 16);
+      expect(style.height, 1.375);
+    });
+
+    testWidgets('padding-block: min((H − 22)/2 − 1, 14); no xs override', (
+      WidgetTester tester,
+    ) async {
+      Future<double> labelTop(CarbonButtonSize size) async {
+        await tester.pumpWidget(
+          _host(
+            CarbonButton(
+              label: 'B',
+              size: size,
+              isExpressive: true,
+              onPressed: () {},
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return tester.getTopLeft(find.text('B')).dy -
+            tester.getTopLeft(find.byType(CarbonButton)).dy;
+      }
+
+      // +1px border in each expectation. The cap stays --temp-1lh based
+      // (14px, from the default 18px line), so xl/2xl pin to 15.
+      expect(await labelTop(CarbonButtonSize.lg), closeTo(13, 0.001));
+      expect(await labelTop(CarbonButtonSize.xl), closeTo(15, 0.001));
+      expect(await labelTop(CarbonButtonSize.xxl), closeTo(15, 0.001));
+      expect(await labelTop(CarbonButtonSize.md), closeTo(9, 0.001));
+      expect(await labelTop(CarbonButtonSize.sm), closeTo(5, 0.001));
+      // The xs 1.5px padding-block-start class is dropped when expressive
+      // (ButtonBase.tsx: `size === 'xs' && !isExpressive`).
+      expect(await labelTop(CarbonButtonSize.xs), closeTo(1, 0.001));
+    });
+
+    testWidgets('icons render at 20px; the inset formula is unchanged', (
+      WidgetTester tester,
+    ) async {
+      Future<(double, double)> iconOf({required bool expressive}) async {
+        await tester.pumpWidget(
+          _host(
+            CarbonButton(
+              label: 'B',
+              icon: CarbonIcons.add,
+              isExpressive: expressive,
+              onPressed: () {},
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final Finder icon = find.byType(CarbonIcon);
+        return (
+          tester.widget<CarbonIcon>(icon).size,
+          tester.getTopLeft(icon).dy -
+              tester.getTopLeft(find.byType(CarbonButton)).dy,
+        );
+      }
+
+      final (double defaultSize, double defaultTop) = await iconOf(
+        expressive: false,
+      );
+      final (double expressiveSize, double expressiveTop) = await iconOf(
+        expressive: true,
+      );
+      expect(defaultSize, 16);
+      expect(expressiveSize, 20);
+      // `.cds--btn--expressive .cds--btn__icon` overrides only the icon
+      // size; inset-block-start keeps the 16px-based formula.
+      expect(expressiveTop, defaultTop);
+    });
+
+    testWidgets('ghost inline and icon-only icons are 20px too', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonButton(
+            label: 'B',
+            kind: CarbonButtonKind.ghost,
+            icon: CarbonIcons.add,
+            isExpressive: true,
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.widget<CarbonIcon>(find.byType(CarbonIcon)).size, 20);
+
+      await tester.pumpWidget(
+        _host(
+          CarbonButton.iconOnly(
+            icon: CarbonIcons.add,
+            iconDescription: 'Add',
+            isExpressive: true,
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.widget<CarbonIcon>(find.byType(CarbonIcon)).size, 20);
+    });
+  });
+
+  group('link mode (ButtonBase.tsx href branch)', () {
+    testWidgets('enabled link buttons expose link semantics', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(CarbonButton(label: 'Docs', link: true, onPressed: () {})),
+      );
+      await tester.pumpAndSettle();
+      final SemanticsNode node = tester.getSemantics(find.text('Docs'));
+      expect(node.flagsCollection.isLink, isTrue);
+      expect(node.flagsCollection.isButton, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('a disabled link keeps button semantics (href && !disabled)', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(const CarbonButton(label: 'Docs', link: true)),
+      );
+      await tester.pumpAndSettle();
+      final SemanticsNode node = tester.getSemantics(find.text('Docs'));
+      expect(node.flagsCollection.isButton, isTrue);
+      expect(node.flagsCollection.isLink, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('link buttons activate like buttons', (
+      WidgetTester tester,
+    ) async {
+      int presses = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonButton(label: 'Docs', link: true, onPressed: () => presses++),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(CarbonButton));
+      expect(presses, 1);
+    });
+  });
+
+  group('expressive goldens', () {
+    testWidgets('expressive buttons across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'button_expressive',
+        containsText: true,
+        size: const Size(480, 180),
+        builder: (BuildContext context) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CarbonButton(
+                    label: 'Primary',
+                    isExpressive: true,
+                    icon: CarbonIcons.add,
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 12),
+                  CarbonButton(
+                    label: 'Ghost',
+                    kind: CarbonButtonKind.ghost,
+                    isExpressive: true,
+                    icon: CarbonIcons.arrowRight,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              CarbonButton(
+                label: 'Expressive md',
+                size: CarbonButtonSize.md,
+                isExpressive: true,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
       );
     });
   });
