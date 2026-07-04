@@ -69,6 +69,8 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.warnText,
     this.hideLabel = false,
     this.aiLabel,
+    this.fluid = false,
+    this.condensed = false,
     this.aiRevert = false,
     this.focusNode,
   }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
@@ -114,6 +116,14 @@ class CarbonComboBox<T> extends StatefulWidget {
 
   /// Visually hides the title (kept for assistive technology).
   final bool hideLabel;
+
+  /// The fluid treatment: a 64px field with the title rendered inside
+  /// above the value, and 64px menu rows (`_fluid-list-box.scss`).
+  final bool fluid;
+
+  /// The condensed fluid variant: the field stays fluid but the menu rows
+  /// keep the standard height (`--list-box__wrapper--fluid--condensed`).
+  final bool condensed;
 
   /// An optional AI presence decorator (a `CarbonAILabel`), rendered in the
   /// field per upstream's `decorator` prop; adds the AI aura treatment.
@@ -299,7 +309,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    final Widget? title = widget.hideLabel
+    final Widget? title = widget.hideLabel || widget.fluid
         ? null
         : ExcludeSemantics(
             child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
@@ -366,7 +376,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
               child: AnimatedContainer(
                 duration: CarbonDuration.fast01,
                 curve: CarbonEasing.standardProductive,
-                height: widget.size.height,
+                height: widget.fluid ? 64 : widget.size.height,
                 decoration: BoxDecoration(
                   color: background,
                   gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
@@ -378,7 +388,30 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                 ),
                 child: Row(
                   children: <Widget>[
-                    Expanded(child: editable),
+                    Expanded(
+                      // Fluid stacks the label-01 title above the input
+                      // (the house centered-column fluid treatment).
+                      child: widget.fluid
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                ExcludeSemantics(
+                                  child: Text(
+                                    widget.titleText,
+                                    style: CarbonTypeStyles.label01.copyWith(
+                                      color: widget.disabled
+                                          ? theme.textDisabled
+                                          : theme.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                editable,
+                              ],
+                            )
+                          : editable,
+                    ),
                     if (_controller.text.isNotEmpty && enabled) ...<Widget>[
                       const SizedBox(width: CarbonSpacing.spacing03),
                       CarbonListBoxSelection(onClear: _clear),
@@ -430,7 +463,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         child: TapRegion(
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(size: widget.size, children: rows),
+            child: CarbonListBoxMenu(
+              size: widget.size,
+              fluidRows: widget.fluid && !widget.condensed,
+              children: rows,
+            ),
           ),
         ),
       ),
@@ -441,6 +478,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     final bool selected = item.value == widget.selectedItem;
     return CarbonListBoxMenuItem(
       size: widget.size,
+      fluid: widget.fluid && !widget.condensed,
       isFirst: index == 0,
       isActive: selected,
       isHighlighted: index == _highlighted,

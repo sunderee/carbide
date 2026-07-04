@@ -56,8 +56,14 @@ class CarbonListBox extends StatefulWidget {
     this.onTap,
     this.aiLabel,
     this.aiRevert = false,
+    this.fluid = false,
+    this.fluidLabel,
     super.key,
-  }) : assert(!(invalid && warn), 'A field cannot be both invalid and warn.');
+  }) : assert(!(invalid && warn), 'A field cannot be both invalid and warn.'),
+       assert(
+         !fluid || fluidLabel != null,
+         'fluid list boxes render their label inside the field.',
+       );
 
   /// The value or placeholder shown in the field.
   final Widget child;
@@ -75,6 +81,13 @@ class CarbonListBox extends StatefulWidget {
 
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
+
+  /// The fluid treatment (`_fluid-list-box.scss`): a 64px field with the
+  /// label rendered inside above the value.
+  final bool fluid;
+
+  /// The label shown inside a [fluid] field.
+  final String? fluidLabel;
 
   /// Whether the control is disabled.
   final bool disabled;
@@ -144,7 +157,11 @@ class _CarbonListBoxState extends State<CarbonListBox> {
       // The AI label sits before the menu chevron (`_list-box.scss`
       // inset-inline-end calc($spacing-08 + 9px)).
       ?widget.aiLabel,
-      CarbonListBoxMenuIcon(open: widget.expanded, disabled: widget.disabled),
+      CarbonListBoxMenuIcon(
+        open: widget.expanded,
+        disabled: widget.disabled,
+        small: widget.fluid,
+      ),
     ];
 
     return MouseRegion(
@@ -162,7 +179,7 @@ class _CarbonListBoxState extends State<CarbonListBox> {
           child: AnimatedContainer(
             duration: CarbonDuration.fast01,
             curve: CarbonEasing.standardProductive,
-            height: widget.size.height,
+            height: widget.fluid ? 64 : widget.size.height,
             decoration: BoxDecoration(
               color: background,
               gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
@@ -181,7 +198,30 @@ class _CarbonListBoxState extends State<CarbonListBox> {
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    child: widget.child,
+                    // Fluid stacks the label-01 label above the value
+                    // (`_fluid-list-box.scss` label at 13px / field padded
+                    // 33px — rendered with the house centered-column fluid
+                    // treatment shared with Select and Text Input).
+                    child: widget.fluid
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              ExcludeSemantics(
+                                child: Text(
+                                  widget.fluidLabel!,
+                                  style: CarbonTypeStyles.label01.copyWith(
+                                    color: widget.disabled
+                                        ? theme.textDisabled
+                                        : theme.textSecondary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              widget.child,
+                            ],
+                          )
+                        : widget.child,
                   ),
                 ),
                 for (final Widget w in trailing) ...<Widget>[
@@ -203,6 +243,7 @@ class CarbonListBoxMenuIcon extends StatelessWidget {
   const CarbonListBoxMenuIcon({
     required this.open,
     this.disabled = false,
+    this.small = false,
     super.key,
   });
 
@@ -212,13 +253,16 @@ class CarbonListBoxMenuIcon extends StatelessWidget {
   /// Whether the host control is disabled (greys the icon).
   final bool disabled;
 
+  /// The 16px fluid variant (`_fluid-list-box.scss` menu-icon 1rem).
+  final bool small;
+
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     // _list-box.scss: 24x24 box, transform rotate(180deg) when open,
-    // transition transform fast-01.
+    // transition transform fast-01; fluid shrinks the box to 16px.
     return SizedBox.square(
-      dimension: 24,
+      dimension: small ? 16 : 24,
       child: Center(
         child: AnimatedRotation(
           turns: open ? 0.5 : 0,
@@ -243,6 +287,7 @@ class CarbonListBoxMenu extends StatelessWidget {
   const CarbonListBoxMenu({
     required this.children,
     this.size = CarbonFieldSize.md,
+    this.fluidRows = false,
     super.key,
   });
 
@@ -251,6 +296,10 @@ class CarbonListBoxMenu extends StatelessWidget {
 
   /// The host field size, which sets the visible-row cap.
   final CarbonFieldSize size;
+
+  /// Whether rows render at the 64px fluid height (`_fluid-list-box.scss`;
+  /// the condensed fluid variant keeps standard rows).
+  final bool fluidRows;
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +311,9 @@ class CarbonListBoxMenu extends StatelessWidget {
       ),
       child: ConstrainedBox(
         // _list-box.scss: 5.5 rows of the item height (40 -> 220, etc.).
-        constraints: BoxConstraints(maxHeight: size.height * 5.5),
+        constraints: BoxConstraints(
+          maxHeight: (fluidRows ? 64 : size.height) * 5.5,
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -286,6 +337,7 @@ class CarbonListBoxMenuItem extends StatefulWidget {
   const CarbonListBoxMenuItem({
     required this.child,
     this.size = CarbonFieldSize.md,
+    this.fluid = false,
     this.isHighlighted = false,
     this.isActive = false,
     this.isFirst = false,
@@ -300,6 +352,9 @@ class CarbonListBoxMenuItem extends StatefulWidget {
 
   /// The host field size, which sets the row height.
   final CarbonFieldSize size;
+
+  /// Whether the row renders at the 64px fluid height.
+  final bool fluid;
 
   /// Whether this row is keyboard-highlighted.
   final bool isHighlighted;
@@ -370,7 +425,7 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
           child: ColoredBox(
             color: background,
             child: Container(
-              height: widget.size.height,
+              height: widget.fluid ? 64 : widget.size.height,
               alignment: AlignmentDirectional.centerStart,
               // The divider sits inside a spacing-05 inset (`margin: 0 16px`).
               margin: const EdgeInsetsDirectional.symmetric(
