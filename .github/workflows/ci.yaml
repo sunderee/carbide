@@ -110,7 +110,8 @@ jobs:
           cache: true
 
       - name: Assert job version matches the pubspec floor
-        run: grep -qF 'flutter: ">=3.44.4"' pubspec.yaml
+        run: |
+          grep -qF 'flutter: ">=3.44.4"' pubspec.yaml
 
       - name: Install dependencies
         run: flutter pub get
