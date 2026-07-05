@@ -11,6 +11,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/layout.dart';
 import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
@@ -211,10 +212,17 @@ class CarbonSelectableTile extends StatelessWidget {
     this.onChanged,
     this.focusNode,
     this.autofocus = false,
+    this.aiLabel,
   });
 
   /// The tile content.
   final Widget child;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), sharing the
+  /// tile's top-end corner with the checkmark per upstream's `decorator`
+  /// prop: the label anchors at `$spacing-08` from the tile end, beside
+  /// the 16px icon slot (`_tile.scss` `--tile--selectable` AI selectors).
+  final Widget? aiLabel;
 
   /// Whether the tile is selected.
   final bool selected;
@@ -284,8 +292,9 @@ class CarbonSelectableTile extends StatelessWidget {
                 end: endPadding,
               ),
               child: Stack(
-                // The checkmark sits in the reserved end padding, outside the
-                // Stack's content box, so it must not be clipped.
+                // The checkmark and AI decorator sit in the reserved end
+                // padding, outside the Stack's content box, so they must
+                // not be clipped.
                 clipBehavior: Clip.none,
                 children: <Widget>[
                   DefaultTextStyle(
@@ -311,6 +320,12 @@ class CarbonSelectableTile extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (aiLabel != null)
+                    PositionedDirectional(
+                      top: 0,
+                      end: CarbonSpacing.spacing08 - endPadding,
+                      child: aiLabel!,
+                    ),
                 ],
               ),
             ),
