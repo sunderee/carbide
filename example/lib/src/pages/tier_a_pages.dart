@@ -262,6 +262,11 @@ class _TilePage extends StatefulWidget {
 class _TilePageState extends State<_TilePage> {
   bool _selected = false;
   bool _expanded = false;
+  bool _ai = false;
+  int _radio = 0;
+
+  Widget? get _aiLabel =>
+      _ai ? const CarbonAILabel(size: CarbonAILabelSize.mini) : null;
 
   @override
   Widget build(BuildContext context) {
@@ -272,18 +277,22 @@ class _TilePageState extends State<_TilePage> {
     );
     return DemoScaffold(
       title: 'Tile',
-      description: 'Base, clickable, selectable and expandable tiles.',
+      description: 'Base, clickable, selectable, radio and expandable tiles.',
       previewAlignment: Alignment.topLeft,
       preview: Wrap(
         spacing: CarbonSpacing.spacing05,
         runSpacing: CarbonSpacing.spacing05,
         children: <Widget>[
-          SizedBox(width: 220, child: CarbonTile(child: body('Base tile'))),
+          SizedBox(
+            width: 220,
+            child: CarbonTile(aiLabel: _aiLabel, child: body('Base tile')),
+          ),
           SizedBox(
             width: 220,
             child: CarbonClickableTile(
               icon: CarbonIcons.launch,
               onPressed: () {},
+              aiLabel: _aiLabel,
               child: body('Clickable tile'),
             ),
           ),
@@ -292,7 +301,27 @@ class _TilePageState extends State<_TilePage> {
             child: CarbonSelectableTile(
               selected: _selected,
               onChanged: (bool v) => setState(() => _selected = v),
+              aiLabel: _aiLabel,
               child: body('Selectable tile'),
+            ),
+          ),
+          SizedBox(
+            width: 220,
+            child: Column(
+              children: <Widget>[
+                for (int i = 0; i < 2; i++)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: i == 0 ? 0 : CarbonSpacing.spacing02,
+                    ),
+                    child: CarbonRadioTile(
+                      selected: _radio == i,
+                      onSelected: () => setState(() => _radio = i),
+                      aiLabel: _aiLabel,
+                      child: body('Radio tile ${i + 1}'),
+                    ),
+                  ),
+              ],
             ),
           ),
           SizedBox(
@@ -300,12 +329,20 @@ class _TilePageState extends State<_TilePage> {
             child: CarbonExpandableTile(
               expanded: _expanded,
               onExpandedChanged: (bool v) => setState(() => _expanded = v),
+              aiLabel: _aiLabel,
               aboveTheFold: body('Expandable tile'),
               belowTheFold: body('Hidden detail revealed on expand.'),
             ),
           ),
         ],
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'AI label',
+          value: _ai,
+          onChanged: (bool v) => setState(() => _ai = v),
+        ),
+      ],
       code: 'CarbonClickableTile(onPressed: () {}, child: Text(...));',
     );
   }

@@ -43,10 +43,18 @@ class CarbonRadioTile extends StatelessWidget {
     this.onSelected,
     this.focusNode,
     this.autofocus = false,
+    this.aiLabel,
   });
 
   /// The tile content.
   final Widget child;
+
+  /// An optional AI presence decorator (a `CarbonAILabel`), anchored to
+  /// the tile's top end per upstream's `decorator` prop. At rest it sits
+  /// in the corner (`$spacing-05`); when [selected] it slides inward to
+  /// `$spacing-08`, making room for the checkmark indicator, at `fast-02`
+  /// × standard-productive (`_tile.scss` `--tile--radio` AI selectors).
+  final Widget? aiLabel;
 
   /// Whether this tile is the selected one in its group.
   final bool selected;
@@ -110,6 +118,10 @@ class CarbonRadioTile extends StatelessWidget {
                 end: endPadding,
               ),
               child: Stack(
+                // The indicator and AI decorator sit in the reserved end
+                // padding, outside the Stack's content box, so they must
+                // not be clipped.
+                clipBehavior: Clip.none,
                 children: <Widget>[
                   DefaultTextStyle(
                     style: CarbonTypeStyles.bodyCompact01.copyWith(
@@ -132,6 +144,18 @@ class CarbonRadioTile extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (aiLabel != null)
+                    AnimatedPositionedDirectional(
+                      duration: CarbonDuration.fast02,
+                      curve: CarbonEasing.standardProductive,
+                      top: 0,
+                      end:
+                          (selected
+                              ? CarbonSpacing.spacing08
+                              : CarbonSpacing.spacing05) -
+                          endPadding,
+                      child: aiLabel!,
+                    ),
                 ],
               ),
             ),
