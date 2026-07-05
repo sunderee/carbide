@@ -38,8 +38,10 @@ void main(List<String> args) {
 
   final File lcov = File(lcovPath);
   if (!lcov.existsSync()) {
-    stderr.writeln('coverage_gate: $lcovPath not found — run '
-        '`flutter test --coverage` first.');
+    stderr.writeln(
+      'coverage_gate: $lcovPath not found — run '
+      '`flutter test --coverage` first.',
+    );
     exit(2);
   }
 
@@ -54,17 +56,21 @@ void main(List<String> args) {
     totalHit += c.hit;
     final double pct = 100 * c.hit / c.lines;
     if (pct < floor) {
-      tail.add('${pct.toStringAsFixed(1).padLeft(5)}%  $file '
-          '(${c.hit}/${c.lines})');
+      tail.add(
+        '${pct.toStringAsFixed(1).padLeft(5)}%  $file '
+        '(${c.hit}/${c.lines})',
+      );
     }
   }
 
   final double total = 100 * totalHit / totalLines;
   final String verdict = total >= floor ? 'PASS' : 'FAIL';
   final StringBuffer out = StringBuffer()
-    ..writeln('Line coverage: ${total.toStringAsFixed(1)}% '
-        '($totalHit/$totalLines lines, ${files.length} files, '
-        'generated registries excluded)')
+    ..writeln(
+      'Line coverage: ${total.toStringAsFixed(1)}% '
+      '($totalHit/$totalLines lines, ${files.length} files, '
+      'generated registries excluded)',
+    )
     ..writeln('Floor: ${floor.toStringAsFixed(1)}% — $verdict');
   if (tail.isNotEmpty) {
     out.writeln('\nFiles under the floor (informational):');
@@ -83,9 +89,11 @@ void main(List<String> args) {
   }
 
   if (total < floor) {
-    stderr.writeln('coverage_gate: total line coverage '
-        '${total.toStringAsFixed(1)}% is below the '
-        '${floor.toStringAsFixed(1)}% floor.');
+    stderr.writeln(
+      'coverage_gate: total line coverage '
+      '${total.toStringAsFixed(1)}% is below the '
+      '${floor.toStringAsFixed(1)}% floor.',
+    );
     exit(1);
   }
 }
@@ -98,9 +106,7 @@ Map<String, ({int lines, int hit})> _parse(File lcov) {
   int hit = 0;
   void flush() {
     final String? file = current;
-    if (file != null &&
-        lines > 0 &&
-        !excludedPrefixes.any(file.startsWith)) {
+    if (file != null && lines > 0 && !excludedPrefixes.any(file.startsWith)) {
       files[file] = (lines: lines, hit: hit);
     }
     current = null;
