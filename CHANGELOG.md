@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1
+
+Hotfix release.
+
+### Fixed
+
+- Labeled checkboxes no longer expand to fill bounded rows: multi-select
+  menu options rendered with the checkbox pinned to the top of the row
+  (most visibly on the 64px fluid rows) instead of vertically centred.
+
 ## 0.2.0
 
 Component-parity release (M10): the composable Dialog, the AI chat surface,
