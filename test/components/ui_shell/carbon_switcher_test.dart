@@ -4,6 +4,8 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -92,9 +94,111 @@ void main() {
       );
       handle.dispose();
     });
+
+    testWidgets('item activates with Enter and Space and shows the focus '
+        'ring', (WidgetTester tester) async {
+      int pressed = 0;
+      await tester.pumpWidget(switcher(() => pressed++));
+      await tester.pumpAndSettle();
+
+      Focus.of(tester.element(find.text('Catalog'))).requestFocus();
+      await tester.pumpAndSettle();
+      final CarbonFocusRing ring = tester.widget<CarbonFocusRing>(
+        find
+            .ancestor(
+              of: find.text('Catalog'),
+              matching: find.byType(CarbonFocusRing),
+            )
+            .first,
+      );
+      expect(ring.visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(pressed, 2);
+    });
+
+    testWidgets('hovering tints a non-selected item only', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(switcher(() {}));
+      await tester.pumpAndSettle();
+      final Color hoverColor = CarbonLayer.of(
+        tester.element(find.text('Catalog')),
+      ).layerHover;
+      Color itemColor(String label) => tester
+          .widget<ColoredBox>(
+            find
+                .ancestor(
+                  of: find.text(label),
+                  matching: find.byType(ColoredBox),
+                )
+                .first,
+          )
+          .color;
+
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+
+      await gesture.moveTo(tester.getCenter(find.text('Catalog')));
+      await tester.pump();
+      expect(itemColor('Catalog'), hoverColor);
+
+      // The selected item stays transparent even while hovered.
+      await gesture.moveTo(tester.getCenter(find.text('Console')));
+      await tester.pump();
+      expect(itemColor('Console'), const Color(0x00000000));
+      expect(itemColor('Catalog'), const Color(0x00000000));
+    });
+
+    testWidgets('divider renders a 1px rule between sections', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 256,
+            child: CarbonSwitcher(
+              children: <Widget>[
+                CarbonSwitcherItem(label: 'A', onPressed: () {}),
+                CarbonSwitcherDivider(key: UniqueKey()),
+                CarbonSwitcherItem(label: 'B', onPressed: () {}),
+              ],
+            ),
+          ),
+        ),
+      );
+      final Finder rule = find.descendant(
+        of: find.byType(CarbonSwitcherDivider),
+        matching: find.byType(SizedBox),
+      );
+      expect(tester.getSize(rule).height, 1);
+    });
   });
 
   group('content', () {
+    testWidgets('pads the page body by spacing05 on every side', (
+      WidgetTester tester,
+    ) async {
+      final Key bodyKey = UniqueKey();
+      await tester.pumpWidget(
+        _host(
+          CarbonShellContent(
+            child: SizedBox(key: bodyKey, width: 40, height: 40),
+          ),
+        ),
+      );
+      final Offset region = tester.getTopLeft(find.byType(CarbonShellContent));
+      final Offset body = tester.getTopLeft(find.byKey(bodyKey));
+      expect(
+        body - region,
+        const Offset(CarbonSpacing.spacing05, CarbonSpacing.spacing05),
+      );
+    });
+
     testWidgets('exposes a main-content region', (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(

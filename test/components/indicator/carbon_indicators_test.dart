@@ -44,6 +44,18 @@ void main() {
       await tester.pumpWidget(_host(const CarbonBadgeIndicator(count: 4000)));
       expect(find.text('999+'), findsOneWidget);
     });
+
+    testWidgets('semantics: the dot reads New, counts read the capped text', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(CarbonBadgeIndicator()));
+      expect(find.bySemanticsLabel('New'), findsOneWidget);
+
+      await tester.pumpWidget(_host(CarbonBadgeIndicator(count: 1000)));
+      expect(find.bySemanticsLabel('999+'), findsOneWidget);
+      handle.dispose();
+    });
   });
 
   group('icon indicator', () {
@@ -104,6 +116,17 @@ void main() {
         CarbonTypeStyles.bodyCompact02.fontSize,
       );
     });
+
+    test('rejects icon sizes other than 16 or 20', () {
+      expect(
+        () => CarbonIconIndicator(
+          kind: CarbonIconIndicatorKind.normal,
+          label: 'Normal',
+          size: 18,
+        ),
+        throwsAssertionError,
+      );
+    });
   });
 
   group('shape indicator', () {
@@ -132,6 +155,32 @@ void main() {
       expect(
         CarbonShapeIndicatorKind.failed.shape,
         isNot(CarbonShapeIndicatorKind.draft.shape),
+      );
+    });
+
+    testWidgets('the 14px text size uses body-compact-01; others rejected', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonShapeIndicator(
+            kind: CarbonShapeIndicatorKind.draft,
+            label: 'Draft',
+            textSize: 14,
+          ),
+        ),
+      );
+      expect(
+        tester.widget<Text>(find.text('Draft')).style!.fontSize,
+        CarbonTypeStyles.bodyCompact01.fontSize,
+      );
+      expect(
+        () => CarbonShapeIndicator(
+          kind: CarbonShapeIndicatorKind.draft,
+          label: 'Draft',
+          textSize: 13,
+        ),
+        throwsAssertionError,
       );
     });
   });

@@ -12,7 +12,13 @@ import '../../support/golden.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion.onTapOutside needs a
 /// TapRegionSurface (a WidgetsApp would supply both in a real app).
-Widget _host(Widget child) => Directionality(
+///
+/// [alignment] places the trigger inside the 800x600 test viewport, so
+/// autoAlign tests can park it against an edge.
+Widget _host(
+  Widget child, {
+  AlignmentGeometry alignment = Alignment.center,
+}) => Directionality(
   textDirection: TextDirection.ltr,
   child: TapRegionSurface(
     child: CarbonTheme(
@@ -30,7 +36,7 @@ Widget _host(Widget child) => Directionality(
                     onTap: () {},
                   ),
                 ),
-                Center(child: child),
+                Align(alignment: alignment, child: child),
               ],
             ),
           ),
@@ -47,6 +53,76 @@ Widget _trigger() => const SizedBox(
   height: 40,
   child: ColoredBox(color: Color(0xFFCCCCCC)),
 );
+
+/// The bounds of the surface's background box.
+Rect _surfaceRect(WidgetTester tester) => tester.getRect(
+  find
+      .ancestor(of: find.text('Body'), matching: find.byType(DecoratedBox))
+      .first,
+);
+
+/// The bounds of the fixed-size trigger.
+Rect _triggerRect(WidgetTester tester) =>
+    tester.getRect(find.byKey(const ValueKey<String>('trigger')));
+
+/// Pumps a closed popover, lets the trigger lay out, then opens it — the way
+/// a real app does, so the surface builds with the trigger already measured.
+Future<void> _pumpAndOpen(
+  WidgetTester tester, {
+  required CarbonPopoverAlignment align,
+  bool autoAlign = false,
+  AlignmentGeometry where = Alignment.center,
+}) async {
+  late StateSetter setOuter;
+  bool open = false;
+  await tester.pumpWidget(
+    _host(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          setOuter = setState;
+          return CarbonPopover(
+            open: open,
+            align: align,
+            autoAlign: autoAlign,
+            content: const Text('Body'),
+            child: _trigger(),
+          );
+        },
+      ),
+      alignment: where,
+    ),
+  );
+  setOuter(() => open = true);
+  await tester.pumpAndSettle();
+}
+
+const Set<CarbonPopoverAlignment> _topSide = <CarbonPopoverAlignment>{
+  CarbonPopoverAlignment.top,
+  CarbonPopoverAlignment.topStart,
+  CarbonPopoverAlignment.topEnd,
+};
+const Set<CarbonPopoverAlignment> _bottomSide = <CarbonPopoverAlignment>{
+  CarbonPopoverAlignment.bottom,
+  CarbonPopoverAlignment.bottomStart,
+  CarbonPopoverAlignment.bottomEnd,
+};
+const Set<CarbonPopoverAlignment> _leftSide = <CarbonPopoverAlignment>{
+  CarbonPopoverAlignment.left,
+  CarbonPopoverAlignment.leftStart,
+  CarbonPopoverAlignment.leftEnd,
+};
+const Set<CarbonPopoverAlignment> _startCross = <CarbonPopoverAlignment>{
+  CarbonPopoverAlignment.topStart,
+  CarbonPopoverAlignment.bottomStart,
+  CarbonPopoverAlignment.leftStart,
+  CarbonPopoverAlignment.rightStart,
+};
+const Set<CarbonPopoverAlignment> _endCross = <CarbonPopoverAlignment>{
+  CarbonPopoverAlignment.topEnd,
+  CarbonPopoverAlignment.bottomEnd,
+  CarbonPopoverAlignment.leftEnd,
+  CarbonPopoverAlignment.rightEnd,
+};
 
 /// The surface's background/border box is the DecoratedBox wrapping the body.
 BoxDecoration _surfaceBox(WidgetTester tester) =>
@@ -449,6 +525,103 @@ void main() {
       await tester.tap(find.text('Body'));
       await tester.pump();
       expect(closes, 0);
+    });
+  });
+
+  group('alignment variants', () {
+    for (final CarbonPopoverAlignment align in CarbonPopoverAlignment.values) {
+      testWidgets('$align places the surface and caret', (
+        WidgetTester tester,
+      ) async {
+        await _pumpAndOpen(tester, align: align);
+        final Rect s = _surfaceRect(tester);
+        final Rect t = _triggerRect(tester);
+
+        // Main axis: the surface floats 10px off the named side.
+        if (_topSide.contains(align)) {
+          expect(s.bottom, moreOrLessEquals(t.top - 10, epsilon: 0.5));
+        } else if (_bottomSide.contains(align)) {
+          expect(s.top, moreOrLessEquals(t.bottom + 10, epsilon: 0.5));
+        } else if (_leftSide.contains(align)) {
+          expect(s.right, moreOrLessEquals(t.left - 10, epsilon: 0.5));
+        } else {
+          expect(s.left, moreOrLessEquals(t.right + 10, epsilon: 0.5));
+        }
+
+        // Cross axis: Start/End line the near edges up; plain values centre.
+        final bool vertical =
+            _topSide.contains(align) || _bottomSide.contains(align);
+        if (_startCross.contains(align)) {
+          if (vertical) {
+            expect(s.left, moreOrLessEquals(t.left, epsilon: 0.5));
+          } else {
+            expect(s.top, moreOrLessEquals(t.top, epsilon: 0.5));
+          }
+        } else if (_endCross.contains(align)) {
+          if (vertical) {
+            expect(s.right, moreOrLessEquals(t.right, epsilon: 0.5));
+          } else {
+            expect(s.bottom, moreOrLessEquals(t.bottom, epsilon: 0.5));
+          }
+        }
+
+        // The caret always points at the trigger centre on the cross axis
+        // (via the Start/End edge inset, or by being centred on the surface).
+        final Finder caret = find.byWidgetPredicate(
+          (Widget w) =>
+              w is CustomPaint &&
+              w.size == (vertical ? const Size(12, 6) : const Size(6, 12)),
+        );
+        final Offset c = tester.getCenter(caret);
+        if (vertical) {
+          expect(c.dx, moreOrLessEquals(t.center.dx, epsilon: 0.5));
+        } else {
+          expect(c.dy, moreOrLessEquals(t.center.dy, epsilon: 0.5));
+        }
+      });
+    }
+  });
+
+  group('autoAlign', () {
+    for (final CarbonPopoverAlignment align in CarbonPopoverAlignment.values) {
+      testWidgets('$align flips away from the viewport edge', (
+        WidgetTester tester,
+      ) async {
+        // Park the trigger against the edge its surface would overflow.
+        final Alignment where = _topSide.contains(align)
+            ? Alignment.topCenter
+            : _bottomSide.contains(align)
+            ? Alignment.bottomCenter
+            : _leftSide.contains(align)
+            ? Alignment.centerLeft
+            : Alignment.centerRight;
+        await _pumpAndOpen(tester, align: align, autoAlign: true, where: where);
+        final Rect s = _surfaceRect(tester);
+        final Rect t = _triggerRect(tester);
+        if (_topSide.contains(align)) {
+          expect(s.top, greaterThan(t.bottom));
+        } else if (_bottomSide.contains(align)) {
+          expect(s.bottom, lessThan(t.top));
+        } else if (_leftSide.contains(align)) {
+          expect(s.left, greaterThan(t.right));
+        } else {
+          expect(s.right, lessThan(t.left));
+        }
+      });
+    }
+
+    testWidgets('keeps the preferred side when it fits', (
+      WidgetTester tester,
+    ) async {
+      await _pumpAndOpen(
+        tester,
+        align: CarbonPopoverAlignment.bottom,
+        autoAlign: true,
+      );
+      expect(
+        _surfaceRect(tester).top,
+        moreOrLessEquals(_triggerRect(tester).bottom + 10, epsilon: 0.5),
+      );
     });
   });
 

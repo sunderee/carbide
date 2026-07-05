@@ -154,6 +154,172 @@ void main() {
       await tester.pump();
       expect(value, 'c');
     });
+
+    testWidgets('vertical orientation stacks with spacing-03 and roves '
+        'with up/down arrows', (WidgetTester tester) async {
+      String? value = 'a';
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return CarbonRadioButtonGroup<String>(
+                legend: 'Plan',
+                value: value,
+                orientation: Axis.vertical,
+                options: const <(String, String)>[
+                  ('a', 'Free'),
+                  ('b', 'Pro'),
+                  ('c', 'Team'),
+                ],
+                onChanged: (String v) => setState(() => value = v),
+              );
+            },
+          ),
+        ),
+      );
+      // Column layout: options stack with an 8px (spacing-03) gap.
+      final Rect first = tester.getRect(find.byType(CarbonRadioButton).at(0));
+      final Rect second = tester.getRect(find.byType(CarbonRadioButton).at(1));
+      expect(second.left, first.left);
+      expect(second.top - first.bottom, CarbonSpacing.spacing03);
+
+      tester
+          .widget<CarbonRadioButton>(find.byType(CarbonRadioButton).first)
+          .focusNode!
+          .requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(value, 'b');
+
+      value = 'a';
+      await tester.pump();
+      tester
+          .widget<CarbonRadioButton>(find.byType(CarbonRadioButton).first)
+          .focusNode!
+          .requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      expect(value, 'c');
+    });
+
+    testWidgets('changing the option count regenerates focus nodes', (
+      WidgetTester tester,
+    ) async {
+      List<(String, String)> options = const <(String, String)>[
+        ('a', 'Free'),
+        ('b', 'Pro'),
+      ];
+      late StateSetter rebuild;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              rebuild = setState;
+              return CarbonRadioButtonGroup<String>(
+                legend: 'Plan',
+                value: 'a',
+                options: options,
+                onChanged: (_) {},
+              );
+            },
+          ),
+        ),
+      );
+      rebuild(() {
+        options = const <(String, String)>[
+          ('a', 'Free'),
+          ('b', 'Pro'),
+          ('c', 'Team'),
+        ];
+      });
+      await tester.pump();
+      expect(find.byType(CarbonRadioButton), findsNWidgets(3));
+      // The regenerated node still drives roving selection.
+      tester
+          .widget<CarbonRadioButton>(find.byType(CarbonRadioButton).last)
+          .focusNode!
+          .requestFocus();
+      await tester.pump();
+      expect(
+        tester
+            .widget<CarbonRadioButton>(find.byType(CarbonRadioButton).last)
+            .focusNode!
+            .hasFocus,
+        isTrue,
+      );
+    });
+  });
+
+  group('group messages', () {
+    Widget message({
+      bool invalid = false,
+      String? invalidText,
+      bool warn = false,
+      String? warnText,
+      String? helperText,
+    }) => _host(
+      CarbonRadioButtonGroup<int>(
+        legend: 'Plan',
+        value: 1,
+        options: const <(int, String)>[(1, 'Free')],
+        onChanged: (_) {},
+        invalid: invalid,
+        invalidText: invalidText,
+        warn: warn,
+        warnText: warnText,
+        helperText: helperText,
+      ),
+    );
+
+    testWidgets('invalid shows the requirement text', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        message(invalid: true, invalidText: 'Pick a plan.'),
+      );
+      expect(find.text('Pick a plan.'), findsOneWidget);
+    });
+
+    testWidgets('warn shows the warning requirement text', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(message(warn: true, warnText: 'Costs extra.'));
+      expect(find.text('Costs extra.'), findsOneWidget);
+    });
+
+    testWidgets('helper text renders when not invalid/warn', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(message(helperText: 'Monthly billing.'));
+      expect(find.text('Monthly billing.'), findsOneWidget);
+    });
+
+    testWidgets('focus ring repaints when the theme focus color changes', (
+      WidgetTester tester,
+    ) async {
+      Widget themed(CarbonThemeData data) => Directionality(
+        textDirection: TextDirection.ltr,
+        child: CarbonTheme(
+          data: data,
+          child: Center(
+            child: CarbonRadioButton(
+              label: 'Email',
+              selected: true,
+              onSelected: () {},
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(themed(CarbonThemeData.white));
+      await tester.pump();
+      // Swapping themes changes the ring color, exercising shouldRepaint.
+      await tester.pumpWidget(themed(CarbonThemeData.gray100));
+      await tester.pump();
+      expect(find.byType(CarbonRadioButton), findsOneWidget);
+    });
   });
 
   group('semantics', () {

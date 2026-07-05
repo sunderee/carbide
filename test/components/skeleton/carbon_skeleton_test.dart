@@ -115,6 +115,46 @@ void main() {
       );
     });
 
+    testWidgets('shape parameters propagate to the rendered size', (
+      WidgetTester tester,
+    ) async {
+      for (final Size custom in const <Size>[Size(80, 24), Size(40, 12)]) {
+        await tester.pumpWidget(
+          _host(
+            CarbonSkeletonPlaceholder(
+              width: custom.width,
+              height: custom.height,
+            ),
+          ),
+        );
+        expect(tester.getSize(find.byType(CarbonSkeletonPlaceholder)), custom);
+      }
+
+      for (final double edge in const <double>[12, 20]) {
+        await tester.pumpWidget(_host(CarbonSkeletonIcon(size: edge)));
+        expect(
+          tester.getSize(find.byType(CarbonSkeletonIcon)),
+          Size(edge, edge),
+        );
+      }
+
+      for (final CarbonButtonSize size in CarbonButtonSize.values) {
+        await tester.pumpWidget(_host(CarbonButtonSkeleton(size: size)));
+        expect(
+          tester.getSize(find.byType(CarbonButtonSkeleton)),
+          Size(CarbonButtonSkeleton.width, size.height),
+        );
+      }
+
+      for (final CarbonTagSize size in CarbonTagSize.values) {
+        await tester.pumpWidget(_host(CarbonTagSkeleton(size: size)));
+        expect(
+          tester.getSize(find.byType(CarbonTagSkeleton)),
+          Size(CarbonTagSkeleton.width, size.height),
+        );
+      }
+    });
+
     testWidgets('text lines: 16px body, 24px heading, 8px gap, '
         'deterministic paragraph widths', (WidgetTester tester) async {
       await tester.pumpWidget(

@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -93,6 +94,80 @@ void main() {
       expect(segmentColor(tester, 'All'), theme.layerSelectedInverse);
     });
 
+    testWidgets('a switch requires text or an icon', (
+      WidgetTester tester,
+    ) async {
+      expect(() => CarbonSwitch(), throwsAssertionError);
+    });
+
+    testWidgets('hover fills layerHover and darkens the label', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const CarbonContentSwitcher(switches: _switches)),
+      );
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: tester.getCenter(find.text('Archived')));
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'Archived'), theme.layerHover01);
+      expect(
+        tester.widget<Text>(find.text('Archived')).style!.color,
+        theme.textPrimary,
+      );
+      // Leaving the segment clears the hover fill.
+      await mouse.moveTo(Offset.zero);
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'Archived'), const Color(0x00000000));
+    });
+
+    testWidgets('shrinking the switch list resets an out-of-range selection', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const CarbonContentSwitcher(switches: _switches)),
+      );
+      await tester.tap(find.text('Drafts'));
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'Drafts'), theme.layerSelectedInverse);
+      await tester.pumpWidget(
+        _host(
+          const CarbonContentSwitcher(
+            switches: <CarbonSwitch>[
+              CarbonSwitch(text: 'All'),
+              CarbonSwitch(text: 'Archived'),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'All'), theme.layerSelectedInverse);
+    });
+
+    testWidgets('icon-only and icon+text segments render icons', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonContentSwitcher(
+            switches: <CarbonSwitch>[
+              CarbonSwitch(icon: CarbonIcons.add),
+              CarbonSwitch(text: 'Both', icon: CarbonIcons.add),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(CarbonIcon), findsNWidgets(2));
+      expect(find.text('Both'), findsOneWidget);
+      // The selected icon-only segment paints the inverse foreground.
+      expect(
+        tester.widget<CarbonIcon>(find.byType(CarbonIcon).first).color,
+        theme.textInverse,
+      );
+    });
+
     testWidgets('controlled selectedIndex + onChanged', (
       WidgetTester tester,
     ) async {
@@ -141,6 +216,30 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.home);
       await tester.pumpAndSettle();
       expect(segmentColor(tester, 'All'), theme.layerSelectedInverse);
+    });
+
+    testWidgets('End selects the last enabled; Left wraps and skips disabled', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const CarbonContentSwitcher(switches: _switches)),
+      );
+      tester
+          .widget<Focus>(
+            find
+                .ancestor(of: find.text('All'), matching: find.byType(Focus))
+                .first,
+          )
+          .focusNode!
+          .requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'Drafts'), theme.layerSelectedInverse);
+      // Left skips the disabled 'Spam' and lands on 'Archived'.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(segmentColor(tester, 'Archived'), theme.layerSelectedInverse);
     });
   });
 

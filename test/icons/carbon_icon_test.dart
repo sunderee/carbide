@@ -56,6 +56,35 @@ void main() {
     });
   });
 
+  group('value semantics', () {
+    // Runtime construction: const instances are canonicalized, so == would
+    // short-circuit on identity and never compare the fields.
+    CarbonIconShape shapeOf(String d) => CarbonIconShape(d: d);
+    CarbonIconArtwork artworkOf(int size) => CarbonIconArtwork(
+      size: size,
+      viewBoxWidth: size.toDouble(),
+      viewBoxHeight: size.toDouble(),
+      shapes: <CarbonIconShape>[shapeOf('M0 0H8V8H0Z')],
+    );
+    CarbonIconData dataOf(String name) =>
+        CarbonIconData(name: name, artwork: <CarbonIconArtwork>[artworkOf(16)]);
+
+    test('equal definitions are equal and share a hash code', () {
+      expect(dataOf('box'), dataOf('box'));
+      expect(dataOf('box').hashCode, dataOf('box').hashCode);
+      expect(artworkOf(16), artworkOf(16));
+      expect(artworkOf(16).hashCode, artworkOf(16).hashCode);
+      expect(shapeOf('M0 0Z'), shapeOf('M0 0Z'));
+      expect(shapeOf('M0 0Z').hashCode, shapeOf('M0 0Z').hashCode);
+    });
+
+    test('a differing field breaks equality', () {
+      expect(dataOf('box'), isNot(dataOf('circle')));
+      expect(artworkOf(16), isNot(artworkOf(20)));
+      expect(shapeOf('M0 0Z'), isNot(shapeOf('M1 1Z')));
+    });
+  });
+
   group('layout', () {
     testWidgets('renders at the default productive size of 16', (
       WidgetTester tester,

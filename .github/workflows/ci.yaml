@@ -42,8 +42,23 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
+      - name: Run tests (with coverage)
+        run: flutter test --coverage
+
+      # Coverage gate (M11, #229): parse the lcov trace, exclude the
+      # generated icon/pictogram registries, publish the percentage to the
+      # job summary, and fail below the floor. The gate script prints the
+      # per-file sub-floor tail for triage.
+      - name: Coverage gate (90% line floor)
+        run: dart run tool/coverage_gate.dart --floor 90
+
+      - name: Upload coverage trace
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: carbide-coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: warn
 
       # API reference gate (M8): generate the public API docs and fail on any
       # dartdoc warning — a broken cross-reference or dead link. Coverage (every

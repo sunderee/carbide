@@ -40,6 +40,26 @@ flutter analyze
 flutter test
 ```
 
+### Coverage
+
+CI runs the package suite with `flutter test --coverage` and gates on a
+**90% line floor** via `dart run tool/coverage_gate.dart --floor 90`, which
+also appends the percentage to the workflow job summary and uploads
+`coverage/lcov.info` as an artifact. Run the same two commands locally to
+reproduce the gate.
+
+What the number means:
+
+- The generated icon/pictogram registries
+  (`lib/src/{icons,pictograms}/generated/`) are excluded from the
+  denominator. Today they are const-only and emit no executable lines
+  anyway; the exclusion keeps the number honest if codegen ever changes.
+- Const-only foundations (`colors`, `typography`, `fluid_typography`,
+  `fonts`) are invisible to lcov for the same reason — they are covered by
+  value-equality tests but do not appear in the report.
+- The floor is a **total**, not per-file. The gate prints every file under
+  the floor as an informational tail; keep new components out of it.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by

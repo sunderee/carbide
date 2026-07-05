@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -222,6 +223,69 @@ void main() {
       );
     });
 
+    testWidgets('Enter activates the focused item and closes the menu', (
+      WidgetTester tester,
+    ) async {
+      int pressed = 0;
+      int closes = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            onClose: () => closes++,
+            children: <Widget>[
+              CarbonMenuItem(label: 'Run', onPressed: () => pressed++),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_focusedLabel(tester), 'Run');
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(pressed, 1);
+      expect(closes, 1);
+    });
+
+    testWidgets('hovering an item paints the hover layer', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[
+              CarbonMenuItem(label: 'Cut', onPressed: () {}),
+              CarbonMenuItem(label: 'Copy', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      await gesture.moveTo(tester.getCenter(find.text('Copy')));
+      await tester.pumpAndSettle();
+      expect(
+        (_row(tester, 'Copy').decoration! as BoxDecoration).color,
+        theme.layerHover01,
+      );
+      expect(
+        tester.widget<Text>(find.text('Copy')).style!.color,
+        theme.textPrimary,
+      );
+
+      await gesture.moveTo(Offset.zero);
+      await tester.pumpAndSettle();
+      expect(
+        (_row(tester, 'Copy').decoration! as BoxDecoration).color,
+        const Color(0x00000000),
+      );
+    });
+
     testWidgets('exposes a button with its label', (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
@@ -398,6 +462,175 @@ void main() {
       await tester.tap(find.text('Descending'));
       await tester.pump();
       expect(value, 'b');
+      handle.dispose();
+    });
+
+    testWidgets('Space toggles the focused selectable', (
+      WidgetTester tester,
+    ) async {
+      bool? changed;
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            children: <Widget>[
+              CarbonMenuItemSelectable(
+                label: 'Wrap',
+                selected: false,
+                onChanged: (bool v) => changed = v,
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // Focus paints the hover tokens on the row.
+      expect(
+        (_row(tester, 'Wrap').decoration! as BoxDecoration).color,
+        theme.layerHover01,
+      );
+      expect(
+        tester.widget<Text>(find.text('Wrap')).style!.color,
+        theme.textPrimary,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(changed, isTrue);
+    });
+
+    testWidgets('disabled selectable is inert and greyed', (
+      WidgetTester tester,
+    ) async {
+      bool? changed;
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[
+              CarbonMenuItemSelectable(
+                label: 'Wrap',
+                selected: false,
+                disabled: true,
+                onChanged: (bool v) => changed = v,
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.tap(find.text('Wrap'));
+      await tester.pump();
+      expect(changed, isNull);
+      expect(
+        tester.widget<Text>(find.text('Wrap')).style!.color,
+        theme.textDisabled,
+      );
+    });
+
+    testWidgets('hover paints selectable and radio rows with layer-hover', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[
+              CarbonMenuItemSelectable(
+                label: 'Wrap',
+                selected: false,
+                onChanged: (_) {},
+              ),
+              CarbonMenuItemRadioGroup<String>(
+                label: 'Sort',
+                value: 'a',
+                onChanged: (_) {},
+                options: const <(String, String)>[('a', 'Ascending')],
+              ),
+            ],
+          ),
+        ),
+      );
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      for (final String label in <String>['Wrap', 'Ascending']) {
+        await gesture.moveTo(tester.getCenter(find.text(label)));
+        await tester.pumpAndSettle();
+        expect(
+          (_row(tester, label).decoration! as BoxDecoration).color,
+          theme.layerHover01,
+          reason: label,
+        );
+        await gesture.moveTo(Offset.zero);
+        await tester.pumpAndSettle();
+        expect(
+          (_row(tester, label).decoration! as BoxDecoration).color,
+          const Color(0x00000000),
+          reason: label,
+        );
+      }
+    });
+
+    testWidgets('Enter selects the focused radio option', (
+      WidgetTester tester,
+    ) async {
+      String? value;
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            children: <Widget>[
+              CarbonMenuItemRadioGroup<String>(
+                label: 'Sort',
+                value: 'a',
+                onChanged: (String v) => value = v,
+                options: const <(String, String)>[
+                  ('a', 'Ascending'),
+                  ('b', 'Descending'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(_focusedLabel(tester), 'Descending');
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(value, 'b');
+    });
+
+    testWidgets('group labels its items; keyboard roves through them', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            children: <Widget>[
+              CarbonMenuItemGroup(
+                label: 'Actions',
+                children: <Widget>[
+                  CarbonMenuItem(label: 'One', onPressed: () {}),
+                  CarbonMenuItemDivider(key: UniqueKey()),
+                  CarbonMenuItem(label: 'Two', onPressed: () {}),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Actions'), findsOneWidget);
+      expect(find.byType(CarbonMenuItemDivider), findsOneWidget);
+      // Grouped items still register with the menu's roving order.
+      expect(_focusedLabel(tester), 'One');
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(_focusedLabel(tester), 'Two');
       handle.dispose();
     });
 

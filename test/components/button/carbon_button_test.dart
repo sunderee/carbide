@@ -269,6 +269,124 @@ void main() {
       await press.up();
     });
 
+    testWidgets('pressed fills for the remaining kinds', (
+      WidgetTester tester,
+    ) async {
+      Future<void> pressAndExpect(
+        CarbonButtonKind kind,
+        Color color, {
+        Color? text,
+      }) async {
+        await pump(tester, kind);
+        final TestGesture press = await tester.startGesture(
+          tester.getCenter(find.byType(CarbonButton)),
+        );
+        await tester.pumpAndSettle();
+        expect(_decorationOf(tester).color, color, reason: '$kind');
+        if (text != null) {
+          expect(_textColorOf(tester, 'B'), text, reason: '$kind');
+        }
+        await press.up();
+        await tester.pumpAndSettle();
+      }
+
+      await pressAndExpect(
+        CarbonButtonKind.secondary,
+        theme.buttonSecondaryActive,
+      );
+      await pressAndExpect(
+        CarbonButtonKind.tertiary,
+        theme.buttonTertiaryActive,
+        text: theme.textInverse,
+      );
+      await pressAndExpect(CarbonButtonKind.ghost, theme.backgroundActive);
+      await pressAndExpect(CarbonButtonKind.danger, theme.buttonDangerActive);
+      await pressAndExpect(
+        CarbonButtonKind.dangerTertiary,
+        theme.buttonDangerActive,
+        text: theme.textOnColor,
+      );
+      await pressAndExpect(
+        CarbonButtonKind.dangerGhost,
+        theme.buttonDangerActive,
+        text: theme.textOnColor,
+      );
+    });
+
+    testWidgets('hover: secondary, danger, and danger--tertiary', (
+      WidgetTester tester,
+    ) async {
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(mouse.removePointer);
+
+      await pump(tester, CarbonButtonKind.secondary);
+      await mouse.addPointer(
+        location: tester.getCenter(find.byType(CarbonButton)),
+      );
+      await tester.pumpAndSettle();
+      expect(_decorationOf(tester).color, theme.buttonSecondaryHover);
+
+      await pump(tester, CarbonButtonKind.danger);
+      await tester.pumpAndSettle();
+      expect(_decorationOf(tester).color, theme.buttonDangerHover);
+
+      await pump(tester, CarbonButtonKind.dangerTertiary);
+      await tester.pumpAndSettle();
+      expect(_decorationOf(tester).color, theme.buttonDangerHover);
+      expect(_decorationOf(tester).border!.top.color, theme.buttonDangerHover);
+      expect(_textColorOf(tester, 'B'), theme.textOnColor);
+    });
+
+    testWidgets('focus: danger--tertiary fills; ghost icon-only keeps the '
+        'single 1px inset ring', (WidgetTester tester) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        _host(
+          CarbonButton(
+            label: 'B',
+            kind: CarbonButtonKind.dangerTertiary,
+            focusNode: node,
+            onPressed: () {},
+          ),
+        ),
+      );
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(_decorationOf(tester).color, theme.buttonDangerPrimary);
+      expect(_decorationOf(tester).border!.top.color, theme.focus);
+      expect(_textColorOf(tester, 'B'), theme.textOnColor);
+
+      final FocusNode ghostNode = FocusNode();
+      addTearDown(ghostNode.dispose);
+      await tester.pumpWidget(
+        _host(
+          CarbonButton.iconOnly(
+            icon: CarbonIcons.add,
+            iconDescription: 'Add',
+            kind: CarbonButtonKind.ghost,
+            focusNode: ghostNode,
+            onPressed: () {},
+          ),
+        ),
+      );
+      ghostNode.requestFocus();
+      await tester.pumpAndSettle();
+      expect(_decorationOf(tester).color, theme.backgroundActive);
+      // `_button.scss`: ghost icon-only focus keeps the transparent border
+      // (no square focus border) and paints only the single inset ring.
+      expect(_decorationOf(tester).border!.top.color, const Color(0x00000000));
+      final AnimatedContainer container = tester.widget<AnimatedContainer>(
+        find.descendant(
+          of: find.byType(CarbonButton),
+          matching: find.byType(AnimatedContainer),
+        ),
+      );
+      expect(container.foregroundDecoration, isNotNull);
+    });
+
     testWidgets('keyboard focus: border + double inset ring; tertiary '
         'fills', (WidgetTester tester) async {
       final FocusNode node = FocusNode();
@@ -461,6 +579,65 @@ void main() {
         ),
       );
       expect(separator.color, CarbonThemeData.white.iconOnColorDisabled);
+    });
+
+    testWidgets('stacked lays buttons out vertically with a 1px separator', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonButtonSet(
+            stacked: true,
+            children: <CarbonButton>[
+              CarbonButton(
+                label: 'Cancel',
+                kind: CarbonButtonKind.secondary,
+                onPressed: () {},
+              ),
+              CarbonButton(label: 'Save', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      final Rect first = tester.getRect(find.byType(CarbonButton).first);
+      final Rect last = tester.getRect(find.byType(CarbonButton).last);
+      expect(first.width, CarbonButtonSet.maxButtonWidth);
+      expect(last.width, CarbonButtonSet.maxButtonWidth);
+      expect(last.top, first.bottom + 1);
+      final ColoredBox separator = tester.widget<ColoredBox>(
+        find.descendant(
+          of: find.byType(CarbonButtonSet),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(separator.color, CarbonThemeData.white.buttonSeparator);
+
+      // A disabled following button switches the stacked separator color.
+      await tester.pumpWidget(
+        _host(
+          CarbonButtonSet(
+            stacked: true,
+            children: <CarbonButton>[
+              CarbonButton(
+                label: 'Cancel',
+                kind: CarbonButtonKind.secondary,
+                onPressed: () {},
+              ),
+              const CarbonButton(label: 'Save', onPressed: null),
+            ],
+          ),
+        ),
+      );
+      final ColoredBox disabledSeparator = tester.widget<ColoredBox>(
+        find.descendant(
+          of: find.byType(CarbonButtonSet),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(
+        disabledSeparator.color,
+        CarbonThemeData.white.layerSelectedDisabled,
+      );
     });
   });
 
