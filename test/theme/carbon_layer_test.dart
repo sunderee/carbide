@@ -181,6 +181,17 @@ void main() {
         isNot(CarbonLayerTokens.resolve(CarbonThemeData.white, 2)),
       );
     });
+
+    test('equal token sets share one hash code', () {
+      expect(
+        CarbonLayerTokens.resolve(CarbonThemeData.white, 1).hashCode,
+        CarbonLayerTokens.resolve(CarbonThemeData.white, 1).hashCode,
+      );
+      expect(
+        CarbonLayerTokens.resolve(CarbonThemeData.white, 1).hashCode,
+        isNot(CarbonLayerTokens.resolve(CarbonThemeData.gray100, 1).hashCode),
+      );
+    });
   });
 
   group('withBackground', () {

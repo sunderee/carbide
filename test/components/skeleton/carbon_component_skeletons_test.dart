@@ -100,6 +100,114 @@ void main() {
     });
   });
 
+  group('variants', () {
+    testWidgets('fluid fields are a single 64px block with the label inside', (
+      WidgetTester tester,
+    ) async {
+      final List<Widget> fluids = <Widget>[
+        CarbonTextInputSkeleton(fluid: true, key: UniqueKey()),
+        CarbonSelectSkeleton(fluid: true, key: UniqueKey()),
+        CarbonDropdownSkeleton(fluid: true, key: UniqueKey()),
+      ];
+      for (final Widget widget in fluids) {
+        await tester.pumpWidget(_host(widget));
+        expect(
+          tester.getSize(find.byKey(widget.key!)).height,
+          64,
+          reason: '${widget.runtimeType}',
+        );
+        // Label bar + value bar, both inside the field block.
+        expect(find.byType(CarbonSkeleton), findsNWidgets(2));
+      }
+    });
+
+    testWidgets('hideLabel drops the label bar on every labelled field', (
+      WidgetTester tester,
+    ) async {
+      final List<Widget> fields = <Widget>[
+        CarbonTextAreaSkeleton(hideLabel: true, key: UniqueKey()),
+        CarbonNumberInputSkeleton(hideLabel: true, key: UniqueKey()),
+        CarbonSelectSkeleton(hideLabel: true, key: UniqueKey()),
+        CarbonDropdownSkeleton(hideLabel: true, key: UniqueKey()),
+        CarbonDatePickerSkeleton(hideLabel: true, key: UniqueKey()),
+      ];
+      for (final Widget widget in fields) {
+        await tester.pumpWidget(_host(widget));
+        expect(
+          find.byType(CarbonSkeleton),
+          findsOneWidget,
+          reason: '${widget.runtimeType}',
+        );
+      }
+    });
+
+    testWidgets('count controls the number of repeated placeholders', (
+      WidgetTester tester,
+    ) async {
+      for (final int count in <int>[1, 3]) {
+        await tester.pumpWidget(_host(CarbonTabsSkeleton(count: count)));
+        expect(find.byType(CarbonSkeleton), findsNWidgets(count));
+
+        await tester.pumpWidget(_host(CarbonBreadcrumbSkeleton(count: count)));
+        expect(find.byType(CarbonSkeleton), findsNWidgets(count));
+
+        // count step circles joined by count - 1 connector lines.
+        await tester.pumpWidget(
+          _host(CarbonProgressIndicatorSkeleton(count: count)),
+        );
+        expect(find.byType(CarbonSkeleton), findsNWidgets(2 * count - 1));
+
+        // One title bar + one chevron placeholder per item.
+        await tester.pumpWidget(_host(CarbonAccordionSkeleton(count: count)));
+        expect(find.byType(CarbonSkeleton), findsNWidgets(2 * count));
+      }
+    });
+
+    testWidgets('grid skeletons honour row and column counts', (
+      WidgetTester tester,
+    ) async {
+      for (final (int rows, int columns) in <(int, int)>[(2, 3), (1, 5)]) {
+        await tester.pumpWidget(
+          _host(
+            CarbonStructuredListSkeleton(rowCount: rows, columnCount: columns),
+          ),
+        );
+        expect(find.byType(CarbonSkeleton), findsNWidgets(rows * columns));
+
+        // The data table adds one header row.
+        await tester.pumpWidget(
+          _host(CarbonDataTableSkeleton(rowCount: rows, columnCount: columns)),
+        );
+        expect(
+          find.byType(CarbonSkeleton),
+          findsNWidgets((rows + 1) * columns),
+        );
+      }
+    });
+
+    testWidgets('fixed-shape skeletons render their spec shape counts', (
+      WidgetTester tester,
+    ) async {
+      final Map<Widget, int> shapeCounts = <Widget, int>{
+        CarbonSearchSkeleton(key: UniqueKey()): 1,
+        CarbonPaginationSkeleton(key: UniqueKey()): 1,
+        CarbonCheckboxSkeleton(key: UniqueKey()): 2,
+        CarbonRadioButtonSkeleton(key: UniqueKey()): 2,
+        CarbonToggleSkeleton(key: UniqueKey()): 2,
+        CarbonFileUploaderSkeleton(key: UniqueKey()): 2,
+        CarbonSliderSkeleton(key: UniqueKey()): 3,
+      };
+      for (final MapEntry<Widget, int> entry in shapeCounts.entries) {
+        await tester.pumpWidget(_host(entry.key));
+        expect(
+          find.byType(CarbonSkeleton),
+          findsNWidgets(entry.value),
+          reason: '${entry.key.runtimeType}',
+        );
+      }
+    });
+  });
+
   group('goldens', () {
     Widget stack(double width, List<Widget> rows) => Padding(
       padding: const EdgeInsets.all(8),

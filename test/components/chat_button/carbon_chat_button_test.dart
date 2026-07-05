@@ -114,6 +114,233 @@ void main() {
       );
     });
 
+    testWidgets('keyboard focus draws the 2px pill focus border', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        _host(
+          CarbonChatButton(label: 'Ask', focusNode: node, onPressed: () {}),
+        ),
+      );
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      final AnimatedContainer container = tester.widget<AnimatedContainer>(
+        find.descendant(
+          of: find.byType(CarbonChatButton),
+          matching: find.byType(AnimatedContainer),
+        ),
+      );
+      final BoxDecoration ring =
+          container.foregroundDecoration! as BoxDecoration;
+      expect((ring.border! as Border).top.color, theme.focus);
+      expect((ring.border! as Border).top.width, 2);
+      expect(ring.borderRadius, BorderRadius.circular(24));
+    });
+
+    testWidgets('a trailing icon renders in the label color', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonChatButton(
+            label: 'Ask',
+            icon: CarbonIcons.arrowRight,
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final CarbonIcon icon = tester.widget<CarbonIcon>(
+        find.byType(CarbonIcon),
+      );
+      expect(icon.icon, CarbonIcons.arrowRight);
+      expect(icon.color, theme.textOnColor);
+    });
+
+    testWidgets('quick action: pressed fill and disabled outline', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonChatButton(label: 'Q', quickAction: true, onPressed: () {}),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final TestGesture press = await tester.startGesture(
+        tester.getCenter(find.byType(CarbonChatButton)),
+      );
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.chatButtonActive);
+      expect(
+        tester.widget<Text>(find.text('Q')).style!.color,
+        theme.chatButtonTextHover,
+      );
+      await press.up();
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(
+        _host(const CarbonChatButton(label: 'Q', quickAction: true)),
+      );
+      await tester.pumpAndSettle();
+      final BoxDecoration decoration = _decoration(tester);
+      expect((decoration.border! as Border).top.color, theme.buttonDisabled);
+      expect(
+        tester.widget<Text>(find.text('Q')).style!.color,
+        theme.buttonDisabled,
+      );
+    });
+
+    testWidgets('disabled: solid kinds fill, tertiary keeps its border, '
+        'ghost keeps none', (WidgetTester tester) async {
+      const Color transparent = Color(0x00000000);
+      Future<void> pumpDisabled(CarbonButtonKind kind) async {
+        await tester.pumpWidget(
+          _host(CarbonChatButton(label: 'Ask', kind: kind)),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      await pumpDisabled(CarbonButtonKind.primary);
+      expect(_decoration(tester).color, theme.buttonDisabled);
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.textOnColorDisabled,
+      );
+
+      await pumpDisabled(CarbonButtonKind.tertiary);
+      expect(_decoration(tester).color, transparent);
+      expect(
+        (_decoration(tester).border! as Border).top.color,
+        theme.buttonDisabled,
+      );
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.textDisabled,
+      );
+
+      await pumpDisabled(CarbonButtonKind.ghost);
+      expect(_decoration(tester).color, transparent);
+      expect((_decoration(tester).border! as Border).top.color, transparent);
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.textDisabled,
+      );
+    });
+
+    testWidgets('rest colors: secondary fill, tertiary outline', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonChatButton(
+            label: 'Ask',
+            kind: CarbonButtonKind.secondary,
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.buttonSecondary);
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.textOnColor,
+      );
+
+      await tester.pumpWidget(
+        _host(
+          CarbonChatButton(
+            label: 'Ask',
+            kind: CarbonButtonKind.tertiary,
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, const Color(0x00000000));
+      expect(
+        (_decoration(tester).border! as Border).top.color,
+        theme.buttonTertiary,
+      );
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.buttonTertiary,
+      );
+    });
+
+    testWidgets('hover fills per kind', (WidgetTester tester) async {
+      Future<void> pumpKind(CarbonButtonKind kind) async {
+        await tester.pumpWidget(
+          _host(CarbonChatButton(label: 'Ask', kind: kind, onPressed: () {})),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(mouse.removePointer);
+
+      await pumpKind(CarbonButtonKind.primary);
+      await mouse.addPointer(
+        location: tester.getCenter(find.byType(CarbonChatButton)),
+      );
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.buttonPrimaryHover);
+
+      await pumpKind(CarbonButtonKind.secondary);
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.buttonSecondaryHover);
+
+      await pumpKind(CarbonButtonKind.tertiary);
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.buttonTertiaryHover);
+      expect(
+        (_decoration(tester).border! as Border).top.color,
+        theme.buttonTertiary,
+      );
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.textInverse,
+      );
+
+      await pumpKind(CarbonButtonKind.ghost);
+      await tester.pumpAndSettle();
+      expect(_decoration(tester).color, theme.backgroundHover);
+      expect(
+        tester.widget<Text>(find.text('Ask')).style!.color,
+        theme.linkPrimaryHover,
+      );
+    });
+
+    testWidgets('pressed fills per kind', (WidgetTester tester) async {
+      Future<void> pressAndExpect(CarbonButtonKind kind, Color color) async {
+        await tester.pumpWidget(
+          _host(CarbonChatButton(label: 'Ask', kind: kind, onPressed: () {})),
+        );
+        await tester.pumpAndSettle();
+        final TestGesture press = await tester.startGesture(
+          tester.getCenter(find.byType(CarbonChatButton)),
+        );
+        await tester.pumpAndSettle();
+        expect(_decoration(tester).color, color, reason: '$kind');
+        await press.up();
+        await tester.pumpAndSettle();
+      }
+
+      await pressAndExpect(CarbonButtonKind.primary, theme.buttonPrimaryActive);
+      await pressAndExpect(
+        CarbonButtonKind.secondary,
+        theme.buttonSecondaryActive,
+      );
+      await pressAndExpect(
+        CarbonButtonKind.tertiary,
+        theme.buttonTertiaryActive,
+      );
+      await pressAndExpect(CarbonButtonKind.ghost, theme.backgroundActive);
+    });
+
     testWidgets('selected survives disabling (--quick-action--selected)', (
       WidgetTester tester,
     ) async {

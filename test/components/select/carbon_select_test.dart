@@ -49,6 +49,10 @@ void main() {
     bool disabled = false,
     bool invalid = false,
     String? invalidText,
+    bool warn = false,
+    String? warnText,
+    String? helperText,
+    bool inline = false,
     String placeholder = 'Choose',
     List<CarbonSelectEntry<String>> items = _items,
     FocusNode? focusNode,
@@ -63,6 +67,10 @@ void main() {
       disabled: disabled,
       invalid: invalid,
       invalidText: invalidText,
+      warn: warn,
+      warnText: warnText,
+      helperText: helperText,
+      inline: inline,
       focusNode: focusNode,
     ),
   );
@@ -156,6 +164,73 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
       expect(find.text('Date'), findsNothing);
+    });
+
+    testWidgets('Enter and Space also open the closed menu', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(select(focusNode: node));
+      node.requestFocus();
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsNothing);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsOneWidget);
+    });
+
+    testWidgets('Up wraps backwards; Space selects the highlight', (
+      WidgetTester tester,
+    ) async {
+      String? chosen;
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        select(onChanged: (String v) => chosen = v, focusNode: node),
+      );
+      node.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      // Highlight starts at Apple (0); Up wraps to Date (3).
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(chosen, 'd');
+    });
+
+    testWidgets('type-ahead jumps to the next matching label', (
+      WidgetTester tester,
+    ) async {
+      String? chosen;
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        select(onChanged: (String v) => chosen = v, focusNode: node),
+      );
+      node.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      // No label starts with x: the highlight stays put.
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
+      await tester.pump();
+      // 'b' jumps the highlight to Banana; Enter selects it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyB);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(chosen, 'b');
     });
 
     testWidgets('Down skips the disabled item', (WidgetTester tester) async {

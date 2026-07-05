@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -159,6 +160,90 @@ void main() {
       expectTextNotClipped(tester, find.text('Copied!'));
       await tester.pump(const Duration(milliseconds: 2100));
     });
+
+    testWidgets('inline copies with Enter when focused', (
+      WidgetTester tester,
+    ) async {
+      String? copied;
+      _mockClipboard(tester, (String? value) => copied = value);
+      await tester.pumpWidget(
+        _host(
+          const CarbonCodeSnippet(
+            code: 'npm i',
+            type: CarbonCodeSnippetType.inline,
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('npm i'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(copied, 'npm i');
+      expect(find.text('Copied!'), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 2100));
+    });
+
+    testWidgets('tapping outside dismisses the inline copy feedback', (
+      WidgetTester tester,
+    ) async {
+      _mockClipboard(tester, (String? _) {});
+      await tester.pumpWidget(
+        _host(
+          const CarbonCodeSnippet(
+            code: 'npm i',
+            type: CarbonCodeSnippetType.inline,
+          ),
+        ),
+      );
+      await tester.tap(find.text('npm i'));
+      await tester.pumpAndSettle();
+      expect(find.text('Copied!'), findsOneWidget);
+
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      expect(find.text('Copied!'), findsNothing);
+      await tester.pump(const Duration(milliseconds: 2100));
+    });
+
+    testWidgets('hovering the inline chip shows the hover layer', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const CarbonCodeSnippet(
+            code: 'npm i',
+            type: CarbonCodeSnippetType.inline,
+          ),
+        ),
+      );
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      BoxDecoration chipDecoration() =>
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.text('npm i'),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+
+      await gesture.moveTo(tester.getCenter(find.text('npm i')));
+      await tester.pump();
+      expect(chipDecoration().color, CarbonThemeData.white.layerHover01);
+
+      await gesture.moveTo(Offset.zero);
+      await tester.pump();
+      expect(chipDecoration().color, CarbonThemeData.white.layer01);
+    });
   });
 
   group('multi-line expand', () {
@@ -193,6 +278,42 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Show more'), findsOneWidget);
     });
+
+    testWidgets('Enter on the focused toggle expands to maxExpandedRows', (
+      WidgetTester tester,
+    ) async {
+      bool hasCodeBox(double height) => find
+          .byWidgetPredicate((Widget w) => w is SizedBox && w.height == height)
+          .evaluate()
+          .isNotEmpty;
+
+      await tester.pumpWidget(
+        _host(
+          const CarbonCodeSnippet(
+            code: 'a\nb\nc\nd\ne\nf',
+            type: CarbonCodeSnippetType.multi,
+            maxCollapsedRows: 2,
+            maxExpandedRows: 3,
+            hideCopyButton: true,
+          ),
+        ),
+      );
+      // Collapsed: 2 rows * 16px.
+      expect(hasCodeBox(32), isTrue);
+
+      Focus.of(tester.element(find.text('Show more'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('Show less'), findsOneWidget);
+      // Expanded but still bounded: 3 rows * 16px.
+      expect(hasCodeBox(48), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.text('Show more'), findsOneWidget);
+      expect(hasCodeBox(32), isTrue);
+    });
   });
 
   group('semantics', () {
@@ -223,6 +344,21 @@ void main() {
         ),
       );
       expect(find.byType(CarbonCodeSnippetSkeleton), findsOneWidget);
+    });
+
+    testWidgets('multi skeleton shows three placeholder lines', (
+      WidgetTester tester,
+    ) async {
+      // Built at runtime (non-const) in a fresh host: the shared Overlay host
+      // keeps its first entry, so the multi variant needs its own pump.
+      final CarbonCodeSnippetType type = CarbonCodeSnippetType.multi;
+      await tester.pumpWidget(_host(CarbonCodeSnippetSkeleton(type: type)));
+      expect(
+        tester
+            .widget<CarbonSkeletonText>(find.byType(CarbonSkeletonText))
+            .lineCount,
+        3,
+      );
     });
   });
 

@@ -111,6 +111,96 @@ void main() {
         closeTo(4 * unit + 3 * 32, 0.6),
       );
     });
+
+    testWidgets('without breakpoint spans, span applies and defaults to the '
+        'full grid', (WidgetTester tester) async {
+      await _pump(
+        tester,
+        1056,
+        CarbonGrid(
+          children: <Widget>[
+            CarbonColumn(
+              span: 4,
+              key: const ValueKey<String>('a'),
+              child: const SizedBox(height: 10),
+            ),
+            const CarbonColumn(
+              key: ValueKey<String>('b'),
+              child: SizedBox(height: 10),
+            ),
+          ],
+        ),
+      );
+      final double unit = _unit(1056, 16, 16);
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
+        closeTo(4 * unit + 3 * 32, 0.6),
+      );
+      // No span at all → the full 16-column width.
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('b'))).width,
+        closeTo(16 * unit + 15 * 32, 0.6),
+      );
+    });
+
+    testWidgets('columns relayout when the grid crosses a breakpoint', (
+      WidgetTester tester,
+    ) async {
+      final Widget grid = CarbonGrid(
+        children: <Widget>[
+          CarbonColumn(
+            sm: 2,
+            lg: 8,
+            key: const ValueKey<String>('a'),
+            child: const SizedBox(height: 10),
+          ),
+        ],
+      );
+
+      await _pump(tester, 1056, grid);
+      final double lgUnit = _unit(1056, 16, 16);
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
+        closeTo(8 * lgUnit + 7 * 32, 0.6),
+      );
+
+      // Shrinking to sm re-resolves the scope; dependents must be notified.
+      await _pump(tester, 400, grid);
+      final double smUnit = _unit(400, 4, 0);
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
+        closeTo(2 * smUnit + 32, 0.6),
+      );
+    });
+
+    testWidgets('a width change within one breakpoint re-derives the unit', (
+      WidgetTester tester,
+    ) async {
+      final Widget column = CarbonColumn(
+        lg: 8,
+        key: const ValueKey<String>('a'),
+        child: const SizedBox(height: 10),
+      );
+
+      // 1056 and 1200 both resolve to lg (16 columns, 16px margin).
+      await _pump(tester, 1056, CarbonGrid(children: <Widget>[column]));
+      await _pump(tester, 1200, CarbonGrid(children: <Widget>[column]));
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
+        closeTo(8 * _unit(1200, 16, 16) + 7 * 32, 0.6),
+      );
+
+      // An unrelated grid property change keeps the column layout stable.
+      await _pump(
+        tester,
+        1200,
+        CarbonGrid(rowSpacing: 8, children: <Widget>[column]),
+      );
+      expect(
+        tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
+        closeTo(8 * _unit(1200, 16, 16) + 7 * 32, 0.6),
+      );
+    });
   });
 
   group('layout', () {

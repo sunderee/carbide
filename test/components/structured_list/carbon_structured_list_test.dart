@@ -4,6 +4,8 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -129,6 +131,89 @@ void main() {
         isSemantics(isInMutuallyExclusiveGroup: true, isChecked: true),
       );
       handle.dispose();
+    });
+  });
+
+  group('keyboard and hover', () {
+    Widget selectableList(ValueChanged<int> onSelected) => _host(
+      CarbonStructuredList(
+        headers: const <String>['Name', 'Type'],
+        rows: _rows(),
+        selectable: true,
+        selectedIndex: 0,
+        onSelected: onSelected,
+      ),
+    );
+
+    Color rowColor(WidgetTester tester, String cellText) {
+      final BoxDecoration deco =
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.text(cellText),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+      return deco.color!;
+    }
+
+    testWidgets('Enter and Space select the focused row', (
+      WidgetTester tester,
+    ) async {
+      final List<int> selected = <int>[];
+      await tester.pumpWidget(selectableList(selected.add));
+      // Focus the first row, Enter selects it.
+      Focus.of(tester.element(find.text('Load balancer'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, <int>[0]);
+      // Focus the second row, Space selects it too.
+      Focus.of(tester.element(find.text('Database'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(selected, <int>[0, 1]);
+    });
+
+    testWidgets('hovering a selectable row shows the hover layer', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(selectableList((_) {}));
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      await gesture.moveTo(tester.getCenter(find.text('Database')));
+      await tester.pump();
+      expect(rowColor(tester, 'Database'), theme.layerHover01);
+
+      await gesture.moveTo(Offset.zero);
+      await tester.pump();
+      expect(rowColor(tester, 'Database'), const Color(0x00000000));
+    });
+
+    testWidgets('rows built at runtime render their cells', (
+      WidgetTester tester,
+    ) async {
+      final List<CarbonStructuredListRow> rows = <CarbonStructuredListRow>[
+        for (int i = 0; i < 2; i++)
+          CarbonStructuredListRow(cells: <Widget>[Text('Cell $i')]),
+      ];
+      await tester.pumpWidget(
+        _host(
+          CarbonStructuredList(headers: const <String>['Name'], rows: rows),
+        ),
+      );
+      expect(find.text('Cell 0'), findsOneWidget);
+      expect(find.text('Cell 1'), findsOneWidget);
     });
   });
 

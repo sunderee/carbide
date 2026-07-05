@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -150,6 +151,29 @@ void main() {
       prev.onPressed!();
       expect(changed, 4);
     });
+
+    testWidgets('hovering a page button fills backgroundHover', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonPaginationNav(totalItems: 5, page: 0, onChange: (_) {})),
+      );
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: tester.getCenter(find.text('2')));
+      await tester.pumpAndSettle();
+      final Container box = tester.widget<Container>(
+        find
+            .ancestor(of: find.text('2'), matching: find.byType(Container))
+            .first,
+      );
+      expect(
+        (box.decoration! as BoxDecoration).color,
+        CarbonThemeData.white.backgroundHover,
+      );
+    });
   });
 
   group('truncation', () {
@@ -171,6 +195,86 @@ void main() {
       expect(find.text('20'), findsOneWidget);
       // At least one overflow menu is rendered.
       expect(find.byType(CarbonOverflowMenu), findsWidgets);
+    });
+
+    testWidgets('start-anchored window collapses only the back', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonPaginationNav(
+            totalItems: 20,
+            page: 0,
+            itemsShown: 7,
+            onChange: (_) {},
+          ),
+        ),
+      );
+      // The front cut is negative and folds into the back cut: 1..5 stay.
+      for (final String n in <String>['1', '2', '3', '4', '5', '20']) {
+        expect(find.text(n), findsOneWidget);
+      }
+      expect(find.byType(CarbonOverflowMenu), findsOneWidget);
+    });
+
+    testWidgets('end-anchored window collapses only the front', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonPaginationNav(
+            totalItems: 20,
+            page: 19,
+            itemsShown: 7,
+            onChange: (_) {},
+          ),
+        ),
+      );
+      // The back cut is negative and folds into the front cut: 16..20 stay.
+      for (final String n in <String>['1', '16', '17', '18', '19', '20']) {
+        expect(find.text(n), findsOneWidget);
+      }
+      expect(find.byType(CarbonOverflowMenu), findsOneWidget);
+    });
+
+    testWidgets('disableOverflow renders static ellipses instead of menus', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonPaginationNav(
+            totalItems: 20,
+            page: 10,
+            itemsShown: 7,
+            disableOverflow: true,
+            onChange: (_) {},
+          ),
+        ),
+      );
+      expect(find.text('…'), findsNWidgets(2));
+      expect(find.byType(CarbonOverflowMenu), findsNothing);
+    });
+
+    testWidgets('an overflow menu item navigates to its page', (
+      WidgetTester tester,
+    ) async {
+      int? changed;
+      await tester.pumpWidget(
+        _host(
+          CarbonPaginationNav(
+            totalItems: 20,
+            page: 10,
+            itemsShown: 7,
+            onChange: (int p) => changed = p,
+          ),
+        ),
+      );
+      await tester.tap(find.byType(CarbonOverflowMenu).first);
+      await tester.pumpAndSettle();
+      // The front menu lists the hidden pages 2..9.
+      await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+      expect(changed, 1);
     });
   });
 

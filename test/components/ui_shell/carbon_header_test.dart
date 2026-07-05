@@ -4,6 +4,8 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -158,6 +160,144 @@ void main() {
       expect(hasClose, isTrue);
     });
 
+    testWidgets('header name fires onPressed when tapped', (
+      WidgetTester tester,
+    ) async {
+      int tapped = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonHeader(
+            name: CarbonHeaderName(
+              prefix: 'IBM',
+              name: 'Carbide',
+              onPressed: () => tapped++,
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Carbide'));
+      expect(tapped, 1);
+    });
+
+    testWidgets('nav item activates with Enter and Space and shows the '
+        'focus ring', (WidgetTester tester) async {
+      int pressed = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonHeader(
+            name: const CarbonHeaderName(name: 'App'),
+            navigation: <Widget>[
+              CarbonHeaderMenuItem(label: 'Docs', onPressed: () => pressed++),
+            ],
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('Docs'))).requestFocus();
+      await tester.pumpAndSettle();
+      final CarbonFocusRing ring = tester.widget<CarbonFocusRing>(
+        find
+            .ancestor(
+              of: find.text('Docs'),
+              matching: find.byType(CarbonFocusRing),
+            )
+            .first,
+      );
+      expect(ring.visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(pressed, 2);
+    });
+
+    testWidgets('hovering a nav item shows the hover background', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonHeader(
+            name: const CarbonHeaderName(name: 'App'),
+            navigation: <Widget>[
+              CarbonHeaderMenuItem(label: 'Docs', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      BoxDecoration decoration() =>
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.text('Docs'),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await gesture.moveTo(tester.getCenter(find.text('Docs')));
+      await tester.pump();
+      expect(decoration().color, theme.backgroundHover);
+
+      await gesture.moveTo(const Offset(700, 400));
+      await tester.pump();
+      expect(decoration().color, const Color(0x00000000));
+    });
+
+    testWidgets('global action hover tint, focus ring and keyboard '
+        'activation', (WidgetTester tester) async {
+      int pressed = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonHeader(
+            name: const CarbonHeaderName(name: 'App'),
+            globalActions: <Widget>[
+              CarbonHeaderGlobalAction(
+                icon: CarbonIcons.search,
+                label: 'Search',
+                onPressed: () => pressed++,
+              ),
+            ],
+          ),
+        ),
+      );
+      final Finder action = find.byType(CarbonHeaderGlobalAction);
+      Color background() => tester
+          .widget<ColoredBox>(
+            find.descendant(of: action, matching: find.byType(ColoredBox)),
+          )
+          .color;
+
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await gesture.moveTo(tester.getCenter(action));
+      await tester.pump();
+      expect(background(), theme.backgroundHover);
+
+      await gesture.moveTo(const Offset(700, 400));
+      await tester.pump();
+      expect(background(), const Color(0x00000000));
+
+      Focus.of(tester.element(find.byType(CarbonIcon))).requestFocus();
+      await tester.pumpAndSettle();
+      final CarbonFocusRing ring = tester.widget<CarbonFocusRing>(
+        find.descendant(of: action, matching: find.byType(CarbonFocusRing)),
+      );
+      expect(ring.visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(pressed, 2);
+    });
+
     testWidgets('header dropdown menu opens its items', (
       WidgetTester tester,
     ) async {
@@ -182,6 +322,69 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Cloud'), findsOneWidget);
       expect(find.text('AI'), findsOneWidget);
+    });
+
+    testWidgets('header dropdown closes after selection and on an outside '
+        'tap', (WidgetTester tester) async {
+      int chosen = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonHeader(
+            name: const CarbonHeaderName(name: 'App'),
+            navigation: <Widget>[
+              CarbonHeaderMenu(
+                label: 'Products',
+                items: <Widget>[
+                  CarbonMenuItem(label: 'Cloud', onPressed: () => chosen++),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.tap(find.text('Products'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cloud'), findsOneWidget);
+
+      // Selecting an item both fires it and dismisses the menu.
+      await tester.tap(find.text('Cloud'));
+      await tester.pumpAndSettle();
+      expect(chosen, 1);
+      expect(find.text('Cloud'), findsNothing);
+
+      // Reopen; a tap outside the popover dismisses it.
+      await tester.tap(find.text('Products'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cloud'), findsOneWidget);
+      await tester.tapAt(const Offset(700, 500));
+      await tester.pumpAndSettle();
+      expect(find.text('Cloud'), findsNothing);
+    });
+  });
+
+  group('skip to content', () {
+    testWidgets('hidden until focused; Enter and Space activate it', (
+      WidgetTester tester,
+    ) async {
+      int skipped = 0;
+      await tester.pumpWidget(
+        _host(CarbonSkipToContent(onPressed: () => skipped++)),
+      );
+      final Finder label = find.text(
+        'Skip to main content',
+        skipOffstage: false,
+      );
+      expect(find.text('Skip to main content'), findsNothing);
+      expect(label, findsOneWidget);
+
+      Focus.of(tester.element(label)).requestFocus();
+      await tester.pumpAndSettle();
+      expect(find.text('Skip to main content'), findsOneWidget);
+      expect(tester.widget<Text>(label).style!.color, theme.focus);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(skipped, 2);
     });
   });
 

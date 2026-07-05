@@ -37,6 +37,40 @@ void main() {
     expect(paint.foregroundPainter, isNotNull);
   });
 
+  testWidgets('paints rounded outer and inner rings for a non-zero '
+      'borderRadius', (WidgetTester tester) async {
+    Widget ring(BorderRadius radius) => _themed(
+      CarbonFocusRing(
+        visible: true,
+        inset: true,
+        borderRadius: radius,
+        child: const SizedBox(width: 80, height: 32),
+      ),
+    );
+
+    await tester.pumpWidget(ring(BorderRadius.circular(8)));
+    RenderObject renderRing() =>
+        tester.renderObject(find.byType(CustomPaint).first);
+    // Outer ring plus the 1px inset ring, both rounded.
+    expect(
+      renderRing(),
+      paints
+        ..rrect()
+        ..rrect(),
+    );
+
+    // Radii smaller than the stroke inset clamp to zero rather than going
+    // negative.
+    await tester.pumpWidget(ring(BorderRadius.circular(1)));
+    expect(
+      renderRing(),
+      paints
+        ..rrect()
+        ..rrect(),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('does not affect child layout', (WidgetTester tester) async {
     await tester.pumpWidget(
       _themed(

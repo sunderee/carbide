@@ -212,6 +212,58 @@ void main() {
       expect(decoration.shape, BoxShape.circle);
     });
 
+    testWidgets('disabled uses layer fill, disabled text and icon colors', (
+      WidgetTester tester,
+    ) async {
+      final CarbonThemeData theme = CarbonThemeData.white;
+      await tester.pumpWidget(
+        _host(const CarbonDismissibleTag(label: 'Filter')),
+      );
+      // `.first`: the surface Container precedes the close-button one.
+      final Container surface = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(TagSurface),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      expect((surface.decoration! as BoxDecoration).color, theme.layer01);
+      expect(
+        tester.widget<Text>(find.text('Filter')).style!.color,
+        theme.textDisabled,
+      );
+      expect(
+        tester.widget<CarbonIcon>(find.byType(CarbonIcon)).color,
+        theme.iconDisabled,
+      );
+    });
+
+    testWidgets('keyboard focus rings the close button; high-contrast tags '
+        'use focusInverse', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonDismissibleTag(
+            label: 'F',
+            type: CarbonTagType.highContrast,
+            onClose: () {},
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.byType(CarbonIcon))).requestFocus();
+      await tester.pumpAndSettle();
+      final Container closeButton = tester.widget<Container>(
+        find
+            .ancestor(
+              of: find.byType(CarbonIcon),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      final BoxDecoration decoration = closeButton.decoration! as BoxDecoration;
+      expect(decoration.border!.top.color, CarbonThemeData.white.focusInverse);
+    });
+
     testWidgets('exposes an accessible dismiss action', (
       WidgetTester tester,
     ) async {
@@ -261,6 +313,32 @@ void main() {
       );
       await tester.tap(find.byType(CarbonSelectableTag));
       expect(changed, isFalse);
+    });
+
+    testWidgets('keyboard focus paints the outer 2px focus ring', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonSelectableTag(
+            label: 'Topic',
+            selected: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      Container ringHost() => tester.widget<Container>(
+        find
+            .ancestor(
+              of: find.byType(TagSurface),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      expect(ringHost().foregroundDecoration, isNull);
+      Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
+      await tester.pumpAndSettle();
+      expect(ringHost().foregroundDecoration, isNotNull);
     });
   });
 
@@ -312,6 +390,26 @@ void main() {
         _surfaceDecoration(tester).border!.top.color,
         CarbonThemeData.white.borderDisabled,
       );
+    });
+
+    testWidgets('keyboard focus paints the outer 2px focus ring', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonOperationalTag(label: 'View all', onPressed: () {})),
+      );
+      Container ringHost() => tester.widget<Container>(
+        find
+            .ancestor(
+              of: find.byType(TagSurface),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      expect(ringHost().foregroundDecoration, isNull);
+      Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
+      await tester.pumpAndSettle();
+      expect(ringHost().foregroundDecoration, isNotNull);
     });
   });
 

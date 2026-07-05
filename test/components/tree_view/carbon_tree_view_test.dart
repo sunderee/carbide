@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -236,6 +237,75 @@ void main() {
   });
 
   group('keyboard', () {
+    /// Runtime-built nodes (non-const) with an enabled last root so End can
+    /// land on it.
+    List<CarbonTreeNode> keyboardNodes() {
+      final List<CarbonTreeNode> children = <CarbonTreeNode>[
+        for (int i = 1; i <= 2; i++) CarbonTreeNode(id: 'a$i', label: 'a$i'),
+      ];
+      return <CarbonTreeNode>[
+        CarbonTreeNode(id: 'a', label: 'a', children: children),
+        const CarbonTreeNode(id: 'b', label: 'b'),
+      ];
+    }
+
+    testWidgets('Up/Home/End rove; Right descends; Left ascends to parent', (
+      WidgetTester tester,
+    ) async {
+      Object? picked;
+      await tester.pumpWidget(
+        _host(
+          CarbonTreeView(
+            label: 'Keys',
+            nodes: keyboardNodes(),
+            initiallyExpandedIds: const <Object>{'a'},
+            onSelect: (Object id) => picked = id,
+          ),
+        ),
+      );
+      // Visible: a, a1, a2, b. Focus + select the parent.
+      await tester.tap(find.text('a'));
+      await tester.pumpAndSettle();
+      expect(picked, 'a');
+
+      // Right on an already-expanded parent moves focus to its first child.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(picked, 'a1');
+
+      // Left on a leaf jumps back to the nearest shallower ancestor.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(picked, 'a');
+
+      // End focuses the last visible node.
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(picked, 'b');
+
+      // Home returns to the first; Down then Up round-trips back to it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(picked, 'a');
+
+      // First Left collapses the expanded root; a second Left is a no-op
+      // because a root has no parent to ascend to.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(find.text('a1'), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(picked, 'a');
+    });
+
     testWidgets('Right expands, Left collapses, Down+Enter selects next', (
       WidgetTester tester,
     ) async {
@@ -260,6 +330,50 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       expect(picked, 'main');
+    });
+  });
+
+  group('hover', () {
+    Color rowColor(WidgetTester tester, String label) {
+      final BoxDecoration deco =
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.text(label),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+      return deco.color!;
+    }
+
+    testWidgets('hovering an unselected row paints the hover layer', (
+      WidgetTester tester,
+    ) async {
+      // The tree is top-left aligned, so park the pointer far away from it.
+      const Offset away = Offset(600, 500);
+      await tester.pumpWidget(_tree());
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: away);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      await gesture.moveTo(tester.getCenter(find.text('README.md')));
+      await tester.pump();
+      expect(rowColor(tester, 'README.md'), theme.layerHover01);
+      expect(
+        tester.widget<Text>(find.text('README.md')).style!.color,
+        theme.textPrimary,
+      );
+
+      await gesture.moveTo(away);
+      await tester.pump();
+      expect(rowColor(tester, 'README.md'), theme.layer01);
     });
   });
 
