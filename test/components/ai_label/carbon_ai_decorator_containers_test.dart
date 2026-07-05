@@ -377,6 +377,7 @@ void main() {
             width: 260,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 CarbonSelectableTile(
                   selected: true,
