@@ -1,0 +1,68 @@
+name: Publish rehearsal
+
+# Packaging dry-run (#233). The real publish (publish.yaml) uses
+# `dart pub publish --force` because the strict dry-run fails on one known,
+# expected warning: CI checks out without submodules, so the five
+# documentation/ gitlinks are "checked-in files ignored by a rule" as far as
+# pub is concerned. `--force` proceeds past warnings — which also means a
+# *real* packaging error would surface only at tag-publish time.
+#
+# This workflow closes that gap on every PR that touches packaging inputs:
+# it runs the strict dry-run and passes only when the output is clean OR
+# contains exactly the known submodule warning and nothing else.
+
+on:
+  pull_request:
+    paths:
+      - pubspec.yaml
+      - CHANGELOG.md
+      - README.md
+      - LICENSE
+      - LICENSE_COMMERCIAL
+      - NOTICE
+      - .gitignore
+      - .pubignore
+      - .github/workflows/publish*.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: pub publish --dry-run (strict)
+    runs-on: ubuntu-latest
+    steps:
+      # No submodules, exactly like publish.yaml's checkout.
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Strict dry-run (known submodule warning tolerated)
+        run: |
+          set +e
+          output=$(dart pub publish --dry-run 2>&1)
+          code=$?
+          set -e
+          echo "$output"
+          if [ "$code" -eq 0 ]; then
+            echo "Dry-run clean."
+            exit 0
+          fi
+          if echo "$output" | grep -q "documentation/carbon" \
+            && echo "$output" | grep -q "Package has 1 warning"; then
+            echo "Only the expected documentation/ submodule warning — OK."
+            exit 0
+          fi
+          echo "::error::Unexpected pub publish warnings/errors — see above."
+          exit 1

@@ -60,6 +60,34 @@ What the number means:
 - The floor is a **total**, not per-file. The gate prints every file under
   the floor as an informational tail; keep new components out of it.
 
+### CI
+
+Every PR runs on a **pinned Flutter** (`flutter-version:` in
+`.github/workflows/ci.yaml`; all workflows carry the same pin — grep
+`flutter-version` when bumping, and bump via a dedicated PR since golden
+rasterization and analyzer behavior follow the toolchain):
+
+- **Format, analyze, test** — plus the coverage gate (above), the icon
+  lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
+  golden comparison is strict and authoritative.
+- **Min supported Flutter** — the same suite on the `pubspec.yaml` Flutter
+  floor with goldens skipped (`CARBIDE_SKIP_GOLDENS`), so the declared
+  constraint keeps being true. A grep step fails the job if the pinned
+  floor version and `pubspec.yaml` drift apart.
+- **Gallery — analyze & test** — the example app's suite + contact sheet.
+- **Publish rehearsal** (`publish-rehearsal.yaml`) — on PRs touching
+  packaging inputs (`pubspec.yaml`, README, LICENSE, NOTICE, …): a strict
+  `dart pub publish --dry-run` that tolerates exactly the known
+  `documentation/` submodule warning and nothing else, so packaging errors
+  are caught before a release tag.
+
+Off-PR cadence: **OS matrix** (`os-matrix.yaml`, weekly + on demand via
+`gh workflow run os-matrix.yaml`) runs the full package suite on macOS and
+Windows (text goldens get the lenient off-Linux bound), the dart:io-free
+suites on the web platform (`--platform chrome`, goldens skipped), and the
+gallery's `integration_test/` smoke driven in a real browser — the same
+configuration the deployed gallery ships.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by
@@ -154,6 +182,10 @@ We deliberately do **not** use pub.dev's reusable publish workflow: it checks
 out with `submodules: false` and runs a strict dry-run that fails on the
 expected "the `documentation/` submodules are excluded from the package"
 warning. `--force` publishes through that warning (it is not an error).
+The gap that leaves — a real packaging error surfacing only at tag time — is
+covered by the **Publish rehearsal** workflow, which runs the strict dry-run
+on every PR that touches packaging inputs and fails on anything beyond the
+known submodule warning.
 
 **One-time setup (required for the action to work).** Automated publishing only
 works once `carbide` is registered as a trusted publisher: on pub.dev →
