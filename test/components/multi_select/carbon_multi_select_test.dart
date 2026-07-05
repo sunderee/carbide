@@ -117,6 +117,52 @@ void main() {
     });
   });
 
+  group('row centering (#262)', () {
+    Future<void> expectCenteredRows(WidgetTester tester) async {
+      await tester.tap(find.byType(CarbonListBox));
+      await tester.pump();
+      final Finder rows = find.byType(CarbonListBoxMenuItem);
+      expect(rows, findsNWidgets(4));
+      for (int i = 0; i < 4; i++) {
+        final Finder row = rows.at(i);
+        final Finder checkbox = find.descendant(
+          of: row,
+          matching: find.byType(CarbonCheckbox),
+        );
+        expect(
+          tester.getCenter(checkbox).dy,
+          moreOrLessEquals(tester.getCenter(row).dy, epsilon: 1),
+          reason: 'row $i',
+        );
+      }
+    }
+
+    testWidgets('option checkboxes centre in their menu rows', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(stateful());
+      await expectCenteredRows(tester);
+    });
+
+    testWidgets('option checkboxes centre in the 64px fluid rows', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMultiSelect<String>(
+            titleText: 'Fruit',
+            label: 'Choose fruit',
+            fluid: true,
+            selectedValues: const <String>{'a'},
+            onChanged: (Set<String> _) {},
+            items: _items,
+          ),
+        ),
+      );
+      await expectCenteredRows(tester);
+    });
+  });
+
   group('keyboard', () {
     testWidgets('Down opens; arrows move; Space toggles; Escape closes', (
       WidgetTester tester,

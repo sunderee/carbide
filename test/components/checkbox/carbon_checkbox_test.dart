@@ -98,6 +98,34 @@ void main() {
     });
   });
 
+  group('bounded-row centering (#262)', () {
+    testWidgets('a labeled checkbox stays content-height in a bounded, '
+        'taller parent', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            height: 64,
+            child: Container(
+              alignment: AlignmentDirectional.centerStart,
+              child: const CarbonCheckbox(label: 'Read', value: true),
+            ),
+          ),
+        ),
+      );
+      // The Align inside the label layout must not inflate to fill the row
+      // (it used to, pinning the box to the top of list-box menu rows).
+      final Size checkbox = tester.getSize(find.byType(CarbonCheckbox));
+      expect(checkbox.height, lessThan(32));
+      expect(
+        tester.getCenter(find.byType(CarbonCheckbox)).dy,
+        moreOrLessEquals(
+          tester.getCenter(find.byType(Container)).dy,
+          epsilon: 1,
+        ),
+      );
+    });
+  });
+
   group('semantics (tri-state)', () {
     testWidgets('unchecked / checked / indeterminate(mixed)', (
       WidgetTester tester,

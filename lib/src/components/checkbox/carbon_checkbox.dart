@@ -124,8 +124,13 @@ class CarbonCheckbox extends StatelessWidget {
             children: <Widget>[
               SizedBox(
                 width: labelOffset,
+                // heightFactor keeps the Align from inflating to fill a
+                // bounded parent (a list-box row would otherwise pin the
+                // whole checkbox to its top); the box still tops-align to
+                // the first label line via the Row's crossAxisAlignment.
                 child: Align(
                   alignment: AlignmentDirectional.topStart,
+                  heightFactor: 1,
                   child: box,
                 ),
               ),
