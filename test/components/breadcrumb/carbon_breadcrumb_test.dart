@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -78,6 +79,20 @@ void main() {
       await tester.pumpWidget(_host(CarbonBreadcrumb(items: crumbs((_) {}))));
       expect(find.bySemanticsLabel('Breadcrumb'), findsOneWidget);
       expect(find.bySemanticsLabel('Home'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(CarbonBreadcrumb(items: crumbs((_) {}))));
+      // Crumbs are text-height CarbonLinks; nodes flagged `isLink` are
+      // exempt from the 48dp rule (WCAG 2.1 target-size link exception,
+      // applied by androidTapTargetGuideline itself), so both axes stay on.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

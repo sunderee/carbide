@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -314,6 +315,43 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Option')),
         isSemantics(isChecked: true, isEnabled: true),
       );
+      handle.dispose();
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonClickableTile(
+                onPressed: () {},
+                child: const Text('Clickable'),
+              ),
+              const SizedBox(height: 8),
+              CarbonSelectableTile(
+                selected: false,
+                onChanged: (_) {},
+                child: const Text('Selectable'),
+              ),
+              const SizedBox(height: 8),
+              CarbonRadioTile(
+                selected: true,
+                onSelected: () {},
+                child: const Text('Radio'),
+              ),
+            ],
+          ),
+        ),
+      );
+      // Interactive tiles are 128×64 minimum (`_tile.scss`), comfortably
+      // above the 48dp Android tap-target guideline.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

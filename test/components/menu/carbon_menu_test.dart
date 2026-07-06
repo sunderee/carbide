@@ -5,10 +5,12 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// OverlayPortal (submenus) needs an Overlay ancestor.
@@ -695,6 +697,57 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pumpAndSettle();
       expect(find.text('Email'), findsNothing);
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[
+              CarbonMenuItem(label: 'Cut', onPressed: () {}),
+              CarbonMenuItem(label: 'Copy', onPressed: () {}),
+              CarbonMenuItem(label: 'Paste', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      // Tap targets are off: menu rows are 32px by upstream default
+      // (`.cds--menu-item { block-size: 2rem }` in documentation/carbon/
+      // packages/styles/scss/components/menu/_menu.scss), so 48dp is
+      // unattainable at the default `sm` size.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
+    });
+
+    testWidgets('traversal visits items in source order', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[
+              CarbonMenuItem(label: 'One', onPressed: () {}),
+              CarbonMenuItem(label: 'Two', onPressed: () {}),
+              CarbonMenuItem(label: 'Three', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      final List<String> labels = tester.semantics
+          .simulatedAccessibilityTraversal()
+          .map((SemanticsNode n) => n.label)
+          .where((String l) => l.isNotEmpty)
+          .toList();
+      expect(labels, containsAllInOrder(<String>['One', 'Two', 'Three']));
+      handle.dispose();
     });
   });
 

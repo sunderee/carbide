@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -285,6 +286,22 @@ void main() {
         _host(CarbonPaginationNav(totalItems: 5, page: 2, onChange: (_) {})),
       );
       expect(find.bySemanticsLabel('Page 3 of 5'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // Default size is lg (48px, `_pagination-nav.scss` layout default
+      // 'lg' and $button-direction-size: $spacing-09), so the 48dp gate
+      // stays fully on. A middle page keeps both arrows enabled.
+      await tester.pumpWidget(
+        _host(CarbonPaginationNav(totalItems: 5, page: 2, onChange: (_) {})),
+      );
+      await expectA11y(tester);
       handle.dispose();
     });
   });

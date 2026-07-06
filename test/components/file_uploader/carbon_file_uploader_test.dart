@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -280,6 +281,33 @@ void main() {
       expect(find.text('Max 5 files, 500kb each.'), findsOneWidget);
       expect(find.text('a.pdf'), findsOneWidget);
       expect(find.text('b.pdf'), findsOneWidget);
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonFileUploader(
+            labelTitle: 'Upload files',
+            labelDescription: 'Max 5 files, 500kb each.',
+            items: <CarbonFileUploaderItem>[
+              CarbonFileUploaderItem(name: 'report.pdf', onDelete: () {}),
+            ],
+            child: CarbonFileUploaderButton(
+              label: 'Add files',
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+      // The md trigger button is 40px (`_button.scss` layout md) and the md
+      // item row 40px (`_file-uploader.scss` `.cds--file__selected-file--md
+      // { min-block-size: convert.to-rem(40px) }`), so the 48dp android
+      // guideline is unattainable at the default size.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

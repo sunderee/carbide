@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -99,6 +100,59 @@ void main() {
       );
       await tester.tap(find.text('Add'));
       expect(added, 1);
+    });
+  });
+
+  group('traversal order (#226)', () {
+    testWidgets('reads toolbar controls, then column headers, then the '
+        'first row', (WidgetTester tester) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonTableToolbar(
+                onSearchChanged: (_) {},
+                overflowItems: <Widget>[
+                  CarbonMenuItem(label: 'Settings', onPressed: () {}),
+                ],
+                actions: <Widget>[
+                  CarbonButton(label: 'Add new', onPressed: () {}),
+                ],
+              ),
+              const CarbonDataTable(
+                columns: <CarbonTableColumn>[
+                  CarbonTableColumn(title: 'Name'),
+                  CarbonTableColumn(title: 'Status'),
+                ],
+                rows: <CarbonTableRow>[
+                  CarbonTableRow(
+                    cells: <Widget>[Text('Load'), Text('Running')],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      final List<String> labels = <String>[
+        for (final SemanticsNode node
+            in tester.semantics.simulatedAccessibilityTraversal())
+          if (node.label.isNotEmpty) node.label,
+      ];
+      expect(
+        labels,
+        containsAllInOrder(<String>[
+          'Expand search',
+          'Table settings',
+          'Add new',
+          'Name',
+          'Status',
+          'Load',
+        ]),
+      );
+      handle.dispose();
     });
   });
 

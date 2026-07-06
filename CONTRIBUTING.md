@@ -88,6 +88,29 @@ suites on the web platform (`--platform chrome`, goldens skipped), and the
 gallery's `integration_test/` smoke driven in a real browser — the same
 configuration the deployed gallery ships.
 
+### Accessibility gates
+
+Two machine-checked gates back the DoD's accessibility bullet (#226):
+
+- **Token-pair contrast** (`test/theme/contrast_test.dart`): every
+  (foreground, background) token pairing components render is swept per
+  theme against WCAG 2.1 — ≥4.5:1 for text, ≥3:1 for meaningful non-text.
+  Upstream-inherited exceptions (placeholder text is 40%-alpha by
+  definition; the dark themes' `layer03` pairings) live in an allowlist
+  that cites `documentation/carbon/packages/themes/src`; an entry whose
+  pair starts passing again fails the sweep until removed. New tokens or
+  new pairings belong in the sweep, not around it.
+- **Guideline matchers**: each interactive component's test file calls
+  `expectA11y(tester)` from `test/support/a11y.dart`, running Flutter's
+  `androidTapTargetGuideline` (48×48dp) and `labeledTapTargetGuideline`.
+  Carbon deliberately ships sub-48dp densities (fields are 40px, menu
+  items 32px, tags 24px); where that makes the tap-target guideline
+  unattainable at the default size, the test keeps the label check and
+  carries a comment citing the SCSS size — never silently omit the gate.
+  Composite components (modal, menu, data table, form, UI shell) also
+  assert reading order via
+  `tester.semantics.simulatedAccessibilityTraversal()`.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by

@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// The trailing selects mount an OverlayPortal, so the picker needs an Overlay
@@ -24,8 +25,12 @@ Widget _host(Widget child) => Directionality(
               builder: (BuildContext context) => Stack(
                 children: <Widget>[
                   Positioned.fill(
+                    // Tap-outside backdrop is test scaffolding; keep it out
+                    // of the semantics tree so a11y sweeps only see the
+                    // picker.
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
+                      excludeFromSemantics: true,
                       onTap: () {},
                     ),
                   ),
@@ -135,6 +140,34 @@ void main() {
         tester.getSemantics(find.byType(EditableText)),
         isSemantics(label: 'Appointment time', isTextField: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The md field is 40px (_time-picker.scss block-size:
+      // convert.to-rem(40px)) — below the 48dp android guideline, so pump
+      // the real lg (48px) variant instead.
+      await tester.pumpWidget(
+        _host(
+          CarbonTimePicker(
+            labelText: 'Time',
+            size: CarbonFieldSize.lg,
+            children: <Widget>[
+              CarbonTimePickerSelect<String>(
+                labelText: 'AM/PM',
+                value: 'AM',
+                size: CarbonFieldSize.lg,
+                items: _periods(),
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+      await expectA11y(tester);
       handle.dispose();
     });
   });

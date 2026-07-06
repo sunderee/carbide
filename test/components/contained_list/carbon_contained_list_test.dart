@@ -9,6 +9,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -307,6 +308,35 @@ void main() {
           child: Align(alignment: Alignment.topCenter, child: sample()),
         ),
       );
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // Clickable rows gate both axes at the default size: list items are
+      // `layout.use('size', $default: 'lg')` = 48px (`_contained-list.scss`).
+      await tester.pumpWidget(
+        _host(
+          CarbonContainedList(
+            label: const Text('Files'),
+            children: <Widget>[
+              CarbonContainedListItem(
+                onPressed: () {},
+                child: const Text('One'),
+              ),
+              CarbonContainedListItem(
+                onPressed: () {},
+                child: const Text('Two'),
+              ),
+            ],
+          ),
+        ),
+      );
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 }

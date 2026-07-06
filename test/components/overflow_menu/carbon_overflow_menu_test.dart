@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion needs a surface + a
@@ -21,10 +22,14 @@ Widget _host(Widget child) => Directionality(
           OverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
+                // The backdrop is a hit-test aid, not UI: keep it out of the
+                // semantics tree so a11y sweeps only see the component.
                 Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {},
+                  child: ExcludeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {},
+                    ),
                   ),
                 ),
                 Center(child: child),
@@ -147,6 +152,24 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       expect(ran, 'del');
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(CarbonOverflowMenu(items: items((_) {}))));
+      await tester.tap(find.byType(CarbonButton));
+      await tester.pumpAndSettle();
+      // Tap targets are off: upstream sizes the trigger 40px
+      // (`.cds--overflow-menu { block-size: $spacing-08 }` in
+      // documentation/carbon/packages/styles/scss/components/
+      // overflow-menu/_overflow-menu.scss) and the open menu rows 32px
+      // (`_menu.scss` `block-size: 2rem`), so 48dp is unattainable.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -297,6 +298,44 @@ void main() {
         find.byType(AnimatedOpacity).last,
       );
       expect(opacity.duration, Duration.zero);
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonDialog(
+            open: true,
+            children: <Widget>[
+              ..._slots(onClose: () {}),
+              CarbonDialogFooter(
+                children: <Widget>[
+                  CarbonButton(
+                    label: 'Cancel',
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.xl,
+                    onPressed: () {},
+                  ),
+                  CarbonButton(
+                    label: 'Save',
+                    size: CarbonButtonSize.xl,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // The 48px close button (`--dialog__close`) and the 64px footer
+      // buttons all clear the 48dp guideline; the backdrop is inert.
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 

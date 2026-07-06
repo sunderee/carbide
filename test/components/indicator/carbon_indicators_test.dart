@@ -185,6 +185,35 @@ void main() {
     });
   });
 
+  group('semantics (#226)', () {
+    testWidgets('icon and shape indicators expose their status as a '
+        'semantic label', (WidgetTester tester) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // Status conveyed by shape + label is the whole point of these
+      // indicators; the label must therefore reach assistive technology.
+      await tester.pumpWidget(
+        _host(
+          const CarbonIconIndicator(
+            kind: CarbonIconIndicatorKind.failed,
+            label: 'Failed',
+          ),
+        ),
+      );
+      expect(find.bySemanticsLabel('Failed'), findsOneWidget);
+
+      await tester.pumpWidget(
+        _host(
+          const CarbonShapeIndicator(
+            kind: CarbonShapeIndicatorKind.stable,
+            label: 'Stable',
+          ),
+        ),
+      );
+      expect(find.bySemanticsLabel('Stable'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
   group('goldens', () {
     Widget column(List<Widget> rows) => Padding(
       padding: const EdgeInsets.all(8),

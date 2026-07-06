@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -178,6 +179,36 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Guidelines')),
         isSemantics(label: 'Guidelines', isLink: true, isEnabled: true),
       );
+      handle.dispose();
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonLink(label: 'Standalone', onPressed: () {}),
+              CarbonLink(
+                label: 'With icon',
+                icon: CarbonIcons.launch,
+                onPressed: () {},
+              ),
+              CarbonLink(label: 'Inline', inline: true, onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      // Links are text-height by design (`_link.scss` sets no min
+      // block-size); nodes flagged `isLink` are exempt from the 48dp rule
+      // (WCAG 2.1 target-size link exception, applied by
+      // androidTapTargetGuideline itself), so both axes stay on.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

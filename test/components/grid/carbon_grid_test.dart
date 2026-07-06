@@ -31,6 +31,7 @@ Future<void> _pump(WidgetTester tester, double width, Widget grid) async {
 }
 
 void main() {
+  // Layout-only: no semantics surface (#226).
   group('spec-lock', () {
     testWidgets('a column spans a fraction of the grid at lg (16 cols)', (
       WidgetTester tester,
