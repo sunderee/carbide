@@ -55,8 +55,10 @@ void main() {
         alignment: AlignmentDirectional.topStart,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          // 720, not 700: Linux FreeType glyph advances run ~8px wider
+          // than CoreText for this label set.
           child: SizedBox(
-            width: 700,
+            width: 720,
             child: CarbonPagination(
               page: 2,
               pageSize: 10,
