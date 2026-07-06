@@ -143,6 +143,19 @@ between machines. Vector geometry renders identically across platforms, but
   (`gh workflow run regenerate-goldens.yml --ref <branch>`), which runs
   `--update-goldens` on Linux and commits the result back to the branch. The
   bot commit does not retrigger CI; pull and push (or open the PR) afterwards.
+- When the loose off-Linux path saves a text comparison, the comparator
+  prints a loud `LOOSE text-golden tolerance applied` notice — treat a
+  local off-Linux pass of a text golden as non-authoritative by definition.
+- **Small-surface goldens** should pass `strict: true`
+  (`<name>.strict.…png`, 0.05% bound): the default 0.5% is whole feature
+  rows of pixels on a 32×32 tile.
+- **DPR canaries** (`test/harness/dpr_canaries_test.dart`) render the
+  hairline-heavy primitives through a 1.5× scale
+  (`devicePixelRatio: 1.5`), pinning fractional-DPR anti-aliasing that
+  1.0-DPR goldens cannot see. **Narrow-width goldens**
+  (`test/harness/responsive_width_test.dart`) pin the 320px wrap/collapse
+  behavior of the responsive components. Add to both when a new component
+  is hairline-heavy or responsive.
 
 ### RTL goldens
 

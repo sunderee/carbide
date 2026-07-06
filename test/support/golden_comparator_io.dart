@@ -44,8 +44,14 @@ void installCarbideGoldenComparator({required bool skipGoldens}) {
 ///   authoritative; use the “Regenerate goldens” workflow) and compared
 ///   strictly there; on other platforms they get a lenient bound that still
 ///   catches gross errors (missing text, wrong layout) without false
-///   failures from rasterizer differences.
-/// - All other goldens use a small tolerance everywhere.
+///   failures from rasterizer differences. When that loose path saves a
+///   comparison, a loud notice is printed — an off-Linux local pass of a
+///   text golden is NOT authoritative (#236).
+/// - Goldens whose name contains `.strict.` allow only 0.05% differing
+///   pixels (#236): the default 0.5% is ~5px on a 32×32 tile — a whole
+///   checkmark row — so small-surface and hairline canaries opt into the
+///   tight bound via `expectThemeGoldens(strict: true)`.
+/// - All other goldens use the small default tolerance everywhere.
 class _CarbideGoldenComparator extends LocalFileComparator {
   _CarbideGoldenComparator(Uri baseDir)
     : super(Uri.parse('$baseDir$_dummyTestFile'));
@@ -57,11 +63,15 @@ class _CarbideGoldenComparator extends LocalFileComparator {
   // Fractions (0..1) of pixels allowed to differ. `diffPercent` is reported
   // as a fraction by the framework, so 0.005 is 0.5%.
   static const double _maxDiffFraction = 0.005;
+  static const double _maxStrictDiffFraction = 0.0005;
   static const double _maxTextDiffFractionOffCi = 0.15;
 
   static double _toleranceFor(Uri golden) {
     if (golden.path.contains('.text.') && !Platform.isLinux) {
       return _maxTextDiffFractionOffCi;
+    }
+    if (golden.path.contains('.strict.')) {
+      return _maxStrictDiffFraction;
     }
     return _maxDiffFraction;
   }
@@ -72,7 +82,19 @@ class _CarbideGoldenComparator extends LocalFileComparator {
       imageBytes,
       await getGoldenBytes(golden),
     );
-    if (result.passed || result.diffPercent <= _toleranceFor(golden)) {
+    if (result.passed) {
+      return true;
+    }
+    if (result.diffPercent <= _toleranceFor(golden)) {
+      if (golden.path.contains('.text.') && !Platform.isLinux) {
+        debugPrint(
+          'carbide: LOOSE text-golden tolerance applied to '
+          '${golden.pathSegments.last} '
+          '(${(result.diffPercent * 100).toStringAsFixed(2)}% differing '
+          'pixels; limit 15%). This platform is not authoritative for text '
+          'goldens — only the Linux CI comparison validates them.',
+        );
+      }
       return true;
     }
     final String error = await generateFailureOutput(result, golden, basedir);
