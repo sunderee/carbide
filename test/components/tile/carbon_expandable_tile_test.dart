@@ -62,6 +62,68 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('spec tokens match _tile.scss', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonExpandableTile(
+            expanded: false,
+            onExpandedChanged: (_) {},
+            aboveTheFold: const Text('above'),
+            belowTheFold: const Text('below'),
+          ),
+        ),
+      );
+      // `__chevron svg`: transform $duration-fast-02
+      // motion(standard, productive).
+      final AnimatedRotation chevron = tester.widget(
+        find.byType(AnimatedRotation),
+      );
+      expect(chevron.duration, CarbonDuration.fast02);
+      expect(chevron.curve, CarbonEasing.standardProductive);
+      // `--tile--expandable`: max-height $duration-moderate-01
+      // motion(standard, productive).
+      final TweenAnimationBuilder<double> fold = tester.widget(
+        find.byType(TweenAnimationBuilder<double>),
+      );
+      expect(fold.duration, CarbonDuration.moderate01);
+      expect(fold.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion snaps the fold and chevron', (
+      WidgetTester tester,
+    ) async {
+      Widget tree(bool expanded) => _host(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: CarbonExpandableTile(
+            expanded: expanded,
+            onExpandedChanged: (_) {},
+            aboveTheFold: const Text('above'),
+            belowTheFold: const Text('below'),
+          ),
+        ),
+      );
+      await tester.pumpWidget(tree(false));
+      expect(
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).duration,
+        Duration.zero,
+      );
+      expect(
+        tester
+            .widget<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>),
+            )
+            .duration,
+        Duration.zero,
+      );
+      // The below-the-fold content is fully revealed on the next frame.
+      await tester.pumpWidget(tree(true));
+      await tester.pump();
+      expect(_belowOpacity(tester), 1);
+    });
+  });
+
   group('spec locks (_tile.scss expandable + chevron)', () {
     testWidgets('chevron container is 48px and rotates 180° when expanded', (
       WidgetTester tester,

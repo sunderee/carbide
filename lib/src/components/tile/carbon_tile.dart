@@ -93,7 +93,8 @@ class CarbonTile extends StatelessWidget {
 /// Hover fills the contextual `layerHover` token, keyboard focus shows the
 /// 2px inset focus outline, and the optional [icon] renders 20px at the
 /// bottom-right in `iconInteractive` (`iconDisabled` when disabled). The
-/// background transitions at `moderate-01` × standard-productive.
+/// background transitions at `moderate-01` × standard-productive, or
+/// instantly when the platform requests reduced motion.
 class CarbonClickableTile extends StatelessWidget {
   /// Creates a clickable tile.
   const CarbonClickableTile({
@@ -130,6 +131,8 @@ class CarbonClickableTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onPressed != null;
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     return Semantics(
       button: true,
@@ -147,8 +150,12 @@ class CarbonClickableTile extends StatelessWidget {
 
           return CarbonFocusRing(
             visible: focused,
+            // Background per `_tile.scss` `--tile--clickable`:
+            // $duration-moderate-01 motion(standard, productive).
             child: AnimatedContainer(
-              duration: CarbonDuration.moderate01,
+              duration: reducedMotion
+                  ? Duration.zero
+                  : CarbonDuration.moderate01,
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,
@@ -199,7 +206,8 @@ class CarbonClickableTile extends StatelessWidget {
 ///
 /// Shows a 16px checkmark at the top-right — `checkbox` outline in
 /// `iconSecondary` while hovered/focused, `checkbox--checked--filled` in
-/// `iconPrimary` when selected — fading at `fast-02` × standard-productive.
+/// `iconPrimary` when selected — fading at `fast-02` × standard-productive
+/// (instantly when the platform requests reduced motion).
 /// Selection draws a 1px `layerSelectedInverse` border
 /// (`layerSelectedDisabled` when disabled). Single-select tiles (upstream
 /// `RadioTile`) arrive with the radio-button visuals.
@@ -248,6 +256,8 @@ class CarbonSelectableTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onChanged != null;
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     return Semantics(
       checked: selected,
@@ -274,8 +284,12 @@ class CarbonSelectableTile extends StatelessWidget {
 
           return CarbonFocusRing(
             visible: focused,
+            // Background/border per `_tile.scss`: $duration-moderate-01
+            // motion(standard, productive).
             child: AnimatedContainer(
-              duration: CarbonDuration.moderate01,
+              duration: reducedMotion
+                  ? Duration.zero
+                  : CarbonDuration.moderate01,
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,
@@ -306,8 +320,13 @@ class CarbonSelectableTile extends StatelessWidget {
                   PositionedDirectional(
                     top: 0,
                     end: CarbonTileSpec.padding - endPadding,
+                    // Checkmark fade per `_tile.scss` `__checkmark`:
+                    // opacity $duration-fast-02
+                    // motion(standard, productive).
                     child: AnimatedOpacity(
-                      duration: CarbonDuration.fast02,
+                      duration: reducedMotion
+                          ? Duration.zero
+                          : CarbonDuration.fast02,
                       curve: CarbonEasing.standardProductive,
                       opacity: checkmarkVisible ? 1 : 0,
                       child: CarbonIcon(

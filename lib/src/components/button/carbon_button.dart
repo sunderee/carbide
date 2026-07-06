@@ -91,7 +91,8 @@ enum CarbonButtonSize {
 /// A null [onPressed] renders the disabled state. Geometry follows the
 /// upstream spec exactly: fixed height per [size], max width 320, 1px border,
 /// text and icon vertically centered up to [CarbonButtonSize.lg] and pinned
-/// to the top above it.
+/// to the top above it. When the platform requests reduced motion, the
+/// hover/press fill transition completes instantly.
 class CarbonButton extends StatelessWidget {
   /// Creates a Carbon button with a text [label] and an optional trailing
   /// [icon].
@@ -380,8 +381,12 @@ class _ButtonSurface extends StatelessWidget {
       }
     }
 
+    // Fill per `button/_mixins.scss`: background / box-shadow /
+    // border-color / outline $duration-fast-01 motion(entrance, productive).
     return AnimatedContainer(
-      duration: CarbonDuration.fast01,
+      duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+          ? Duration.zero
+          : CarbonDuration.fast01,
       curve: CarbonEasing.entranceProductive,
       // The spec height is a minimum, not a ceiling: under text scaling
       // the label's line box may exceed the fixed chrome, and the button

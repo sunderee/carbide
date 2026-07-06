@@ -24,6 +24,8 @@ import '../../utils/focus_ring.dart';
 
 /// A right-side panel under the header that slides open (0 → 256px), hosting a
 /// [CarbonSwitcher] or notification content.
+///
+/// When the platform requests reduced motion, the slide completes instantly.
 class CarbonHeaderPanel extends StatelessWidget {
   /// Creates a header panel.
   const CarbonHeaderPanel({
@@ -49,9 +51,13 @@ class CarbonHeaderPanel extends StatelessWidget {
       container: true,
       explicitChildNodes: true,
       label: label,
+      // Slide per `_header-panel.scss`: width $duration-fast-02
+      // motion(exit, productive).
       child: AnimatedContainer(
-        duration: CarbonDuration.fast02,
-        curve: CarbonEasing.standardProductive,
+        duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+            ? Duration.zero
+            : CarbonDuration.fast02,
+        curve: CarbonEasing.exitProductive,
         width: open ? 256 : 0,
         decoration: BoxDecoration(
           color: layer.layer,

@@ -54,6 +54,9 @@ class _AccordionScope extends InheritedWidget {
 
 /// A list of collapsible [CarbonAccordionItem]s.
 ///
+/// When the platform requests reduced motion, the fold, chevron, and hover
+/// transitions complete instantly.
+///
 /// ```dart
 /// CarbonAccordion(
 ///   children: <Widget>[
@@ -167,15 +170,22 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
         (scope?.align ?? CarbonAccordionAlign.end) ==
         CarbonAccordionAlign.start;
     final bool enabled = !widget.disabled;
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final Duration fast02 = reducedMotion
+        ? Duration.zero
+        : CarbonDuration.fast02;
 
     final Color titleColor = widget.disabled
         ? theme.textDisabled
         : theme.textPrimary;
 
-    // ChevronRight rotates a quarter-turn to point down when open.
+    // ChevronRight rotates a quarter-turn to point down when open
+    // (`_accordion.scss` `__arrow`: all $duration-fast-02
+    // motion(standard, productive)).
     final Widget chevron = AnimatedRotation(
       turns: _isOpen ? 0.25 : 0,
-      duration: CarbonDuration.fast02,
+      duration: fast02,
       curve: CarbonEasing.standardProductive,
       child: CarbonIcon(
         CarbonIcons.chevronRight,
@@ -211,8 +221,10 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
             child: CarbonFocusRing(
               visible: _focused,
               inset: true,
+              // Hover fill per `_accordion.scss` `__heading:hover`:
+              // background motion(standard, productive) $duration-fast-02.
               child: AnimatedContainer(
-                duration: CarbonDuration.fast02,
+                duration: fast02,
                 curve: CarbonEasing.standardProductive,
                 constraints: BoxConstraints(minHeight: size.height),
                 color: enabled && _hovered
@@ -238,10 +250,12 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
       ),
     );
 
+    // Body fold per `_accordion.scss` `__wrapper`: all $duration-fast-02
+    // motion(entrance, productive).
     final Widget body = TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: _isOpen ? 1 : 0),
-      duration: CarbonDuration.fast02,
-      curve: CarbonEasing.standardProductive,
+      duration: fast02,
+      curve: CarbonEasing.entranceProductive,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(
           alignment: AlignmentDirectional.topStart,

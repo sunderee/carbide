@@ -38,6 +38,40 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('selection transition tokens', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(const CarbonContentSwitcher(switches: _switches)),
+      );
+      // `_content-switcher.scss` cites no transition tokens; Carbide uses
+      // fast-01 × standard-productive for this micro-interaction.
+      final AnimatedDefaultTextStyle segment = tester.widget(
+        find.byType(AnimatedDefaultTextStyle).first,
+      );
+      expect(segment.duration, CarbonDuration.fast01);
+      expect(segment.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion is instant', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: CarbonContentSwitcher(switches: _switches),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedDefaultTextStyle>(
+              find.byType(AnimatedDefaultTextStyle).first,
+            )
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   Color segmentColor(WidgetTester tester, String label) =>
       (tester
                   .widget<Container>(

@@ -48,6 +48,54 @@ Color _rowColor(WidgetTester tester, String cell) =>
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
+  group('motion', () {
+    testWidgets('row fill tokens match _data-table.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonDataTable(columns: _columns, rows: _rows())),
+      );
+      // `tbody tr`: background-color $duration-fast-01
+      // motion(entrance, productive).
+      final AnimatedContainer row = tester.widget(
+        find
+            .ancestor(
+              of: find.text('Load'),
+              matching: find.byType(AnimatedContainer),
+            )
+            .first,
+      );
+      expect(row.duration, CarbonDuration.fast01);
+      expect(row.curve, CarbonEasing.entranceProductive);
+    });
+
+    testWidgets('reduced motion fills rows instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonDataTable(columns: _columns, rows: _rows()),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(
+              find
+                  .ancestor(
+                    of: find.text('Load'),
+                    matching: find.byType(AnimatedContainer),
+                  )
+                  .first,
+            )
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('structure', () {
     testWidgets('renders header + cells; title and description', (
       WidgetTester tester,

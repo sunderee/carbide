@@ -47,6 +47,40 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('fill tokens match button/_mixins.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonButton(label: 'Go', onPressed: () {})),
+      );
+      // background / box-shadow / border-color / outline $duration-fast-01
+      // motion(entrance, productive).
+      final AnimatedContainer fill = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(fill.duration, CarbonDuration.fast01);
+      expect(fill.curve, CarbonEasing.entranceProductive);
+    });
+
+    testWidgets('reduced motion fills instantly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonButton(label: 'Go', onPressed: () {}),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('spec locks (styles/scss/components/button)', () {
     testWidgets('heights per size (layout sizes, _button.scss)', (
       WidgetTester tester,

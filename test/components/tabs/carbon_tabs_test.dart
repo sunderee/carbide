@@ -45,6 +45,40 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('tab transition tokens match _tabs.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
+      );
+      // `__nav-item`: color / border-bottom-color / outline
+      // $duration-fast-01 motion(standard, productive).
+      final AnimatedContainer tab = tester.widget(
+        find.byType(AnimatedContainer).first,
+      );
+      expect(tab.duration, CarbonDuration.fast01);
+      expect(tab.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion is instant', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: CarbonTabs(tabs: _tabs, panels: _panels),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer).first)
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   BoxDecoration decorationOf(WidgetTester tester, String label) =>
       tester
               .widget<AnimatedContainer>(

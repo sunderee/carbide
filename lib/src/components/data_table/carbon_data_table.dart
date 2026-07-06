@@ -126,6 +126,9 @@ class CarbonTableBatchAction {
 
 /// A Carbon data table.
 ///
+/// When the platform requests reduced motion, the row hover fill, row
+/// expansion, and batch-actions bar transitions complete instantly.
+///
 /// ```dart
 /// CarbonDataTable(
 ///   title: 'Routines',
@@ -660,9 +663,13 @@ class _BodyRowState extends State<_BodyRow> {
     Widget content = MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
+      // Row fill per `_data-table.scss` `tbody tr`: background-color
+      // $duration-fast-01 motion(entrance, productive).
       child: AnimatedContainer(
-        duration: CarbonDuration.fast01,
-        curve: CarbonEasing.standardProductive,
+        duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+            ? Duration.zero
+            : CarbonDuration.fast01,
+        curve: CarbonEasing.entranceProductive,
         decoration: BoxDecoration(
           color: background,
           // 1px border-subtle row divider (suppressed on the last row when the
@@ -784,9 +791,15 @@ class _ExpandChevronState extends State<_ExpandChevron> {
                 inset: true,
                 child: SizedBox.square(
                   dimension: 24,
+                  // Chevron per `_data-table-expandable.scss`
+                  // `__expand__svg`: transform $duration-moderate-01
+                  // motion(standard, productive).
                   child: AnimatedRotation(
                     turns: widget.expanded ? 0.25 : 0,
-                    duration: CarbonDuration.fast02,
+                    duration:
+                        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                        ? Duration.zero
+                        : CarbonDuration.moderate01,
                     curve: CarbonEasing.standardProductive,
                     child: CarbonIcon(
                       CarbonIcons.chevronRight,
@@ -819,9 +832,13 @@ class _ExpandedDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    // Detail fold per `_data-table-expandable.scss` `tr[data-child-row]`:
+    // height $duration-moderate-01 motion(standard, productive).
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
-      duration: CarbonDuration.moderate01,
+      duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+          ? Duration.zero
+          : CarbonDuration.moderate01,
       curve: CarbonEasing.standardProductive,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(
@@ -954,10 +971,14 @@ class _BatchHeader extends StatelessWidget {
     return Stack(
       children: <Widget>[
         header,
-        // Slide the bar down over the header when a selection exists.
+        // Slide the bar down over the header when a selection exists
+        // (`_data-table-action.scss` `--batch-actions`: transform
+        // $duration-fast-02 motion(standard, productive)).
         AnimatedSlide(
           offset: active ? Offset.zero : const Offset(0, -1),
-          duration: CarbonDuration.fast02,
+          duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+              ? Duration.zero
+              : CarbonDuration.fast02,
           curve: CarbonEasing.standardProductive,
           child: IgnorePointer(ignoring: !active, child: bar),
         ),

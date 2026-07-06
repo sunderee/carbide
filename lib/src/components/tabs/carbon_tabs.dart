@@ -67,7 +67,9 @@ class CarbonTab {
 /// A tabbed interface: a row of [tabs] with a matching panel each.
 ///
 /// Selection is controlled when [onChanged] is provided, otherwise managed
-/// internally. Left/Right (Home/End) move and activate tabs.
+/// internally. Left/Right (Home/End) move and activate tabs. When the
+/// platform requests reduced motion, tab state transitions complete
+/// instantly.
 ///
 /// ```dart
 /// CarbonTabs(
@@ -855,8 +857,14 @@ class _TabButtonState extends State<_TabButton> {
             child: CarbonFocusRing(
               visible: _focused,
               inset: true,
+              // State transition per `_tabs.scss` `__nav-item`: color /
+              // border-bottom-color / outline $duration-fast-01
+              // motion(standard, productive).
               child: AnimatedContainer(
-                duration: CarbonDuration.fast01,
+                duration:
+                    (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                    ? Duration.zero
+                    : CarbonDuration.fast01,
                 curve: CarbonEasing.standardProductive,
                 height: widget.size.height,
                 padding: const EdgeInsets.symmetric(

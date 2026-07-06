@@ -67,6 +67,60 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('expansion tokens match _data-table-expandable.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(const _Expandable()));
+      // `__expand__svg`: transform $duration-moderate-01
+      // motion(standard, productive).
+      final AnimatedRotation chevron = tester.widget(
+        find.byType(AnimatedRotation).first,
+      );
+      expect(chevron.duration, CarbonDuration.moderate01);
+      expect(chevron.curve, CarbonEasing.standardProductive);
+      // `tr[data-child-row]`: height $duration-moderate-01
+      // motion(standard, productive).
+      final TweenAnimationBuilder<double> detail = tester.widget(
+        find.byType(TweenAnimationBuilder<double>).first,
+      );
+      expect(detail.duration, CarbonDuration.moderate01);
+      expect(detail.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion expands instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: _Expandable(),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedRotation>(find.byType(AnimatedRotation).first)
+            .duration,
+        Duration.zero,
+      );
+      expect(
+        tester
+            .widget<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>).first,
+            )
+            .duration,
+        Duration.zero,
+      );
+      // The detail row is fully revealed on the next frame.
+      await tester.tap(find.bySemanticsLabel('Expand row 1'));
+      await tester.pump();
+      await tester.pump();
+      expect(_detailFactor(tester, 'Load balancer details'), 1);
+    });
+  });
+
   group('expansion', () {
     testWidgets('a chevron expands and collapses a row detail', (
       WidgetTester tester,

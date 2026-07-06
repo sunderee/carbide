@@ -45,6 +45,9 @@ class _SideNavScope extends InheritedWidget {
 
 /// The left navigation panel of the UI Shell.
 ///
+/// When the platform requests reduced motion, the collapse/expand
+/// transition completes instantly (in both panel and rail modes).
+///
 /// ```dart
 /// CarbonSideNav(
 ///   items: <Widget>[
@@ -222,9 +225,12 @@ class _CarbonSideNavState extends State<CarbonSideNav> {
         container: true,
         explicitChildNodes: true,
         label: 'Side navigation',
+        // The upstream `.cds--side-nav` inline-size transition: 0.11s
+        // cubic-bezier(0.2, 0, 1, 0.9) (`_side-nav.scss`, hardcoded — not a
+        // motion token).
         child: AnimatedContainer(
-          duration: CarbonDuration.moderate01,
-          curve: CarbonEasing.standardProductive,
+          duration: _reducedMotion ? Duration.zero : _expansion,
+          curve: _expansionCurve,
           width: widget.expanded ? 256 : 48,
           color: theme.background,
           child: _panel(expanded: widget.expanded),
@@ -479,6 +485,9 @@ class CarbonSideNavMenuItem extends StatelessWidget {
 }
 
 /// A collapsible side-nav menu grouping [children].
+///
+/// When the platform requests reduced motion, the fold and chevron snap
+/// instantly.
 class CarbonSideNavMenu extends StatefulWidget {
   /// Creates a side-nav menu.
   const CarbonSideNavMenu({
@@ -511,6 +520,11 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final Duration fast02 = reducedMotion
+        ? Duration.zero
+        : CarbonDuration.fast02;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -524,9 +538,11 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
             current: false,
             onTap: () => setState(() => _open = !_open),
             indent: 0,
+            // Chevron per `_side-nav.scss` `__submenu-chevron > svg`:
+            // transform $duration-fast-02 (no easing token cited).
             trailing: AnimatedRotation(
               turns: _open ? 0.5 : 0,
-              duration: CarbonDuration.fast02,
+              duration: fast02,
               curve: CarbonEasing.standardProductive,
               child: CarbonIcon(
                 CarbonIcons.chevronDown,
@@ -538,7 +554,7 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
         ),
         TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0, end: _open ? 1 : 0),
-          duration: CarbonDuration.fast02,
+          duration: fast02,
           curve: CarbonEasing.standardProductive,
           builder: (BuildContext context, double t, Widget? child) => ClipRect(
             child: Align(

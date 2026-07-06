@@ -29,6 +29,75 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('spec tokens match _tile.scss', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonRadioTile(
+            selected: true,
+            onSelected: () {},
+            aiLabel: const SizedBox.square(dimension: 8),
+            child: const Text('R'),
+          ),
+        ),
+      );
+      // Surface: $duration-moderate-01 motion(standard, productive).
+      final AnimatedContainer surface = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(surface.duration, CarbonDuration.moderate01);
+      expect(surface.curve, CarbonEasing.standardProductive);
+      // Indicator fade: opacity $duration-fast-02
+      // motion(standard, productive).
+      final AnimatedOpacity indicator = tester.widget(
+        find.byType(AnimatedOpacity),
+      );
+      expect(indicator.duration, CarbonDuration.fast02);
+      expect(indicator.curve, CarbonEasing.standardProductive);
+      // AI decorator slide (`--tile--radio` AI selectors):
+      // inset-inline-end $duration-fast-02 motion(standard, productive).
+      final AnimatedPositionedDirectional slide = tester.widget(
+        find.byType(AnimatedPositionedDirectional),
+      );
+      expect(slide.duration, CarbonDuration.fast02);
+      expect(slide.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion is instant', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonRadioTile(
+              selected: true,
+              onSelected: () {},
+              aiLabel: const SizedBox.square(dimension: 8),
+              child: const Text('R'),
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+      expect(
+        tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).duration,
+        Duration.zero,
+      );
+      expect(
+        tester
+            .widget<AnimatedPositionedDirectional>(
+              find.byType(AnimatedPositionedDirectional),
+            )
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('spec locks (_tile.scss radio-tile)', () {
     testWidgets('selected: layerSelectedInverse border + visible checkmark', (
       WidgetTester tester,
