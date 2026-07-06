@@ -238,7 +238,11 @@ class _Content extends StatelessWidget {
                       padding: const EdgeInsetsDirectional.only(
                         start: CarbonSpacing.spacing05,
                       ),
-                      child: header.pageActions,
+                      // Actions size to their content: a bare CarbonButton
+                      // would expand toward its 320px max under the row's
+                      // loose constraints (same guard as the data-table
+                      // batch bar).
+                      child: IntrinsicWidth(child: header.pageActions),
                     ),
                 ],
               ),
