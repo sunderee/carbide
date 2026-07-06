@@ -43,6 +43,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
           cache: true
 
       - name: Install dependencies
@@ -77,6 +79,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
           cache: true
 
       - name: Install dependencies

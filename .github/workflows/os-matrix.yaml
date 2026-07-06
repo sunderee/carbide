@@ -1,0 +1,123 @@
+name: OS matrix
+
+# Cross-platform behavioral runs (#233). PR CI stays Linux-only and fast;
+# this workflow proves the suite on the other engines on a weekly cadence
+# (and on demand via workflow_dispatch):
+#
+# - macOS + Windows: the full package suite. Text goldens are
+#   Linux-authoritative by design — the comparator grants them a lenient
+#   15% bound off-Linux, and non-text (vector) goldens render
+#   bit-identically everywhere, so no test is excluded.
+# - Web: the dart:io-free suites on the chrome platform with golden
+#   comparison disabled (browser pixels are not baselines), plus the gallery
+#   integration test driven in a real browser — the configuration the
+#   deployed gallery actually ships.
+
+on:
+  schedule:
+    # Mondays 05:30 UTC.
+    - cron: "30 5 * * 1"
+  workflow_dispatch:
+  # Self-validating: editing this workflow runs it once on the PR.
+  pull_request:
+    paths:
+      - .github/workflows/os-matrix.yaml
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    name: Package tests — ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+  web-smoke:
+    name: Package tests — web (chrome)
+    # `flutter test --platform chrome` currently hangs in the "loading"
+    # phase (reproduced on ubuntu CI and macOS at Flutter 3.44.4, even for
+    # a single suite) — tracked in #271. Bounded so a hang costs minutes,
+    # not the 6h default, and excluded from the PR self-validation trigger
+    # so the known-red check never gates a merge; the weekly/dispatch runs
+    # keep the signal. The gallery integration job below is the per-PR
+    # proof that Carbide executes on the web.
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # The icon fidelity sweep and pictogram suite read reference files via
+      # dart:io and cannot compile for the web. Scope is deliberately small
+      # (the dart:io-free foundations) until the loading-phase hang is
+      # fixed, so a future fix has a fast iteration loop.
+      - name: Run web-compilable suites
+        run: >
+          flutter test --platform chrome
+          --dart-define=CARBIDE_SKIP_GOLDENS=true
+          test/theme test/utils test/foundations
+
+  gallery-web-integration:
+    name: Gallery integration test — web
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Keep in sync with ci.yaml's pin (#233).
+          flutter-version: 3.44.4
+          cache: true
+
+      - name: Install dependencies
+        working-directory: example
+        run: flutter pub get
+
+      # ubuntu-latest runners preinstall Chrome + a matching chromedriver.
+      - name: Start chromedriver
+        run: chromedriver --port=4444 &
+
+      - name: Drive the gallery smoke test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/gallery_smoke_test.dart
+          -d web-server
