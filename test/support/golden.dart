@@ -120,13 +120,12 @@ Future<void> expectThemeGoldens(
         ),
       );
       if (devicePixelRatio != 1.0) {
+        // FittedBox lays the scene out at its logical [size] and paints
+        // it through an exact uniform scale into the enlarged surface —
+        // the same transform a fractional-DPR display applies.
         scene = SizedBox.fromSize(
           size: surface,
-          child: Transform.scale(
-            scale: devicePixelRatio,
-            alignment: AlignmentDirectional.topStart,
-            child: scene,
-          ),
+          child: FittedBox(fit: BoxFit.fill, child: scene),
         );
       }
       await tester.pumpWidget(

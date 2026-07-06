@@ -89,10 +89,12 @@ void main() {
         await tester.pumpAndSettle();
       },
       builder: (BuildContext context) => Center(
-        child: CarbonButton(
-          label: 'Focused',
-          focusNode: FocusNode(),
-          onPressed: () {},
+        child: IntrinsicWidth(
+          child: CarbonButton(
+            label: 'Focused',
+            focusNode: FocusNode(),
+            onPressed: () {},
+          ),
         ),
       ),
     );
