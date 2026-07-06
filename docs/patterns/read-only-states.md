@@ -65,7 +65,7 @@ CarbonTextInput(
 const SizedBox(height: CarbonSpacing.spacing06),
 CarbonToggle(
   labelText: 'Public endpoint',
-  value: _public,
+  toggled: _public,
   readOnly: !_canEdit,
   onToggled: (bool v) => setState(() => _public = v),
 )
