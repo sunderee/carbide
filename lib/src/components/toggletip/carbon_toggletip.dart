@@ -28,6 +28,9 @@ import '../popover/carbon_popover.dart';
 /// [content] and an optional [actions] row. Escape closes it and returns focus
 /// to the trigger.
 ///
+/// The popover shows and hides instantly — Carbon defines no toggletip
+/// motion, so reduced motion needs no special handling.
+///
 /// ```dart
 /// CarbonToggletip(
 ///   content: const Text('Additional context about this field.'),

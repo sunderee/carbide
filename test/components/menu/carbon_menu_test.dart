@@ -751,6 +751,47 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_menu.scss` (line 84): the row's only motion is
+    // `transition: background-color $duration-fast-01
+    // motion(standard, productive)`; the menu itself has no open
+    // transition, so it appears instantly.
+    testWidgets('spec lock: row tint is fast-01 × standard-productive', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMenu(
+            autofocus: false,
+            children: <Widget>[CarbonMenuItem(label: 'Run', onPressed: () {})],
+          ),
+        ),
+      );
+      final AnimatedContainer row = _row(tester, 'Run');
+      expect(row.duration, CarbonDuration.fast01);
+      expect(row.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion: row tint applies instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(
+            CarbonMenu(
+              autofocus: false,
+              children: <Widget>[
+                CarbonMenuItem(label: 'Run', onPressed: () {}),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(_row(tester, 'Run').duration, Duration.zero);
+    });
+  });
+
   group('goldens', () {
     testWidgets('action menu across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

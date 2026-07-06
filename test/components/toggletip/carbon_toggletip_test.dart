@@ -160,6 +160,29 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_toggletip.scss` defines no transition or animation —
+    // the popover pops in and out instantly, so there is no decorative
+    // motion to disable under reduced motion.
+    testWidgets('opens instantly with no implicit animations', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonToggletip(content: Text('Details'))),
+        ),
+      );
+      await tester.tap(find.byType(CarbonIcon));
+      await tester.pump();
+      await tester.pump(); // the deferred overlay show renders next frame.
+      expect(find.text('Details'), findsOneWidget);
+      expect(tester.hasRunningAnimations, isFalse);
+      expect(find.byType(AnimatedOpacity), findsNothing);
+      expect(find.byType(FadeTransition), findsNothing);
+    });
+  });
+
   group('goldens', () {
     testWidgets('open toggletip across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

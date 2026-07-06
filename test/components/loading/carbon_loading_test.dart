@@ -112,6 +112,42 @@ void main() {
     });
   });
 
+  group('reduced motion (#235)', () {
+    // The spin (loading/_animation.scss: 690ms `spin`) is essential motion:
+    // per Carbon's motion guidance a loading indicator communicates that
+    // the system is still working, so it deliberately keeps rotating under
+    // MediaQueryData.disableAnimations rather than freezing.
+    testWidgets('the spinner keeps spinning (essential motion)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonLoading()),
+        ),
+      );
+      final double before = _painterOf(tester).rotation;
+      await tester.pump(const Duration(milliseconds: 230));
+      expect(_painterOf(tester).rotation, isNot(before));
+      expect(tester.hasRunningAnimations, isTrue);
+    });
+
+    testWidgets('the inline loading spinner keeps spinning too', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonInlineLoading(description: 'Saving...')),
+        ),
+      );
+      final double before = _painterOf(tester).rotation;
+      await tester.pump(const Duration(milliseconds: 230));
+      expect(_painterOf(tester).rotation, isNot(before));
+      expect(tester.hasRunningAnimations, isTrue);
+    });
+  });
+
   group('CarbonInlineLoading (inline-loading scss + tsx)', () {
     testWidgets('statuses render spinner / success / error with tokens', (
       WidgetTester tester,

@@ -11,8 +11,9 @@
 // still a preview upstream — Carbide ports it under stable names, the same
 // posture as the Icon/Shape indicators). A centered 48rem surface on the
 // layer with a 1px border-subtle-01 border, entering with the upstream
-// opacity + translateY(-24px) transition (moderate-02 × exit-expressive,
-// skipped under reduced motion). Modal dialogs add the overlay backdrop and
+// opacity + translateY(-24px) transition (moderate-02 × entrance-expressive
+// per the `[open]` / `presence-dialog__enter` rules, skipped under reduced
+// motion). Modal dialogs add the overlay backdrop and
 // a focus trap; non-modal dialogs float without blocking the page (the
 // native <dialog> show()/showModal() split). Escape requests close; unlike
 // CarbonModal there is no outside-tap dismissal — the native dialog element
@@ -33,6 +34,11 @@ import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
 
 /// A composable Carbon dialog.
+///
+/// Opening plays the upstream entrance transition — opacity +
+/// translateY(−24px) at `moderate-02` × `entrance, expressive`. Under
+/// reduced motion (`MediaQueryData.disableAnimations`) the dialog and its
+/// backdrop appear instantly.
 ///
 /// Compose the slots inside [children]:
 ///
@@ -184,12 +190,15 @@ class _CarbonDialogState extends State<CarbonDialog> {
         return Center(
           child: AnimatedSlide(
             duration: duration,
-            curve: CarbonEasing.exitExpressive,
+            // `_dialog.scss` `[open]`: transform $duration-moderate-02
+            // motion(entrance, expressive) — only the entrance plays here;
+            // closing unmounts the overlay instantly.
+            curve: CarbonEasing.entranceExpressive,
             // transform: translateY(-$spacing-06) while hidden.
             offset: _entered ? Offset.zero : const Offset(0, -0.05),
             child: AnimatedOpacity(
               duration: duration,
-              curve: CarbonEasing.exitExpressive,
+              curve: CarbonEasing.entranceExpressive,
               opacity: _entered ? 1 : 0,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -361,6 +370,8 @@ class CarbonDialogCloseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     return Semantics(
       button: true,
       label: label,
@@ -370,8 +381,10 @@ class CarbonDialogCloseButton extends StatelessWidget {
         builder: (BuildContext context, Set<WidgetState> states) {
           final bool hovered = states.contains(WidgetState.hovered);
           final bool focused = states.contains(WidgetState.focused);
+          // `_dialog.scss`: background-color $duration-fast-02
+          // motion(standard, productive); instant under reduced motion.
           return AnimatedContainer(
-            duration: CarbonDuration.fast02,
+            duration: reducedMotion ? Duration.zero : CarbonDuration.fast02,
             curve: CarbonEasing.standardProductive,
             width: 48,
             height: 48,

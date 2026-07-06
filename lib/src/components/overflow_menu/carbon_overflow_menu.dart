@@ -35,6 +35,10 @@ enum CarbonMenuAlignment {
 
 /// An icon button (⋮) that opens a [CarbonMenu] of actions.
 ///
+/// The menu opens and closes instantly (no transition of its own); the
+/// trigger's hover/selected tints are `CarbonButton`'s, which already honor
+/// reduced motion.
+///
 /// ```dart
 /// CarbonOverflowMenu(
 ///   items: <Widget>[

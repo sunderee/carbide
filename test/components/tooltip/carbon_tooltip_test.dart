@@ -182,6 +182,41 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_tooltip.scss` defines no transition or animation — the
+    // bubble pops in instantly (the enter/leave delays are hover debounce,
+    // not motion), so there is nothing to disable under reduced motion.
+    testWidgets('shows instantly after the enter delay, with no fade', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(
+            const CarbonTooltip(
+              label: 'Duplicate',
+              child: SizedBox(width: 40, height: 40),
+            ),
+          ),
+        ),
+      );
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      await gesture.moveTo(tester.getCenter(find.byType(CarbonTooltip)));
+      await tester.pump(const Duration(milliseconds: 120));
+      await tester.pump(); // the popover's deferred show renders next frame.
+      expect(find.text('Duplicate'), findsOneWidget);
+      expect(tester.hasRunningAnimations, isFalse);
+      expect(find.byType(AnimatedOpacity), findsNothing);
+      expect(find.byType(FadeTransition), findsNothing);
+    });
+  });
+
   group('goldens', () {
     testWidgets('tooltip bubble across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
