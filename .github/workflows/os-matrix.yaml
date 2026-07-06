@@ -29,6 +29,7 @@ permissions:
 jobs:
   desktop:
     name: Package tests — ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -54,6 +55,13 @@ jobs:
 
   web-smoke:
     name: Package tests — web (chrome)
+    # `flutter test --platform chrome` currently hangs in the "loading"
+    # phase (reproduced on ubuntu CI and macOS at Flutter 3.44.4, even for
+    # a single suite) — tracked in the web-test-hang issue. Bounded so a
+    # hang costs minutes, not the 6h default; scheduled-only cadence keeps
+    # PRs unaffected. The gallery integration job below is the per-release
+    # proof that Carbide executes on the web.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -71,15 +79,18 @@ jobs:
         run: flutter pub get
 
       # The icon fidelity sweep and pictogram suite read reference files via
-      # dart:io and cannot compile for the web; everything else runs.
+      # dart:io and cannot compile for the web. Scope is deliberately small
+      # (the dart:io-free foundations) until the loading-phase hang is
+      # fixed, so a future fix has a fast iteration loop.
       - name: Run web-compilable suites
         run: >
           flutter test --platform chrome
           --dart-define=CARBIDE_SKIP_GOLDENS=true
-          test/components test/theme test/utils test/foundations test/rtl
+          test/theme test/utils test/foundations
 
   gallery-web-integration:
     name: Gallery integration test — web
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
