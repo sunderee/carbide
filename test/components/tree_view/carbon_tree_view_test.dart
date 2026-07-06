@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -395,6 +396,24 @@ void main() {
           hasTapAction: true,
         ),
       );
+      handle.dispose();
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _tree(onSelect: (_) {}, expanded: const <Object>{'src', 'utils'}),
+      );
+      await tester.pumpAndSettle();
+      // Tap targets are off: tree rows are 32px by upstream default
+      // (`min-block-size: convert.to-rem(32px)` in documentation/carbon/
+      // packages/styles/scss/components/treeview/_treeview.scss), so 48dp
+      // is unattainable at the default `sm` size.
+      await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });
   });

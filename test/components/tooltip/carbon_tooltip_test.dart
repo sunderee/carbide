@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -154,6 +155,30 @@ void main() {
             .first,
       );
       expect(style.style.color, theme.textInverse);
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          const CarbonTooltip(
+            label: 'Duplicate',
+            defaultOpen: true,
+            child: SizedBox(width: 48, height: 48),
+          ),
+        ),
+      );
+      await tester.pump();
+      // CarbonTooltip is hover/focus-only — it adds no tap handler of its
+      // own (the trigger is whatever child the caller wraps), so there is
+      // no tappable trigger to size-check. The full gate locks that the
+      // open bubble introduces no unlabeled or undersized tap targets.
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 

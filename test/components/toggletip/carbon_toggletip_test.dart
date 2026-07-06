@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion needs a surface.
@@ -21,10 +22,14 @@ Widget _host(Widget child) => Directionality(
           OverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
+                // The backdrop is a hit-test aid, not UI: keep it out of the
+                // semantics tree so a11y sweeps only see the component.
                 Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {},
+                  child: ExcludeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {},
+                    ),
                   ),
                 ),
                 Center(child: child),
@@ -130,6 +135,27 @@ void main() {
         _host(const CarbonToggletip(content: Text('Details'))),
       );
       expect(find.bySemanticsLabel('Show information'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          const CarbonToggletip(defaultOpen: true, content: Text('Details')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // Tap targets are off: the trigger is the bare 16px information icon
+      // by upstream default (`.cds--toggletip-button` is only
+      // `button-reset` + flex in documentation/carbon/packages/styles/
+      // scss/components/toggletip/_toggletip.scss — no minimum size), so
+      // 48dp is unattainable.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

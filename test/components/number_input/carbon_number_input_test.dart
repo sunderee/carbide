@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -209,6 +210,27 @@ void main() {
       );
       expect(find.bySemanticsLabel('Increment number'), findsOneWidget);
       expect(find.bySemanticsLabel('Decrement number'), findsOneWidget);
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The md steppers are 40px squares (_number-input.scss block-size:
+      // convert.to-rem(40px)) — below the 48dp android guideline, so pump
+      // the real lg (48px) variant instead.
+      await tester.pumpWidget(
+        _host(
+          CarbonNumberInput(
+            labelText: 'Qty',
+            value: 3,
+            size: CarbonFieldSize.lg,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      await expectA11y(tester);
       handle.dispose();
     });
   });

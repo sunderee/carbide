@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -214,6 +215,30 @@ void main() {
       );
       expect(find.text('Cell 0'), findsOneWidget);
       expect(find.text('Cell 1'), findsOneWidget);
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonStructuredList(
+            headers: const <String>['Name', 'Type'],
+            rows: _rows(),
+            selectable: true,
+            selectedIndex: 0,
+            onSelected: (_) {},
+          ),
+        ),
+      );
+      // Selectable rows span the list width at ≥50px (16px vertical cell
+      // padding around the body line, `_structured-list.scss`), and each
+      // row merges its cell text into one labelled radio node.
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 

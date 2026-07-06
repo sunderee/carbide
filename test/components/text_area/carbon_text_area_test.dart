@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -159,6 +160,15 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Comments')),
         isSemantics(label: 'Comments', isTextField: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(const CarbonTextArea(labelText: 'Bio')));
+      await expectA11y(tester);
       handle.dispose();
     });
   });

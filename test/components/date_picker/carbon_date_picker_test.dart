@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -28,8 +29,11 @@ Widget _overlay(Widget child) => TapRegionSurface(
         builder: (BuildContext context) => Stack(
           children: <Widget>[
             Positioned.fill(
+              // Tap-outside backdrop is test scaffolding; keep it out of
+              // the semantics tree so a11y sweeps only see the picker.
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
+                excludeFromSemantics: true,
                 onTap: () {},
               ),
             ),
@@ -290,6 +294,29 @@ void main() {
         ),
       );
       expect(find.text('Date is required'), findsOneWidget);
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The md field is 40px (_date-picker.scss block-size:
+      // convert.to-rem(40px)) — below the 48dp android guideline, so pump
+      // the real lg (48px) variant instead.
+      await tester.pumpWidget(
+        _fieldHost(
+          SizedBox(
+            width: 320,
+            child: CarbonDatePicker(
+              labelText: 'Date',
+              size: CarbonFieldSize.lg,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 

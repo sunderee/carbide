@@ -18,6 +18,7 @@ Widget _host(Widget child) => Directionality(
 );
 
 void main() {
+  // Layout-only: no semantics surface (#226).
   group('gap resolution (Stack.tsx SPACING_STEPS)', () {
     test('steps 1–12 map onto the Carbon spacing scale', () {
       for (int step = 1; step <= 12; step++) {

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -215,6 +216,23 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Details')),
         isSemantics(label: 'Details', isSelected: false),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The Dart default is already lg (48px); _tabs.scss defaults the tab
+      // bar to md (40px), which would sit below the 48dp android guideline.
+      await tester.pumpWidget(
+        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
+      );
+      // TODO(#226): each enabled tab also exposes an inner
+      // Focus+GestureDetector semantics node ([focus, tap], no label)
+      // beside its labelled button node — suspected product defect;
+      // re-enable `labeled` once lib merges the two.
+      await expectA11y(tester, labeled: false);
       handle.dispose();
     });
   });

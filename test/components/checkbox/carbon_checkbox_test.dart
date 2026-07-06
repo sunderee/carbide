@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -161,6 +162,22 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Opt')),
         isSemantics(isCheckStateMixed: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonCheckbox(label: 'Subscribe', value: false, onChanged: (_) {}),
+        ),
+      );
+      // The row is label-height (~24px) around a 16px box (`_checkbox.scss`
+      // `block-size: convert.to-rem(16px)`), so the 48dp android guideline
+      // is unattainable at the default size.
+      await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });
   });

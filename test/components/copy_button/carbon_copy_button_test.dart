@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -314,6 +315,38 @@ void main() {
       expect(find.bySemanticsLabel('Copied!'), findsOneWidget);
       handle.dispose();
       await tester.pump(const Duration(milliseconds: 2100));
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // `_host`'s tap-outside backdrop is itself an unlabelled tap target,
+      // so pump the same shell without the backdrop.
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: TapRegionSurface(
+            child: CarbonTheme(
+              data: CarbonThemeData.white,
+              child: Overlay(
+                initialEntries: <OverlayEntry>[
+                  OverlayEntry(
+                    builder: (BuildContext context) =>
+                        const Center(child: CarbonCopyButton()),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      // The default md button is a 40px square (CarbonCopySize.md; upstream
+      // the copy button fills its 40px single-line snippet row —
+      // `_code-snippet.scss` `block-size: $spacing-08`), so the 48dp android
+      // guideline is unattainable at the default size.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

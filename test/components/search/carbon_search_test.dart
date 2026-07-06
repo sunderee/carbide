@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -173,6 +174,23 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Find')),
         isSemantics(label: 'Find', isTextField: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // An initial value keeps the clear button visible for the sweep.
+      await tester.pumpWidget(
+        _host(const CarbonSearch(labelText: 'Find', initialValue: 'query')),
+      );
+      await tester.pumpAndSettle();
+      // The md field and its clear button are 40px (`_search.scss`
+      // `layout.use('size', $default: 'md')` sizing `block-size:
+      // layout.size('height')`), so the 48dp android guideline is
+      // unattainable at the default size.
+      await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });
   });

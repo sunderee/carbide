@@ -119,6 +119,35 @@ void main() {
     });
   });
 
+  group('semantics (#226)', () {
+    testWidgets('menu items expose label, button role and tap action', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(_menu()));
+      await rightClick(tester);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Cut')),
+        isSemantics(
+          label: 'Cut',
+          isButton: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Copy')),
+        isSemantics(
+          label: 'Copy',
+          isButton: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+  });
+
   group('goldens', () {
     testWidgets('open menu across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

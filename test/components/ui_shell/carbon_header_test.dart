@@ -5,6 +5,7 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -385,6 +386,92 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
       expect(skipped, 2);
+    });
+  });
+
+  group('traversal (#226)', () {
+    testWidgets('visits header name, nav, global actions, then side nav', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: TapRegionSurface(
+            child: CarbonTheme(
+              data: CarbonThemeData.white,
+              child: Overlay(
+                initialEntries: <OverlayEntry>[
+                  OverlayEntry(
+                    builder: (BuildContext context) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        CarbonHeader(
+                          name: const CarbonHeaderName(
+                            prefix: 'IBM',
+                            name: 'Carbide',
+                          ),
+                          navigation: <Widget>[
+                            CarbonHeaderMenuItem(
+                              label: 'Catalog',
+                              onPressed: () {},
+                            ),
+                          ],
+                          globalActions: <Widget>[
+                            CarbonHeaderGlobalAction(
+                              icon: CarbonIcons.notification,
+                              label: 'Notifications',
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              CarbonSideNav(
+                                items: <Widget>[
+                                  CarbonSideNavLink(
+                                    label: 'Dashboard',
+                                    current: true,
+                                    onPressed: () {},
+                                  ),
+                                  CarbonSideNavLink(
+                                    label: 'Documents',
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                              const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final List<String> labels = tester.semantics
+          .simulatedAccessibilityTraversal()
+          .map((SemanticsNode n) => n.label)
+          .where((String l) => l.isNotEmpty)
+          .toList();
+      expect(
+        labels,
+        containsAllInOrder(<String>[
+          'IBM Carbide',
+          'Catalog',
+          'Notifications',
+          'Dashboard',
+          'Documents',
+        ]),
+      );
+      handle.dispose();
     });
   });
 

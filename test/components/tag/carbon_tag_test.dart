@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -410,6 +411,36 @@ void main() {
       Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
       await tester.pumpAndSettle();
       expect(ringHost().foregroundDecoration, isNotNull);
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          Wrap(
+            spacing: 8,
+            children: <Widget>[
+              CarbonDismissibleTag(label: 'Filter', onClose: () {}),
+              CarbonSelectableTag(
+                label: 'Topic',
+                selected: false,
+                onChanged: (_) {},
+              ),
+              CarbonOperationalTag(label: 'View all', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      // Tap targets are exempt: interactive tags are spec-locked below
+      // 48dp by styles/scss/components/tag/_tag.scss (heights xs/sm 18px,
+      // md 24px, lg 32px; the dismiss button matches the tag height), so
+      // the Android guideline is unattainable at Carbon's sizes.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

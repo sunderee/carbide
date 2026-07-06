@@ -14,6 +14,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child, {CarbonThemeData? theme}) => Directionality(
@@ -514,6 +515,21 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Add item')),
         isSemantics(label: 'Add item', isButton: true, isEnabled: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(CarbonButton(label: 'Go', onPressed: () {})),
+      );
+      await tester.pumpAndSettle();
+      // Only the default lg (48px) is gated; xs/sm/md are 24/32/40px by
+      // design (`_button.scss` layout.use('size') heights), so 48dp is
+      // unattainable there.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -533,6 +534,47 @@ void main() {
         _host(const CarbonCallout(subtitle: 'Just a subtitle')),
       );
       expect(find.text('Just a subtitle'), findsOneWidget);
+    });
+  });
+
+  group('a11y (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonActionableNotification(
+            kind: CarbonNotificationKind.success,
+            title: 'Saved',
+            subtitle: 'Draft stored.',
+            actionLabel: 'Undo',
+            onAction: () {},
+            onClose: () {},
+          ),
+        ),
+      );
+      // Tap targets are off for the actionable variant: the ghost action
+      // button is 32px by upstream default (`block-size:
+      // convert.to-rem(32px)` in documentation/carbon/packages/styles/
+      // scss/components/notification/_actionable-notification.scss), so
+      // 48dp is unattainable. Labels stay gated.
+      await expectA11y(tester, tapTargets: false);
+
+      // The inline variant's only tap target is the 48px close control,
+      // so it takes the full gate.
+      await tester.pumpWidget(
+        _host(
+          CarbonInlineNotification(
+            kind: CarbonNotificationKind.success,
+            title: 'Saved',
+            subtitle: 'Draft stored.',
+            onClose: () {},
+          ),
+        ),
+      );
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 
