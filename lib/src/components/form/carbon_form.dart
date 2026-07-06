@@ -386,8 +386,12 @@ class CarbonField extends StatelessWidget {
         gradient: ai ? aiFieldGradient(theme) : null,
         border: Border(bottom: BorderSide(color: borderColor)),
       ),
-      child: SizedBox(
-        height: fluid ? 64 : size.height,
+      // The field height is a minimum: content grows the chrome under
+      // text scaling instead of clipping (docs/text-scaling.md). At 1.0x
+      // content always fits, so this renders identically to the previous
+      // fixed height.
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: fluid ? 64 : size.height),
         child: Padding(
           padding: const EdgeInsetsDirectional.only(start: paddingInline),
           child: Row(

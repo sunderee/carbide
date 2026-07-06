@@ -383,9 +383,19 @@ class _ButtonSurface extends StatelessWidget {
     return AnimatedContainer(
       duration: CarbonDuration.fast01,
       curve: CarbonEasing.entranceProductive,
-      height: size.height,
+      // The spec height is a minimum, not a ceiling: under text scaling
+      // the label's line box may exceed the fixed chrome, and the button
+      // grows downward instead of clipping (docs/text-scaling.md). At
+      // 1.0x the content always fits, so this renders identically to the
+      // previous fixed height.
+      height: iconOnly ? size.height : null,
       width: iconOnly ? size.height : null,
-      constraints: const BoxConstraints(maxWidth: CarbonButton.maxWidth),
+      constraints: iconOnly
+          ? const BoxConstraints(maxWidth: CarbonButton.maxWidth)
+          : BoxConstraints(
+              minHeight: size.height,
+              maxWidth: CarbonButton.maxWidth,
+            ),
       foregroundDecoration: style.focusRing
           ? _focusRingDecoration(theme, style)
           : null,

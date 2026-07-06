@@ -462,8 +462,10 @@ class _HeaderRow extends StatelessWidget {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     return ColoredBox(
       color: layer.layerAccent,
-      child: SizedBox(
-        height: size.height,
+      // Row height is a minimum: cells grow the band under text scaling
+      // instead of clipping (docs/text-scaling.md).
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: size.height),
         child: Row(
           children: <Widget>[
             ?leading,
@@ -673,8 +675,8 @@ class _BodyRowState extends State<_BodyRow> {
             ),
           ),
         ),
-        child: SizedBox(
-          height: widget.size.height,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: widget.size.height),
           child: DefaultTextStyle.merge(
             style: CarbonTypeStyles.bodyCompact01.copyWith(color: textColor),
             child: Row(
@@ -945,21 +947,21 @@ class _BatchHeader extends StatelessWidget {
       ),
     );
 
-    return SizedBox(
-      height: size.height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          header,
-          // Slide the bar down over the header when a selection exists.
-          AnimatedSlide(
-            offset: active ? Offset.zero : const Offset(0, -1),
-            duration: CarbonDuration.fast02,
-            curve: CarbonEasing.standardProductive,
-            child: IgnorePointer(ignoring: !active, child: bar),
-          ),
-        ],
-      ),
+    // Both children lay out at their natural (min-height-backed) size and
+    // the band takes the taller of the two, so text scaling can grow the
+    // bar without the header capping it. The slid-away bar stays hidden
+    // by the Stack's default clip.
+    return Stack(
+      children: <Widget>[
+        header,
+        // Slide the bar down over the header when a selection exists.
+        AnimatedSlide(
+          offset: active ? Offset.zero : const Offset(0, -1),
+          duration: CarbonDuration.fast02,
+          curve: CarbonEasing.standardProductive,
+          child: IgnorePointer(ignoring: !active, child: bar),
+        ),
+      ],
     );
   }
 }

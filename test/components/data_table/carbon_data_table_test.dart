@@ -115,10 +115,15 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        // The row height token is a minimum (docs/text-scaling.md); at
+        // 1.0x scale the rendered row sits exactly on the token.
         final double rowHeight = tester
             .getSize(
               find
-                  .ancestor(of: find.text('A'), matching: find.byType(SizedBox))
+                  .ancestor(
+                    of: find.text('A'),
+                    matching: find.byType(ConstrainedBox),
+                  )
                   .first,
             )
             .height;

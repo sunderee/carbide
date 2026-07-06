@@ -111,6 +111,16 @@ Two machine-checked gates back the DoD's accessibility bullet (#226):
   assert reading order via
   `tester.semantics.simulatedAccessibilityTraversal()`.
 
+### Text scaling
+
+Spec heights are **minimums**: chrome grows with text under
+`MediaQuery.textScaler` instead of clipping, and no component clamps the
+user's scale (policy + rationale in [docs/text-scaling.md](docs/text-scaling.md)).
+The sweep in `test/scaling/` renders every specimen from
+`test/support/specimens.dart` at 1.3× and 2.0× and fails on overflow or a
+text squeezed below one scaled line box. New components add a specimen to
+the registry; use fixed heights only as `minHeight` constraints.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by
