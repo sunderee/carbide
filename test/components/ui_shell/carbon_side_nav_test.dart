@@ -423,6 +423,9 @@ void main() {
       await expectThemeGoldens(
         tester,
         name: 'ui_shell_side_nav',
+        // Direction-sensitive geometry (#227): mirrored fill / side
+        // accent / overlay side re-snapshots under RTL.
+        directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(280, 260),
         builder: (BuildContext context) => Align(

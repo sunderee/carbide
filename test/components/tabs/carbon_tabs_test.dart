@@ -276,6 +276,9 @@ void main() {
       await expectThemeGoldens(
         tester,
         name: 'tabs_variants',
+        // Direction-sensitive geometry (#227): mirrored fill / side
+        // accent / overlay side re-snapshots under RTL.
+        directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(440, 220),
         builder: (BuildContext context) => Center(
