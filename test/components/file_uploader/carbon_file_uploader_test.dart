@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,6 +26,18 @@ CarbonFocusRing _ringAround(WidgetTester tester, Finder of) =>
     tester.widget<CarbonFocusRing>(
       find.ancestor(of: of, matching: find.byType(CarbonFocusRing)).first,
     );
+
+/// The bare host has no WidgetsApp shortcut map, so real Tab traversal is
+/// wired up locally (same pattern as the ui_shell header tests).
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
 
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
@@ -308,6 +321,113 @@ void main() {
       // guideline is unattainable at the default size.
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
+    });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream: documentation/carbon-website/src/pages/components/
+    // file-uploader/accessibility.mdx — "Both variants of the file uploader
+    // provide buttons for uploading and removing files. The drop target
+    // 'Drag and drop files here...' also provides conventional button
+    // keyboard interaction (Tab to reach; Enter or Space to activate). Once
+    // a file has been added, it can be removed by activating the delete
+    // ('x') button after each file name."
+
+    testWidgets('Enter and Space activate the focused trigger button', (
+      WidgetTester tester,
+    ) async {
+      int opened = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonFileUploaderButton(
+            label: 'Add files',
+            onPressed: () => opened++,
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('Add files'))).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(opened, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(opened, 2);
+    });
+
+    testWidgets('Tab reaches the remove button after the trigger; Enter '
+        'and Space remove the file', (WidgetTester tester) async {
+      int removed = 0;
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonFileUploader(
+              items: <CarbonFileUploaderItem>[
+                CarbonFileUploaderItem(
+                  name: 'report.pdf',
+                  onDelete: () => removed++,
+                ),
+              ],
+              child: CarbonFileUploaderButton(
+                label: 'Add files',
+                onPressed: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // First Tab stop: the trigger button.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(
+        Focus.of(tester.element(find.text('Add files'))).hasPrimaryFocus,
+        isTrue,
+      );
+
+      // Second Tab stop: the item's remove ('x') button, with the ring.
+      final Finder close = find.byWidgetPredicate(
+        (Widget w) => w is CarbonIcon && w.icon == CarbonIcons.close,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(Focus.of(tester.element(close)).hasPrimaryFocus, isTrue);
+      expect(_ringAround(tester, close).visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(removed, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(removed, 2);
+    });
+
+    testWidgets('the drop zone is focusable; Enter and Space open the '
+        'picker', (WidgetTester tester) async {
+      int opened = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonFileUploaderDropContainer(
+            label: 'Drop zone',
+            onPressed: () => opened++,
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('Drop zone'))).requestFocus();
+      await tester.pumpAndSettle();
+      expect(_ringAround(tester, find.text('Drop zone')).visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(opened, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(opened, 2);
     });
   });
 

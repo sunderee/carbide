@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -81,6 +82,104 @@ void main() {
       expect(find.bySemanticsLabel('Home'), findsOneWidget);
       handle.dispose();
     });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream spec: documentation/carbon-website/src/pages/components/
+    // breadcrumb/accessibility.mdx — each page link in the breadcrumb is
+    // reached by Tab and activated by Enter; when the breadcrumb is
+    // truncated, the ellipsis button for the overflow menu is in the tab
+    // order and follows the overflow menu's keyboard spec
+    // (documentation/carbon-website/src/pages/components/overflow-menu/
+    // accessibility.mdx).
+
+    Widget tabHost(Widget child) => _host(
+      FocusTraversalGroup(
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // A focus anchor before the component, so the first Tab
+                // press moves focus onto the first crumb link.
+                Focus(autofocus: true, child: const SizedBox.shrink()),
+                child,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('Tab reaches each link in order; Enter activates it', (
+      WidgetTester tester,
+    ) async {
+      String? went;
+      await tester.pumpWidget(
+        tabHost(CarbonBreadcrumb(items: crumbs((String s) => went = s))),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(
+        Focus.of(tester.element(find.text('Home'))).hasPrimaryFocus,
+        isTrue,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(
+        Focus.of(tester.element(find.text('Reports'))).hasPrimaryFocus,
+        isTrue,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(went, 'rep');
+    });
+
+    testWidgets(
+      'ellipsis overflow trigger: Enter/Space open the menu, Escape closes '
+      'it and restores focus to the trigger',
+      (WidgetTester tester) async {
+        // Spec shape: a truncated breadcrumb collapses the middle crumbs
+        // behind an ellipsis CarbonOverflowMenu trigger in the tab order.
+        await tester.pumpWidget(
+          _host(
+            CarbonBreadcrumb(
+              items: <CarbonBreadcrumbItem>[
+                for (int i = 0; i < 6; i++)
+                  CarbonBreadcrumbItem(label: 'Level $i', onPressed: () {}),
+                const CarbonBreadcrumbItem(label: 'Here', isCurrentPage: true),
+              ],
+            ),
+          ),
+        );
+        final Finder ellipsisTrigger = find.descendant(
+          of: find.byType(CarbonBreadcrumb),
+          matching: find.byType(CarbonOverflowMenu),
+        );
+        expect(ellipsisTrigger, findsOneWidget);
+        final FocusNode trigger = Focus.of(tester.element(ellipsisTrigger));
+        trigger.requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(find.byType(CarbonMenu), findsOneWidget);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(CarbonMenu), findsNothing);
+        expect(trigger.hasPrimaryFocus, isTrue);
+      },
+      // TODO(#231): CarbonBreadcrumb has no ellipsis ("...") overflow
+      // trigger — collapsing truncated crumbs into a CarbonOverflowMenu is
+      // an unimplemented follow-up (see the note in
+      // lib/src/components/breadcrumb/carbon_breadcrumb.dart). Re-enable
+      // once the truncated breadcrumb renders the ellipsis trigger.
+      skip: true,
+    );
   });
 
   group('a11y (#226)', () {

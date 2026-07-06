@@ -51,6 +51,22 @@ Widget _fieldHost(Widget child) => Directionality(
   child: CarbonTheme(data: CarbonThemeData.white, child: _overlay(child)),
 );
 
+/// The bare test host has no WidgetsApp, so install the Tab → focus-traversal
+/// wiring an app scaffold would normally provide.
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+    SingleActivator(LogicalKeyboardKey.tab, shift: true): PreviousFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{
+      NextFocusIntent: NextFocusAction(),
+      PreviousFocusIntent: PreviousFocusAction(),
+    },
+    child: FocusTraversalGroup(child: child),
+  ),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -318,6 +334,274 @@ void main() {
       await expectA11y(tester);
       handle.dispose();
     });
+  });
+
+  // Keyboard spec: documentation/carbon-website/src/pages/components/
+  // date-picker/accessibility.mdx defers to the W3C WAI-ARIA date picker
+  // dialog pattern (linked under Resources): Left/Right move the focused day
+  // by one, Up/Down move it by a week, Enter (or Space) selects it, and
+  // Escape closes the dialog, returning focus to the trigger.
+  group('calendar keyboard (#231)', () {
+    Widget calendar({
+      required ValueChanged<DateTime> onChanged,
+      DateTime? value,
+      VoidCallback? onEscape,
+    }) => _host(
+      SizedBox(
+        width: 320,
+        child: CarbonCalendar(
+          value: value,
+          onChanged: onChanged,
+          onEscape: onEscape,
+          autofocus: true,
+        ),
+      ),
+    );
+
+    testWidgets('ArrowRight/ArrowLeft move the focused day by one; Enter '
+        'selects it', (WidgetTester tester) async {
+      DateTime? picked;
+      await tester.pumpWidget(
+        calendar(
+          value: DateTime(2026, 6, 15),
+          onChanged: (DateTime d) => picked = d,
+        ),
+      );
+      await tester.pump();
+
+      // Right, Right, Left nets +1 day from the anchored selection.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(picked, DateTime(2026, 6, 16));
+    });
+
+    testWidgets('ArrowDown/ArrowUp move the focused day by a week; Space '
+        'selects it', (WidgetTester tester) async {
+      DateTime? picked;
+      await tester.pumpWidget(
+        calendar(
+          value: DateTime(2026, 6, 15),
+          onChanged: (DateTime d) => picked = d,
+        ),
+      );
+      await tester.pump();
+
+      // Down, Down, Up nets +7 days.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(picked, DateTime(2026, 6, 22));
+    });
+
+    testWidgets('the keyboard-focused day carries the 2px focus outline', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        calendar(value: DateTime(2026, 6, 15), onChanged: (_) {}),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+
+      Container cell(String day) => tester.widget<Container>(
+        find
+            .ancestor(of: find.text(day), matching: find.byType(Container))
+            .first,
+      );
+      final BoxDecoration outline =
+          cell('16').foregroundDecoration! as BoxDecoration;
+      expect(outline.border!.top.width, 2);
+      expect(outline.border!.top.color, theme.focus);
+      // The selected-but-unfocused day keeps no outline.
+      expect(cell('15').foregroundDecoration, isNull);
+    });
+
+    testWidgets('arrowing past the month start turns the page back', (
+      WidgetTester tester,
+    ) async {
+      DateTime? picked;
+      await tester.pumpWidget(
+        calendar(
+          value: DateTime(2026, 6, 1),
+          onChanged: (DateTime d) => picked = d,
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(find.text('May 2026'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(picked, DateTime(2026, 5, 31));
+    });
+
+    testWidgets('Escape on the day grid calls onEscape', (
+      WidgetTester tester,
+    ) async {
+      int escapes = 0;
+      await tester.pumpWidget(
+        calendar(
+          value: DateTime(2026, 6, 15),
+          onChanged: (_) {},
+          onEscape: () => escapes++,
+        ),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      expect(escapes, 1);
+    });
+  });
+
+  // Field-level keyboard behavior per the same WAI-ARIA dialog pattern: the
+  // opened calendar takes focus and is fully arrow-key driven; Escape
+  // dismisses the dialog without committing and returns focus to the field.
+  group('field keyboard (#231)', () {
+    testWidgets('the opened calendar is keyboard-driven: arrows move, Enter '
+        'picks and closes', (WidgetTester tester) async {
+      DateTime? picked;
+      await tester.pumpWidget(
+        _fieldHost(
+          SizedBox(
+            width: 320,
+            child: CarbonDatePicker(
+              labelText: 'Date',
+              value: DateTime(2026, 6, 15),
+              onChanged: (DateTime d) => picked = d,
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('06/15/2026'));
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsOneWidget);
+
+      // The grid autofocuses, so keys land on it straight away.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(picked, DateTime(2026, 6, 22));
+      expect(find.text('June 2026'), findsNothing);
+    });
+
+    testWidgets('Escape closes the calendar without picking', (
+      WidgetTester tester,
+    ) async {
+      DateTime? picked;
+      await tester.pumpWidget(
+        _fieldHost(
+          SizedBox(
+            width: 320,
+            child: CarbonDatePicker(
+              labelText: 'Date',
+              value: DateTime(2026, 6, 15),
+              onChanged: (DateTime d) => picked = d,
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('06/15/2026'));
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsNothing);
+      expect(picked, isNull);
+    });
+
+    testWidgets(
+      'Tab reaches the field trigger and Enter opens the calendar',
+      (WidgetTester tester) async {
+        final FocusNode anchor = FocusNode(debugLabel: 'anchor');
+        addTearDown(anchor.dispose);
+        await tester.pumpWidget(
+          _fieldHost(
+            _tabTraversal(
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Focus(focusNode: anchor, child: const SizedBox.shrink()),
+                  SizedBox(
+                    width: 320,
+                    child: CarbonDatePicker(
+                      labelText: 'Date',
+                      value: DateTime(2026, 6, 15),
+                      onChanged: (_) {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        anchor.requestFocus();
+        await tester.pump();
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        final BuildContext? focused =
+            tester.binding.focusManager.primaryFocus?.context;
+        expect(
+          focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
+          isNotNull,
+        );
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(find.text('June 2026'), findsOneWidget);
+      },
+      // TODO(#231): CarbonDatePicker's trigger has no FocusNode, so it can
+      // neither be reached with Tab nor opened with Enter/Space; the
+      // WAI-ARIA date picker dialog pattern (date-picker/accessibility.mdx,
+      // Resources) requires a keyboard-operable trigger. Re-enable once the
+      // trigger is focusable.
+      skip: true,
+    );
+
+    testWidgets(
+      'Escape returns focus to the field trigger',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _fieldHost(
+            SizedBox(
+              width: 320,
+              child: CarbonDatePicker(
+                labelText: 'Date',
+                value: DateTime(2026, 6, 15),
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('06/15/2026'));
+        await tester.pumpAndSettle();
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.text('June 2026'), findsNothing);
+        final BuildContext? focused =
+            tester.binding.focusManager.primaryFocus?.context;
+        expect(
+          focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
+          isNotNull,
+        );
+      },
+      // TODO(#231): Escape closes the calendar but keyboard focus is not
+      // returned to the field — the trigger has no FocusNode to restore to
+      // (WAI-ARIA date picker dialog pattern: "Escape: Closes the dialog
+      // and returns focus to the Choose Date button"). Re-enable with the
+      // focusable trigger.
+      skip: true,
+    );
   });
 
   group('goldens', () {

@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -142,6 +143,105 @@ void main() {
       expect(find.bySemanticsLabel('Expand search'), findsOneWidget);
       handle.dispose();
     });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream: documentation/carbon-website/src/pages/components/search/
+    // accessibility.mdx — users "press Enter to submit their text as a
+    // search term, or they can press Esc to clear it"; for the expandable
+    // variant "the user activates the icon-only button to reveal and put
+    // focus into the search input". The Escape-collapse detail comes from
+    // documentation/carbon/packages/react/src/components/ExpandableSearch/
+    // ExpandableSearch.tsx (handleKeyDown collapses when empty).
+
+    testWidgets(
+      'Escape clears the query and reports the change',
+      (WidgetTester tester) async {
+        final TextEditingController controller = TextEditingController(
+          text: 'query',
+        );
+        addTearDown(controller.dispose);
+        final FocusNode node = FocusNode();
+        addTearDown(node.dispose);
+        String? last;
+        int cleared = 0;
+        await tester.pumpWidget(
+          _host(
+            CarbonSearch(
+              controller: controller,
+              focusNode: node,
+              onChanged: (String v) => last = v,
+              onClear: () => cleared++,
+            ),
+          ),
+        );
+        node.requestFocus();
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pump();
+        expect(controller.text, isEmpty);
+        expect(last, '');
+        expect(cleared, 1);
+      },
+      // TODO(#231): CarbonSearch has no Escape handler; upstream clears the
+      // query (firing onChanged/onClear) when Esc is pressed in the field.
+      skip: true,
+    );
+
+    testWidgets('Enter on the focused magnifier expands and moves focus '
+        'into the field', (WidgetTester tester) async {
+      await tester.pumpWidget(_host(const CarbonExpandableSearch()));
+      Focus.of(tester.element(find.byType(CarbonIcon))).requestFocus();
+      await tester.pumpAndSettle();
+      expect(find.byType(EditableText), findsNothing);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(EditableText), findsOneWidget);
+      expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .focusNode
+            .hasFocus,
+        isTrue,
+      );
+    });
+
+    testWidgets('Space on the focused magnifier expands too', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(const CarbonExpandableSearch()));
+      Focus.of(tester.element(find.byType(CarbonIcon))).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.byType(EditableText), findsOneWidget);
+      expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .focusNode
+            .hasFocus,
+        isTrue,
+      );
+    });
+
+    testWidgets(
+      'Escape collapses the expanded empty search',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_host(const CarbonExpandableSearch()));
+        await tester.tap(find.byType(CarbonIcon));
+        await tester.pumpAndSettle();
+        expect(find.byType(EditableText), findsOneWidget);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(EditableText), findsNothing);
+      },
+      // TODO(#231): CarbonExpandableSearch has no Escape handler; upstream
+      // collapses the expanded search on Escape when the field is empty.
+      skip: true,
+    );
   });
 
   group('fluid + semantics', () {

@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -152,6 +153,109 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       expect(ran, 'del');
+    });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream spec: documentation/carbon-website/src/pages/components/
+    // overflow-menu/accessibility.mdx — each overflow menu is in the tab
+    // order and is activated by Space or Enter; when open, the first item
+    // takes focus; Esc collapses the menu and puts focus onto the menu
+    // button. Focus return after an item selection closes the menu is the
+    // Menu primitive's behavior upstream (documentation/carbon/packages/
+    // react/src/components/Menu/Menu.tsx, `focusReturn`).
+
+    FocusNode trigger(WidgetTester tester) => Focus.of(
+      tester.element(
+        find.byWidgetPredicate(
+          (Widget w) =>
+              w is CarbonIcon && w.icon == CarbonIcons.overflowMenuVertical,
+        ),
+      ),
+    );
+
+    Widget tabHost(Widget child) => _host(
+      FocusTraversalGroup(
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // A focus anchor before the component, so the first Tab
+                // press moves focus onto the trigger.
+                Focus(autofocus: true, child: const SizedBox.shrink()),
+                child,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('Tab reaches the trigger; Enter opens with the first item '
+        'focused', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        tabHost(CarbonOverflowMenu(items: items((_) {}))),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(trigger(tester).hasPrimaryFocus, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonMenu), findsOneWidget);
+      expect(
+        Focus.of(tester.element(find.text('Edit'))).hasPrimaryFocus,
+        isTrue,
+      );
+    });
+
+    testWidgets('Space on the focused trigger opens the menu', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(CarbonOverflowMenu(items: items((_) {}))));
+      trigger(tester).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonMenu), findsOneWidget);
+    });
+
+    testWidgets('Escape closes the menu and focus returns to the trigger', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(CarbonOverflowMenu(items: items((_) {}))));
+      trigger(tester).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonMenu), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonMenu), findsNothing);
+      expect(trigger(tester).hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('selecting an item closes the menu and focus returns to the '
+        'trigger', (WidgetTester tester) async {
+      String? ran;
+      await tester.pumpWidget(
+        _host(CarbonOverflowMenu(items: items((String s) => ran = s))),
+      );
+      trigger(tester).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      // The first item (Edit) holds focus; Enter activates it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(ran, 'edit');
+      expect(find.byType(CarbonMenu), findsNothing);
+      expect(trigger(tester).hasPrimaryFocus, isTrue);
     });
   });
 

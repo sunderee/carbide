@@ -537,6 +537,115 @@ void main() {
     });
   });
 
+  group('keyboard (#231)', () {
+    // Upstream spec: documentation/carbon-website/src/pages/components/
+    // notification/accessibility.mdx — all interactive elements in
+    // notifications receive focus with the Tab key, and actions such as
+    // closing or activating buttons are performed with Enter or Space.
+
+    final Finder closeIcon = find.byWidgetPredicate(
+      (Widget w) => w is CarbonIcon && w.icon == CarbonIcons.close,
+    );
+
+    Widget tabHost(Widget child) => _host(
+      FocusTraversalGroup(
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // A focus anchor before the component, so the first Tab
+                // press moves focus onto the notification's first control.
+                Focus(autofocus: true, child: const SizedBox.shrink()),
+                child,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('Tab reaches the action button, then the close button', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        tabHost(
+          CarbonActionableNotification(
+            kind: CarbonNotificationKind.info,
+            title: 'Update available',
+            actionLabel: 'Retry',
+            onAction: () {},
+            onClose: () {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(
+        Focus.of(tester.element(find.text('Retry'))).hasPrimaryFocus,
+        isTrue,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(Focus.of(tester.element(closeIcon)).hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('Enter and Space both activate the action button', (
+      WidgetTester tester,
+    ) async {
+      int acted = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonActionableNotification(
+            kind: CarbonNotificationKind.error,
+            title: 'Failed',
+            actionLabel: 'Retry',
+            onAction: () => acted++,
+            onClose: () {},
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('Retry'))).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(acted, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(acted, 2);
+    });
+
+    testWidgets('Enter and Space on the close control fire onClose', (
+      WidgetTester tester,
+    ) async {
+      int closed = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonActionableNotification(
+            kind: CarbonNotificationKind.success,
+            title: 'Saved',
+            actionLabel: 'Undo',
+            onAction: () {},
+            onClose: () => closed++,
+          ),
+        ),
+      );
+      Focus.of(tester.element(closeIcon)).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(closed, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(closed, 2);
+    });
+  });
+
   group('a11y (#226)', () {
     testWidgets('meets tap-target and label guidelines', (
       WidgetTester tester,

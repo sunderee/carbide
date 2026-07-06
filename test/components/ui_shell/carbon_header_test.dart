@@ -39,6 +39,18 @@ Widget _host(Widget child) => Directionality(
   ),
 );
 
+/// Adds the Tab → next-focus wiring a WidgetsApp would normally provide, so
+/// tests can drive real Tab key traversal without one.
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -472,6 +484,134 @@ void main() {
         ]),
       );
       handle.dispose();
+    });
+  });
+
+  // Keyboard spec (Apache-2.0 Carbon Design System; see NOTICE):
+  //   documentation/carbon-website/src/pages/components/UI-shell-header/
+  //     accessibility.mdx — "Each element in the header can be reached by
+  //     the Tab key. A 'Skip to main content' link appears when a keyboard
+  //     user first tabs into the page. Links and icons are activated by
+  //     Enter. Icons can also be activated by Space."
+  group('keyboard (#231)', () {
+    testWidgets('Tab reaches nav items then global actions in order', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonHeader(
+              name: const CarbonHeaderName(name: 'App'),
+              navigation: <Widget>[
+                CarbonHeaderMenuItem(label: 'Catalog', onPressed: () {}),
+                CarbonHeaderMenuItem(label: 'Docs', onPressed: () {}),
+              ],
+              globalActions: <Widget>[
+                CarbonHeaderGlobalAction(
+                  icon: CarbonIcons.search,
+                  label: 'Search',
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      bool focused(Finder finder) =>
+          Focus.of(tester.element(finder)).hasPrimaryFocus;
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused(find.text('Catalog')), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused(find.text('Docs')), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused(find.byType(CarbonIcon)), isTrue);
+    });
+
+    testWidgets(
+      'the header name is reachable by Tab',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            _tabTraversal(
+              CarbonHeader(
+                name: CarbonHeaderName(
+                  prefix: 'IBM',
+                  name: 'Carbide',
+                  onPressed: () {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        expect(
+          Focus.of(tester.element(find.text('Carbide'))).hasPrimaryFocus,
+          isTrue,
+        );
+      },
+      // TODO(#231): CarbonHeaderName builds no Focus node, so the name is
+      // not Tab-reachable (upstream: every header element is).
+      skip: true,
+    );
+
+    testWidgets('skip to content: first Tab reveals the link and Enter '
+        'moves focus to the content region', (WidgetTester tester) async {
+      final FocusNode contentNode = FocusNode(debugLabel: 'content');
+      addTearDown(contentNode.dispose);
+      int navigated = 0;
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            SizedBox(
+              width: 640,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  CarbonSkipToContent(
+                    onPressed: () {
+                      navigated++;
+                      contentNode.requestFocus();
+                    },
+                  ),
+                  CarbonHeader(
+                    name: const CarbonHeaderName(name: 'App'),
+                    navigation: <Widget>[
+                      CarbonHeaderMenuItem(label: 'Catalog', onPressed: () {}),
+                    ],
+                  ),
+                  Focus(focusNode: contentNode, child: const Text('Body')),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // The link renders offstage until it receives focus.
+      expect(find.text('Skip to main content'), findsNothing);
+
+      // The first Tab into the page lands on the skip link and reveals it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(find.text('Skip to main content'), findsOneWidget);
+
+      // Enter activates the link; the callback hands focus to the content
+      // region, which also hides the link again.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(navigated, 1);
+      expect(contentNode.hasPrimaryFocus, isTrue);
+      expect(find.text('Skip to main content'), findsNothing);
     });
   });
 

@@ -19,6 +19,18 @@ Widget _host(Widget child) => Directionality(
   ),
 );
 
+/// Adds the Tab → next-focus wiring a WidgetsApp would normally provide, so
+/// tests can drive real Tab key traversal without one.
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -162,6 +174,114 @@ void main() {
           )
           .heightFactor!;
       expect(open, 1);
+    });
+  });
+
+  // Keyboard spec (Apache-2.0 Carbon Design System; see NOTICE):
+  //   documentation/carbon-website/src/pages/components/UI-shell-left-panel/
+  //     accessibility.mdx — "All items can be reached by Tab. Toggling a
+  //     collapsed section with Space or Enter expands it ... Activating any
+  //     of the links (with Enter) updates the main content area."
+  group('keyboard (#231)', () {
+    testWidgets('Tab reaches each link in order with a visible focus ring', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonSideNav(
+              items: <Widget>[
+                CarbonSideNavLink(label: 'Dashboard', onPressed: () {}),
+                CarbonSideNavLink(label: 'Documents', onPressed: () {}),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      CarbonFocusRing ring(String label) => tester.widget<CarbonFocusRing>(
+        find
+            .ancestor(
+              of: find.text(label),
+              matching: find.byType(CarbonFocusRing),
+            )
+            .first,
+      );
+      bool focused(String label) =>
+          Focus.of(tester.element(find.text(label))).hasPrimaryFocus;
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Dashboard'), isTrue);
+      expect(ring('Dashboard').visible, isTrue);
+      expect(ring('Documents').visible, isFalse);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Documents'), isTrue);
+      expect(ring('Documents').visible, isTrue);
+      expect(ring('Dashboard').visible, isFalse);
+    });
+
+    testWidgets('a focused link activates with Enter and Space', (
+      WidgetTester tester,
+    ) async {
+      int went = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonSideNav(
+            items: <Widget>[
+              CarbonSideNavLink(label: 'Docs', onPressed: () => went++),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      Focus.of(tester.element(find.text('Docs'))).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(went, 2);
+    });
+
+    testWidgets('a sub-menu expands with Enter and collapses with Space', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonSideNav(
+            items: <Widget>[
+              CarbonSideNavMenu(
+                label: 'Reports',
+                children: <Widget>[
+                  CarbonSideNavMenuItem(label: 'Daily', onPressed: () {}),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      double heightFactor() => tester
+          .widget<Align>(
+            find
+                .ancestor(of: find.text('Daily'), matching: find.byType(Align))
+                .first,
+          )
+          .heightFactor!;
+      expect(heightFactor(), 0);
+
+      Focus.of(tester.element(find.text('Reports'))).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(heightFactor(), 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(heightFactor(), 0);
     });
   });
 

@@ -6,6 +6,7 @@
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,6 +23,25 @@ Widget _host(Widget child) => Directionality(
     ),
   ),
 );
+
+/// The bare host has no WidgetsApp shortcut map, so real Tab traversal is
+/// wired up locally (same pattern as the ui_shell header tests).
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
+
+CarbonFocusRing _ringOf(WidgetTester tester, String text) =>
+    tester.widget<CarbonFocusRing>(
+      find
+          .ancestor(of: find.text(text), matching: find.byType(CarbonFocusRing))
+          .first,
+    );
 
 void main() {
   setUp(() {
@@ -242,6 +262,103 @@ void main() {
             .first,
       );
       expect(style.style.color, CarbonThemeData.white.textDisabled);
+    });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream: documentation/carbon-website/src/pages/components/
+    // contained-list/accessibility.mdx — "In all interactive variants, the
+    // Tab key is used for navigation and both Space and Enter are used to
+    // activate components. Users tab between any actionable items in the
+    // list, regardless of whether each item is clickable or contains an
+    // action button."
+
+    testWidgets('Enter and Space activate the focused clickable item', (
+      WidgetTester tester,
+    ) async {
+      int pressed = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonContainedList(
+            children: <Widget>[
+              CarbonContainedListItem(
+                onPressed: () => pressed++,
+                child: const Text('Item'),
+              ),
+            ],
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.text('Item'))).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(pressed, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(pressed, 2);
+    });
+
+    testWidgets('clickable items are sequential Tab stops', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonContainedList(
+              label: const Text('Files'),
+              children: <Widget>[
+                CarbonContainedListItem(
+                  onPressed: () {},
+                  child: const Text('One'),
+                ),
+                CarbonContainedListItem(
+                  onPressed: () {},
+                  child: const Text('Two'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(_ringOf(tester, 'One').visible, isTrue);
+      expect(_ringOf(tester, 'Two').visible, isFalse);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(_ringOf(tester, 'One').visible, isFalse);
+      expect(_ringOf(tester, 'Two').visible, isTrue);
+    });
+
+    testWidgets('keyboard focus shows the focus-token ring', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonContainedList(
+            children: <Widget>[
+              CarbonContainedListItem(
+                onPressed: () {},
+                child: const Text('Item'),
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(_ringOf(tester, 'Item').visible, isFalse);
+
+      Focus.of(tester.element(find.text('Item'))).requestFocus();
+      await tester.pumpAndSettle();
+      final CarbonFocusRing ring = _ringOf(tester, 'Item');
+      expect(ring.visible, isTrue);
+      // No per-widget override: the ring paints the theme `focus` token.
+      expect(ring.color, isNull);
     });
   });
 
