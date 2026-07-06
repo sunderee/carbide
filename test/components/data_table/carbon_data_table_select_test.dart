@@ -69,6 +69,57 @@ class _SelectableState extends State<_Selectable> {
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
+  group('motion', () {
+    testWidgets('batch bar slide tokens match _data-table-action.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const _Selectable(
+            batchActions: <CarbonTableBatchAction>[
+              CarbonTableBatchAction(label: 'Delete'),
+            ],
+          ),
+        ),
+      );
+      // `--batch-actions`: transform $duration-fast-02
+      // motion(standard, productive).
+      final AnimatedSlide bar = tester.widget(find.byType(AnimatedSlide));
+      expect(bar.duration, CarbonDuration.fast02);
+      expect(bar.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion slides the batch bar instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: _Selectable(
+              batchActions: <CarbonTableBatchAction>[
+                CarbonTableBatchAction(label: 'Delete'),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).duration,
+        Duration.zero,
+      );
+      // Selecting a row lands the bar fully on the next frame.
+      await tester.tap(find.bySemanticsLabel('Select row 1'));
+      await tester.pump();
+      await tester.pump();
+      expect(
+        tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+        Offset.zero,
+      );
+      expect(find.text('1 item selected'), findsOneWidget);
+    });
+  });
+
   group('multi-select', () {
     testWidgets('row checkbox selects + fills with layer-selected', (
       WidgetTester tester,

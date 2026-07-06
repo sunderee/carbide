@@ -41,6 +41,40 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('fill tokens match button/_mixins.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonChatButton(label: 'Ask', onPressed: () {})),
+      );
+      // Chat buttons reuse the button fill transition: background /
+      // border-color $duration-fast-01 motion(entrance, productive).
+      final AnimatedContainer fill = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(fill.duration, CarbonDuration.fast01);
+      expect(fill.curve, CarbonEasing.entranceProductive);
+    });
+
+    testWidgets('reduced motion fills instantly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonChatButton(label: 'Ask', onPressed: () {}),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('chat button (_chat-button.scss)', () {
     testWidgets('pill radius and height per size', (WidgetTester tester) async {
       for (final (CarbonChatButtonSize size, double radius)

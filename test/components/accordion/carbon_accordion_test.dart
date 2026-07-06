@@ -36,6 +36,73 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('spec tokens match _accordion.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const CarbonAccordion(
+            children: <Widget>[
+              CarbonAccordionItem(title: 'A', child: Text('Body')),
+            ],
+          ),
+        ),
+      );
+      // `__arrow`: all $duration-fast-02 motion(standard, productive).
+      final AnimatedRotation chevron = tester.widget(
+        find.byType(AnimatedRotation),
+      );
+      expect(chevron.duration, CarbonDuration.fast02);
+      expect(chevron.curve, CarbonEasing.standardProductive);
+      // `__heading:hover`: background motion(standard, productive)
+      // $duration-fast-02.
+      final AnimatedContainer header = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(header.duration, CarbonDuration.fast02);
+      expect(header.curve, CarbonEasing.standardProductive);
+      // `__wrapper`: all $duration-fast-02 motion(entrance, productive).
+      final TweenAnimationBuilder<double> fold = tester.widget(
+        find.byType(TweenAnimationBuilder<double>),
+      );
+      expect(fold.duration, CarbonDuration.fast02);
+      expect(fold.curve, CarbonEasing.entranceProductive);
+    });
+
+    testWidgets('reduced motion opens instantly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: CarbonAccordion(
+              children: <Widget>[
+                CarbonAccordionItem(title: 'A', child: Text('Body')),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).duration,
+        Duration.zero,
+      );
+      expect(
+        tester
+            .widget<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>),
+            )
+            .duration,
+        Duration.zero,
+      );
+      // The body fold is fully open on the next frame.
+      await tester.tap(find.text('A'));
+      await tester.pump();
+      await tester.pump();
+      expect(_bodyFactor(tester, 'Body'), 1);
+    });
+  });
+
   group('toggle', () {
     testWidgets('tapping the title expands and collapses the body', (
       WidgetTester tester,

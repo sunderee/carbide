@@ -106,6 +106,10 @@ extension on CarbonPopoverAlignment {
 /// respond to [onRequestClose], which fires on an outside tap or the Escape
 /// key.
 ///
+/// The surface shows and hides instantly — Carbon defines no popover motion
+/// (`_popover.scss` has no transition), so reduced motion needs no special
+/// handling.
+///
 /// ```dart
 /// CarbonPopover(
 ///   open: _open,

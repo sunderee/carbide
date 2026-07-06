@@ -52,7 +52,8 @@ class CarbonTheme extends InheritedWidget {
 ///
 /// Swapping [data] interpolates every token via [CarbonThemeData.lerp], so a
 /// theme switch (for example light to dark) transitions smoothly rather than
-/// snapping.
+/// snapping. The crossfade is decorative: when the platform requests reduced
+/// motion, the new theme applies instantly.
 class AnimatedCarbonTheme extends ImplicitlyAnimatedWidget {
   /// Creates an animated theme around [child].
   const AnimatedCarbonTheme({
@@ -78,6 +79,33 @@ class AnimatedCarbonTheme extends ImplicitlyAnimatedWidget {
 class _AnimatedCarbonThemeState
     extends AnimatedWidgetBaseState<AnimatedCarbonTheme> {
   _CarbonThemeDataTween? _data;
+
+  void _syncDuration() {
+    // The theme crossfade is decorative, so it collapses to zero when the
+    // platform requests reduced motion.
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    controller.duration = reducedMotion ? Duration.zero : widget.duration;
+    if (reducedMotion && controller.isAnimating) {
+      // A crossfade already in flight was started with the pre-clamp
+      // duration; jump it to its end state.
+      controller.value = controller.upperBound;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncDuration();
+  }
+
+  @override
+  void didUpdateWidget(AnimatedCarbonTheme oldWidget) {
+    // The base class resets the controller duration from widget.duration;
+    // re-clamp it afterwards.
+    super.didUpdateWidget(oldWidget);
+    _syncDuration();
+  }
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {

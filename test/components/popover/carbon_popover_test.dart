@@ -664,6 +664,43 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_popover.scss` defines no transition or animation — the
+    // surface pops in and out instantly, so there is no decorative motion
+    // to disable under reduced motion.
+    testWidgets('opens instantly with no implicit animations', (
+      WidgetTester tester,
+    ) async {
+      late StateSetter setOuter;
+      bool open = false;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                setOuter = setState;
+                return CarbonPopover(
+                  open: open,
+                  content: const Text('Body'),
+                  child: const SizedBox(width: 100, height: 40),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      setOuter(() => open = true);
+      await tester.pump();
+      await tester.pump(); // the deferred overlay show renders next frame.
+      expect(find.text('Body'), findsOneWidget);
+      // Fully shown at once: nothing animates toward visibility.
+      expect(tester.hasRunningAnimations, isFalse);
+      expect(find.byType(AnimatedOpacity), findsNothing);
+      expect(find.byType(FadeTransition), findsNothing);
+    });
+  });
+
   group('goldens', () {
     Widget specimen(CarbonPopoverAlignment align) => Center(
       child: CarbonPopover(

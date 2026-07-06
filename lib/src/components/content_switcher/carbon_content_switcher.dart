@@ -42,6 +42,9 @@ class CarbonSwitch {
 
 /// A horizontal segmented control that selects one of several [switches].
 ///
+/// When the platform requests reduced motion, the selection transition
+/// completes instantly.
+///
 /// ```dart
 /// CarbonContentSwitcher(
 ///   switches: const <CarbonSwitch>[
@@ -298,8 +301,14 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
                             start: BorderSide(color: theme.borderInverse),
                           ),
                   ),
+                  // `_content-switcher.scss` cites no transition tokens;
+                  // fast-01 × standard-productive is Carbide's choice for
+                  // this micro-interaction.
                   child: AnimatedDefaultTextStyle(
-                    duration: CarbonDuration.fast01,
+                    duration:
+                        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                        ? Duration.zero
+                        : CarbonDuration.fast01,
                     curve: CarbonEasing.standardProductive,
                     style: CarbonTypeStyles.bodyCompact01.copyWith(
                       color: foreground,

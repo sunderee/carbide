@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
+import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
@@ -47,6 +48,11 @@ enum CarbonModalSize {
 /// Controlled via [open]; respond to [onClose] (fired by the close button, an
 /// outside tap, or Escape). Focus is trapped within the dialog while open and
 /// restored to the launcher on close.
+///
+/// Opening plays the upstream entrance transition — the modal fades in while
+/// the dialog container slides down from −24px (`moderate-02` ×
+/// `entrance, expressive`). Under reduced motion
+/// (`MediaQueryData.disableAnimations`) the modal appears instantly.
 ///
 /// ```dart
 /// CarbonModal(
@@ -157,6 +163,7 @@ class _CarbonModalState extends State<CarbonModal> {
   final OverlayPortalController _overlay = OverlayPortalController();
   final FocusScopeNode _scope = FocusScopeNode(debugLabel: 'CarbonModal');
   FocusNode? _restoreFocus;
+  bool _entered = false;
 
   @override
   void initState() {
@@ -164,6 +171,7 @@ class _CarbonModalState extends State<CarbonModal> {
     if (widget.open) {
       _restoreFocus = FocusManager.instance.primaryFocus;
       _overlay.show();
+      _entered = true;
     }
   }
 
@@ -185,8 +193,14 @@ class _CarbonModalState extends State<CarbonModal> {
       if (widget.open && !_overlay.isShowing) {
         _restoreFocus = FocusManager.instance.primaryFocus;
         _overlay.show();
+        // Mount hidden first so the entrance transition plays.
+        setState(() => _entered = false);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && widget.open) setState(() => _entered = true);
+        });
       } else if (!widget.open && _overlay.isShowing) {
         _overlay.hide();
+        _entered = false;
         _restoreFocus?.requestFocus();
       }
     }
@@ -219,6 +233,15 @@ class _CarbonModalState extends State<CarbonModal> {
 
   Widget _buildOverlay(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+    // `_modal.scss` `modal-animations` / `modal-container-animations`: the
+    // wrapper fades and the container slides from translate3d(0, -24px, 0),
+    // both $duration-moderate-02 × motion(entrance, expressive); under
+    // `prefers-reduced-motion` the transition is dropped entirely.
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final Duration duration = reducedMotion
+        ? Duration.zero
+        : CarbonDuration.moderate02;
 
     return Positioned.fill(
       child: Focus(
@@ -227,52 +250,66 @@ class _CarbonModalState extends State<CarbonModal> {
         child: FocusScope(
           node: _scope,
           autofocus: true,
-          child: Stack(
-            children: <Widget>[
-              // The scrim.
-              Positioned.fill(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.preventCloseOnClickOutside
-                      ? null
-                      : widget.onClose,
-                  child: ColoredBox(
-                    color: widget.aiLabel != null && !widget.aiRevert
-                        ? theme.aiOverlay
-                        : theme.overlay,
+          child: AnimatedOpacity(
+            duration: duration,
+            curve: CarbonEasing.entranceExpressive,
+            opacity: _entered ? 1 : 0,
+            child: Stack(
+              children: <Widget>[
+                // The scrim.
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: widget.preventCloseOnClickOutside
+                        ? null
+                        : widget.onClose,
+                    child: ColoredBox(
+                      color: widget.aiLabel != null && !widget.aiRevert
+                          ? theme.aiOverlay
+                          : theme.overlay,
+                    ),
                   ),
                 ),
-              ),
-              LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) =>
-                    Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: widget.size.width,
-                          maxHeight: constraints.maxHeight * 0.9,
-                        ),
-                        // Swallow taps so they do not reach the scrim.
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: _Dialog(
-                            title: widget.title,
-                            label: widget.label,
-                            danger: widget.danger,
-                            passiveModal: widget.passiveModal,
-                            isFullWidth: widget.isFullWidth,
-                            aiLabel: widget.aiLabel,
-                            aiRevert: widget.aiRevert,
-                            closeLabel: widget.closeLabel,
-                            onClose: widget.onClose,
-                            primaryButton: widget.primaryButton,
-                            secondaryButton: widget.secondaryButton,
-                            child: widget.child,
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) =>
+                      Center(
+                        child: AnimatedSlide(
+                          duration: duration,
+                          curve: CarbonEasing.entranceExpressive,
+                          // transform: translate3d(0, -24px, 0) while hidden,
+                          // approximated as a fraction of the dialog height.
+                          offset: _entered
+                              ? Offset.zero
+                              : const Offset(0, -0.05),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: widget.size.width,
+                              maxHeight: constraints.maxHeight * 0.9,
+                            ),
+                            // Swallow taps so they do not reach the scrim.
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: _Dialog(
+                                title: widget.title,
+                                label: widget.label,
+                                danger: widget.danger,
+                                passiveModal: widget.passiveModal,
+                                isFullWidth: widget.isFullWidth,
+                                aiLabel: widget.aiLabel,
+                                aiRevert: widget.aiRevert,
+                                closeLabel: widget.closeLabel,
+                                onClose: widget.onClose,
+                                primaryButton: widget.primaryButton,
+                                secondaryButton: widget.secondaryButton,
+                                child: widget.child,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

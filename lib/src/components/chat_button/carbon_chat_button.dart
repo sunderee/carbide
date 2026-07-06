@@ -52,6 +52,9 @@ enum CarbonChatButtonSize {
 
 /// A Carbon AI chat button.
 ///
+/// When the platform requests reduced motion, the hover/press fill
+/// transition completes instantly.
+///
 /// ```dart
 /// CarbonChatButton(label: 'Ask a question', onPressed: ask);
 /// CarbonChatButton(
@@ -138,8 +141,13 @@ class CarbonChatButton extends StatelessWidget {
             states: states,
           );
           final BorderRadius radius = BorderRadius.circular(size.radius);
+          // Fill per `button/_mixins.scss` (chat buttons reuse the button
+          // reset): background / border-color $duration-fast-01
+          // motion(entrance, productive).
           return AnimatedContainer(
-            duration: CarbonDuration.fast01,
+            duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                ? Duration.zero
+                : CarbonDuration.fast01,
             curve: CarbonEasing.entranceProductive,
             height: size.height,
             constraints: const BoxConstraints(maxWidth: 320),

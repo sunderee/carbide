@@ -25,6 +25,11 @@ import '../../theme/carbon_theme_data.dart';
 /// and centers the spinner — place it inside a Stack covering the content
 /// it blocks. When [active] is false the spinner freezes (the upstream
 /// two-phase wind-down animation is simplified to a stop; recorded).
+///
+/// The spin is essential motion and deliberately ignores
+/// `MediaQueryData.disableAnimations`: per Carbon's motion guidance a
+/// loading indicator communicates that the system is still working, so
+/// freezing it would read as a hang rather than reduced motion.
 class CarbonLoading extends StatefulWidget {
   /// Creates a loading spinner.
   const CarbonLoading({

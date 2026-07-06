@@ -301,6 +301,62 @@ void main() {
     });
   });
 
+  group('motion spec locks (#235)', () {
+    // Spec source: `_dialog.scss` — the `[open]` transitions (and the
+    // `presence-dialog__enter` keyframes) run opacity + transform at
+    // $duration-moderate-02 × motion(entrance, expressive); only the
+    // entrance plays in Carbide (closing unmounts the overlay).
+    testWidgets('entrance is moderate-02 × entrance-expressive', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(CarbonDialog(open: true, children: _slots())),
+      );
+      final AnimatedSlide slide = tester.widget<AnimatedSlide>(
+        find.byType(AnimatedSlide),
+      );
+      expect(slide.duration, CarbonDuration.moderate02);
+      expect(slide.curve, CarbonEasing.entranceExpressive);
+      // The surface fade and the backdrop fade.
+      for (final AnimatedOpacity fade in tester.widgetList<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      )) {
+        expect(fade.duration, CarbonDuration.moderate02);
+      }
+    });
+
+    // Spec source: `_dialog.scss` `--dialog__close`: transition
+    // background-color $duration-fast-02 motion(standard, productive).
+    testWidgets('close button hover tint is fast-02 × standard-productive; '
+        'instant under reduced motion', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(CarbonDialog(open: true, children: _slots(onClose: () {}))),
+      );
+      final Finder button = find.descendant(
+        of: find.byType(CarbonDialogCloseButton),
+        matching: find.byType(AnimatedContainer),
+      );
+      expect(
+        tester.widget<AnimatedContainer>(button).duration,
+        CarbonDuration.fast02,
+      );
+      expect(
+        tester.widget<AnimatedContainer>(button).curve,
+        CarbonEasing.standardProductive,
+      );
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(
+            CarbonDialog(open: true, children: _slots(onClose: () {})),
+          ),
+        ),
+      );
+      expect(tester.widget<AnimatedContainer>(button).duration, Duration.zero);
+    });
+  });
+
   group('accessibility guidelines (#226)', () {
     testWidgets('meets tap-target and label guidelines', (
       WidgetTester tester,

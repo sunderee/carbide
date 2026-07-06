@@ -26,6 +26,10 @@ import '../popover/carbon_popover.dart';
 /// Escape. [enterDelayMs] (default 100) and [leaveDelayMs] (default 300) debounce
 /// pointer hover so it does not flicker.
 ///
+/// The bubble shows and hides instantly — Carbon defines no tooltip motion
+/// (the delays above are hover debounce, not animation), so reduced motion
+/// needs no special handling.
+///
 /// ```dart
 /// CarbonTooltip(
 ///   label: 'Duplicate',

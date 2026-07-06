@@ -42,6 +42,11 @@ enum CarbonInlineLoadingStatus {
 /// becomes [CarbonInlineLoadingStatus.finished], [onSuccess] fires after
 /// [successDelay] (upstream default 1500ms). Status changes are announced
 /// via a live region.
+///
+/// Status changes swap icons instantly (no fade), so reduced motion needs
+/// no special handling there; the active spinner is essential motion and
+/// keeps spinning under `MediaQueryData.disableAnimations` — see
+/// [CarbonLoading].
 class CarbonInlineLoading extends StatefulWidget {
   /// Creates an inline loading indicator.
   const CarbonInlineLoading({

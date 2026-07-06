@@ -59,6 +59,42 @@ void main() {
     ),
   );
 
+  group('motion', () {
+    testWidgets('panel slide tokens match _header-panel.scss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const CarbonHeaderPanel(open: true, child: SizedBox())),
+      );
+      // width $duration-fast-02 motion(exit, productive).
+      final AnimatedContainer panel = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(panel.duration, CarbonDuration.fast02);
+      expect(panel.curve, CarbonEasing.exitProductive);
+    });
+
+    testWidgets('reduced motion opens instantly', (WidgetTester tester) async {
+      Widget tree(bool open) => _host(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: CarbonHeaderPanel(open: open, child: const SizedBox()),
+        ),
+      );
+      await tester.pumpWidget(tree(false));
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+      // The panel is at its full 256px width on the next frame.
+      await tester.pumpWidget(tree(true));
+      await tester.pump();
+      expect(tester.getSize(find.byType(CarbonHeaderPanel)).width, 256);
+    });
+  });
+
   group('header panel', () {
     testWidgets('open is 256px wide; closed collapses to 0', (
       WidgetTester tester,

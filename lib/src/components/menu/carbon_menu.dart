@@ -100,6 +100,10 @@ class _MenuScope extends InheritedWidget {
 /// overlay (for example a [CarbonPopover]) anchored to its trigger, and calls
 /// [onClose] in response to selection or dismissal.
 ///
+/// The menu opens and closes instantly (Carbon defines no open transition);
+/// row hover tints ease at `fast-01`, applied instantly under reduced motion
+/// (`MediaQueryData.disableAnimations`).
+///
 /// ```dart
 /// CarbonMenu(
 ///   onClose: () => setState(() => _open = false),
@@ -536,8 +540,12 @@ class _MenuItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    // `_menu.scss`: background-color $duration-fast-01
+    // motion(standard, productive); instant under reduced motion.
     return AnimatedContainer(
-      duration: CarbonDuration.fast01,
+      duration: reducedMotion ? Duration.zero : CarbonDuration.fast01,
       curve: CarbonEasing.standardProductive,
       height: size.height,
       decoration: BoxDecoration(color: background),

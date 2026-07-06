@@ -30,6 +30,86 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    testWidgets('spec tokens match _tile.scss', (WidgetTester tester) async {
+      // Clickable: background $duration-moderate-01
+      // motion(standard, productive).
+      await tester.pumpWidget(
+        _host(CarbonClickableTile(onPressed: () {}, child: const Text('T'))),
+      );
+      final AnimatedContainer clickable = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(clickable.duration, CarbonDuration.moderate01);
+      expect(clickable.curve, CarbonEasing.standardProductive);
+
+      // Selectable: the same surface transition, plus the checkmark fade at
+      // opacity $duration-fast-02 motion(standard, productive).
+      await tester.pumpWidget(
+        _host(
+          CarbonSelectableTile(
+            selected: true,
+            onChanged: (_) {},
+            child: const Text('S'),
+          ),
+        ),
+      );
+      final AnimatedContainer selectable = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(selectable.duration, CarbonDuration.moderate01);
+      expect(selectable.curve, CarbonEasing.standardProductive);
+      final AnimatedOpacity checkmark = tester.widget(
+        find.byType(AnimatedOpacity),
+      );
+      expect(checkmark.duration, CarbonDuration.fast02);
+      expect(checkmark.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion is instant', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonSelectableTile(
+              selected: true,
+              onChanged: (_) {},
+              child: const Text('S'),
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+      expect(
+        tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).duration,
+        Duration.zero,
+      );
+
+      await tester.pumpWidget(
+        _host(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: CarbonClickableTile(
+              onPressed: () {},
+              child: const Text('T'),
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('spec locks (styles/scss/components/tile/_tile.scss)', () {
     testWidgets('minimum size 128×64 and 16px padding', (
       WidgetTester tester,

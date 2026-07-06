@@ -42,6 +42,91 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  group('motion', () {
+    Widget nav({bool reducedMotion = false, bool menuOpen = false}) => _host(
+      MediaQuery(
+        data: MediaQueryData(disableAnimations: reducedMotion),
+        child: CarbonSideNav(
+          items: <Widget>[
+            CarbonSideNavMenu(
+              label: 'Reports',
+              initiallyExpanded: menuOpen,
+              children: <Widget>[
+                CarbonSideNavMenuItem(label: 'Daily', onPressed: () {}),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    testWidgets('panel expansion uses the hardcoded upstream transition', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(nav());
+      // `_side-nav.scss` `.cds--side-nav`: inline-size 0.11s
+      // cubic-bezier(0.2, 0, 1, 0.9) ("TODO: sync with motion work" — not a
+      // motion token upstream).
+      final AnimatedContainer panel = tester.widget(
+        find.byType(AnimatedContainer),
+      );
+      expect(panel.duration, const Duration(milliseconds: 110));
+      expect(panel.curve, const Cubic(0.2, 0, 1, 0.9));
+    });
+
+    testWidgets('menu tokens: chevron and fold at fast-02', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(nav());
+      // `_side-nav.scss` `__submenu-chevron > svg`: transform
+      // $duration-fast-02 (no easing token cited).
+      final AnimatedRotation chevron = tester.widget(
+        find.byType(AnimatedRotation),
+      );
+      expect(chevron.duration, CarbonDuration.fast02);
+      expect(chevron.curve, CarbonEasing.standardProductive);
+      final TweenAnimationBuilder<double> fold = tester.widget(
+        find.byType(TweenAnimationBuilder<double>),
+      );
+      expect(fold.duration, CarbonDuration.fast02);
+      expect(fold.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion collapses panel and menu instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(nav(reducedMotion: true));
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+      expect(
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).duration,
+        Duration.zero,
+      );
+      expect(
+        tester
+            .widget<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>),
+            )
+            .duration,
+        Duration.zero,
+      );
+      // Opening the menu reveals the item on the next frame.
+      await tester.tap(find.text('Reports'));
+      await tester.pump();
+      await tester.pump();
+      final Align fold = tester.widget(
+        find
+            .ancestor(of: find.text('Daily'), matching: find.byType(Align))
+            .first,
+      );
+      expect(fold.heightFactor, 1);
+    });
+  });
+
   group('panel', () {
     testWidgets('expanded is 256px and shows labels; rail is 48px', (
       WidgetTester tester,

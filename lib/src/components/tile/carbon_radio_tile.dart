@@ -33,7 +33,8 @@ import 'carbon_tile.dart';
 /// `layerSelectedInverse` selection border, the 16px indicator at the
 /// top-right — but uses the `CheckmarkFilled` indicator and single-select
 /// (radio) behaviour. Normally built by [CarbonTileGroup]; use directly only
-/// for a standalone tile.
+/// for a standalone tile. When the platform requests reduced motion, the
+/// indicator fade and AI-decorator slide complete instantly.
 class CarbonRadioTile extends StatelessWidget {
   /// Creates a radio tile.
   const CarbonRadioTile({
@@ -76,6 +77,11 @@ class CarbonRadioTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onSelected != null;
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final Duration fast02 = reducedMotion
+        ? Duration.zero
+        : CarbonDuration.fast02;
 
     return Semantics(
       inMutuallyExclusiveGroup: true,
@@ -100,8 +106,12 @@ class CarbonRadioTile extends StatelessWidget {
 
           return CarbonFocusRing(
             visible: focused,
+            // Background/border per `_tile.scss`: $duration-moderate-01
+            // motion(standard, productive).
             child: AnimatedContainer(
-              duration: CarbonDuration.moderate01,
+              duration: reducedMotion
+                  ? Duration.zero
+                  : CarbonDuration.moderate01,
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,
@@ -132,8 +142,10 @@ class CarbonRadioTile extends StatelessWidget {
                   PositionedDirectional(
                     top: 0,
                     end: CarbonTileSpec.padding - endPadding,
+                    // Indicator fade per `_tile.scss`: opacity
+                    // $duration-fast-02 motion(standard, productive).
                     child: AnimatedOpacity(
-                      duration: CarbonDuration.fast02,
+                      duration: fast02,
                       curve: CarbonEasing.standardProductive,
                       opacity: indicatorVisible ? 1 : 0,
                       child: CarbonIcon(
@@ -144,9 +156,12 @@ class CarbonRadioTile extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // AI decorator slide per `_tile.scss` `--tile--radio` AI
+                  // selectors: inset-inline-end $duration-fast-02
+                  // motion(standard, productive).
                   if (aiLabel != null)
                     AnimatedPositionedDirectional(
-                      duration: CarbonDuration.fast02,
+                      duration: fast02,
                       curve: CarbonEasing.standardProductive,
                       top: 0,
                       end:

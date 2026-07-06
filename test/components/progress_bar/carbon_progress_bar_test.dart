@@ -208,6 +208,68 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_progress-bar.scss` — the determinate bar transitions
+    // `transform $duration-fast-02 motion(standard, productive)`; the
+    // indeterminate sweep is the 1400ms `progress-bar-indeterminate`
+    // animation (locked in the spec-locks group above).
+    testWidgets('spec lock: determinate fill is fast-02 × '
+        'standard-productive', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(const CarbonProgressBar(label: 'L', value: 30)),
+      );
+      final TweenAnimationBuilder<double> fill = tester
+          .widget<TweenAnimationBuilder<double>>(
+            find.byType(TweenAnimationBuilder<double>),
+          );
+      expect(fill.duration, CarbonDuration.fast02);
+      expect(fill.curve, CarbonEasing.standardProductive);
+    });
+
+    testWidgets('reduced motion: determinate value changes apply instantly', (
+      WidgetTester tester,
+    ) async {
+      Widget bar(double value) => MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: _host(CarbonProgressBar(label: 'L', value: value)),
+      );
+      await tester.pumpWidget(bar(30));
+      expect(
+        tester
+            .widget<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>),
+            )
+            .duration,
+        Duration.zero,
+      );
+      await tester.pumpWidget(bar(60));
+      await tester.pump();
+      expect(
+        tester
+            .widget<FractionallySizedBox>(find.byType(FractionallySizedBox))
+            .widthFactor,
+        0.6,
+      );
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    // The sweep is essential motion: per Carbon's motion guidance it
+    // communicates that work is still ongoing, so it deliberately keeps
+    // running under MediaQueryData.disableAnimations.
+    testWidgets('reduced motion: the indeterminate sweep keeps running', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonProgressBar(label: 'L')),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(tester.hasRunningAnimations, isTrue);
+    });
+  });
+
   group('semantics', () {
     testWidgets('exposes label and percentage; indeterminate omits value', (
       WidgetTester tester,

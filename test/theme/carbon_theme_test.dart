@@ -120,6 +120,36 @@ void main() {
     await tester.pumpAndSettle();
     expect(observed, CarbonThemeData.gray100.background);
   });
+
+  testWidgets('AnimatedCarbonTheme applies instantly under reduced motion', (
+    WidgetTester tester,
+  ) async {
+    // The theme crossfade is decorative, so disableAnimations collapses it
+    // to zero: the new theme is fully applied on the next frame.
+    late Color observed;
+    Widget tree(CarbonThemeData data) => _host(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: AnimatedCarbonTheme(
+          data: data,
+          duration: const Duration(milliseconds: 200),
+          child: Builder(
+            builder: (BuildContext context) {
+              observed = CarbonTheme.of(context).background;
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(tree(CarbonThemeData.white));
+    expect(observed, CarbonThemeData.white.background);
+
+    await tester.pumpWidget(tree(CarbonThemeData.gray100));
+    await tester.pump();
+    expect(observed, CarbonThemeData.gray100.background);
+  });
 }
 
 /// A harness that swaps the [CarbonTheme] data while keeping its child stable.

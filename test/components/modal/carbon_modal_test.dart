@@ -241,6 +241,103 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_modal.scss` `modal-animations` /
+    // `modal-container-animations` — the wrapper fades and the container
+    // slides from translate3d(0, -24px, 0), both $duration-moderate-02 ×
+    // motion(entrance, expressive).
+    testWidgets('spec lock: entrance is moderate-02 × entrance-expressive', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(modal());
+      final AnimatedOpacity fade = tester.widget<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      );
+      expect(fade.duration, CarbonDuration.moderate02);
+      expect(fade.curve, CarbonEasing.entranceExpressive);
+      final AnimatedSlide slide = tester.widget<AnimatedSlide>(
+        find.byType(AnimatedSlide),
+      );
+      expect(slide.duration, CarbonDuration.moderate02);
+      expect(slide.curve, CarbonEasing.entranceExpressive);
+      expect(slide.offset, Offset.zero);
+    });
+
+    testWidgets('opening plays the fade + slide entrance', (
+      WidgetTester tester,
+    ) async {
+      late StateSetter set;
+      bool open = false;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              set = setState;
+              return CarbonModal(
+                open: open,
+                title: 'T',
+                child: const Text('Body'),
+              );
+            },
+          ),
+        ),
+      );
+      set(() => open = true);
+      await tester.pump();
+      await tester.pump();
+      // Mounted hidden first, then transitions to visible.
+      expect(
+        tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).opacity,
+        0,
+      );
+      await tester.pump();
+      expect(
+        tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).opacity,
+        1,
+      );
+      expect(tester.hasRunningAnimations, isTrue);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('reduced motion: the modal appears instantly', (
+      WidgetTester tester,
+    ) async {
+      late StateSetter set;
+      bool open = false;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                set = setState;
+                return CarbonModal(
+                  open: open,
+                  title: 'T',
+                  child: const Text('Body'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      set(() => open = true);
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+      final AnimatedOpacity fade = tester.widget<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      );
+      expect(fade.duration, Duration.zero);
+      expect(fade.opacity, 1);
+      expect(
+        tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).duration,
+        Duration.zero,
+      );
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+  });
+
   group('goldens', () {
     testWidgets('danger modal across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

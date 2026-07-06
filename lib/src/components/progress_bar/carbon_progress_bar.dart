@@ -75,6 +75,11 @@ enum CarbonProgressBarStatus {
 /// animates at `fast-02`. The finished/error statuses fill the track and
 /// show a 16px status icon by the label. The track reads the contextual
 /// `borderSubtle` token.
+///
+/// Under reduced motion (`MediaQueryData.disableAnimations`) determinate
+/// value changes apply instantly, but the indeterminate sweep keeps moving:
+/// it is essential motion — per Carbon's motion guidance it communicates
+/// that work is still ongoing, and a frozen stripe would read as a stall.
 class CarbonProgressBar extends StatefulWidget {
   /// Creates a progress bar.
   const CarbonProgressBar({
@@ -332,6 +337,8 @@ class _Track extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool reducedMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 48),
       child: SizedBox(
@@ -339,6 +346,8 @@ class _Track extends StatelessWidget {
         width: double.infinity,
         child: ColoredBox(
           color: trackColor,
+          // The indeterminate sweep deliberately keeps running under
+          // reduced motion (essential motion — ongoing work).
           child: indeterminate
               ? AnimatedBuilder(
                   animation: controller,
@@ -352,9 +361,14 @@ class _Track extends StatelessWidget {
                     ),
                   ),
                 )
+              // `_progress-bar.scss`: transition: transform
+              // $duration-fast-02 motion(standard, productive); instant
+              // under reduced motion.
               : TweenAnimationBuilder<double>(
                   tween: Tween<double>(end: fraction),
-                  duration: CarbonDuration.fast02,
+                  duration: reducedMotion
+                      ? Duration.zero
+                      : CarbonDuration.fast02,
                   curve: CarbonEasing.standardProductive,
                   builder:
                       (BuildContext context, double width, Widget? child) =>

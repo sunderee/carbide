@@ -277,6 +277,56 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `slug/_slug.scss` (the real AILabel styles): the trigger
+    // transitions color/border/box-shadow/background at $duration-fast-01
+    // motion(entrance, productive). The callout itself has no motion.
+    testWidgets('spec lock: trigger tint is fast-01 × entrance-productive', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(const CarbonAILabel()));
+      final AnimatedContainer box = tester.widget<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
+      expect(box.duration, CarbonDuration.fast01);
+      expect(box.curve, CarbonEasing.entranceProductive);
+    });
+
+    testWidgets('reduced motion: trigger tints apply instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonAILabel()),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+    });
+
+    testWidgets('reduced motion: inline affordance tints apply instantly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(const CarbonAILabel(inline: true)),
+        ),
+      );
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
+    });
+  });
+
   group('goldens', () {
     Widget overlaid(Widget child) => Overlay(
       initialEntries: <OverlayEntry>[

@@ -277,6 +277,30 @@ void main() {
     });
   });
 
+  group('motion (#235)', () {
+    // Spec source: `_overflow-menu.scss` transitions only the trigger's
+    // background/outline (fast-02 — owned by CarbonButton, which honors
+    // reduced motion); the menu itself has no open transition and appears
+    // instantly.
+    testWidgets('the menu opens instantly under reduced motion', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: _host(CarbonOverflowMenu(items: items((_) {}))),
+        ),
+      );
+      await tester.tap(find.byType(CarbonButton));
+      await tester.pump();
+      await tester.pump(); // the deferred overlay show renders next frame.
+      expect(find.byType(CarbonMenu), findsOneWidget);
+      expect(find.byType(FadeTransition), findsNothing);
+      // Nothing left animating once shown.
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+  });
+
   group('goldens', () {
     testWidgets('open overflow menu across themes', (
       WidgetTester tester,
