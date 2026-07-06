@@ -317,6 +317,67 @@ void main() {
     });
   });
 
+  group('keyboard (#231)', () {
+    // Upstream: documentation/carbon-website/src/pages/components/
+    // code-snippet/accessibility.mdx — "For all three variants, the code
+    // snippet can be copied with Space or Enter" and "The multi-line's
+    // buttons are reachable by Tab and activated with Space or Enter". The
+    // show-more/less toggle's Enter/Space drive is covered in the
+    // 'multi-line expand' group above; the inline chip's in 'copy'.
+
+    Finder copyIcon() => find.descendant(
+      of: find.byType(CarbonCopyButton),
+      matching: find.byType(CarbonIcon),
+    );
+
+    testWidgets('Enter and Space on the focused copy button copy the code', (
+      WidgetTester tester,
+    ) async {
+      final List<String?> copies = <String?>[];
+      int notified = 0;
+      _mockClipboard(tester, copies.add);
+      await tester.pumpWidget(
+        _host(CarbonCodeSnippet(code: code, onCopy: () => notified++)),
+      );
+      Focus.of(tester.element(copyIcon())).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(copies, <String?>[code]);
+      expect(notified, 1);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(copies, <String?>[code, code]);
+      expect(notified, 2);
+      await tester.pump(const Duration(milliseconds: 2100));
+    });
+
+    testWidgets('the multi-line copy button also copies with Enter', (
+      WidgetTester tester,
+    ) async {
+      String? copied;
+      _mockClipboard(tester, (String? value) => copied = value);
+      await tester.pumpWidget(
+        _host(
+          const CarbonCodeSnippet(
+            code: 'a\nb\nc\nd\ne',
+            type: CarbonCodeSnippetType.multi,
+            maxCollapsedRows: 2,
+          ),
+        ),
+      );
+      Focus.of(tester.element(copyIcon())).requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(copied, 'a\nb\nc\nd\ne');
+      await tester.pump(const Duration(milliseconds: 2100));
+    });
+  });
+
   group('semantics', () {
     testWidgets('inline chip is a labelled button', (
       WidgetTester tester,

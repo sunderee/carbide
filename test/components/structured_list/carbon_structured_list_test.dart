@@ -20,6 +20,18 @@ Widget _host(Widget child) => Directionality(
   ),
 );
 
+/// The bare host has no WidgetsApp shortcut map, so real Tab traversal is
+/// wired up locally (same pattern as the ui_shell header tests).
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
+
 List<CarbonStructuredListRow> _rows() => const <CarbonStructuredListRow>[
   CarbonStructuredListRow(
     cells: <Widget>[Text('Load balancer'), Text('Routine')],
@@ -215,6 +227,61 @@ void main() {
       );
       expect(find.text('Cell 0'), findsOneWidget);
       expect(find.text('Cell 1'), findsOneWidget);
+    });
+  });
+
+  group('keyboard reachability (#231)', () {
+    // Upstream: documentation/carbon-website/src/pages/components/
+    // structured-list/accessibility.mdx defers to the WAI-ARIA table
+    // pattern and IBM requirements 2.1.1 Keyboard, 2.4.3 Focus Order and
+    // 2.4.7 Focus Visible; the react implementation
+    // (documentation/carbon/packages/react/src/components/StructuredList/
+    // StructuredList.tsx) defines no arrow-key handling — selectable rows
+    // are sequential Tab stops activated with Enter/Space.
+
+    testWidgets('rows are sequential Tab stops with a visible focus ring; '
+        'Space selects the reached row', (WidgetTester tester) async {
+      final List<int> selected = <int>[];
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonStructuredList(
+              headers: const <String>['Name', 'Type'],
+              rows: _rows(),
+              selectable: true,
+              selectedIndex: 0,
+              onSelected: selected.add,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      CarbonFocusRing ringOf(String cell) => tester.widget<CarbonFocusRing>(
+        find
+            .ancestor(
+              of: find.text(cell),
+              matching: find.byType(CarbonFocusRing),
+            )
+            .first,
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(ringOf('Load balancer').visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(ringOf('Database').visible, isTrue);
+      expect(ringOf('Load balancer').visible, isFalse);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(selected, <int>[1]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(ringOf('Cache').visible, isTrue);
     });
   });
 

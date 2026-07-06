@@ -5,6 +5,7 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -411,6 +412,106 @@ void main() {
       Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
       await tester.pumpAndSettle();
       expect(ringHost().foregroundDecoration, isNotNull);
+    });
+  });
+
+  group('keyboard (#231)', () {
+    // Upstream spec: documentation/carbon-website/src/pages/components/tag/
+    // accessibility.mdx — dismissible tags are in the tab order and receive
+    // focus around the close icon; Enter or Space dismisses. Selectable
+    // tags are in the tab order; Enter or Space toggles the selection.
+    // Operational tags are in the tab order; Enter or Space activates.
+
+    Widget tabHost(Widget child) => _host(
+      FocusTraversalGroup(
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // A focus anchor before the component, so the first Tab
+                // press moves focus onto the tag's control.
+                Focus(autofocus: true, child: const SizedBox.shrink()),
+                child,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('dismissible: Tab reaches the dismiss affordance; Enter and '
+        'Space dismiss', (WidgetTester tester) async {
+      int closed = 0;
+      await tester.pumpWidget(
+        tabHost(CarbonDismissibleTag(label: 'Filter', onClose: () => closed++)),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      // The close icon's Focus ancestor is the dismiss affordance.
+      expect(
+        Focus.of(tester.element(find.byType(CarbonIcon))).hasPrimaryFocus,
+        isTrue,
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(closed, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(closed, 2);
+    });
+
+    testWidgets('selectable: Space (and Enter) toggle the selection', (
+      WidgetTester tester,
+    ) async {
+      bool selected = false;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) =>
+                CarbonSelectableTag(
+                  label: 'Topic',
+                  selected: selected,
+                  onChanged: (bool v) => setState(() => selected = v),
+                ),
+          ),
+        ),
+      );
+      Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(selected, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(selected, isFalse);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, isTrue);
+    });
+
+    testWidgets('operational: Enter and Space activate', (
+      WidgetTester tester,
+    ) async {
+      int pressed = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonOperationalTag(label: 'View all', onPressed: () => pressed++),
+        ),
+      );
+      Focus.of(tester.element(find.byType(TagSurface))).requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(pressed, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(pressed, 2);
     });
   });
 

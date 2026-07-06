@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -238,6 +239,92 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  // Keyboard spec (Apache-2.0 Carbon Design System; see NOTICE):
+  //   documentation/carbon-website/src/pages/components/breadcrumb/
+  //     accessibility.mdx — "Each page link in the breadcrumb is reached by
+  //     Tab and activated by Enter. The current page, if listed in the
+  //     breadcrumb, is not a link."
+  //   No page-header accessibility.mdx exists; the band's focus order
+  //   (breadcrumb bar before the title row and its page actions) follows
+  //   the composition verified against
+  //   documentation/carbon/packages/react/src/components/PageHeader/
+  //     PageHeader.tsx.
+  group('keyboard (#231)', () {
+    /// Adds the Tab → next-focus wiring a WidgetsApp would normally
+    /// provide, so tests can drive real Tab key traversal without one.
+    Widget tabTraversal(Widget child) => Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+        child: FocusScope(autofocus: true, child: child),
+      ),
+    );
+
+    Widget header({
+      required VoidCallback onHome,
+      required VoidCallback onFinance,
+      required VoidCallback onEdit,
+    }) => CarbonPageHeader(
+      title: 'Reports',
+      breadcrumbs: <CarbonBreadcrumbItem>[
+        CarbonBreadcrumbItem(label: 'Home', onPressed: onHome),
+        CarbonBreadcrumbItem(label: 'Finance', onPressed: onFinance),
+        const CarbonBreadcrumbItem(label: 'Reports', isCurrentPage: true),
+      ],
+      pageActions: CarbonButton(label: 'Edit', onPressed: onEdit),
+    );
+
+    testWidgets('Tab visits breadcrumb links then the page action', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          tabTraversal(header(onHome: () {}, onFinance: () {}, onEdit: () {})),
+        ),
+      );
+      await tester.pumpAndSettle();
+      bool focused(String label) =>
+          Focus.of(tester.element(find.text(label))).hasPrimaryFocus;
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Home'), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Finance'), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Edit'), isTrue);
+    });
+
+    testWidgets('Enter activates a breadcrumb link and a page action', (
+      WidgetTester tester,
+    ) async {
+      int home = 0;
+      int edit = 0;
+      await tester.pumpWidget(
+        _host(
+          header(onHome: () => home++, onFinance: () {}, onEdit: () => edit++),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      Focus.of(tester.element(find.text('Home'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(home, 1);
+
+      Focus.of(tester.element(find.text('Edit'))).requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(edit, 1);
     });
   });
 

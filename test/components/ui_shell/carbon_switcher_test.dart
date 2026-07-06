@@ -19,6 +19,18 @@ Widget _host(Widget child) => Directionality(
   ),
 );
 
+/// Adds the Tab → next-focus wiring a WidgetsApp would normally provide, so
+/// tests can drive real Tab key traversal without one.
+Widget _tabTraversal(Widget child) => Shortcuts(
+  shortcuts: const <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+  },
+  child: Actions(
+    actions: <Type, Action<Intent>>{NextFocusIntent: NextFocusAction()},
+    child: FocusScope(autofocus: true, child: child),
+  ),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -176,6 +188,63 @@ void main() {
         matching: find.byType(SizedBox),
       );
       expect(tester.getSize(rule).height, 1);
+    });
+  });
+
+  // Keyboard spec (Apache-2.0 Carbon Design System; see NOTICE):
+  //   documentation/carbon-website/src/pages/components/UI-shell-right-panel/
+  //     accessibility.mdx — "All actionable links in the panel can be
+  //     reached by Tab. Activating any of the links (with Enter) loads new
+  //     content." (Enter/Space activation of a focused item is covered in
+  //     the switcher group above.)
+  group('keyboard (#231)', () {
+    testWidgets('Tab reaches each item in order and Enter activates', (
+      WidgetTester tester,
+    ) async {
+      int went = 0;
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonHeaderPanel(
+              open: true,
+              child: CarbonSwitcher(
+                children: <Widget>[
+                  CarbonSwitcherItem(
+                    label: 'Console',
+                    selected: true,
+                    onPressed: () {},
+                  ),
+                  const CarbonSwitcherDivider(),
+                  CarbonSwitcherItem(label: 'Catalog', onPressed: () => went++),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      CarbonFocusRing ring(String label) => tester.widget<CarbonFocusRing>(
+        find
+            .ancestor(
+              of: find.text(label),
+              matching: find.byType(CarbonFocusRing),
+            )
+            .first,
+      );
+      bool focused(String label) =>
+          Focus.of(tester.element(find.text(label))).hasPrimaryFocus;
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Console'), isTrue);
+      expect(ring('Console').visible, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focused('Catalog'), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(went, 1);
     });
   });
 

@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -229,6 +230,156 @@ void main() {
       expect(
         (pad.padding.resolve(TextDirection.ltr)).left,
         CarbonSpacing.spacing01,
+      );
+    });
+  });
+
+  // Keyboard spec: upstream renders a native <input> followed by native
+  // <select>s in DOM order (documentation/carbon/packages/react/src/
+  // components/TimePicker/TimePicker.tsx and
+  // TimePickerSelect/TimePickerSelect.tsx), so Tab runs field → AM/PM
+  // select, typing lands in the focused field, and the selects keep
+  // Carbon's select keyboard model (Enter/Space/Down opens, arrows move,
+  // Enter/Space commits — documentation/carbon-website/src/pages/
+  // components/pagination/accessibility.mdx describes it for selects).
+  group('keyboard & focus (#231)', () {
+    /// The bare test host has no WidgetsApp, so install the Tab →
+    /// focus-traversal wiring an app scaffold would normally provide.
+    Widget tabTraversal(Widget child) => Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.tab): NextFocusIntent(),
+        SingleActivator(LogicalKeyboardKey.tab, shift: true):
+            PreviousFocusIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          NextFocusIntent: NextFocusAction(),
+          PreviousFocusIntent: PreviousFocusAction(),
+        },
+        child: FocusTraversalGroup(child: child),
+      ),
+    );
+
+    Future<FocusNode> pumpPicker(
+      WidgetTester tester, {
+      ValueChanged<String>? onFieldChanged,
+      ValueChanged<String>? onPeriodChanged,
+    }) async {
+      final FocusNode field = FocusNode(debugLabel: 'time field');
+      addTearDown(field.dispose);
+      await tester.pumpWidget(
+        _host(
+          tabTraversal(
+            CarbonTimePicker(
+              labelText: 'Time',
+              focusNode: field,
+              onChanged: onFieldChanged,
+              children: <Widget>[
+                CarbonTimePickerSelect<String>(
+                  labelText: 'AM/PM',
+                  value: 'AM',
+                  items: _periods(),
+                  onChanged: onPeriodChanged ?? (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      return field;
+    }
+
+    testWidgets('Tab moves from the time field to the AM/PM select', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode field = await pumpPicker(tester);
+      field.requestFocus();
+      await tester.pump();
+      expect(field.hasPrimaryFocus, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(field.hasPrimaryFocus, isFalse);
+      final BuildContext? focused =
+          tester.binding.focusManager.primaryFocus?.context;
+      expect(
+        focused
+            ?.findAncestorWidgetOfExactType<CarbonTimePickerSelect<String>>(),
+        isNotNull,
+      );
+    });
+
+    testWidgets('the focused field shows its focus chrome and takes '
+        'keyboard entry', (WidgetTester tester) async {
+      String? value;
+      final FocusNode field = await pumpPicker(
+        tester,
+        onFieldChanged: (String v) => value = v,
+      );
+      field.requestFocus();
+      // One pump applies the focus change, the next rebuilds the chrome.
+      await tester.pump();
+      await tester.pump();
+
+      // The time field's chrome reflects keyboard focus.
+      expect(
+        find.byWidgetPredicate((Widget w) => w is CarbonField && w.focused),
+        findsOneWidget,
+      );
+
+      await tester.enterText(find.byType(EditableText), '10:45');
+      await tester.pump();
+      expect(value, '10:45');
+    });
+
+    testWidgets('the AM/PM select opens with Enter, arrows move and Enter '
+        'commits', (WidgetTester tester) async {
+      String? period;
+      final FocusNode field = await pumpPicker(
+        tester,
+        onPeriodChanged: (String v) => period = v,
+      );
+      field.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Enter opens the menu on the focused select; PM becomes visible.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('PM'), findsOneWidget);
+
+      // Down highlights PM; Enter commits it and closes the menu.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(period, 'PM');
+      expect(find.text('PM'), findsNothing);
+    });
+
+    testWidgets('Escape closes the select menu and keeps focus on it', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode field = await pumpPicker(tester);
+      field.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.text('PM'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('PM'), findsNothing);
+      final BuildContext? focused =
+          tester.binding.focusManager.primaryFocus?.context;
+      expect(
+        focused
+            ?.findAncestorWidgetOfExactType<CarbonTimePickerSelect<String>>(),
+        isNotNull,
       );
     });
   });
