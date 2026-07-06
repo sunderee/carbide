@@ -72,6 +72,11 @@ enum CarbonThemeVariant {
 /// `Directionality(rtl)` as `goldens/<name>[.text].<variant>.rtl.png`. Opt in
 /// for components with direction-sensitive geometry (mirrored fills, side
 /// accents, submenu sides); direction-neutral components stay LTR-only.
+///
+/// [mediaQuery] overrides the host's `MediaQueryData` — the default pins
+/// text scale 1.0 like always. Use sparingly (docs/text-scaling.md): the
+/// text-input 1.3x canary is the intended kind of use, not per-component
+/// scaled variants.
 Future<void> expectThemeGoldens(
   WidgetTester tester, {
   required String name,
@@ -81,6 +86,7 @@ Future<void> expectThemeGoldens(
   Duration? pumpBeforeSnapshot,
   Future<void> Function(WidgetTester tester)? afterPump,
   Set<TextDirection> directions = const <TextDirection>{TextDirection.ltr},
+  MediaQueryData mediaQuery = const MediaQueryData(),
 }) async {
   assert(directions.isNotEmpty, 'directions must name at least one direction');
   await tester.binding.setSurfaceSize(size);
@@ -98,7 +104,7 @@ Future<void> expectThemeGoldens(
           child: RepaintBoundary(
             key: key,
             child: MediaQuery(
-              data: const MediaQueryData(),
+              data: mediaQuery,
               child: CarbonTheme(
                 data: variant.theme,
                 child: SizedBox.fromSize(

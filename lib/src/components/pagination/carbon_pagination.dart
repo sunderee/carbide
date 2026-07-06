@@ -103,8 +103,10 @@ class CarbonPagination extends StatelessWidget {
       label: 'Pagination',
       child: DefaultTextStyle.merge(
         style: text,
-        child: SizedBox(
-          height: CarbonFieldSize.lg.height,
+        // The lg bar height is a minimum: the labels grow the bar under
+        // text scaling instead of clipping (docs/text-scaling.md).
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: CarbonFieldSize.lg.height),
           child: DecoratedBox(
             // border-block-start: 1px solid border-subtle.
             decoration: BoxDecoration(

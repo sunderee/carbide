@@ -65,3 +65,38 @@ void expectFitsWithin(
         '(${inner.width.toStringAsFixed(2)} > ${outer.width.toStringAsFixed(2)}).',
   );
 }
+
+/// Asserts every visible [Text] in the tree renders at least one full line
+/// box at [scale] — the text-scaling analogue of [expectTextNotClipped].
+///
+/// Texts that opt into ellipsis/fade with `maxLines` still keep their first
+/// line's height, so they pass; a fixed-height ancestor that squeezes the
+/// glyph box below one scaled line is exactly the clipping this catches.
+void expectNoClippedTextAtScale(
+  WidgetTester tester,
+  double scale, {
+  double slack = 0.5,
+}) {
+  for (final Element element in find.byType(Text).evaluate()) {
+    final Text text = element.widget as Text;
+    final String? data = text.data ?? text.textSpan?.toPlainText();
+    if (data == null || data.trim().isEmpty) {
+      continue;
+    }
+    final Size rendered = element.size ?? Size.zero;
+    if (rendered == Size.zero) {
+      continue;
+    }
+    final TextStyle? style = text.style;
+    final double fontSize = style?.fontSize ?? 14;
+    final double lineHeight = fontSize * (style?.height ?? 1.0) * scale;
+    expect(
+      rendered.height,
+      greaterThanOrEqualTo(lineHeight - slack),
+      reason:
+          'Text "$data" is clipped at ${scale}x scale: rendered '
+          '${rendered.height.toStringAsFixed(2)}px tall but one scaled line '
+          'needs ${lineHeight.toStringAsFixed(2)}px.',
+    );
+  }
+}

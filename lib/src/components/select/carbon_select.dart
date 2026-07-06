@@ -531,8 +531,9 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
               : layer.field;
           return ColoredBox(
             color: bg,
-            child: SizedBox(
-              height: widget.size.height,
+            // Option-row height is a minimum (docs/text-scaling.md).
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: widget.size.height),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -592,8 +593,9 @@ class _FluidSelectField extends StatelessWidget {
         color: layer.field,
         border: Border(bottom: BorderSide(color: border)),
       ),
-      child: SizedBox(
-        height: 64,
+      // Fluid field height is a minimum (docs/text-scaling.md).
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 64),
         child: Row(
           children: <Widget>[
             Expanded(

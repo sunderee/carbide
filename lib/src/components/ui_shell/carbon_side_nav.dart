@@ -360,8 +360,11 @@ class _NavRowState extends State<_NavRow> {
                       ),
                     ),
                   ),
-                  child: SizedBox(
-                    height: 32,
+                  // The 32px row height is a minimum: labels grow the row
+                  // under text scaling instead of clipping
+                  // (docs/text-scaling.md).
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 32),
                     child: expanded
                         ? Padding(
                             padding: EdgeInsetsDirectional.only(

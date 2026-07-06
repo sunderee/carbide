@@ -329,11 +329,15 @@ class TagSurface extends StatelessWidget {
     final CarbonIconData? leading = icon;
 
     return Container(
-      constraints: const BoxConstraints(
+      // The spec height is a minimum: under text scaling the pill grows
+      // with its label instead of clipping it (docs/text-scaling.md). At
+      // 1.0x the label always fits, so this renders identically to the
+      // previous fixed height.
+      constraints: BoxConstraints(
         minWidth: CarbonTag.minWidth,
         maxWidth: CarbonTag.maxWidth,
+        minHeight: size.height,
       ),
-      height: size.height,
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(CarbonTag.radius),
