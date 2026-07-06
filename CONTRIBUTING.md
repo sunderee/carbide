@@ -121,6 +121,21 @@ The sweep in `test/scaling/` renders every specimen from
 text squeezed below one scaled line box. New components add a specimen to
 the registry; use fixed heights only as `minHeight` constraints.
 
+### Reduced motion
+
+Every animated component honors `MediaQueryData.disableAnimations`
+(#235): decorative motion — entrances, folds, fades, hover fills, theme
+crossfades — collapses to `Duration.zero`
+(`MediaQuery.maybeDisableAnimationsOf(context) ?? false`, the toggle
+pattern), while essential motion (the loading spinner, the indeterminate
+progress sweep) keeps running because it communicates ongoing work; each
+widget's doc states its decision. Tests pump with
+`MediaQueryData(disableAnimations: true)` and assert the end state on the
+next frame. Every animated component also carries a **motion-token
+spec-lock** asserting its duration/curve equal the `CarbonDuration` /
+`CarbonEasing` constants its SCSS cites — motion drift is invisible in
+static goldens by construction.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by
