@@ -77,6 +77,17 @@ enum CarbonThemeVariant {
 /// text scale 1.0 like always. Use sparingly (docs/text-scaling.md): the
 /// text-input 1.3x canary is the intended kind of use, not per-component
 /// scaled variants.
+///
+/// [strict] names the golden `<name>.strict[.text].<variant>.png`, which
+/// the comparator bounds at 0.05% differing pixels instead of the default
+/// 0.5% (#236). Opt in for small-surface goldens, where 0.5% of the area
+/// is whole feature-rows of pixels.
+///
+/// [devicePixelRatio] paints the scene through a scale transform, the way
+/// a fractional-DPR display rasterizes it — 1px hairlines land on
+/// physical-pixel boundaries and anti-alias exactly as they would on a
+/// 1.5x screen. The surface (and golden) is `size × devicePixelRatio`.
+/// Used by the DPR canaries (#236); leave at 1.0 elsewhere.
 Future<void> expectThemeGoldens(
   WidgetTester tester, {
   required String name,
@@ -87,9 +98,12 @@ Future<void> expectThemeGoldens(
   Future<void> Function(WidgetTester tester)? afterPump,
   Set<TextDirection> directions = const <TextDirection>{TextDirection.ltr},
   MediaQueryData mediaQuery = const MediaQueryData(),
+  bool strict = false,
+  double devicePixelRatio = 1.0,
 }) async {
   assert(directions.isNotEmpty, 'directions must name at least one direction');
-  await tester.binding.setSurfaceSize(size);
+  final Size surface = size * devicePixelRatio;
+  await tester.binding.setSurfaceSize(surface);
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
   for (final TextDirection direction in directions) {
@@ -98,6 +112,23 @@ Future<void> expectThemeGoldens(
       final Key key = ValueKey<String>(
         'carbide-golden-${variant.label}$directionSuffix',
       );
+      Widget scene = SizedBox.fromSize(
+        size: size,
+        child: ColoredBox(
+          color: variant.background,
+          child: Builder(builder: builder),
+        ),
+      );
+      if (devicePixelRatio != 1.0) {
+        scene = SizedBox.fromSize(
+          size: surface,
+          child: Transform.scale(
+            scale: devicePixelRatio,
+            alignment: AlignmentDirectional.topStart,
+            child: scene,
+          ),
+        );
+      }
       await tester.pumpWidget(
         Directionality(
           textDirection: direction,
@@ -105,16 +136,7 @@ Future<void> expectThemeGoldens(
             key: key,
             child: MediaQuery(
               data: mediaQuery,
-              child: CarbonTheme(
-                data: variant.theme,
-                child: SizedBox.fromSize(
-                  size: size,
-                  child: ColoredBox(
-                    color: variant.background,
-                    child: Builder(builder: builder),
-                  ),
-                ),
-              ),
+              child: CarbonTheme(data: variant.theme, child: scene),
             ),
           ),
         ),
@@ -126,11 +148,13 @@ Future<void> expectThemeGoldens(
       if (pumpBeforeSnapshot != null) {
         await tester.pump(pumpBeforeSnapshot);
       }
+      final String strictSuffix = strict ? '.strict' : '';
       final String suffix = containsText ? '.text' : '';
       await expectLater(
         find.byKey(key),
         matchesGoldenFile(
-          'goldens/$name$suffix.${variant.label}$directionSuffix.png',
+          'goldens/$name$strictSuffix$suffix'
+          '.${variant.label}$directionSuffix.png',
         ),
       );
     }
