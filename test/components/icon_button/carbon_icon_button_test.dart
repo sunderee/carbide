@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -129,6 +130,25 @@ void main() {
         ),
       );
       expect(find.bySemanticsLabel('Add item'), findsOneWidget);
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonIconButton(
+            icon: CarbonIcons.add,
+            label: 'Add item',
+            onPressed: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // The default lg icon button is a 48px square (CarbonButton.iconOnly).
+      await expectA11y(tester);
       handle.dispose();
     });
   });

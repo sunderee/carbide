@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -234,6 +235,28 @@ void main() {
         tester.getSemantics(find.byType(AnimatedScale)),
         isSemantics(isSlider: true, value: '42'),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonSlider(
+            labelText: 'Volume',
+            value: 50,
+            min: 0,
+            max: 100,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      // Both guidelines pass: the 14px thumb (`_slider.scss` `block-size:
+      // convert.to-rem(14px)`) exposes adjustable slider semantics rather
+      // than a tap action, so no sub-48dp tap target exists to flag.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

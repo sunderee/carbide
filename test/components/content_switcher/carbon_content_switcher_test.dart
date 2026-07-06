@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -260,6 +261,25 @@ void main() {
           isSelected: true,
         ),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The md switcher is 40px (_content-switcher.scss layout.use('size',
+      // $default: 'md')) — below the 48dp android guideline, so pump the
+      // real lg (48px) variant instead.
+      await tester.pumpWidget(
+        _host(
+          const CarbonContentSwitcher(
+            switches: _switches,
+            size: CarbonFieldSize.lg,
+          ),
+        ),
+      );
+      await expectA11y(tester);
       handle.dispose();
     });
   });

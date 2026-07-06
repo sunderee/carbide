@@ -165,6 +165,52 @@ void main() {
     });
   });
 
+  group('semantics (#226)', () {
+    testWidgets('links expose label, button role and selected state', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonSideNav(
+            items: <Widget>[
+              CarbonSideNavLink(
+                label: 'Dashboard',
+                icon: CarbonIcons.dashboard,
+                current: true,
+                onPressed: () {},
+              ),
+              CarbonSideNavLink(label: 'Documents', onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Side navigation'), findsOneWidget);
+      // The current link carries the selected state.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Dashboard')),
+        isSemantics(
+          label: 'Dashboard',
+          isButton: true,
+          isSelected: true,
+          hasTapAction: true,
+        ),
+      );
+      // Sibling links stay unselected but keep role + action.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Documents')),
+        isSemantics(
+          label: 'Documents',
+          isButton: true,
+          isSelected: false,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+  });
+
   group('goldens', () {
     testWidgets('side nav across themes (gray-100 is the dark shell)', (
       WidgetTester tester,

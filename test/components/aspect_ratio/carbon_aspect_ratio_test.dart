@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/golden.dart';
 
 void main() {
+  // Layout-only: no semantics surface (#226).
   group('spec-lock', () {
     test('named ratios match their numeric value', () {
       expect(CarbonAspectRatioValue.r16x9.ratio, closeTo(16 / 9, 1e-9));

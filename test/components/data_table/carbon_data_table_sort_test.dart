@@ -141,6 +141,33 @@ void main() {
     });
   });
 
+  group('semantics (#226)', () {
+    testWidgets('the sorted column header is a labelled, focusable '
+        'tap target', (WidgetTester tester) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonDataTable(
+            columns: _columns,
+            rows: _rows(),
+            sortColumnIndex: 0,
+            sortDirection: CarbonSortDirection.ascending,
+            onSort: (_) {},
+          ),
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Name')),
+        isSemantics(hasTapAction: true, isFocusable: true),
+      );
+      // TODO(#226): upstream TableHeader exposes the direction via
+      // `aria-sort`, but the sorted column carries no sort-state
+      // semantics here (no hint/value/flag) — only the activation
+      // surface can be asserted until that lands.
+      handle.dispose();
+    });
+  });
+
   group('goldens', () {
     testWidgets('sorted table across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

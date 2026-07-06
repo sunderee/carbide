@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -237,6 +238,28 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // Composite band: gate the title + lg page action configuration.
+      // Breadcrumb links are text-height by design and carry their own
+      // sweep (with the 48dp exemption) in the breadcrumb suite, so they
+      // stay out of this pump.
+      await tester.pumpWidget(
+        _host(
+          CarbonPageHeader(
+            title: 'Reports',
+            pageActions: CarbonButton(label: 'Edit', onPressed: () {}),
+          ),
+        ),
+      );
+      await expectA11y(tester);
+      handle.dispose();
     });
   });
 }

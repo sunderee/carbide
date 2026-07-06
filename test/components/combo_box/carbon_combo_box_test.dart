@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// OverlayPortal needs an Overlay ancestor.
@@ -211,6 +212,28 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Fruit')),
         isSemantics(label: 'Fruit', isTextField: true),
       );
+      handle.dispose();
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The md field is 40px (_list-box.scss layout.use('size',
+      // $default: 'md')) — below the 48dp android guideline, so pump the
+      // real lg (48px) variant instead.
+      await tester.pumpWidget(
+        _host(
+          const CarbonComboBox<String>(
+            titleText: 'Fruit',
+            placeholder: 'Filter…',
+            items: _items,
+            size: CarbonFieldSize.lg,
+            onChanged: _noop,
+          ),
+        ),
+      );
+      await expectA11y(tester);
       handle.dispose();
     });
   });

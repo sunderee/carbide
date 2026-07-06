@@ -4,6 +4,8 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/semantics.dart'
+    show SemanticsAction, SemanticsData, SemanticsNode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -205,6 +207,29 @@ void main() {
           reason: '${entry.key.runtimeType}',
         );
       }
+    });
+  });
+
+  group('semantics (#226)', () {
+    testWidgets('skeletons are hidden from assistive technology', (
+      WidgetTester tester,
+    ) async {
+      // Loading placeholders are decorative; none of them may leak a
+      // label or an action into the semantics tree.
+      final SemanticsHandle handle = tester.ensureSemantics();
+      for (final MapEntry<String, Widget> entry in all.entries) {
+        await tester.pumpWidget(_host(entry.value));
+        final Iterable<SemanticsNode> leaked = tester.semantics
+            .simulatedAccessibilityTraversal()
+            .where((SemanticsNode node) {
+              final SemanticsData data = node.getSemanticsData();
+              return data.label.isNotEmpty ||
+                  data.hasAction(SemanticsAction.tap) ||
+                  data.hasAction(SemanticsAction.longPress);
+            });
+        expect(leaked, isEmpty, reason: '${entry.key} skeleton');
+      }
+      handle.dispose();
     });
   });
 

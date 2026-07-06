@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
 
@@ -359,6 +360,64 @@ void main() {
             .lineCount,
         3,
       );
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // A backdrop-free host: `_host`'s full-screen tap catcher is test
+      // scaffolding and would register as an unlabelled tappable node.
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: TapRegionSurface(
+            child: CarbonTheme(
+              data: CarbonThemeData.white,
+              child: Overlay(
+                initialEntries: <OverlayEntry>[
+                  OverlayEntry(
+                    builder: (BuildContext context) => Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const SizedBox(
+                            width: 320,
+                            child: CarbonCodeSnippet(code: code),
+                          ),
+                          const SizedBox(height: 8),
+                          const CarbonCodeSnippet(
+                            code: 'npm i',
+                            type: CarbonCodeSnippetType.inline,
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: 320,
+                            child: CarbonCodeSnippet(
+                              code: 'a\nb\nc\nd\ne',
+                              type: CarbonCodeSnippetType.multi,
+                              maxCollapsedRows: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      // Tap targets are exempt: styles/scss/components/code-snippet/
+      // _code-snippet.scss locks the single bar and its copy button to
+      // `$spacing-08` (40px), the inline chip to 1.25rem (20px,
+      // `--snippet--inline.--btn`), and the Show more toggle to a ~32px
+      // ghost control, so 48dp is unattainable at Carbon's spec sizes.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

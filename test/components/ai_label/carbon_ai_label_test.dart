@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion needs a surface.
@@ -238,6 +239,40 @@ void main() {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const CarbonAILabel(textLabel: 'summary')));
       expect(find.bySemanticsLabel('AI summary'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      // The plain host (no unlabeled backdrop fixture): the backdrop in
+      // [_host] exists only for tap-outside tests and would fail the
+      // labeled sweep on scaffolding rather than product code.
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: TapRegionSurface(
+            child: CarbonTheme(
+              data: CarbonThemeData.white,
+              child: Overlay(
+                initialEntries: <OverlayEntry>[
+                  OverlayEntry(
+                    builder: (BuildContext context) =>
+                        const Center(child: CarbonAILabel()),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      // Tap-target gate off: every AI label chip is 16–32px by design
+      // (`_ai-label.scss` sizes mini…xl), with a padded 24px hit target —
+      // all below the 48dp guideline.
+      await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });
   });

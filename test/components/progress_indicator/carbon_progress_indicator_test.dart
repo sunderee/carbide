@@ -7,6 +7,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child) => Directionality(
@@ -120,6 +121,31 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Account')),
         isSemantics(label: 'Account', isSelected: false),
       );
+      handle.dispose();
+    });
+  });
+
+  group('accessibility guidelines (#226)', () {
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonProgressIndicator(
+            steps: _steps,
+            currentIndex: 1,
+            interactive: true,
+            onStepSelected: (_) {},
+          ),
+        ),
+      );
+      // Interactive steps currently expose no SemanticsAction.tap (the
+      // GestureDetector sits inside the step's ExcludeSemantics and the
+      // outer Semantics has no onTap — TODO(#226)), so the guidelines
+      // have no step node to measure yet; the gate still guards every
+      // node that does expose a tap action.
+      await expectA11y(tester);
       handle.dispose();
     });
   });

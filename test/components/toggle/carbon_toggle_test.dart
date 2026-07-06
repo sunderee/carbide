@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/a11y.dart';
 import '../../support/golden.dart';
 
 Widget _host(Widget child, {bool reduceMotion = false}) => Directionality(
@@ -206,6 +207,22 @@ void main() {
             .duration,
         Duration.zero,
       );
+    });
+
+    testWidgets('meets tap-target and label guidelines', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          CarbonToggle(labelText: 'Wi-Fi', toggled: false, onToggled: (_) {}),
+        ),
+      );
+      // The md switch is a 48×24 track (`_toggle.scss` `block-size:
+      // convert.to-rem(24px); inline-size: convert.to-rem(48px)`), so the
+      // 48dp android guideline is unattainable at the default size.
+      await expectA11y(tester, tapTargets: false);
+      handle.dispose();
     });
   });
 

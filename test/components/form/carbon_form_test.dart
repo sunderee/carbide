@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -278,6 +279,37 @@ void main() {
       expect(legend.style!.fontSize, CarbonTypeStyles.label01.fontSize);
       expect(legend.style!.color, theme.textSecondary);
       expect(find.bySemanticsLabel('Contact'), findsOneWidget);
+      handle.dispose();
+    });
+  });
+
+  group('traversal order (#226)', () {
+    testWidgets('reads legend, then the labelled field, then helper text', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(
+          const CarbonFormGroup(
+            legend: 'Contact',
+            child: CarbonTextInput(
+              labelText: 'Name',
+              helperText: 'Your full name',
+            ),
+          ),
+        ),
+      );
+      final List<String> labels = <String>[
+        for (final SemanticsNode node
+            in tester.semantics.simulatedAccessibilityTraversal())
+          if (node.label.isNotEmpty) node.label,
+      ];
+      // The visible CarbonFormLabel is folded into the text field's own
+      // semantic label, so the field node itself reads 'Name'.
+      expect(
+        labels,
+        containsAllInOrder(<String>['Contact', 'Name', 'Your full name']),
+      );
       handle.dispose();
     });
   });

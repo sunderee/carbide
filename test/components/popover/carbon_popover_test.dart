@@ -625,6 +625,45 @@ void main() {
     });
   });
 
+  group('semantics (#226)', () {
+    testWidgets('surface content is reachable when open, gone when closed', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      late StateSetter setOuter;
+      bool open = false;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              setOuter = setState;
+              return CarbonPopover(
+                open: open,
+                content: const Text('Body'),
+                child: _trigger(),
+              );
+            },
+          ),
+        ),
+      );
+      expect(find.bySemanticsLabel('Body'), findsNothing);
+
+      setOuter(() => open = true);
+      await tester.pumpAndSettle();
+      // The popover is a plain container: its content must surface in the
+      // semantics tree as-is — reachable, and with no stray role glued on.
+      expect(find.bySemanticsLabel('Body'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Body')),
+        isSemantics(label: 'Body', isButton: false, isLink: false),
+      );
+      // Carbide has no tab-tip popover variant (upstream's tab-tip close
+      // affordance lives on the trigger tab, not the surface), so there
+      // are no close controls to label-check here.
+      handle.dispose();
+    });
+  });
+
   group('goldens', () {
     Widget specimen(CarbonPopoverAlignment align) => Center(
       child: CarbonPopover(
