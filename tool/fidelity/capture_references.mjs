@@ -60,6 +60,19 @@ for (const story of stories) {
 
 await browser.close();
 
+// Stamp the @carbon/react version the live Storybook tracks (#230): the
+// published Storybook deploys from the latest release, so the npm registry
+// 'latest' at capture time identifies what the pixels were rendered by.
+// Compared against the submodule pin by the staleness check in
+// test/fidelity/fidelity_test.dart.
+let carbonReactVersion = null;
+try {
+  const res = await fetch('https://registry.npmjs.org/@carbon/react/latest');
+  carbonReactVersion = (await res.json()).version ?? null;
+} catch {
+  console.log('WARN could not resolve @carbon/react version for the stamp');
+}
+
 const ok = results.filter((r) => r.ok).length;
 mkdirSync(OUT, { recursive: true });
 writeFileSync(
@@ -68,6 +81,7 @@ writeFileSync(
     {
       source: BASE,
       capturedAt: new Date().toISOString(),
+      carbonReactVersion,
       themes: THEMES,
       stories,
       results,

@@ -11,11 +11,18 @@
 //
 // It is deliberately NOT a strict pixel gate: Carbon renders in Chromium and
 // Carbide in Flutter, so exact pixels can never match. The committed references
-// are real upstream ground truth; the side-by-side is the review surface; and
-// the only hard assertion is that Carbide renders something non-trivial (a
-// reliable cross-renderer sanity check that catches a blank / collapsed
-// component). A coarse difference score is computed and shown for context.
+// are real upstream ground truth; the side-by-side is the review surface; the
+// hard assertions are (a) Carbide renders something non-trivial and (b) the
+// coarse luminance-grid diff stays within the story's committed `threshold`
+// (#230) — a soft drift gate, per-component and deliberately lax, because the
+// value is drift *detection* across renderers, not pixel identity. Stories
+// without a threshold print a `FIDELITY-SCORE` bootstrap line instead.
+//
+// Reference freshness (#230): the manifest stamps the @carbon/react version
+// the live Storybook ran at capture; a check below warns when the submodule
+// pin drifts ≥2 minors ahead of the captured references.
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -28,6 +35,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 const String _refDir = 'test/fidelity/references';
 const String _outDir = 'test/fidelity/comparisons';
+const String _storiesPath = 'tool/fidelity/stories.json';
+const String _submodulePackage =
+    'documentation/carbon/packages/react/package.json';
+
+/// Per-component drift thresholds from stories.json (absent → bootstrap).
+final Map<String, double> _thresholds = () {
+  final Map<String, dynamic> stories =
+      jsonDecode(File(_storiesPath).readAsStringSync())
+          as Map<String, dynamic>;
+  return <String, double>{
+    for (final dynamic s in stories['stories'] as List<dynamic>)
+      if ((s as Map<String, dynamic>)['threshold'] != null)
+        s['component'] as String: (s['threshold'] as num).toDouble(),
+  };
+}();
 
 /// The four Carbon themes, keyed by the reference-file slug (the Storybook
 /// theme global).
@@ -133,6 +155,51 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
 };
 
 void main() {
+  test('references are not stale relative to the submodule pin', () {
+    final File pkg = File(_submodulePackage);
+    if (!pkg.existsSync()) {
+      // CI checks out without the documentation submodules; the check
+      // only runs where the pin is present (local dev, capture time).
+      markTestSkipped('submodule not checked out');
+      return;
+    }
+    final Map<String, dynamic> manifest =
+        jsonDecode(File('$_refDir/manifest.json').readAsStringSync())
+            as Map<String, dynamic>;
+    // Fresh captures stamp a top-level version; the hand-merged manifest
+    // carries per-batch stamps. Use the newest non-null one.
+    final List<String> stamped = <String>[
+      if (manifest['carbonReactVersion'] is String)
+        manifest['carbonReactVersion'] as String,
+      if (manifest['captures'] is List)
+        for (final dynamic c in manifest['captures'] as List<dynamic>)
+          if ((c as Map<String, dynamic>)['carbonReactVersion'] is String)
+            c['carbonReactVersion'] as String,
+    ];
+    if (stamped.isEmpty) {
+      markTestSkipped('no capture version stamped (pre-#230 references)');
+      return;
+    }
+    int minor(String v) => int.parse(v.split('.')[1]);
+    final int captured = stamped.map(minor).reduce(math.max);
+    final String pinVersion =
+        (jsonDecode(pkg.readAsStringSync())
+                as Map<String, dynamic>)['version']
+            as String;
+    final int pin = minor(pinVersion);
+    if (pin - captured >= 2) {
+      // A warning, not a failure: stale references still detect drift,
+      // they just measure against an older upstream. Re-capture via
+      // tool/fidelity/capture.sh when this fires.
+      debugPrint(
+        'WARNING: fidelity references were captured at @carbon/react '
+        'minor $captured but the submodule pin is at minor $pin — '
+        're-capture (tool/fidelity/capture.sh) to refresh ground truth.',
+      );
+    }
+    expect(captured, greaterThan(0));
+  });
+
   for (final MapEntry<String, Widget Function()> entry in _builders.entries) {
     final String component = entry.key;
     for (final String themeSlug in _themes.keys) {
@@ -167,6 +234,28 @@ void main() {
         );
         final _Grid refGrid = await _luminanceGrid(tester, reference);
         final double diff = _meanAbsDiff(refGrid, carbideGrid);
+
+        // The soft drift gate (#230): the committed per-story threshold
+        // bounds the coarse diff. No threshold yet → bootstrap line for
+        // harvesting one (score + margin goes into stories.json).
+        final double? threshold = _thresholds[component];
+        if (threshold != null) {
+          expect(
+            diff,
+            lessThanOrEqualTo(threshold),
+            reason:
+                '$component ($themeSlug) drifted from its committed '
+                'upstream reference (diff ${_pct(diff)} > threshold '
+                '${_pct(threshold)}) — inspect '
+                '$_outDir/${component}_$themeSlug.png; if the change is '
+                'intentional, re-baseline the threshold in '
+                '$_storiesPath.',
+          );
+        } else {
+          debugPrint(
+            'FIDELITY-SCORE $component $themeSlug ${diff.toStringAsFixed(4)}',
+          );
+        }
 
         final ui.Image comparison = await _composeSideBySide(
           tester,

@@ -1,17 +1,137 @@
 {
   "_comment": "Curated Carbon React Storybook stories captured as upstream fidelity references. `component` is the Carbide-side slug; `storyId` is the Storybook iframe id. Add entries here and a matching builder in test/fidelity/fidelity_test.dart to extend coverage.",
   "stories": [
-    { "component": "button", "storyId": "components-button--default" },
-    { "component": "tag", "storyId": "components-tag--read-only" },
-    { "component": "checkbox", "storyId": "components-checkbox--default" },
-    { "component": "toggle", "storyId": "components-toggle--default" },
-    { "component": "text-input", "storyId": "components-textinput--default" },
-    { "component": "dropdown", "storyId": "components-dropdown--default" },
-    { "component": "tabs", "storyId": "components-tabs--default" },
-    { "component": "accordion", "storyId": "components-accordion--default" },
-    { "component": "tree-view", "storyId": "components-treeview--default" },
-    { "component": "multiselect", "storyId": "components-multiselect--default" },
-    { "component": "data-table", "storyId": "components-datatable-basic--default" },
-    { "component": "notification", "storyId": "components-notifications-inline--default" }
+    {
+      "component": "button",
+      "storyId": "components-button--default"
+    },
+    {
+      "component": "tag",
+      "storyId": "components-tag--read-only"
+    },
+    {
+      "component": "checkbox",
+      "storyId": "components-checkbox--default"
+    },
+    {
+      "component": "toggle",
+      "storyId": "components-toggle--default"
+    },
+    {
+      "component": "text-input",
+      "storyId": "components-textinput--default"
+    },
+    {
+      "component": "dropdown",
+      "storyId": "components-dropdown--default"
+    },
+    {
+      "component": "tabs",
+      "storyId": "components-tabs--default"
+    },
+    {
+      "component": "accordion",
+      "storyId": "components-accordion--default"
+    },
+    {
+      "component": "tree-view",
+      "storyId": "components-treeview--default"
+    },
+    {
+      "component": "multiselect",
+      "storyId": "components-multiselect--default"
+    },
+    {
+      "component": "data-table",
+      "storyId": "components-datatable-basic--default"
+    },
+    {
+      "component": "notification",
+      "storyId": "components-notifications-inline--default"
+    },
+    {
+      "component": "search",
+      "storyId": "components-search--default"
+    },
+    {
+      "component": "number-input",
+      "storyId": "components-numberinput--default"
+    },
+    {
+      "component": "select",
+      "storyId": "components-select--default"
+    },
+    {
+      "component": "combo-box",
+      "storyId": "components-combobox--default"
+    },
+    {
+      "component": "date-picker",
+      "storyId": "components-datepicker--default"
+    },
+    {
+      "component": "radio-button",
+      "storyId": "components-radiobutton--default"
+    },
+    {
+      "component": "slider",
+      "storyId": "components-slider--default"
+    },
+    {
+      "component": "modal",
+      "storyId": "components-modal--default"
+    },
+    {
+      "component": "tooltip",
+      "storyId": "components-tooltip--default"
+    },
+    {
+      "component": "progress-bar",
+      "storyId": "components-progressbar--default"
+    },
+    {
+      "component": "progress-indicator",
+      "storyId": "components-progressindicator--default"
+    },
+    {
+      "component": "breadcrumb",
+      "storyId": "components-breadcrumb--default"
+    },
+    {
+      "component": "pagination",
+      "storyId": "components-pagination--default"
+    },
+    {
+      "component": "code-snippet",
+      "storyId": "components-codesnippet--singleline"
+    },
+    {
+      "component": "content-switcher",
+      "storyId": "components-contentswitcher--default"
+    },
+    {
+      "component": "structured-list",
+      "storyId": "components-structuredlist--default"
+    },
+    {
+      "component": "tile",
+      "storyId": "components-tile--default"
+    },
+    {
+      "component": "loading",
+      "storyId": "components-loading--default"
+    },
+    {
+      "component": "inline-loading",
+      "storyId": "components-inlineloading--default"
+    },
+    {
+      "component": "overflow-menu",
+      "storyId": "components-overflowmenu--default"
+    },
+    {
+      "component": "link",
+      "storyId": "components-link--default"
+    }
   ]
 }
