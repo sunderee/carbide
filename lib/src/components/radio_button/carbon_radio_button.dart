@@ -352,11 +352,20 @@ class _CarbonRadioButtonGroupState<T> extends State<CarbonRadioButtonGroup<T>> {
     if (event is! KeyDownEvent || widget.onChanged == null) {
       return KeyEventResult.ignored;
     }
+    // Horizontal arrows follow the visual direction (mirrored under RTL,
+    // like slider and menu); the vertical orientation stays logical.
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    final LogicalKeyboardKey nextKey = rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey previousKey = rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
     final bool forward = widget.orientation == Axis.horizontal
-        ? event.logicalKey == LogicalKeyboardKey.arrowRight
+        ? event.logicalKey == nextKey
         : event.logicalKey == LogicalKeyboardKey.arrowDown;
     final bool backward = widget.orientation == Axis.horizontal
-        ? event.logicalKey == LogicalKeyboardKey.arrowLeft
+        ? event.logicalKey == previousKey
         : event.logicalKey == LogicalKeyboardKey.arrowUp;
     if (forward) {
       _move(index, 1);
