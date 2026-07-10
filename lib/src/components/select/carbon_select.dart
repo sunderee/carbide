@@ -23,6 +23,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
+import '../../utils/scroll_into_view.dart';
 import '../form/carbon_form.dart';
 
 /// An entry in a [CarbonSelect]: either an item or a group of items.
@@ -514,47 +515,51 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   ) {
     final bool selected = item.value == widget.value;
     final bool highlighted = index == _highlighted;
-    return Semantics(
-      button: true,
-      selected: selected,
-      enabled: !item.disabled,
-      label: item.label,
-      child: CarbonInteraction(
+    // The keyboard-roved row keeps itself inside the popup fold (#279).
+    return CarbonScrollIntoView(
+      active: highlighted,
+      child: Semantics(
+        button: true,
+        selected: selected,
         enabled: !item.disabled,
-        onPressed: () => _select(item),
-        builder: (BuildContext context, Set<WidgetState> states) {
-          final bool hovered = states.contains(WidgetState.hovered);
-          final Color bg = selected
-              ? layer.layerSelected
-              : (hovered || highlighted) && !item.disabled
-              ? layer.layerHover
-              : layer.field;
-          return ColoredBox(
-            color: bg,
-            // Option-row height is a minimum (docs/text-scaling.md).
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: widget.size.height),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: ExcludeSemantics(
-                    child: Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: CarbonTypeStyles.bodyCompact01.copyWith(
-                        color: item.disabled
-                            ? theme.textDisabled
-                            : theme.textPrimary,
+        label: item.label,
+        child: CarbonInteraction(
+          enabled: !item.disabled,
+          onPressed: () => _select(item),
+          builder: (BuildContext context, Set<WidgetState> states) {
+            final bool hovered = states.contains(WidgetState.hovered);
+            final Color bg = selected
+                ? layer.layerSelected
+                : (hovered || highlighted) && !item.disabled
+                ? layer.layerHover
+                : layer.field;
+            return ColoredBox(
+              color: bg,
+              // Option-row height is a minimum (docs/text-scaling.md).
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: widget.size.height),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: ExcludeSemantics(
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: CarbonTypeStyles.bodyCompact01.copyWith(
+                          color: item.disabled
+                              ? theme.textDisabled
+                              : theme.textPrimary,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

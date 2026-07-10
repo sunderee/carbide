@@ -26,6 +26,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/scroll_into_view.dart';
 import '../form/carbon_form.dart' show CarbonField, CarbonFieldSize;
 
 /// The drop shadow under a list-box menu (`box-shadow()`: `0 2px 6px $shadow`;
@@ -410,37 +411,42 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
         ? layer.borderSubtle
         : const Color(0x00000000);
 
-    return MouseRegion(
-      cursor: widget.disabled
-          ? SystemMouseCursors.basic
-          : SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.disabled ? null : widget.onTap,
-        child: CarbonFocusRing(
-          visible: widget.isHighlighted,
-          inset: true,
-          child: ColoredBox(
-            color: background,
-            child: Container(
-              height: widget.fluid ? 64 : widget.size.height,
-              alignment: AlignmentDirectional.centerStart,
-              // The divider sits inside a spacing-05 inset (`margin: 0 16px`).
-              margin: const EdgeInsetsDirectional.symmetric(
-                horizontal: CarbonSpacing.spacing05,
-              ),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: dividerColor)),
-              ),
-              child: DefaultTextStyle.merge(
-                style: CarbonTypeStyles.bodyCompact01.copyWith(
-                  color: textColor,
+    // The keyboard-roved row keeps itself inside the 5.5-row fold (#279).
+    return CarbonScrollIntoView(
+      active: widget.isHighlighted,
+      child: MouseRegion(
+        cursor: widget.disabled
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.disabled ? null : widget.onTap,
+          child: CarbonFocusRing(
+            visible: widget.isHighlighted,
+            inset: true,
+            child: ColoredBox(
+              color: background,
+              child: Container(
+                height: widget.fluid ? 64 : widget.size.height,
+                alignment: AlignmentDirectional.centerStart,
+                // The divider sits inside a spacing-05 inset
+                // (`margin: 0 16px`).
+                margin: const EdgeInsetsDirectional.symmetric(
+                  horizontal: CarbonSpacing.spacing05,
                 ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                child: widget.child,
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: dividerColor)),
+                ),
+                child: DefaultTextStyle.merge(
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(
+                    color: textColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  child: widget.child,
+                ),
               ),
             ),
           ),
