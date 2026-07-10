@@ -135,15 +135,26 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    // Horizontal arrows follow the visual direction (mirrored under RTL,
+    // like slider and menu); vertical arrows stay logical.
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    final LogicalKeyboardKey nextKey = rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey previousKey = rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
+    if (event.logicalKey == nextKey ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      _move(1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == previousKey ||
+        event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      _move(-1);
+      return KeyEventResult.handled;
+    }
     switch (event.logicalKey) {
-      case LogicalKeyboardKey.arrowRight:
-      case LogicalKeyboardKey.arrowDown:
-        _move(1);
-        return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowLeft:
-      case LogicalKeyboardKey.arrowUp:
-        _move(-1);
-        return KeyEventResult.handled;
       case LogicalKeyboardKey.home:
         _select(widget.switches.indexWhere((CarbonSwitch s) => !s.disabled));
         return KeyEventResult.handled;

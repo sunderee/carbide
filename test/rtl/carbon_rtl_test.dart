@@ -17,6 +17,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/golden.dart';
+import '../support/specimens.dart';
 
 Widget _rtlHost(Widget child) => Directionality(
   textDirection: TextDirection.rtl,
@@ -26,171 +27,38 @@ Widget _rtlHost(Widget child) => Directionality(
   ),
 );
 
+/// Like [_rtlHost], with an Overlay so portal-based specimens (dialog)
+/// can mount — used by the crash sweep only (the behavior tests keep the
+/// plain host their pointer math was written against).
+Widget _rtlOverlayHost(Widget child) => Directionality(
+  textDirection: TextDirection.rtl,
+  child: CarbonTheme(
+    data: CarbonThemeData.white,
+    child: Overlay(
+      initialEntries: <OverlayEntry>[
+        OverlayEntry(
+          builder: (BuildContext context) =>
+              Align(alignment: AlignmentDirectional.topStart, child: child),
+        ),
+      ],
+    ),
+  ),
+);
+
 void main() {
   group('RTL crash guard', () {
-    // One representative per family; pumped under Directionality(rtl) and
-    // asserted to build and lay out without exceptions.
-    final Map<String, WidgetBuilder> specimens = <String, WidgetBuilder>{
-      'button': (_) =>
-          CarbonButton(label: 'Save', icon: CarbonIcons.add, onPressed: () {}),
-      'text input': (_) => const SizedBox(
-        width: 280,
-        child: CarbonTextInput(
-          labelText: 'Email',
-          placeholder: 'you@example.com',
-          helperText: 'Helper',
-        ),
-      ),
-      'search': (_) =>
-          const SizedBox(width: 280, child: CarbonSearch(placeholder: 'Find')),
-      'checkbox': (_) => const CarbonCheckbox(label: 'Subscribe', value: true),
-      'toggle': (_) =>
-          const CarbonToggle(labelText: 'Notifications', toggled: true),
-      'slider': (_) => SizedBox(
-        width: 320,
-        child: CarbonSlider(
-          labelText: 'Amount',
-          value: 60,
-          min: 0,
-          max: 100,
-          onChanged: (num _) {},
-        ),
-      ),
-      'tag': (_) => const CarbonTag(label: 'Beta', type: CarbonTagType.blue),
-      'accordion': (_) => const SizedBox(
-        width: 320,
-        child: CarbonAccordion(
-          children: <Widget>[
-            CarbonAccordionItem(
-              title: 'Section',
-              initiallyOpen: true,
-              child: Text('Body'),
-            ),
-          ],
-        ),
-      ),
-      'breadcrumb': (_) => CarbonBreadcrumb(
-        items: <CarbonBreadcrumbItem>[
-          CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
-          const CarbonBreadcrumbItem(label: 'Reports', isCurrentPage: true),
-        ],
-      ),
-      'tabs (contained)': (_) => const SizedBox(
-        width: 400,
-        child: CarbonTabs(
-          variant: CarbonTabVariant.contained,
-          tabs: <CarbonTab>[
-            CarbonTab(label: 'One'),
-            CarbonTab(label: 'Two'),
-          ],
-          panels: <Widget>[Text('1'), Text('2')],
-        ),
-      ),
-      'content switcher': (_) => CarbonContentSwitcher(
-        selectedIndex: 1,
-        onChanged: (int _) {},
-        switches: const <CarbonSwitch>[
-          CarbonSwitch(text: 'Day'),
-          CarbonSwitch(text: 'Week'),
-        ],
-      ),
-      'notification': (_) => SizedBox(
-        width: 360,
-        child: CarbonInlineNotification(
-          kind: CarbonNotificationKind.success,
-          title: 'Saved',
-          subtitle: 'All changes stored.',
-          onClose: () {},
-        ),
-      ),
-      'progress bar': (_) => const SizedBox(
-        width: 280,
-        child: CarbonProgressBar(label: 'Uploading', value: 64),
-      ),
-      'progress indicator': (_) => const SizedBox(
-        width: 480,
-        child: CarbonProgressIndicator(
-          currentIndex: 1,
-          steps: <CarbonProgressStep>[
-            CarbonProgressStep(label: 'Account'),
-            CarbonProgressStep(label: 'Profile'),
-            CarbonProgressStep(label: 'Confirm'),
-          ],
-        ),
-      ),
-      'pagination nav': (_) =>
-          CarbonPaginationNav(totalItems: 8, page: 2, onChange: (int _) {}),
-      'tree view': (_) => const SizedBox(
-        width: 260,
-        child: CarbonTreeView(
-          label: 'Files',
-          selectedId: 'a',
-          initiallyExpandedIds: <Object>{'src'},
-          nodes: <CarbonTreeNode>[
-            CarbonTreeNode(
-              id: 'src',
-              label: 'src',
-              children: <CarbonTreeNode>[
-                CarbonTreeNode(id: 'a', label: 'main.dart'),
-              ],
-            ),
-          ],
-        ),
-      ),
-      'data table': (_) => const SizedBox(
-        width: 420,
-        child: CarbonDataTable(
-          selection: CarbonTableSelection.multi,
-          selectedRows: <int>{0},
-          columns: <CarbonTableColumn>[
-            CarbonTableColumn(title: 'Name'),
-            CarbonTableColumn(title: 'Role'),
-          ],
-          rows: <CarbonTableRow>[
-            CarbonTableRow(cells: <Widget>[Text('Ada'), Text('Admin')]),
-            CarbonTableRow(cells: <Widget>[Text('Grace'), Text('Editor')]),
-          ],
-        ),
-      ),
-      'structured list': (_) => const SizedBox(
-        width: 400,
-        child: CarbonStructuredList(
-          headers: <String>['Name', 'Type'],
-          selectedIndex: 0,
-          rows: <CarbonStructuredListRow>[
-            CarbonStructuredListRow(
-              cells: <Widget>[Text('Load'), Text('Routine')],
-            ),
-          ],
-        ),
-      ),
-      'side nav': (_) => SizedBox(
-        width: 256,
-        height: 300,
-        child: CarbonSideNav(
-          expanded: true,
-          items: <Widget>[
-            CarbonSideNavLink(
-              label: 'Overview',
-              icon: CarbonIcons.dashboard,
-              current: true,
-              onPressed: () {},
-            ),
-            CarbonSideNavLink(
-              label: 'Reports',
-              icon: CarbonIcons.document,
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ),
-    };
-
-    for (final MapEntry<String, WidgetBuilder> entry in specimens.entries) {
+    // The shared registry (one representative per family, including the
+    // overlay-hosted dialog and the chat button); each specimen must build
+    // and lay out under Directionality(rtl) without exceptions.
+    for (final MapEntry<String, WidgetBuilder> entry
+        in carbideSpecimens.entries) {
       testWidgets('${entry.key} builds under Directionality(rtl)', (
         WidgetTester tester,
       ) async {
-        await tester.pumpWidget(_rtlHost(Builder(builder: entry.value)));
+        tester.view.physicalSize = const Size(1400, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(_rtlOverlayHost(Builder(builder: entry.value)));
         await tester.pump();
         expect(tester.takeException(), isNull);
       });
@@ -534,6 +402,105 @@ void main() {
           await tester.pumpAndSettle();
         },
       );
+    });
+  });
+
+  group('RTL roving (#227)', () {
+    Widget focusOf(WidgetTester tester, String label) => tester.widget<Focus>(
+      find.ancestor(of: find.text(label), matching: find.byType(Focus)).first,
+    );
+
+    testWidgets('tabs: horizontal arrows follow the visual direction', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _rtlHost(
+          const SizedBox(
+            width: 400,
+            child: CarbonTabs(
+              variant: CarbonTabVariant.contained,
+              tabs: <CarbonTab>[
+                CarbonTab(label: 'One'),
+                CarbonTab(label: 'Two'),
+                CarbonTab(label: 'Three'),
+              ],
+              panels: <Widget>[Text('P1'), Text('P2'), Text('P3')],
+            ),
+          ),
+        ),
+      );
+      (focusOf(tester, 'One') as Focus).focusNode!.requestFocus();
+      await tester.pump();
+      // Under RTL the list renders right-to-left, so visual-left (the
+      // physical ArrowLeft key) moves to the NEXT tab.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(find.text('P2'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(find.text('P1'), findsOneWidget);
+    });
+
+    testWidgets('content switcher: arrows follow the visual direction', (
+      WidgetTester tester,
+    ) async {
+      int selected = 0;
+      await tester.pumpWidget(
+        _rtlHost(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) =>
+                CarbonContentSwitcher(
+                  selectedIndex: selected,
+                  onChanged: (int i) => setState(() => selected = i),
+                  switches: const <CarbonSwitch>[
+                    CarbonSwitch(text: 'Day'),
+                    CarbonSwitch(text: 'Week'),
+                  ],
+                ),
+          ),
+        ),
+      );
+      (focusOf(tester, 'Day') as Focus).focusNode!.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(selected, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(selected, 0);
+    });
+
+    testWidgets('radio group: horizontal arrows follow the visual '
+        'direction; vertical stays logical', (WidgetTester tester) async {
+      String value = 'a';
+      await tester.pumpWidget(
+        _rtlHost(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) =>
+                CarbonRadioButtonGroup<String>(
+                  legend: 'Plan',
+                  value: value,
+                  onChanged: (String v) => setState(() => value = v),
+                  options: const <(String, String)>[
+                    ('a', 'Free'),
+                    ('b', 'Pro'),
+                    ('c', 'Team'),
+                  ],
+                ),
+          ),
+        ),
+      );
+      tester
+          .widget<CarbonRadioButton>(find.byType(CarbonRadioButton).first)
+          .focusNode!
+          .requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(value, 'b');
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(value, 'a');
     });
   });
 }
