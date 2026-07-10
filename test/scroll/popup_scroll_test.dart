@@ -13,6 +13,7 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,6 +45,30 @@ Future<void> _wheel(WidgetTester tester, Offset at, double dy) async {
   pointer.hover(at);
   await tester.sendEventToBinding(pointer.scroll(Offset(0, dy)));
   await tester.pumpAndSettle();
+}
+
+/// Asserts the option row labelled [label] sits fully inside the popup's
+/// scroll viewport (the #279 scroll-into-view contract).
+void _expectRowWithinFold(WidgetTester tester, String label) {
+  final Rect fold = tester.getRect(find.byType(SingleChildScrollView));
+  final Rect row = tester.getRect(
+    find
+        .ancestor(
+          of: find.text(label),
+          matching: find.byType(CarbonListBoxMenuItem),
+        )
+        .first,
+  );
+  expect(
+    row.top,
+    greaterThanOrEqualTo(fold.top - 0.01),
+    reason: '$label starts above the popup fold',
+  );
+  expect(
+    row.bottom,
+    lessThanOrEqualTo(fold.bottom + 0.01),
+    reason: '$label ends below the popup fold',
+  );
 }
 
 void main() {
@@ -96,16 +121,55 @@ void main() {
       expect(tester.getRect(find.text('Option 50')).top, lessThan(before));
     });
 
-    testWidgets(
-      'arrowing keeps the highlighted option in view',
-      (WidgetTester tester) async {},
-      // TODO(#232): no scroll-into-view exists on keyboard highlight —
-      // arrowing to Option 50 leaves the highlight below the 5.5-row fold
-      // (upstream list-boxes keep it visible). Re-enable with a real
-      // assertion when the list-box family gains ensureVisible-on-
-      // highlight; sibling gaps tracked with the popup follow-up issue.
-      skip: true,
-    );
+    testWidgets('arrowing keeps the highlighted option in view (#279)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonDropdown<int>(
+            titleText: 'Options',
+            onChanged: (int _) {},
+            items: _dropdownItems(100),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(CarbonListBox));
+      await tester.pumpAndSettle();
+
+      // Ten ArrowDowns rove the highlight from Option 1 to Option 11 —
+      // five rows past the 5.5-row fold.
+      for (int i = 0; i < 10; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+      }
+      _expectRowWithinFold(tester, 'Option 11');
+
+      // And back up beyond the current window: the highlight scrolls the
+      // popup the other way.
+      for (int i = 0; i < 10; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pumpAndSettle();
+      }
+      _expectRowWithinFold(tester, 'Option 1');
+    });
+
+    testWidgets('opening reveals a preselected value below the fold (#279)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonDropdown<int>(
+            titleText: 'Options',
+            selectedItem: 50,
+            onChanged: (int _) {},
+            items: _dropdownItems(100),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(CarbonListBox));
+      await tester.pumpAndSettle();
+      _expectRowWithinFold(tester, 'Option 50');
+    });
 
     testWidgets('builds all 1,000 options eagerly (documented absence of '
         'virtualization)', (WidgetTester tester) async {
@@ -154,6 +218,68 @@ void main() {
         300,
       );
       expect(tester.getRect(find.text('Option 40')).top, lessThan(before));
+    });
+
+    testWidgets('arrowing keeps the highlighted option in view (#279)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonMultiSelect<int>(
+            titleText: 'Options',
+            label: 'Choose',
+            onChanged: (Set<int> _) {},
+            items: <CarbonMultiSelectItem<int>>[
+              for (int i = 1; i <= 60; i++)
+                CarbonMultiSelectItem<int>(value: i, label: 'Option $i'),
+            ],
+          ),
+        ),
+      );
+      await tester.tap(find.byType(CarbonListBox));
+      await tester.pumpAndSettle();
+      for (int i = 0; i < 12; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+      }
+      _expectRowWithinFold(tester, 'Option 13');
+    });
+  });
+
+  group('select popup', () {
+    testWidgets('arrowing keeps the highlighted option in view (#279)', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        _host(
+          CarbonSelect<int>(
+            labelText: 'Options',
+            focusNode: node,
+            onChanged: (int _) {},
+            items: <CarbonSelectEntry<int>>[
+              for (int i = 1; i <= 50; i++)
+                CarbonSelectItem<int>(value: i, label: 'Option $i'),
+            ],
+          ),
+        ),
+      );
+      node.requestFocus();
+      await tester.pump();
+
+      // ArrowDown opens with the highlight on Option 1; ten more rove it
+      // to Option 11, past the 240px popup cap (six 40px rows).
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      for (int i = 0; i < 10; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+      }
+      final Rect fold = tester.getRect(find.byType(SingleChildScrollView));
+      final Rect row = tester.getRect(find.text('Option 11'));
+      expect(row.top, greaterThanOrEqualTo(fold.top - 0.01));
+      expect(row.bottom, lessThanOrEqualTo(fold.bottom + 0.01));
     });
   });
 
