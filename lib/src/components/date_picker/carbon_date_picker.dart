@@ -599,6 +599,53 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
 
   bool _open = false;
   final Object _group = UniqueKey();
+  final FocusNode _focus = FocusNode(debugLabel: 'CarbonDatePicker');
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_rebuild);
+  }
+
+  void _rebuild() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _focus.removeListener(_rebuild);
+    _focus.dispose();
+    super.dispose();
+  }
+
+  /// Enter/Space open the calendar from the focused trigger (WAI-ARIA
+  /// date-picker dialog pattern via `date-picker/accessibility.mdx`).
+  ///
+  /// The trigger is unfocused first: the calendar grid's `autofocus` is
+  /// only honored while its focus scope has no focused child, and the
+  /// dialog pattern moves focus into the opened calendar.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (widget.disabled || _open || event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      node.unfocus();
+      setState(() => _open = true);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  /// Closes the calendar and returns keyboard focus to the trigger, per
+  /// the WAI-ARIA dialog pattern ("Escape: closes the dialog and returns
+  /// focus"; choosing a date does the same).
+  void _closeAndRefocus() {
+    setState(() => _open = false);
+    _focus.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -617,28 +664,34 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
           autofocus: true,
-          onEscape: () => setState(() => _open = false),
+          onEscape: _closeAndRefocus,
           onChanged: (DateTime d) {
             widget.onChanged(d);
-            setState(() => _open = false);
+            _closeAndRefocus();
           },
         ),
         child: TapRegion(
           groupId: _group,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.disabled
-                ? null
-                : () => setState(() => _open = !_open),
-            child: _DateField(
-              size: widget.size,
-              disabled: widget.disabled,
-              invalid: widget.invalid,
-              text: widget.value == null ? null : _format(widget.value!),
-              placeholder: widget.placeholder,
-              aiLabel: widget.aiLabel,
-              aiRevert: widget.aiRevert,
-              fluidLabel: _fluid ? widget.labelText : null,
+          child: Focus(
+            focusNode: _focus,
+            canRequestFocus: !widget.disabled,
+            onKeyEvent: _onKey,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.disabled
+                  ? null
+                  : () => setState(() => _open = !_open),
+              child: _DateField(
+                size: widget.size,
+                disabled: widget.disabled,
+                invalid: widget.invalid,
+                focused: _focus.hasFocus,
+                text: widget.value == null ? null : _format(widget.value!),
+                placeholder: widget.placeholder,
+                aiLabel: widget.aiLabel,
+                aiRevert: widget.aiRevert,
+                fluidLabel: _fluid ? widget.labelText : null,
+              ),
             ),
           ),
         ),
@@ -760,12 +813,43 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
   bool _open = false;
   CarbonDateRange? _beforeOpen;
   final Object _group = UniqueKey();
+  final FocusNode _startFocus = FocusNode(
+    debugLabel: 'CarbonDateRangePicker.start',
+  );
+  final FocusNode _endFocus = FocusNode(
+    debugLabel: 'CarbonDateRangePicker.end',
+  );
+
+  /// The field that opened the calendar; Escape returns focus to it.
+  FocusNode? _opener;
 
   /// The two range inputs are a fixed 143.5px wide with a 1px gap
   /// (`_date-picker.scss` `--date-picker--range`).
   static const double _inputWidth = 143.5;
 
-  void _toggle() {
+  @override
+  void initState() {
+    super.initState();
+    _startFocus.addListener(_rebuild);
+    _endFocus.addListener(_rebuild);
+  }
+
+  void _rebuild() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _startFocus.removeListener(_rebuild);
+    _endFocus.removeListener(_rebuild);
+    _startFocus.dispose();
+    _endFocus.dispose();
+    super.dispose();
+  }
+
+  void _toggle(FocusNode opener) {
     if (widget.disabled) {
       return;
     }
@@ -773,46 +857,85 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
       _open = !_open;
       if (_open) {
         _beforeOpen = widget.value;
+        _opener = opener;
       }
     });
   }
 
   void _cancel() {
-    // Escape restores the committed value from when the popover opened.
+    // Escape restores the committed value from when the popover opened,
+    // and returns keyboard focus to the field that opened it (WAI-ARIA
+    // dialog pattern).
     if (widget.value != _beforeOpen && _beforeOpen != null) {
       widget.onChanged(_beforeOpen!);
     }
     setState(() => _open = false);
+    _opener?.requestFocus();
   }
 
-  Widget _labelledField(String label, DateTime? date) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      if (!_fluid)
-        ExcludeSemantics(
-          child: CarbonFormLabel(label, disabled: widget.disabled),
-        ),
-      Semantics(
-        button: true,
-        label: label,
-        value: date == null ? null : _format(date),
-        child: SizedBox(
-          width: _inputWidth,
-          child: _DateField(
-            size: widget.size,
-            disabled: widget.disabled,
-            invalid: widget.invalid,
-            text: date == null ? null : _format(date),
-            placeholder: widget.placeholder,
-            aiLabel: widget.aiLabel,
-            aiRevert: widget.aiRevert,
-            fluidLabel: _fluid ? label : null,
+  /// Enter/Space open the shared calendar from either focused field. The
+  /// field is unfocused first so the calendar grid's `autofocus` is
+  /// honored (see [CarbonDatePicker]).
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (widget.disabled || _open || event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      node.unfocus();
+      _toggle(node);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  Widget _labelledField(String label, DateTime? date, FocusNode focus) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (!_fluid)
+            // The label opens the calendar too (upstream's label-for);
+            // excluded from semantics so the labelled field node below
+            // stays the only actionable one.
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              excludeFromSemantics: true,
+              onTap: () => _toggle(focus),
+              child: ExcludeSemantics(
+                child: CarbonFormLabel(label, disabled: widget.disabled),
+              ),
+            ),
+          Semantics(
+            button: true,
+            label: label,
+            value: date == null ? null : _format(date),
+            child: Focus(
+              focusNode: focus,
+              canRequestFocus: !widget.disabled,
+              onKeyEvent: _onKey,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _toggle(focus),
+                child: SizedBox(
+                  width: _inputWidth,
+                  child: _DateField(
+                    size: widget.size,
+                    disabled: widget.disabled,
+                    invalid: widget.invalid,
+                    focused: focus.hasFocus,
+                    text: date == null ? null : _format(date),
+                    placeholder: widget.placeholder,
+                    aiLabel: widget.aiLabel,
+                    aiRevert: widget.aiRevert,
+                    fluidLabel: _fluid ? label : null,
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
-    ],
-  );
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -820,9 +943,9 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        _labelledField(widget.startLabelText, widget.value?.start),
+        _labelledField(widget.startLabelText, widget.value?.start, _startFocus),
         const SizedBox(width: 1),
-        _labelledField(widget.endLabelText, widget.value?.end),
+        _labelledField(widget.endLabelText, widget.value?.end, _endFocus),
       ],
     );
 
@@ -842,17 +965,11 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
           widget.onChanged(r);
           if (r.isComplete) {
             setState(() => _open = false);
+            _opener?.requestFocus();
           }
         },
       ),
-      child: TapRegion(
-        groupId: _group,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _toggle,
-          child: fields,
-        ),
-      ),
+      child: TapRegion(groupId: _group, child: fields),
     );
 
     final Widget? message = widget.invalid && widget.invalidText != null
@@ -877,6 +994,7 @@ class _DateField extends StatelessWidget {
     required this.invalid,
     required this.text,
     required this.placeholder,
+    this.focused = false,
     this.aiLabel,
     this.aiRevert = false,
     this.fluidLabel,
@@ -885,6 +1003,7 @@ class _DateField extends StatelessWidget {
   final CarbonFieldSize size;
   final bool disabled;
   final bool invalid;
+  final bool focused;
   final String? text;
   final String placeholder;
   final Widget? aiLabel;
@@ -906,6 +1025,7 @@ class _DateField extends StatelessWidget {
       size: size,
       disabled: disabled,
       status: invalid ? CarbonFieldStatus.invalid : CarbonFieldStatus.none,
+      focused: focused,
       aiLabel: aiLabel,
       aiRevert: aiRevert,
       fluid: fluidLabel != null,

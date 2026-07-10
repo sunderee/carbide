@@ -519,90 +519,86 @@ void main() {
       expect(picked, isNull);
     });
 
-    testWidgets(
-      'Tab reaches the field trigger and Enter opens the calendar',
-      (WidgetTester tester) async {
-        final FocusNode anchor = FocusNode(debugLabel: 'anchor');
-        addTearDown(anchor.dispose);
-        await tester.pumpWidget(
-          _fieldHost(
-            _tabTraversal(
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Focus(focusNode: anchor, child: const SizedBox.shrink()),
-                  SizedBox(
-                    width: 320,
-                    child: CarbonDatePicker(
-                      labelText: 'Date',
-                      value: DateTime(2026, 6, 15),
-                      onChanged: (_) {},
-                    ),
+    testWidgets('Tab reaches the field trigger and Enter opens the calendar', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode anchor = FocusNode(debugLabel: 'anchor');
+      addTearDown(anchor.dispose);
+      DateTime? picked;
+      await tester.pumpWidget(
+        _fieldHost(
+          _tabTraversal(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Focus(focusNode: anchor, child: const SizedBox.shrink()),
+                SizedBox(
+                  width: 320,
+                  child: CarbonDatePicker(
+                    labelText: 'Date',
+                    value: DateTime(2026, 6, 15),
+                    onChanged: (DateTime d) => picked = d,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
-        anchor.requestFocus();
-        await tester.pump();
+        ),
+      );
+      anchor.requestFocus();
+      await tester.pump();
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-        await tester.pump();
-        final BuildContext? focused =
-            tester.binding.focusManager.primaryFocus?.context;
-        expect(
-          focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
-          isNotNull,
-        );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      final BuildContext? focused =
+          tester.binding.focusManager.primaryFocus?.context;
+      expect(
+        focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
+        isNotNull,
+      );
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-        await tester.pumpAndSettle();
-        expect(find.text('June 2026'), findsOneWidget);
-      },
-      // TODO(#231): CarbonDatePicker's trigger has no FocusNode, so it can
-      // neither be reached with Tab nor opened with Enter/Space; the
-      // WAI-ARIA date picker dialog pattern (date-picker/accessibility.mdx,
-      // Resources) requires a keyboard-operable trigger. Re-enable once the
-      // trigger is focusable.
-      skip: true,
-    );
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsOneWidget);
 
-    testWidgets(
-      'Escape returns focus to the field trigger',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          _fieldHost(
-            SizedBox(
-              width: 320,
-              child: CarbonDatePicker(
-                labelText: 'Date',
-                value: DateTime(2026, 6, 15),
-                onChanged: (_) {},
-              ),
+      // Focus moved into the calendar grid (the WAI-ARIA dialog
+      // pattern), so arrows and Enter drive it straight away.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(picked, DateTime(2026, 6, 22));
+      expect(find.text('June 2026'), findsNothing);
+    });
+
+    testWidgets('Escape returns focus to the field trigger', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _fieldHost(
+          SizedBox(
+            width: 320,
+            child: CarbonDatePicker(
+              labelText: 'Date',
+              value: DateTime(2026, 6, 15),
+              onChanged: (_) {},
             ),
           ),
-        );
-        await tester.tap(find.text('06/15/2026'));
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.tap(find.text('06/15/2026'));
+      await tester.pumpAndSettle();
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-        await tester.pumpAndSettle();
-        expect(find.text('June 2026'), findsNothing);
-        final BuildContext? focused =
-            tester.binding.focusManager.primaryFocus?.context;
-        expect(
-          focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
-          isNotNull,
-        );
-      },
-      // TODO(#231): Escape closes the calendar but keyboard focus is not
-      // returned to the field — the trigger has no FocusNode to restore to
-      // (WAI-ARIA date picker dialog pattern: "Escape: Closes the dialog
-      // and returns focus to the Choose Date button"). Re-enable with the
-      // focusable trigger.
-      skip: true,
-    );
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsNothing);
+      final BuildContext? focused =
+          tester.binding.focusManager.primaryFocus?.context;
+      expect(
+        focused?.findAncestorWidgetOfExactType<CarbonDatePicker>(),
+        isNotNull,
+      );
+    });
   });
 
   group('goldens', () {
@@ -906,6 +902,58 @@ void main() {
         CarbonDateRange(DateTime(2026, 6, 10), DateTime(2026, 6, 12)),
       );
       expect(find.text('June 2026'), findsNothing);
+    });
+
+    testWidgets('both fields are Tab-reachable; Enter opens the shared '
+        'calendar and Escape returns focus to the opener', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode anchor = FocusNode(debugLabel: 'anchor');
+      addTearDown(anchor.dispose);
+      await tester.pumpWidget(
+        _fieldHost(
+          _tabTraversal(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Focus(focusNode: anchor, child: const SizedBox.shrink()),
+                CarbonDateRangePicker(
+                  value: CarbonDateRange(
+                    DateTime(2026, 6, 10),
+                    DateTime(2026, 6, 12),
+                  ),
+                  onChanged: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      anchor.requestFocus();
+      await tester.pump();
+
+      // Tab visits start, then end.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      final FocusNode? endNode = tester.binding.focusManager.primaryFocus;
+      expect(endNode?.debugLabel, 'CarbonDateRangePicker.end');
+
+      // Enter on the end field opens the shared calendar.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsOneWidget);
+
+      // Escape closes it and hands focus back to the end field.
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('June 2026'), findsNothing);
+      expect(
+        tester.binding.focusManager.primaryFocus?.debugLabel,
+        'CarbonDateRangePicker.end',
+      );
     });
   });
 

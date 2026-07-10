@@ -654,12 +654,14 @@ class _VerticalTabButtonState extends State<_VerticalTabButton> {
         ? CarbonTypeStyles.headingCompact01
         : CarbonTypeStyles.bodyCompact01;
 
+    // No `onTap` on the Semantics widget: the inner GestureDetector and
+    // Focus merge their tap/focus actions into this labelled node instead
+    // of forking an unlabelled companion node (#268).
     return Semantics(
       selected: widget.selected,
       enabled: enabled,
       button: true,
       label: widget.tab.label,
-      onTap: enabled ? widget.onTap : null,
       child: MouseRegion(
         cursor: enabled
             ? SystemMouseCursors.click
@@ -845,12 +847,15 @@ class _TabButtonState extends State<_TabButton> {
       ],
     );
 
+    // No `onTap` on the Semantics widget: the inner GestureDetector and
+    // Focus merge their tap/focus actions into this labelled node instead
+    // of forking an unlabelled companion node (#268). The dismiss icon's
+    // own tap handler still forks, but that node carries its own label.
     return Semantics(
       selected: widget.selected,
       enabled: enabled,
       button: true,
       label: widget.tab.label,
-      onTap: enabled ? widget.onTap : null,
       child: MouseRegion(
         cursor: enabled
             ? SystemMouseCursors.click

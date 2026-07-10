@@ -328,10 +328,6 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('3'), findsOneWidget);
       },
-      // TODO(#231): CarbonSelect ignores ArrowUp while closed;
-      // pagination/accessibility.mdx says the selects open "with Space or
-      // with Up or Down arrows". Re-enable once ArrowUp opens the select.
-      skip: true,
     );
   });
 

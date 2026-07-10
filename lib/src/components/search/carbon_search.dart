@@ -8,6 +8,7 @@
 //   styles/scss/components/fluid-search/_fluid-search.scss
 //   react/src/components/{Search,ExpandableSearch}
 
+import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/motion.dart';
@@ -133,20 +134,41 @@ class _CarbonSearchState extends State<CarbonSearch> {
     _focus.requestFocus();
   }
 
+  /// Escape clears a non-empty query (`search/accessibility.mdx`: users
+  /// "press Esc to clear it"). An empty query ignores the key so it can
+  /// bubble — [CarbonExpandableSearch] collapses on it, like upstream.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape &&
+        _controller.text.isNotEmpty) {
+      _clear();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _CarbonSearchField(
-      controller: _controller,
-      focusNode: _focus,
-      placeholder: widget.placeholder,
-      labelText: widget.labelText,
-      size: widget.size,
-      disabled: widget.disabled,
-      fluid: _fluid,
-      autofocus: widget.autofocus,
-      onChanged: widget.onChanged,
-      onClear: _clear,
-      closeButtonLabel: widget.closeButtonLabel,
+    // The ancestor Focus sees keys before the EditableText's own
+    // Shortcuts/Actions, so Escape is intercepted here (the combo box
+    // uses the same mechanism).
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onKeyEvent: _onKey,
+      child: _CarbonSearchField(
+        controller: _controller,
+        focusNode: _focus,
+        placeholder: widget.placeholder,
+        labelText: widget.labelText,
+        size: widget.size,
+        disabled: widget.disabled,
+        fluid: _fluid,
+        autofocus: widget.autofocus,
+        onChanged: widget.onChanged,
+        onClear: _clear,
+        closeButtonLabel: widget.closeButtonLabel,
+      ),
     );
   }
 }
@@ -380,6 +402,9 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
   late final TextEditingController _controller =
       widget.controller ?? TextEditingController();
   final FocusNode _focus = FocusNode();
+  final FocusNode _buttonFocus = FocusNode(
+    debugLabel: 'CarbonExpandableSearch.button',
+  );
   bool _expanded = false;
 
   @override
@@ -395,6 +420,7 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
       _controller.dispose();
     }
     _focus.dispose();
+    _buttonFocus.dispose();
     super.dispose();
   }
 
@@ -410,6 +436,24 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
     _focus.requestFocus();
   }
 
+  /// Escape on an expanded empty search collapses it and hands focus back
+  /// to the magnifier button (react `ExpandableSearch.tsx` handleKeyDown;
+  /// `Search.tsx` focuses the expand button). A non-empty query never
+  /// reaches this handler — the inner [CarbonSearch] clears it instead.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape &&
+        _controller.text.isEmpty) {
+      setState(() => _expanded = false);
+      // The button mounts on the next frame, replacing the field.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _buttonFocus.requestFocus();
+      });
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
@@ -422,6 +466,7 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
         label: widget.expandLabel,
         child: CarbonInteraction(
           enabled: !widget.disabled,
+          focusNode: _buttonFocus,
           onPressed: _expand,
           builder: (BuildContext context, Set<WidgetState> states) {
             final bool hovered = states.contains(WidgetState.hovered);
@@ -449,17 +494,22 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
       );
     }
 
-    return CarbonSearch(
-      labelText: widget.labelText,
-      controller: _controller,
-      focusNode: _focus,
-      placeholder: widget.placeholder,
-      size: widget.size,
-      disabled: widget.disabled,
-      autofocus: true,
-      onChanged: widget.onChanged,
-      onClear: widget.onClear,
-      closeButtonLabel: widget.closeButtonLabel,
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onKeyEvent: _onKey,
+      child: CarbonSearch(
+        labelText: widget.labelText,
+        controller: _controller,
+        focusNode: _focus,
+        placeholder: widget.placeholder,
+        size: widget.size,
+        disabled: widget.disabled,
+        autofocus: true,
+        onChanged: widget.onChanged,
+        onClear: widget.onClear,
+        closeButtonLabel: widget.closeButtonLabel,
+      ),
     );
   }
 }

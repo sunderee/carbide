@@ -154,39 +154,37 @@ void main() {
     // documentation/carbon/packages/react/src/components/ExpandableSearch/
     // ExpandableSearch.tsx (handleKeyDown collapses when empty).
 
-    testWidgets(
-      'Escape clears the query and reports the change',
-      (WidgetTester tester) async {
-        final TextEditingController controller = TextEditingController(
-          text: 'query',
-        );
-        addTearDown(controller.dispose);
-        final FocusNode node = FocusNode();
-        addTearDown(node.dispose);
-        String? last;
-        int cleared = 0;
-        await tester.pumpWidget(
-          _host(
-            CarbonSearch(
-              controller: controller,
-              focusNode: node,
-              onChanged: (String v) => last = v,
-              onClear: () => cleared++,
-            ),
+    testWidgets('Escape clears the query and reports the change', (
+      WidgetTester tester,
+    ) async {
+      final TextEditingController controller = TextEditingController(
+        text: 'query',
+      );
+      addTearDown(controller.dispose);
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      String? last;
+      int cleared = 0;
+      await tester.pumpWidget(
+        _host(
+          CarbonSearch(
+            controller: controller,
+            focusNode: node,
+            onChanged: (String v) => last = v,
+            onClear: () => cleared++,
           ),
-        );
-        node.requestFocus();
-        await tester.pumpAndSettle();
-        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-        await tester.pump();
-        expect(controller.text, isEmpty);
-        expect(last, '');
-        expect(cleared, 1);
-      },
-      // TODO(#231): CarbonSearch has no Escape handler; upstream clears the
-      // query (firing onChanged/onClear) when Esc is pressed in the field.
-      skip: true,
-    );
+        ),
+      );
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(controller.text, isEmpty);
+      expect(last, '');
+      expect(cleared, 1);
+      // The field keeps focus after clearing (Search.tsx clearInput).
+      expect(node.hasFocus, isTrue);
+    });
 
     testWidgets('Enter on the focused magnifier expands and moves focus '
         'into the field', (WidgetTester tester) async {
@@ -226,22 +224,24 @@ void main() {
       );
     });
 
-    testWidgets(
-      'Escape collapses the expanded empty search',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(_host(const CarbonExpandableSearch()));
-        await tester.tap(find.byType(CarbonIcon));
-        await tester.pumpAndSettle();
-        expect(find.byType(EditableText), findsOneWidget);
+    testWidgets('Escape collapses the expanded empty search', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(const CarbonExpandableSearch()));
+      await tester.tap(find.byType(CarbonIcon));
+      await tester.pumpAndSettle();
+      expect(find.byType(EditableText), findsOneWidget);
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-        await tester.pumpAndSettle();
-        expect(find.byType(EditableText), findsNothing);
-      },
-      // TODO(#231): CarbonExpandableSearch has no Escape handler; upstream
-      // collapses the expanded search on Escape when the field is empty.
-      skip: true,
-    );
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(EditableText), findsNothing);
+      // Focus lands on the magnifier button (Search.tsx focuses the
+      // expand button on Escape).
+      expect(
+        Focus.of(tester.element(find.byType(CarbonIcon))).hasPrimaryFocus,
+        isTrue,
+      );
+    });
   });
 
   group('fluid + semantics', () {

@@ -280,11 +280,7 @@ void main() {
           ),
         ),
       );
-      // TODO(#226): the header also exposes an inner Focus+GestureDetector
-      // semantics node ([focus, tap], no label) beside its labelled button
-      // node — suspected product defect; re-enable `labeled` once lib
-      // merges the two.
-      await expectA11y(tester, labeled: false);
+      await expectA11y(tester);
       handle.dispose();
     });
   });

@@ -535,34 +535,35 @@ void main() {
       expect(focused(find.byType(CarbonIcon)), isTrue);
     });
 
-    testWidgets(
-      'the header name is reachable by Tab',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          _host(
-            _tabTraversal(
-              CarbonHeader(
-                name: CarbonHeaderName(
-                  prefix: 'IBM',
-                  name: 'Carbide',
-                  onPressed: () {},
-                ),
+    testWidgets('the header name is reachable by Tab and activated by Enter', (
+      WidgetTester tester,
+    ) async {
+      int pressed = 0;
+      await tester.pumpWidget(
+        _host(
+          _tabTraversal(
+            CarbonHeader(
+              name: CarbonHeaderName(
+                prefix: 'IBM',
+                name: 'Carbide',
+                onPressed: () => pressed++,
               ),
             ),
           ),
-        );
-        await tester.pumpAndSettle();
-        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-        await tester.pumpAndSettle();
-        expect(
-          Focus.of(tester.element(find.text('Carbide'))).hasPrimaryFocus,
-          isTrue,
-        );
-      },
-      // TODO(#231): CarbonHeaderName builds no Focus node, so the name is
-      // not Tab-reachable (upstream: every header element is).
-      skip: true,
-    );
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(
+        Focus.of(tester.element(find.text('Carbide'))).hasPrimaryFocus,
+        isTrue,
+      );
+
+      // Enter activates the name, like upstream's <a> anchor.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(pressed, 1);
+    });
 
     testWidgets('skip to content: first Tab reveals the link and Enter '
         'moves focus to the content region', (WidgetTester tester) async {

@@ -257,7 +257,10 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
+      // ArrowUp opens too, per native-<select> parity
+      // (pagination/accessibility.mdx: "Space or Up or Down arrows").
       if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowUp ||
           event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.space) {
         _open();
