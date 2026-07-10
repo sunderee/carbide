@@ -42,8 +42,7 @@ const String _submodulePackage =
 /// Per-component drift thresholds from stories.json (absent → bootstrap).
 final Map<String, double> _thresholds = () {
   final Map<String, dynamic> stories =
-      jsonDecode(File(_storiesPath).readAsStringSync())
-          as Map<String, dynamic>;
+      jsonDecode(File(_storiesPath).readAsStringSync()) as Map<String, dynamic>;
   return <String, double>{
     for (final dynamic s in stories['stories'] as List<dynamic>)
       if ((s as Map<String, dynamic>)['threshold'] != null)
@@ -152,6 +151,249 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
       subtitle: 'Subtitle text goes here.',
     ),
   ),
+  'dropdown': () => SizedBox(
+    width: 400,
+    child: CarbonDropdown<int>(
+      titleText: 'Label',
+      label: 'Choose an option',
+      helperText: 'Helper text',
+      onChanged: (int _) {},
+      items: const <CarbonDropdownItem<int>>[
+        CarbonDropdownItem<int>(value: 0, label: 'Option 1'),
+        CarbonDropdownItem<int>(value: 1, label: 'Option 2'),
+      ],
+    ),
+  ),
+  'tabs': () => const SizedBox(
+    width: 480,
+    child: CarbonTabs(
+      tabs: <CarbonTab>[
+        CarbonTab(label: 'Dashboard'),
+        CarbonTab(label: 'Monitoring'),
+        CarbonTab(label: 'Activity'),
+        CarbonTab(label: 'Settings'),
+      ],
+      panels: <Widget>[
+        Text('Tab Panel 1'),
+        Text('Tab Panel 2'),
+        Text('Tab Panel 3'),
+        Text('Tab Panel 4'),
+      ],
+    ),
+  ),
+  'accordion': () => const SizedBox(
+    width: 640,
+    child: CarbonAccordion(
+      children: <Widget>[
+        CarbonAccordionItem(title: 'Choose your plan', child: Text('Body')),
+        CarbonAccordionItem(title: 'Add team members', child: Text('Body')),
+        CarbonAccordionItem(title: 'Set payment details', child: Text('Body')),
+        CarbonAccordionItem(
+          title: 'Review and confirm (title can be a node)',
+          child: Text('Body'),
+        ),
+      ],
+    ),
+  ),
+  'multiselect': () => SizedBox(
+    width: 400,
+    child: CarbonMultiSelect<int>(
+      titleText: 'Label',
+      label: 'This is a label',
+      helperText: 'This is helper text',
+      onChanged: (Set<int> _) {},
+      items: const <CarbonMultiSelectItem<int>>[
+        CarbonMultiSelectItem<int>(value: 0, label: 'Option 1'),
+        CarbonMultiSelectItem<int>(value: 1, label: 'Option 2'),
+      ],
+    ),
+  ),
+  'search': () =>
+      const SizedBox(width: 400, child: CarbonSearch(placeholder: 'Search')),
+  'number-input': () => SizedBox(
+    width: 300,
+    child: CarbonNumberInput(
+      labelText: 'NumberInput label',
+      helperText: 'Optional helper text',
+      value: 50,
+      min: 0,
+      max: 100,
+      onChanged: (num? _) {},
+    ),
+  ),
+  'select': () => SizedBox(
+    width: 400,
+    child: CarbonSelect<int>(
+      labelText: 'Select an option',
+      helperText: 'Optional helper text',
+      value: 0,
+      onChanged: (int? _) {},
+      items: const <CarbonSelectItem<int>>[
+        CarbonSelectItem<int>(value: 0, label: 'Option 1'),
+        CarbonSelectItem<int>(value: 1, label: 'Option 2'),
+      ],
+    ),
+  ),
+  'combo-box': () => SizedBox(
+    width: 400,
+    child: CarbonComboBox<int>(
+      titleText: 'ComboBox title',
+      onChanged: (int? _) {},
+      items: const <CarbonComboBoxItem<int>>[
+        CarbonComboBoxItem<int>(value: 0, label: 'Option 1'),
+        CarbonComboBoxItem<int>(value: 1, label: 'Option 2'),
+      ],
+    ),
+  ),
+  'date-picker': () => SizedBox(
+    width: 300,
+    child: CarbonDatePicker(
+      labelText: 'Date Picker label',
+      onChanged: (DateTime? _) {},
+    ),
+  ),
+  'radio-button': () => CarbonRadioButtonGroup<int>(
+    legend: 'Radio button heading',
+    value: 0,
+    orientation: Axis.vertical,
+    onChanged: (int _) {},
+    options: const <(int, String)>[
+      (0, 'Radio button label'),
+      (1, 'Radio button label'),
+      (2, 'Radio button label'),
+    ],
+  ),
+  'slider': () => SizedBox(
+    width: 400,
+    child: CarbonSlider(
+      labelText: 'Slider label',
+      value: 50,
+      min: 0,
+      max: 100,
+      onChanged: (num _) {},
+    ),
+  ),
+  // The Storybook reference captures the story root: the trigger button
+  // with the opened modal's scrim/header band cropped over it. No Carbide
+  // composition reproduces that crop, so the builder renders the same
+  // trigger + open dialog and the threshold stays wide (drift detection
+  // only).
+  'modal': () => SizedBox(
+    width: 640,
+    height: 400,
+    child: Stack(
+      children: <Widget>[
+        CarbonButton(label: 'Launch modal', onPressed: _noop),
+        CarbonDialog(
+          open: true,
+          modal: true,
+          onRequestClose: _noop,
+          children: <Widget>[
+            const CarbonDialogHeader(
+              children: <Widget>[Text('Add a custom domain')],
+            ),
+            const CarbonDialogBody(
+              child: Text(
+                'Custom domains direct requests for your apps in this '
+                'Cloud Foundry organization to a URL that you own.',
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+  // DefinitionTooltip closed state: the underlined term only. The bare
+  // host has no DefaultTextStyle, so the child styles itself.
+  'tooltip': () => Builder(
+    builder: (BuildContext context) => CarbonTooltip(
+      label: 'Uniform Resource Locator; the address of a resource.',
+      child: Text(
+        'URL',
+        style: CarbonTypeStyles.bodyCompact01.copyWith(
+          color: CarbonTheme.of(context).textPrimary,
+        ),
+      ),
+    ),
+  ),
+  'progress-bar': () => const SizedBox(
+    width: 400,
+    child: CarbonProgressBar(label: 'Progress bar label', value: 75),
+  ),
+  'progress-indicator': () => const SizedBox(
+    width: 640,
+    child: CarbonProgressIndicator(
+      currentIndex: 1,
+      steps: <CarbonProgressStep>[
+        CarbonProgressStep(label: 'First step'),
+        CarbonProgressStep(label: 'Second step'),
+        CarbonProgressStep(label: 'Third step'),
+        CarbonProgressStep(label: 'Fourth step'),
+        CarbonProgressStep(label: 'Fifth step'),
+      ],
+    ),
+  ),
+  'breadcrumb': () => CarbonBreadcrumb(
+    items: <CarbonBreadcrumbItem>[
+      CarbonBreadcrumbItem(label: 'Breadcrumb 1', onPressed: _noop),
+      CarbonBreadcrumbItem(label: 'Breadcrumb 2', onPressed: _noop),
+      CarbonBreadcrumbItem(label: 'Breadcrumb 3', onPressed: _noop),
+    ],
+  ),
+  'pagination': () => SizedBox(
+    width: 720,
+    child: CarbonPagination(
+      page: 1,
+      pageSize: 10,
+      totalItems: 103,
+      onPageChanged: (int _) {},
+      onPageSizeChanged: (int _) {},
+    ),
+  ),
+  'code-snippet': () => const SizedBox(
+    width: 560,
+    child: CarbonCodeSnippet(
+      code: 'yarn add carbon-components@latest carbon-components-react@latest',
+    ),
+  ),
+  'content-switcher': () => CarbonContentSwitcher(
+    selectedIndex: 0,
+    onChanged: (int _) {},
+    switches: const <CarbonSwitch>[
+      CarbonSwitch(text: 'First section'),
+      CarbonSwitch(text: 'Second section'),
+      CarbonSwitch(text: 'Third section'),
+    ],
+  ),
+  'structured-list': () => const SizedBox(
+    width: 640,
+    child: CarbonStructuredList(
+      headers: <String>['ColumnA', 'ColumnB', 'ColumnC'],
+      rows: <CarbonStructuredListRow>[
+        CarbonStructuredListRow(
+          cells: <Widget>[Text('Row 1'), Text('Row 1'), Text('Row 1')],
+        ),
+        CarbonStructuredListRow(
+          cells: <Widget>[Text('Row 2'), Text('Row 2'), Text('Row 2')],
+        ),
+      ],
+    ),
+  ),
+  'tile': () => const SizedBox(
+    width: 320,
+    child: CarbonTile(child: Text('Default tile')),
+  ),
+  'loading': () => const CarbonLoading(),
+  'inline-loading': () =>
+      const CarbonInlineLoading(description: 'Loading data...'),
+  'overflow-menu': () => CarbonOverflowMenu(
+    items: <CarbonMenuItem>[
+      CarbonMenuItem(label: 'Stop app', onPressed: _noop),
+      CarbonMenuItem(label: 'Restart app', onPressed: _noop),
+      CarbonMenuItem(label: 'Rename app', onPressed: _noop),
+    ],
+  ),
+  'link': () => CarbonLink(label: 'Link', onPressed: _noop),
 };
 
 void main() {
@@ -183,8 +425,7 @@ void main() {
     int minor(String v) => int.parse(v.split('.')[1]);
     final int captured = stamped.map(minor).reduce(math.max);
     final String pinVersion =
-        (jsonDecode(pkg.readAsStringSync())
-                as Map<String, dynamic>)['version']
+        (jsonDecode(pkg.readAsStringSync()) as Map<String, dynamic>)['version']
             as String;
     final int pin = minor(pinVersion);
     if (pin - captured >= 2) {

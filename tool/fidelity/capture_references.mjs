@@ -28,9 +28,12 @@ const page = await context.newPage();
 const results = [];
 for (const story of stories) {
   for (const theme of THEMES) {
+    // The Storybook's theme decorator follows the `backgrounds` global
+    // (mapped to data-carbon-theme); the legacy `theme` global is kept in
+    // the URL for older deployments.
     const url =
       `${BASE}/iframe.html?id=${story.storyId}` +
-      `&viewMode=story&globals=theme:${theme}`;
+      `&viewMode=story&globals=theme:${theme};backgrounds.value:${theme}`;
     const out = join(OUT, story.component, `${theme}.png`);
     try {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });

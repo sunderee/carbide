@@ -27,7 +27,7 @@
       ]
     },
     {
-      "capturedAt": "2026-07-07T20:04:00Z",
+      "capturedAt": "2026-07-10T05:30:00Z",
       "carbonReactVersion": "1.111.1",
       "_comment": "Live Storybook at capture ran @carbon/react 1.111.1 (submodule pin: 1.111.0 \u2014 one patch apart).",
       "components": [

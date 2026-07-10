@@ -3,135 +3,168 @@
   "stories": [
     {
       "component": "button",
-      "storyId": "components-button--default"
+      "storyId": "components-button--default",
+      "threshold": 0.64
     },
     {
       "component": "tag",
-      "storyId": "components-tag--read-only"
+      "storyId": "components-tag--read-only",
+      "threshold": 0.21
     },
     {
       "component": "checkbox",
-      "storyId": "components-checkbox--default"
+      "storyId": "components-checkbox--default",
+      "threshold": 0.3
     },
     {
       "component": "toggle",
-      "storyId": "components-toggle--default"
+      "storyId": "components-toggle--default",
+      "threshold": 0.28
     },
     {
       "component": "text-input",
-      "storyId": "components-textinput--default"
+      "storyId": "components-textinput--default",
+      "threshold": 0.12
     },
     {
       "component": "dropdown",
-      "storyId": "components-dropdown--default"
+      "storyId": "components-dropdown--default",
+      "threshold": 0.1
     },
     {
       "component": "tabs",
-      "storyId": "components-tabs--default"
+      "storyId": "components-tabs--default",
+      "threshold": 0.13
     },
     {
       "component": "accordion",
-      "storyId": "components-accordion--default"
+      "storyId": "components-accordion--default",
+      "threshold": 0.09
     },
     {
       "component": "tree-view",
-      "storyId": "components-treeview--default"
+      "storyId": "components-treeview--default",
+      "threshold": 0.14
     },
     {
       "component": "multiselect",
-      "storyId": "components-multiselect--default"
+      "storyId": "components-multiselect--default",
+      "threshold": 0.11
     },
     {
       "component": "data-table",
-      "storyId": "components-datatable-basic--default"
+      "storyId": "components-datatable-basic--default",
+      "threshold": 0.1
     },
     {
       "component": "notification",
-      "storyId": "components-notifications-inline--default"
+      "storyId": "components-notifications-inline--default",
+      "threshold": 0.44
     },
     {
       "component": "search",
-      "storyId": "components-search--default"
+      "storyId": "components-search--default",
+      "threshold": 0.1
     },
     {
       "component": "number-input",
-      "storyId": "components-numberinput--default"
+      "storyId": "components-numberinput--default",
+      "threshold": 0.09
     },
     {
       "component": "select",
-      "storyId": "components-select--default"
+      "storyId": "components-select--default",
+      "threshold": 0.1
     },
     {
       "component": "combo-box",
-      "storyId": "components-combobox--default"
+      "storyId": "components-combobox--default",
+      "threshold": 0.12
     },
     {
       "component": "date-picker",
-      "storyId": "components-datepicker--default"
+      "storyId": "components-datepicker--default",
+      "threshold": 0.12
     },
     {
       "component": "radio-button",
-      "storyId": "components-radiobutton--default"
+      "storyId": "components-radiobutton--default",
+      "threshold": 0.18
     },
     {
       "component": "slider",
-      "storyId": "components-slider--default"
+      "storyId": "components-slider--default",
+      "threshold": 0.1
     },
     {
       "component": "modal",
-      "storyId": "components-modal--default"
+      "storyId": "components-modal--default",
+      "threshold": 0.44
     },
     {
       "component": "tooltip",
-      "storyId": "components-tooltip--default"
+      "storyId": "components-tooltip--default",
+      "threshold": 0.24
     },
     {
       "component": "progress-bar",
-      "storyId": "components-progressbar--default"
+      "storyId": "components-progressbar--default",
+      "threshold": 0.22
     },
     {
       "component": "progress-indicator",
-      "storyId": "components-progressindicator--default"
+      "storyId": "components-progressindicator--default",
+      "threshold": 0.1
     },
     {
       "component": "breadcrumb",
-      "storyId": "components-breadcrumb--default"
+      "storyId": "components-breadcrumb--default",
+      "threshold": 0.16
     },
     {
       "component": "pagination",
-      "storyId": "components-pagination--default"
+      "storyId": "components-pagination--default",
+      "threshold": 0.12
     },
     {
       "component": "code-snippet",
-      "storyId": "components-codesnippet--singleline"
+      "storyId": "components-codesnippet--singleline",
+      "threshold": 0.13
     },
     {
       "component": "content-switcher",
-      "storyId": "components-contentswitcher--default"
+      "storyId": "components-contentswitcher--default",
+      "threshold": 0.13
     },
     {
       "component": "structured-list",
-      "storyId": "components-structuredlist--default"
+      "storyId": "components-structuredlist--default",
+      "threshold": 0.11
     },
     {
       "component": "tile",
-      "storyId": "components-tile--default"
+      "storyId": "components-tile--default",
+      "threshold": 0.08
     },
     {
       "component": "loading",
-      "storyId": "components-loading--default"
+      "storyId": "components-loading--default",
+      "threshold": 0.21
     },
     {
       "component": "inline-loading",
-      "storyId": "components-inlineloading--default"
+      "storyId": "components-inlineloading--default",
+      "threshold": 0.14
     },
     {
       "component": "overflow-menu",
-      "storyId": "components-overflowmenu--default"
+      "storyId": "components-overflowmenu--default",
+      "threshold": 0.07
     },
     {
       "component": "link",
-      "storyId": "components-link--default"
+      "storyId": "components-link--default",
+      "threshold": 0.18
     }
   ]
 }
