@@ -72,6 +72,29 @@ Widget _tree({
   ),
 );
 
+/// The background color of the row containing [label].
+Color _rowColor(WidgetTester tester, String label) {
+  final BoxDecoration deco =
+      tester
+              .widget<DecoratedBox>(
+                find
+                    .ancestor(
+                      of: find.text(label),
+                      matching: find.byType(DecoratedBox),
+                    )
+                    .first,
+              )
+              .decoration
+          as BoxDecoration;
+  return deco.color!;
+}
+
+/// The 4px active-marker strip inside the row containing [label], if any.
+Finder _marker(WidgetTester tester, String label) => find.descendant(
+  of: find.ancestor(of: find.text(label), matching: find.byType(Stack)).first,
+  matching: find.byType(PositionedDirectional),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -177,6 +200,250 @@ void main() {
         tester.widget<Text>(find.text('secret.env')).style!.color,
         theme.textDisabled,
       );
+    });
+
+    testWidgets('activeId and selectedIds render independently (#253)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonTreeView(
+            label: 'Files',
+            nodes: _nodes(),
+            initiallyExpandedIds: const <Object>{'src'},
+            selectedIds: const <Object>{'main'},
+            activeId: 'readme',
+            onSelectionChanged: (_) {},
+          ),
+        ),
+      );
+
+      // The selected node paints layer-selected but carries no marker.
+      expect(_rowColor(tester, 'main.dart'), theme.layerSelected01);
+      expect(_marker(tester, 'main.dart'), findsNothing);
+
+      // The active node carries the 4px interactive marker on the plain
+      // layer background.
+      expect(_rowColor(tester, 'README.md'), theme.layer01);
+      expect(_marker(tester, 'README.md'), findsOneWidget);
+      final ColoredBox marker = tester.widget<ColoredBox>(
+        find.descendant(
+          of: _marker(tester, 'README.md'),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(marker.color, theme.interactive);
+    });
+  });
+
+  // Multiselect + controllable-parity (#253): react `TreeView.tsx`
+  // `handleTreeSelect` toggles membership on Ctrl/Cmd-activation and
+  // collapses to the plain-activated node otherwise; `handleKeyDown`
+  // extends with Ctrl+Shift+Home/End and selects all with Ctrl+A.
+  group('multiselect (#253)', () {
+    Widget multi({
+      Set<Object> selectedIds = const <Object>{},
+      Object? activeId,
+      ValueChanged<Set<Object>>? onSelectionChanged,
+      ValueChanged<Object>? onActivate,
+      ValueChanged<Object>? onSelect,
+      bool multiselect = true,
+    }) => _host(
+      CarbonTreeView(
+        label: 'Files',
+        nodes: _nodes(),
+        multiselect: multiselect,
+        selectedIds: selectedIds,
+        activeId: activeId,
+        onSelectionChanged: onSelectionChanged,
+        onActivate: onActivate,
+        onSelect: onSelect,
+        initiallyExpandedIds: const <Object>{'src'},
+      ),
+    );
+
+    testWidgets('Ctrl-click adds an unselected node to the selection and '
+        'does not activate it', (WidgetTester tester) async {
+      Set<Object>? selection;
+      int activations = 0;
+      await tester.pumpWidget(
+        multi(
+          selectedIds: const <Object>{'main'},
+          onSelectionChanged: (Set<Object> ids) => selection = ids,
+          onActivate: (_) => activations++,
+        ),
+      );
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(find.text('README.md'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      expect(selection, <Object>{'main', 'readme'});
+      expect(activations, 0);
+    });
+
+    testWidgets('Ctrl-click removes an already-selected node', (
+      WidgetTester tester,
+    ) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(
+          selectedIds: const <Object>{'main', 'readme'},
+          onSelectionChanged: (Set<Object> ids) => selection = ids,
+        ),
+      );
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(find.text('README.md'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      expect(selection, <Object>{'main'});
+    });
+
+    testWidgets('Cmd-click toggles too (meta ≡ ctrl, like upstream)', (
+      WidgetTester tester,
+    ) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(onSelectionChanged: (Set<Object> ids) => selection = ids),
+      );
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+      await tester.tap(find.text('src'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+      expect(selection, <Object>{'src'});
+    });
+
+    testWidgets('a plain tap collapses the selection to the tapped node '
+        'and activates it', (WidgetTester tester) async {
+      Set<Object>? selection;
+      Object? activated;
+      Object? picked;
+      await tester.pumpWidget(
+        multi(
+          selectedIds: const <Object>{'main', 'src'},
+          onSelectionChanged: (Set<Object> ids) => selection = ids,
+          onActivate: (Object id) => activated = id,
+          onSelect: (Object id) => picked = id,
+        ),
+      );
+      await tester.tap(find.text('README.md'));
+      expect(selection, <Object>{'readme'});
+      expect(activated, 'readme');
+      expect(picked, 'readme');
+    });
+
+    testWidgets('Ctrl+Space toggles the focused node from the keyboard', (
+      WidgetTester tester,
+    ) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(
+          selectedIds: const <Object>{'src'},
+          onSelectionChanged: (Set<Object> ids) => selection = ids,
+        ),
+      );
+      // Plain-activate src (focuses it), rove down to main.dart.
+      await tester.tap(find.text('src'));
+      await tester.pumpAndSettle();
+      expect(selection, <Object>{'src'});
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      // The toggle reports the controlled selection plus the roved node.
+      expect(selection, <Object>{'src', 'main'});
+    });
+
+    testWidgets('Ctrl+Shift+End extends the selection to the last visible '
+        'node, skipping disabled ones', (WidgetTester tester) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(onSelectionChanged: (Set<Object> ids) => selection = ids),
+      );
+      // Visible: src, main, utils, readme, secret(disabled).
+      await tester.tap(find.text('src'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      expect(selection, <Object>{'src', 'main', 'utils', 'readme'});
+    });
+
+    testWidgets('Ctrl+Shift+Home extends the selection to the first node', (
+      WidgetTester tester,
+    ) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(onSelectionChanged: (Set<Object> ids) => selection = ids),
+      );
+      await tester.tap(find.text('README.md'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      expect(selection, <Object>{'readme', 'utils', 'main', 'src'});
+    });
+
+    testWidgets('Ctrl+A selects every visible enabled node — not the '
+        'collapsed or disabled ones', (WidgetTester tester) async {
+      Set<Object>? selection;
+      await tester.pumpWidget(
+        multi(onSelectionChanged: (Set<Object> ids) => selection = ids),
+      );
+      await tester.tap(find.text('src'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      // math is hidden under the collapsed utils; secret is disabled.
+      expect(selection, <Object>{'src', 'main', 'utils', 'readme'});
+    });
+
+    testWidgets('without multiselect, Ctrl-click stays a plain activation', (
+      WidgetTester tester,
+    ) async {
+      Set<Object>? selection;
+      Object? activated;
+      await tester.pumpWidget(
+        multi(
+          multiselect: false,
+          selectedIds: const <Object>{'main'},
+          onSelectionChanged: (Set<Object> ids) => selection = ids,
+          onActivate: (Object id) => activated = id,
+        ),
+      );
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(find.text('README.md'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      expect(selection, <Object>{'readme'});
+      expect(activated, 'readme');
+    });
+
+    testWidgets('two selected rows both expose selected semantics', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        multi(selectedIds: const <Object>{'main', 'readme'}),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('main.dart')),
+        isSemantics(label: 'main.dart', isSelected: true),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('README.md')),
+        isSemantics(label: 'README.md', isSelected: true),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('src')),
+        isSemantics(label: 'src', isSelected: false),
+      );
+      handle.dispose();
     });
   });
 
@@ -419,6 +686,37 @@ void main() {
   });
 
   group('goldens', () {
+    testWidgets('multi-selection with a separate active node across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'tree_view_states',
+        containsText: true,
+        size: const Size(280, 220),
+        builder: (BuildContext context) => Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 260,
+            child: CarbonTreeView(
+              label: 'Files',
+              multiselect: true,
+              // main + README selected (layer-selected background); utils
+              // active (4px marker only) — the #253 split matrix.
+              selectedIds: const <Object>{'main', 'readme'},
+              activeId: 'utils',
+              onSelectionChanged: (_) {},
+              initiallyExpandedIds: const <Object>{'src'},
+              nodes: _nodes(),
+            ),
+          ),
+        ),
+        afterPump: (WidgetTester tester) async {
+          await tester.pumpAndSettle();
+        },
+      );
+    });
+
     testWidgets('tree across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
         tester,
