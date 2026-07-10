@@ -226,34 +226,64 @@ class _TreeViewPage extends StatefulWidget {
 
 class _TreeViewPageState extends State<_TreeViewPage> {
   Object? _selected = 'main';
+  Set<Object> _multiSelected = <Object>{'main', 'app'};
+  Object? _active = 'app';
+
+  static const List<CarbonTreeNode> _nodes = <CarbonTreeNode>[
+    CarbonTreeNode(
+      id: 'src',
+      label: 'src',
+      icon: CarbonIcons.folder,
+      children: <CarbonTreeNode>[
+        CarbonTreeNode(id: 'main', label: 'main.dart'),
+        CarbonTreeNode(id: 'app', label: 'app.dart'),
+      ],
+    ),
+    CarbonTreeNode(id: 'readme', label: 'README.md'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Tree view',
-      description: 'A hierarchical, keyboard-navigable tree.',
+      description:
+          'A hierarchical, keyboard-navigable tree; multiselect toggles '
+          'with Ctrl/Cmd-click and extends with Ctrl+Shift+Home/End.',
       previewAlignment: Alignment.topLeft,
-      preview: SizedBox(
-        width: 280,
-        child: CarbonTreeView(
-          label: 'Files',
-          selectedId: _selected,
-          initiallyExpandedIds: const <Object>{'src'},
-          onSelect: (Object id) => setState(() => _selected = id),
-          nodes: const <CarbonTreeNode>[
-            CarbonTreeNode(
-              id: 'src',
-              label: 'src',
-              icon: CarbonIcons.folder,
-              children: <CarbonTreeNode>[
-                CarbonTreeNode(id: 'main', label: 'main.dart'),
-                CarbonTreeNode(id: 'app', label: 'app.dart'),
-              ],
+      preview: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            width: 280,
+            child: CarbonTreeView(
+              label: 'Files',
+              selectedId: _selected,
+              initiallyExpandedIds: const <Object>{'src'},
+              onSelect: (Object id) => setState(() => _selected = id),
+              nodes: _nodes,
             ),
-            CarbonTreeNode(id: 'readme', label: 'README.md'),
-          ],
-        ),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing06),
+          SizedBox(
+            width: 280,
+            child: CarbonTreeView(
+              label: 'Files (multiselect)',
+              multiselect: true,
+              selectedIds: _multiSelected,
+              activeId: _active,
+              initiallyExpandedIds: const <Object>{'src'},
+              onSelectionChanged: (Set<Object> ids) =>
+                  setState(() => _multiSelected = ids),
+              onActivate: (Object id) => setState(() => _active = id),
+              nodes: _nodes,
+            ),
+          ),
+        ],
       ),
-      code: 'CarbonTreeView(label: \'Files\', nodes: <CarbonTreeNode>[…]);',
+      code:
+          'CarbonTreeView(label: \'Files\', multiselect: true, '
+          'selectedIds: {…}, nodes: <CarbonTreeNode>[…]);',
     );
   }
 }
