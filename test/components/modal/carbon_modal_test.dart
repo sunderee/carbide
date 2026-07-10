@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -18,7 +19,7 @@ Widget _host(Widget child) => Directionality(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(builder: (BuildContext context) => child),
+        managedOverlayEntry(builder: (BuildContext context) => child),
       ],
     ),
   ),
@@ -347,7 +348,7 @@ void main() {
         size: const Size(720, 360),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => CarbonModal(
                 open: true,
                 title: 'Delete account',
@@ -446,7 +447,7 @@ void main() {
         size: const Size(720, 420),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => CarbonModal(
                 open: true,
                 title: 'Members',

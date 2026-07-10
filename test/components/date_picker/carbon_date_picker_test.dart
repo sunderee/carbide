@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -25,7 +26,7 @@ Widget _host(Widget child) => Directionality(
 Widget _overlay(Widget child) => TapRegionSurface(
   child: Overlay(
     initialEntries: <OverlayEntry>[
-      OverlayEntry(
+      managedOverlayEntry(
         builder: (BuildContext context) => Stack(
           children: <Widget>[
             Positioned.fill(

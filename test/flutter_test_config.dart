@@ -16,6 +16,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 import 'support/golden_comparator_io.dart'
     if (dart.library.js_interop) 'support/golden_comparator_web.dart';
@@ -26,6 +27,20 @@ import 'support/load_fonts.dart';
 const bool _skipGoldens = bool.fromEnvironment('CARBIDE_SKIP_GOLDENS');
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  // Leak tracking (#234): every `testWidgets` case doubles as a leak
+  // test — a forgotten dispose() or an overlay entry that outlives its
+  // trigger fails the test that pumped it. Objects the harness itself
+  // allocates (fonts, decoded golden images) are ignored; anything else
+  // is fixed in lib/ or allowlisted per-test with a justification.
+  LeakTesting.enable();
+  LeakTesting.settings = LeakTesting.settings.withIgnored(
+    createdByTestHelpers: true,
+    // Golden capture/decoding allocates ui.Images inside the framework's
+    // matchesGoldenFile flow and reports them against the pumping test.
+    // Nothing in lib/ allocates a ui.Image (icons and pictograms are
+    // vector CustomPaints), so ignoring the class hides no product leak.
+    classes: <String>['Image'],
+  );
   TestWidgetsFlutterBinding.ensureInitialized();
   await loadCarbidePlexFonts();
   installCarbideGoldenComparator(skipGoldens: _skipGoldens);

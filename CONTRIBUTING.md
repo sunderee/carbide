@@ -136,6 +136,24 @@ spec-lock** asserting its duration/curve equal the `CarbonDuration` /
 `CarbonEasing` constants its SCSS cites — motion drift is invisible in
 static goldens by construction.
 
+### Leak testing
+
+`LeakTesting.enable()` runs in `test/flutter_test_config.dart`, so **every
+`testWidgets` case doubles as a leak test** (#234): an undisposed
+`FocusNode`/controller or an overlay entry that outlives its trigger fails
+the test that pumped it. Rules:
+
+- Prefer fixing over ignoring; the only global ignores are
+  `createdByTestHelpers` and the `Image` class (golden capture allocates
+  `ui.Image`s inside the framework; nothing in `lib/` allocates one).
+  Any new allowlist entry carries a justification comment.
+- Test hosts that build an `Overlay` must create entries via
+  `managedOverlayEntry` (`test/support/overlay_entries.dart`) — the
+  entry's creator owns disposal, and a bare `OverlayEntry` in a host
+  leaks by construction.
+- `test/leaks/overlay_lifetime_test.dart` drives every popup component
+  through open, close, and tear-down-while-open.
+
 ### Golden tests
 
 The bundled IBM Plex fonts are loaded automatically for every test by

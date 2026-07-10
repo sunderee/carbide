@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -18,7 +19,9 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(builder: (BuildContext context) => Center(child: child)),
+          managedOverlayEntry(
+            builder: (BuildContext context) => Center(child: child),
+          ),
         ],
       ),
     ),
@@ -309,7 +312,9 @@ void main() {
   group('goldens', () {
     Widget overlaid(Widget child) => Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(builder: (BuildContext context) => Center(child: child)),
+        managedOverlayEntry(
+          builder: (BuildContext context) => Center(child: child),
+        ),
       ],
     );
 

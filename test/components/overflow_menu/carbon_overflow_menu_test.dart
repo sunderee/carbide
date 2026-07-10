@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion needs a surface + a
 /// hittable backdrop.
@@ -20,7 +21,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 // The backdrop is a hit-test aid, not UI: keep it out of the
@@ -312,7 +313,7 @@ void main() {
         size: const Size(220, 180),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Padding(
                 padding: const EdgeInsets.all(8),
                 child: Align(

@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// CarbonHeaderMenu's dropdown needs an Overlay + TapRegionSurface + backdrop.
 Widget _host(Widget child) => Directionality(
@@ -20,7 +21,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 Positioned.fill(
@@ -414,7 +415,7 @@ void main() {
               data: CarbonThemeData.white,
               child: Overlay(
                 initialEntries: <OverlayEntry>[
-                  OverlayEntry(
+                  managedOverlayEntry(
                     builder: (BuildContext context) => Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[

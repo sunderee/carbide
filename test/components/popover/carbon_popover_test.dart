@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion.onTapOutside needs a
 /// TapRegionSurface (a WidgetsApp would supply both in a real app).
@@ -25,7 +26,7 @@ Widget _host(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 // A full-screen hittable backdrop so an outside tap reaches the
@@ -726,7 +727,7 @@ void main() {
         size: const Size(280, 200),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) =>
                   specimen(CarbonPopoverAlignment.bottom),
             ),
@@ -743,7 +744,7 @@ void main() {
         size: const Size(400, 160),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) =>
                   specimen(CarbonPopoverAlignment.right),
             ),

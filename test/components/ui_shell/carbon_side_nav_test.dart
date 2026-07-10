@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -489,7 +490,7 @@ void main() {
           data: CarbonThemeData.white,
           child: Overlay(
             initialEntries: <OverlayEntry>[
-              OverlayEntry(
+              managedOverlayEntry(
                 builder: (BuildContext context) => SizedBox(
                   height: 400,
                   child: Row(
@@ -612,7 +613,7 @@ void main() {
         size: const Size(360, 240),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => SizedBox(
                 height: 240,
                 child: Row(

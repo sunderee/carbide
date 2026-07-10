@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
+import '../../support/overlay_entries.dart';
 
 /// CarbonCopyButton / the inline chip use a Popover; tests need an Overlay and
 /// a TapRegion surface.
@@ -22,7 +23,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 Positioned.fill(
@@ -439,7 +440,7 @@ void main() {
               data: CarbonThemeData.white,
               child: Overlay(
                 initialEntries: <OverlayEntry>[
-                  OverlayEntry(
+                  managedOverlayEntry(
                     builder: (BuildContext context) => Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -485,7 +486,7 @@ void main() {
   group('goldens', () {
     Widget overlaid(Widget child) => Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(
+        managedOverlayEntry(
           builder: (BuildContext context) => Center(
             child: Padding(padding: const EdgeInsets.all(8), child: child),
           ),

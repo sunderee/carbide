@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// OverlayPortal (submenus) needs an Overlay ancestor.
 Widget _host(Widget child) => Directionality(
@@ -20,7 +21,9 @@ Widget _host(Widget child) => Directionality(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(builder: (BuildContext context) => Center(child: child)),
+        managedOverlayEntry(
+          builder: (BuildContext context) => Center(child: child),
+        ),
       ],
     ),
   ),
