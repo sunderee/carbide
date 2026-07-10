@@ -44,7 +44,7 @@ jobs:
         with:
           channel: stable
           # Keep in sync with ci.yaml's pin (#233).
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
@@ -74,7 +74,7 @@ jobs:
         with:
           channel: stable
           # Keep in sync with ci.yaml's pin (#233).
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
@@ -103,7 +103,7 @@ jobs:
         with:
           channel: stable
           # Keep in sync with ci.yaml's pin (#233).
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies

@@ -30,7 +30,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
@@ -106,12 +106,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Assert job version matches the pubspec floor
         run: |
-          grep -qF 'flutter: ">=3.44.4"' pubspec.yaml
+          grep -qF 'flutter: ">=3.44.6"' pubspec.yaml
 
       - name: Install dependencies
         run: flutter pub get
@@ -133,7 +133,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.4
+          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
