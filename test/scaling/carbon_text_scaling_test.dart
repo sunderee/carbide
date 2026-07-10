@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/golden.dart';
 import '../support/legibility.dart';
 import '../support/specimens.dart';
+import '../support/overlay_entries.dart';
 
 Widget _host(double scale, Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -27,7 +28,7 @@ Widget _host(double scale, Widget child) => Directionality(
       // Overlay so portal-based specimens (dialog) can mount.
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) =>
                 Align(alignment: AlignmentDirectional.topStart, child: child),
           ),

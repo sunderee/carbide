@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
@@ -18,7 +19,7 @@ Widget _host(Widget child) => Directionality(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(
+        managedOverlayEntry(
           builder: (BuildContext context) =>
               Center(child: SizedBox(width: 320, child: child)),
         ),
@@ -288,7 +289,7 @@ void main() {
         size: const Size(320, 280),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Padding(
                 padding: const EdgeInsets.all(12),
                 child: const Align(

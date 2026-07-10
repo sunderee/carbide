@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
 import '../../support/legibility.dart';
+import '../../support/overlay_entries.dart';
 
 /// OverlayPortal needs an Overlay ancestor; TapRegion needs a surface.
 Widget _host(Widget child) => Directionality(
@@ -22,7 +23,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 Positioned.fill(
@@ -331,7 +332,7 @@ void main() {
               data: CarbonThemeData.white,
               child: Overlay(
                 initialEntries: <OverlayEntry>[
-                  OverlayEntry(
+                  managedOverlayEntry(
                     builder: (BuildContext context) =>
                         const Center(child: CarbonCopyButton()),
                   ),
@@ -353,7 +354,9 @@ void main() {
   group('goldens', () {
     Widget overlaid(Widget child) => Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(builder: (BuildContext context) => Center(child: child)),
+        managedOverlayEntry(
+          builder: (BuildContext context) => Center(child: child),
+        ),
       ],
     );
 

@@ -32,6 +32,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../support/overlay_entries.dart';
 
 const String _refDir = 'test/fidelity/references';
 const String _outDir = 'test/fidelity/comparisons';
@@ -533,7 +534,7 @@ Future<ui.Image> _renderCarbide(
           child: TapRegionSurface(
             child: Overlay(
               initialEntries: <OverlayEntry>[
-                OverlayEntry(
+                managedOverlayEntry(
                   builder: (BuildContext context) => Center(
                     // Capture the component tight, on the theme background (as
                     // the Carbon reference has it). The background keeps

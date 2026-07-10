@@ -74,6 +74,19 @@ void main() {
   });
 
   testWidgets('focus ring stroke at 1.5x DPR', (WidgetTester tester) async {
+    // One node per theme variant; each pump builds a fresh host.
+    final List<FocusNode> nodes = <FocusNode>[];
+    addTearDown(() {
+      for (final FocusNode node in nodes) {
+        node.dispose();
+      }
+    });
+    FocusNode nextNode() {
+      final FocusNode node = FocusNode();
+      nodes.add(node);
+      return node;
+    }
+
     await expectThemeGoldens(
       tester,
       name: 'dpr15_focus_ring',
@@ -92,7 +105,7 @@ void main() {
         child: IntrinsicWidth(
           child: CarbonButton(
             label: 'Focused',
-            focusNode: FocusNode(),
+            focusNode: nextNode(),
             onPressed: () {},
           ),
         ),

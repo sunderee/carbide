@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 Widget _host(Widget child, {double width = 360}) => Directionality(
   textDirection: TextDirection.ltr,
@@ -33,7 +34,7 @@ Widget _overlayHost(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) =>
                 Center(child: SizedBox(width: 360, child: child)),
           ),

@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/golden.dart';
 import '../support/specimens.dart';
+import '../support/overlay_entries.dart';
 
 Widget _rtlHost(Widget child) => Directionality(
   textDirection: TextDirection.rtl,
@@ -36,7 +37,7 @@ Widget _rtlOverlayHost(Widget child) => Directionality(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(
+        managedOverlayEntry(
           builder: (BuildContext context) =>
               Align(alignment: AlignmentDirectional.topStart, child: child),
         ),
@@ -117,7 +118,7 @@ void main() {
             data: CarbonThemeData.white,
             child: Overlay(
               initialEntries: <OverlayEntry>[
-                OverlayEntry(
+                managedOverlayEntry(
                   builder: (BuildContext context) => Center(
                     child: SizedBox(
                       width: 220,
@@ -170,7 +171,7 @@ void main() {
             data: CarbonThemeData.white,
             child: Overlay(
               initialEntries: <OverlayEntry>[
-                OverlayEntry(
+                managedOverlayEntry(
                   builder: (BuildContext context) => const Center(
                     child: CarbonOverflowMenu(
                       items: <Widget>[CarbonMenuItem(label: 'Edit')],
@@ -353,7 +354,7 @@ void main() {
         directions: const <TextDirection>{TextDirection.rtl},
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Padding(
                 padding: const EdgeInsets.all(24),
                 child: Row(

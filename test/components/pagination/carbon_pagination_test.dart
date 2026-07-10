@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// CarbonSelect (used by the pagination pickers) needs an Overlay ancestor.
 Widget _host(Widget child) => Directionality(
@@ -18,7 +19,7 @@ Widget _host(Widget child) => Directionality(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(
+        managedOverlayEntry(
           builder: (BuildContext context) =>
               Center(child: SizedBox(width: 760, child: child)),
         ),
@@ -343,7 +344,7 @@ void main() {
         size: const Size(800, 64),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Center(
                 child: SizedBox(
                   width: 760,

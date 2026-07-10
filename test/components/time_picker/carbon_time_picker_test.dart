@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// The trailing selects mount an OverlayPortal, so the picker needs an Overlay
 /// + TapRegionSurface — a real app's scaffold supplies both.
@@ -22,7 +23,7 @@ Widget _host(Widget child) => Directionality(
       child: TapRegionSurface(
         child: Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Stack(
                 children: <Widget>[
                   Positioned.fill(

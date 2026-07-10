@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
+import '../../support/overlay_entries.dart';
 
 /// CarbonOverflowMenu needs an Overlay + TapRegionSurface + a hittable backdrop.
 Widget _host(Widget child) => Directionality(
@@ -18,7 +19,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) => Stack(
               children: <Widget>[
                 Positioned.fill(
@@ -167,7 +168,7 @@ void main() {
         size: const Size(540, 80),
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
-            OverlayEntry(
+            managedOverlayEntry(
               builder: (BuildContext context) => Center(
                 child: SizedBox(
                   width: 520,
