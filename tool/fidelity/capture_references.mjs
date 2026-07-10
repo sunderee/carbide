@@ -28,9 +28,12 @@ const page = await context.newPage();
 const results = [];
 for (const story of stories) {
   for (const theme of THEMES) {
+    // The Storybook's theme decorator follows the `backgrounds` global
+    // (mapped to data-carbon-theme); the legacy `theme` global is kept in
+    // the URL for older deployments.
     const url =
       `${BASE}/iframe.html?id=${story.storyId}` +
-      `&viewMode=story&globals=theme:${theme}`;
+      `&viewMode=story&globals=theme:${theme};backgrounds.value:${theme}`;
     const out = join(OUT, story.component, `${theme}.png`);
     try {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
@@ -60,6 +63,19 @@ for (const story of stories) {
 
 await browser.close();
 
+// Stamp the @carbon/react version the live Storybook tracks (#230): the
+// published Storybook deploys from the latest release, so the npm registry
+// 'latest' at capture time identifies what the pixels were rendered by.
+// Compared against the submodule pin by the staleness check in
+// test/fidelity/fidelity_test.dart.
+let carbonReactVersion = null;
+try {
+  const res = await fetch('https://registry.npmjs.org/@carbon/react/latest');
+  carbonReactVersion = (await res.json()).version ?? null;
+} catch {
+  console.log('WARN could not resolve @carbon/react version for the stamp');
+}
+
 const ok = results.filter((r) => r.ok).length;
 mkdirSync(OUT, { recursive: true });
 writeFileSync(
@@ -68,6 +84,7 @@ writeFileSync(
     {
       source: BASE,
       capturedAt: new Date().toISOString(),
+      carbonReactVersion,
       themes: THEMES,
       stories,
       results,

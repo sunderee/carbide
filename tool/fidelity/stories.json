@@ -1,17 +1,170 @@
 {
   "_comment": "Curated Carbon React Storybook stories captured as upstream fidelity references. `component` is the Carbide-side slug; `storyId` is the Storybook iframe id. Add entries here and a matching builder in test/fidelity/fidelity_test.dart to extend coverage.",
   "stories": [
-    { "component": "button", "storyId": "components-button--default" },
-    { "component": "tag", "storyId": "components-tag--read-only" },
-    { "component": "checkbox", "storyId": "components-checkbox--default" },
-    { "component": "toggle", "storyId": "components-toggle--default" },
-    { "component": "text-input", "storyId": "components-textinput--default" },
-    { "component": "dropdown", "storyId": "components-dropdown--default" },
-    { "component": "tabs", "storyId": "components-tabs--default" },
-    { "component": "accordion", "storyId": "components-accordion--default" },
-    { "component": "tree-view", "storyId": "components-treeview--default" },
-    { "component": "multiselect", "storyId": "components-multiselect--default" },
-    { "component": "data-table", "storyId": "components-datatable-basic--default" },
-    { "component": "notification", "storyId": "components-notifications-inline--default" }
+    {
+      "component": "button",
+      "storyId": "components-button--default",
+      "threshold": 0.64
+    },
+    {
+      "component": "tag",
+      "storyId": "components-tag--read-only",
+      "threshold": 0.21
+    },
+    {
+      "component": "checkbox",
+      "storyId": "components-checkbox--default",
+      "threshold": 0.3
+    },
+    {
+      "component": "toggle",
+      "storyId": "components-toggle--default",
+      "threshold": 0.28
+    },
+    {
+      "component": "text-input",
+      "storyId": "components-textinput--default",
+      "threshold": 0.12
+    },
+    {
+      "component": "dropdown",
+      "storyId": "components-dropdown--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "tabs",
+      "storyId": "components-tabs--default",
+      "threshold": 0.13
+    },
+    {
+      "component": "accordion",
+      "storyId": "components-accordion--default",
+      "threshold": 0.09
+    },
+    {
+      "component": "tree-view",
+      "storyId": "components-treeview--default",
+      "threshold": 0.14
+    },
+    {
+      "component": "multiselect",
+      "storyId": "components-multiselect--default",
+      "threshold": 0.11
+    },
+    {
+      "component": "data-table",
+      "storyId": "components-datatable-basic--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "notification",
+      "storyId": "components-notifications-inline--default",
+      "threshold": 0.44
+    },
+    {
+      "component": "search",
+      "storyId": "components-search--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "number-input",
+      "storyId": "components-numberinput--default",
+      "threshold": 0.09
+    },
+    {
+      "component": "select",
+      "storyId": "components-select--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "combo-box",
+      "storyId": "components-combobox--default",
+      "threshold": 0.12
+    },
+    {
+      "component": "date-picker",
+      "storyId": "components-datepicker--default",
+      "threshold": 0.12
+    },
+    {
+      "component": "radio-button",
+      "storyId": "components-radiobutton--default",
+      "threshold": 0.18
+    },
+    {
+      "component": "slider",
+      "storyId": "components-slider--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "modal",
+      "storyId": "components-modal--default",
+      "threshold": 0.44
+    },
+    {
+      "component": "tooltip",
+      "storyId": "components-tooltip--default",
+      "threshold": 0.24
+    },
+    {
+      "component": "progress-bar",
+      "storyId": "components-progressbar--default",
+      "threshold": 0.22
+    },
+    {
+      "component": "progress-indicator",
+      "storyId": "components-progressindicator--default",
+      "threshold": 0.1
+    },
+    {
+      "component": "breadcrumb",
+      "storyId": "components-breadcrumb--default",
+      "threshold": 0.16
+    },
+    {
+      "component": "pagination",
+      "storyId": "components-pagination--default",
+      "threshold": 0.12
+    },
+    {
+      "component": "code-snippet",
+      "storyId": "components-codesnippet--singleline",
+      "threshold": 0.13
+    },
+    {
+      "component": "content-switcher",
+      "storyId": "components-contentswitcher--default",
+      "threshold": 0.13
+    },
+    {
+      "component": "structured-list",
+      "storyId": "components-structuredlist--default",
+      "threshold": 0.11
+    },
+    {
+      "component": "tile",
+      "storyId": "components-tile--default",
+      "threshold": 0.08
+    },
+    {
+      "component": "loading",
+      "storyId": "components-loading--default",
+      "threshold": 0.21
+    },
+    {
+      "component": "inline-loading",
+      "storyId": "components-inlineloading--default",
+      "threshold": 0.14
+    },
+    {
+      "component": "overflow-menu",
+      "storyId": "components-overflowmenu--default",
+      "threshold": 0.07
+    },
+    {
+      "component": "link",
+      "storyId": "components-link--default",
+      "threshold": 0.18
+    }
   ]
 }

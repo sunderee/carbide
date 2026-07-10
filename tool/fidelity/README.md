@@ -52,3 +52,31 @@ context, and a human reviews the side-by-side.
 2. Re-run `capture.sh` and commit the new references.
 3. Add a matching `'<slug>': () => <Carbide widget>` to `_builders` in
    `fidelity_test.dart`.
+
+## The three fidelity tiers (#230)
+
+Not every component carries the same upstream guarantee — the tier is
+explicit so nobody mistakes golden-only coverage for an upstream gate:
+
+1. **Pixel-gated (icons + pictograms)** — every asset rendered through the
+   production painter is compared against rsvg-rasterized upstream SVGs at
+   ≤0.5% blurred-coverage mismatch, with a mutation guard, on every CI
+   run. The strongest guarantee in the repo.
+2. **Threshold-gated (components in `stories.json`)** — rendered beside a
+   committed Carbon Storybook screenshot; the coarse luminance-grid diff
+   must stay within the story's committed `threshold`. Deliberately lax
+   (Chromium vs Flutter text rendering, framing differences): the gate
+   detects *drift*, not pixel identity. Bootstrap flow: add the story +
+   builder with no threshold, run the suite, read the `FIDELITY-SCORE`
+   lines, commit `max(per-theme score) + margin` as the threshold, and
+   ratchet it down as fidelity improves.
+3. **Golden-only (everything else)** — Carbide compared against its own
+   past output plus SCSS spec-locks. A systematic spec misreading is
+   invisible here; promote components into tier 2 as stories are
+   captured.
+
+Reference freshness: `manifest.json` stamps the `@carbon/react` version
+the live Storybook ran at capture; the fidelity suite warns when the
+submodule pin drifts ≥2 minors ahead. Re-capture on submodule bumps
+(the references currently target the v11.111.x line, matching the
+v11.111.0 pin).
