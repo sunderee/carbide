@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.2.2
+
+Testing-depth release (M11): the suite grows from 1,175 to 1,661 package
+tests with new repo-wide gates — 90% coverage floor, WCAG contrast and
+tap-target checks, text-scaling and reduced-motion sweeps, suite-wide
+leak tracking, and a threshold-gated comparison against real Carbon
+rendering for 33 components. Carbon remains pinned at v11.111.0.
+
+### Added
+
+- **AI decorator slots on selectable and radio tiles** — `aiLabel` on
+  `CarbonSelectableTile` and `CarbonRadioTile`, sharing the checkmark
+  corner per the upstream `decorator` prop (completes the AI decorator
+  surface across the tile family).
+- **Modal entrance motion** — `CarbonModal` gains the upstream
+  fade-and-slide entrance (`moderate-02` × entrance-expressive).
+- 13 new pattern docs under `docs/patterns/` (common actions, dialog,
+  disabled/read-only states, disclosures, empty states, fluid styles,
+  filtering, global header, login, overflow content, search, text
+  toolbar) and a text-scaling policy doc.
+
+### Fixed
+
+- **Radio tile indicator was invisible**: the tile's `Stack` clipped the
+  `CheckmarkFilled` indicator out of existence (the golden had baked the
+  bug in).
+- **Page-header actions stretched**: a bare `CarbonButton` in
+  `pageActions` expanded toward its 320px max width; actions now size to
+  their content.
+- **Text no longer clips under system text scaling**: every Carbon spec
+  height is a minimum — button, tag pill, the text-field family, select
+  option rows, data-table rows and batch bar, side-nav rows, and the
+  pagination bar grow with the user's text scale
+  (see `docs/text-scaling.md`).
+- **Reduced motion is honored catalog-wide**: decorative animation
+  completes instantly under `MediaQueryData.disableAnimations`; essential
+  motion (loading spinner, indeterminate progress) keeps running.
+- **Motion fidelity**: dialog entrance curve (was exit-expressive),
+  accordion fold easing, data-table row easing and expand-chevron
+  duration, header-panel easing, and the side-nav panel transition now
+  match their SCSS citations.
+- **RTL roving**: tabs, content switcher, and horizontal radio groups
+  mirror Left/Right arrows under `Directionality(rtl)`, like slider and
+  menu already did.
+
+### Testing & infrastructure
+
+- Coverage collected and gated in CI at a 90% line floor (currently
+  97.3%); Flutter pinned across all workflows with a min-supported-SDK
+  job; macOS/Windows/web runs on a weekly cadence; publish dry-run
+  rehearsal on packaging PRs.
+- Golden harness: 1.5× DPR canaries for hairline primitives, per-golden
+  strict tolerance, 320px narrow-width goldens, and a `.rtl` golden axis
+  for the direction-sensitive set.
+- Accessibility gates: WCAG 2.1 token-pair contrast sweep and
+  tap-target/label guideline matchers across the catalog; keyboard and
+  focus coverage for the 15 previously untested components.
+- Suite-wide leak tracking (zero product leaks found) with overlay
+  lifetime tests; scroll/drag suites for the data table, modal, code
+  snippet, popups, and tree view.
+- Upstream fidelity: 33 components compared against captured Carbon
+  Storybook references behind per-story drift thresholds, with reference
+  version stamping and a staleness guard.
+
 ## 0.2.1
 
 Hotfix release.
