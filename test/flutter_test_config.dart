@@ -39,7 +39,10 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     // matchesGoldenFile flow and reports them against the pumping test.
     // Nothing in lib/ allocates a ui.Image (icons and pictograms are
     // vector CustomPaints), so ignoring the class hides no product leak.
-    classes: <String>['Image'],
+    // CkPicture is the same capture flow's allocation on the CanvasKit
+    // web engine — it happens even under the pass-through web comparator
+    // and is reported only by golden tests (#271).
+    classes: <String>['Image', 'CkPicture'],
   );
   TestWidgetsFlutterBinding.ensureInitialized();
   await loadCarbidePlexFonts();
