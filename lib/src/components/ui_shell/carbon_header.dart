@@ -100,7 +100,12 @@ class CarbonHeader extends StatelessWidget {
 }
 
 /// The product name shown at the start of a [CarbonHeader].
-class CarbonHeaderName extends StatelessWidget {
+///
+/// When [onPressed] is set the name behaves like upstream's `HeaderName`
+/// anchor: it is reachable with Tab and activated with Enter or Space
+/// (`UI-shell-header/accessibility.mdx`: every header element can be
+/// reached by the Tab key).
+class CarbonHeaderName extends StatefulWidget {
   /// Creates a header name.
   const CarbonHeaderName({
     required this.name,
@@ -119,40 +124,74 @@ class CarbonHeaderName extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
+  State<CarbonHeaderName> createState() => _CarbonHeaderNameState();
+}
+
+class _CarbonHeaderNameState extends State<CarbonHeaderName> {
+  bool _focused = false;
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (widget.onPressed != null &&
+        event is KeyDownEvent &&
+        (event.logicalKey == LogicalKeyboardKey.enter ||
+            event.logicalKey == LogicalKeyboardKey.space)) {
+      widget.onPressed!();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+    final bool interactive = widget.onPressed != null;
     return Semantics(
-      button: onPressed != null,
-      label: prefix != null ? '$prefix $name' : name,
-      onTap: onPressed,
+      button: interactive,
+      label: widget.prefix != null
+          ? '${widget.prefix} ${widget.name}'
+          : widget.name,
+      onTap: widget.onPressed,
       child: ExcludeSemantics(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: CarbonSpacing.spacing05,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                if (prefix != null) ...<Widget>[
-                  Text(
-                    prefix!,
-                    style: CarbonTypeStyles.bodyCompact01.copyWith(
-                      color: theme.textPrimary,
-                    ),
+        child: MouseRegion(
+          cursor: interactive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onPressed,
+            child: Focus(
+              canRequestFocus: interactive,
+              onKeyEvent: _onKey,
+              onFocusChange: (bool f) => setState(() => _focused = f),
+              child: CarbonFocusRing(
+                visible: _focused,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: CarbonSpacing.spacing05,
                   ),
-                  const SizedBox(width: CarbonSpacing.spacing02),
-                ],
-                Text(
-                  name,
-                  style: CarbonTypeStyles.bodyCompact01.copyWith(
-                    color: theme.textPrimary,
-                    fontWeight: FontWeight.w600,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (widget.prefix != null) ...<Widget>[
+                        Text(
+                          widget.prefix!,
+                          style: CarbonTypeStyles.bodyCompact01.copyWith(
+                            color: theme.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: CarbonSpacing.spacing02),
+                      ],
+                      Text(
+                        widget.name,
+                        style: CarbonTypeStyles.bodyCompact01.copyWith(
+                          color: theme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

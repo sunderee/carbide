@@ -198,12 +198,14 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
       style: CarbonTypeStyles.body01.copyWith(color: titleColor),
     );
 
+    // No `onTap` on the Semantics widget: the inner GestureDetector and
+    // Focus merge their tap/focus actions into this labelled node instead
+    // of forking an unlabelled companion node (#268).
     final Widget header = Semantics(
       button: true,
       enabled: enabled,
       expanded: _isOpen,
       label: widget.title,
-      onTap: enabled ? _toggle : null,
       child: MouseRegion(
         cursor: enabled
             ? SystemMouseCursors.click
