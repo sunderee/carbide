@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.3.0
+
+TreeView controllable-API parity plus the component fixes the M11
+accessibility, keyboard, and scroll sweeps surfaced — and the web test
+platform unblocked. The suite grows from 1,661 to 1,684 package tests;
+Carbon remains pinned at v11.111.0.
+
+### Added
+
+- **TreeView multiselect + active/selected split** (#253) — the rest of
+  upstream's `enable-treeview-controllable` surface: `multiselect`
+  (Ctrl/Cmd-activation toggles membership, Ctrl+Shift+Home/End extends,
+  Ctrl/Cmd+A selects all visible enabled nodes), `selectedIds` +
+  `onSelectionChanged` for the controlled selection set, and `activeId` +
+  `onActivate` — the 4px marker now follows the *active* node and the
+  layer-selected background the *selected* set, per `_treeview.scss`.
+  The existing `selectedId`/`onSelect` single-select API is unchanged
+  and renders pixel-identically.
+- **Popup scroll-into-view** (#279) — the list-box family (dropdown,
+  combo box, multi select) and the select popup keep the
+  keyboard-highlighted option inside the 5.5-row fold, and reveal a
+  preselected value below the fold on open, matching native list boxes.
+
+### Fixed
+
+- **Unlabelled companion semantics nodes** (#268): tabs and accordion no
+  longer expose a second `[focus, tap]` node beside the labelled button
+  node — their suites now pass the full labelled tap-target sweep.
+- **Keyboard gaps from the #231 sweep** (#270): `CarbonHeaderName` is
+  Tab-reachable and activates with Enter/Space; `CarbonSearch` clears a
+  non-empty query on Escape; `CarbonExpandableSearch` collapses on
+  Escape when empty, returning focus to the magnifier button;
+  `CarbonDatePicker` (and the range picker) gain a focusable field
+  trigger — Enter/Space open the calendar with focus moving into the
+  grid, Escape and date-pick restore it; `CarbonSelect` opens on ArrowUp.
+- **`flutter test --platform chrome` no longer hangs** (#271): the Plex
+  font load never completed on the web test platform, wedging every
+  suite in the loading phase. Font loading now no-ops on the web
+  (behavioral runs only; goldens stay Linux-authoritative), and the
+  os-matrix web job is back on PR self-validation.
+
+### Testing & infrastructure
+
+- Seven skip-marked keyboard/scroll locks re-enabled and extended; new
+  multiselect state-matrix tests and goldens; suite 1,661 → 1,684 at
+  97.6% coverage.
+- Suite-wide leak tracking now also covers the web run (the CanvasKit
+  golden-capture allocation is allowlisted like its VM counterpart).
+
 ## 0.2.2
 
 Testing-depth release (M11): the suite grows from 1,175 to 1,661 package
