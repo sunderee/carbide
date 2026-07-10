@@ -55,14 +55,13 @@ jobs:
 
   web-smoke:
     name: Package tests — web (chrome)
-    # `flutter test --platform chrome` currently hangs in the "loading"
-    # phase (reproduced on ubuntu CI and macOS at Flutter 3.44.4, even for
-    # a single suite) — tracked in #271. Bounded so a hang costs minutes,
-    # not the 6h default, and excluded from the PR self-validation trigger
-    # so the known-red check never gates a merge; the weekly/dispatch runs
-    # keep the signal. The gallery integration job below is the per-PR
-    # proof that Carbide executes on the web.
-    if: github.event_name != 'pull_request'
+    # The #271 "loading"-phase hang is fixed: it was the Plex font load in
+    # `flutter_test_config.dart` — on the web test platform the
+    # `rootBundle.load` future for a font asset never completes, wedging
+    # every suite before its main() ran. `loadCarbidePlexFonts` now no-ops
+    # on the web (goldens are skipped there anyway), so the job runs on the
+    # PR self-validation trigger again. The timeout stays as a regression
+    # bound: a reintroduced hang costs minutes, not the 6h default.
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -81,9 +80,9 @@ jobs:
         run: flutter pub get
 
       # The icon fidelity sweep and pictogram suite read reference files via
-      # dart:io and cannot compile for the web. Scope is deliberately small
-      # (the dart:io-free foundations) until the loading-phase hang is
-      # fixed, so a future fix has a fast iteration loop.
+      # dart:io and cannot compile for the web. Scope stays the dart:io-free
+      # foundations for now; widening to the component suites (which run
+      # with placeholder glyphs on the web) is a separate decision.
       - name: Run web-compilable suites
         run: >
           flutter test --platform chrome

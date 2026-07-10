@@ -4,6 +4,7 @@
 // Public License v3.0 or later. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,7 +34,21 @@ const Map<String, List<String>> carbidePlexFontAssets = <String, List<String>>{
 /// Call this (typically in `setUpAll`) before any golden or layout assertion
 /// that depends on Plex metrics. Requires an initialized test binding, which
 /// `testWidgets` and `flutter_test`'s default `main` provide.
+///
+/// On the web test platform this is a no-op: under `flutter test
+/// --platform chrome` the `rootBundle.load` future for a font asset never
+/// completes, so awaiting it wedges every suite in the "loading" phase
+/// (#271 — bisected there; the empty-config run passes, the fonts-only
+/// config hangs). Web runs are behavioral-only (goldens are skipped and
+/// Linux-VM-authoritative), so placeholder glyphs are acceptable.
 Future<void> loadCarbidePlexFonts() async {
+  if (kIsWeb) {
+    debugPrint(
+      'carbide: Plex font loading SKIPPED on the web test platform (#271) — '
+      'text renders with placeholder glyphs.',
+    );
+    return;
+  }
   for (final MapEntry<String, List<String>> family
       in carbidePlexFontAssets.entries) {
     final FontLoader loader = FontLoader(family.key);
