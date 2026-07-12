@@ -3,14 +3,11 @@
 Thanks for your interest. Carbide aims for a faithful, well-tested Carbon port,
 so contributions are held to a deliberately high bar.
 
-## Contributor License Agreement (CLA)
+## License
 
-Carbide is dual-licensed (AGPL-3.0-or-later and commercial; see COMMERCIAL.md).
-So that the project can keep offering a commercial license, **all contributions
-are accepted under a CLA** granting Bizjak Tech OÜ the right to relicense
-contributed code. By opening a pull request you agree your contribution is
-provided under those terms. For substantial contributions we may ask you to sign
-the CLA explicitly.
+Carbide is licensed under the [Apache License, Version 2.0](LICENSE). By
+opening a pull request you agree your contribution is licensed under those
+terms.
 
 ## Ground rules
 

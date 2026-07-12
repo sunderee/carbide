@@ -165,14 +165,12 @@ uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 
 ## Licensing
 
-Carbide is **dual-licensed**:
+Carbide is licensed under the **[Apache License, Version 2.0](LICENSE)** —
+the same license as the IBM Carbon Design System. You may use it freely in
+open-source and proprietary applications under those terms.
 
-- **[AGPL-3.0-or-later](LICENSE)** for open-source use.
-- A **[commercial license](COMMERCIAL.md)** for proprietary use.
-
-Design tokens are derived from the Apache-2.0 licensed Carbon Design System and
-the project bundles the SIL OFL 1.1 licensed IBM Plex fonts; see [`NOTICE`](NOTICE)
-for attribution.
+Design tokens are derived from Carbon and the project bundles the SIL OFL 1.1
+licensed IBM Plex fonts; see [`NOTICE`](NOTICE) for attribution.
 
 ## Trademark
 
