@@ -2,7 +2,8 @@ name: carbide
 description: >-
   An unofficial Flutter port of the IBM Carbon Design System, built strictly on
   Flutter's base widgets (no Material, no Cupertino).
-version: 0.3.0
+version: 0.4.0
+license: Apache-2.0
 homepage: "https://github.com/Bizjak-Tech-OU/carbide"
 repository: "https://github.com/Bizjak-Tech-OU/carbide"
 issue_tracker: "https://github.com/Bizjak-Tech-OU/carbide/issues"

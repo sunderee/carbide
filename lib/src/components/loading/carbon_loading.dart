@@ -1,7 +1,7 @@
 // Copyright 2026 Bizjak Tech OÜ
 //
-// This file is part of Carbide and is licensed under the GNU Affero General
-// Public License v3.0 or later. See the LICENSE file in the project root.
+// This file is part of Carbide and is licensed under the Apache License,
+// Version 2.0. See the LICENSE file in the project root.
 //
 // Spec sources (Apache-2.0 Carbon Design System; see NOTICE):
 //   styles/scss/components/loading/{_loading,_vars,_functions,_animation}.scss

@@ -1,7 +1,7 @@
 // Copyright 2026 Bizjak Tech OÜ
 //
-// This file is part of Carbide and is licensed under the GNU Affero General
-// Public License v3.0 or later. See the LICENSE file in the project root.
+// This file is part of Carbide and is licensed under the Apache License,
+// Version 2.0. See the LICENSE file in the project root.
 //
 // Overlay lifetime (#234): every popup-owning component is opened, closed,
 // and — the hard case — torn down while open. The suite-wide leak tracker

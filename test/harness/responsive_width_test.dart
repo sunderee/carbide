@@ -1,7 +1,7 @@
 // Copyright 2026 Bizjak Tech OÜ
 //
-// This file is part of Carbide and is licensed under the GNU Affero General
-// Public License v3.0 or later. See the LICENSE file in the project root.
+// This file is part of Carbide and is licensed under the Apache License,
+// Version 2.0. See the LICENSE file in the project root.
 //
 // Narrow-width stress goldens (#236): one 320px golden per component with
 // responsive behavior, pinning what wrap/collapse/squeeze actually looks

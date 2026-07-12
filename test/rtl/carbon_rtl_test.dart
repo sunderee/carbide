@@ -1,7 +1,7 @@
 // Copyright 2026 Bizjak Tech OÜ
 //
-// This file is part of Carbide and is licensed under the GNU Affero General
-// Public License v3.0 or later. See the LICENSE file in the project root.
+// This file is part of Carbide and is licensed under the Apache License,
+// Version 2.0. See the LICENSE file in the project root.
 //
 // RTL / bidi coverage (#221): a crash-guard sweep pumping component
 // families under Directionality(rtl), behavioral locks for the

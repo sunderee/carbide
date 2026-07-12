@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0
+
+License and distribution release. Carbide is now free to use in any project —
+open source or proprietary — under the Apache License 2.0.
+
+### Changed
+
+- **Apache License 2.0** — Carbide is now licensed under the Apache License,
+  Version 2.0, matching the IBM Carbon Design System. The previous
+  AGPL-3.0-or-later dual-licensing model and paid commercial tier are
+  removed.
+- Updated `LICENSE`, `NOTICE`, `README`, `CONTRIBUTING`, source-file copyright
+  headers, and code-generation tooling to reflect the new license.
+- Removed `COMMERCIAL.md`.
+
 ## 0.3.0
 
 TreeView controllable-API parity plus the component fixes the M11
