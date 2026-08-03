@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+Widen Flutter and Dart SDK versions.
+
 ## 0.4.0
 
 License and distribution release. Carbide is now free to use in any project —
