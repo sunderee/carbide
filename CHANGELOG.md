@@ -2,7 +2,20 @@
 
 ## 0.4.1
 
-Widen Flutter and Dart SDK versions.
+Widen the declared Dart and Flutter SDK floors so Carbide can be consumed on
+toolchains older than the latest stable release. CI still pins the primary
+analyze/test job to Flutter 3.44.6 for reproducible goldens; a separate
+**Min supported Flutter** job proves the package still analyzes and passes
+its behavioral suite at the pubspec floor (goldens skipped).
+
+### Changed
+
+- **Dart SDK floor** — `>=3.12.2` → `>=3.12.0` (Flutter 3.44.0 toolchain).
+- **Flutter SDK floor** — `>=3.44.6` → `>=3.44.0`.
+- **CI min-sdk guard** — the floor job now installs Flutter 3.44.0 and asserts
+  the `pubspec.yaml` `flutter:` constraint stays in sync.
+- **Gallery example constraints** — aligned with the library floor so
+  `flutter pub get` resolves cleanly on the min-sdk job.
 
 ## 0.4.0
 
@@ -214,7 +227,7 @@ component list, and adds the 2x Grid and the indicator family.
 - **Copy** & **Copy button** — copy-to-clipboard buttons with a transient
   feedback bubble.
 - **AI Label** — the AI explainability marker (sizes, inline, and revert
-  modes) with an AI-tinted callout; adds the `ai-*` theme token group.
+  modes) with an AI-tinted callout; adds the six `ai-*` theme token group.
 - **Code snippet** — inline, single-line, and multi-line (show more / show
   less) variants, plus a skeleton.
 - **Contained list** — a titled list whose items can carry a leading icon, a
