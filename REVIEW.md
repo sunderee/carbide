@@ -2045,6 +2045,100 @@ defects without the requested test:
   indeterminate progress as essential motion. Keep the rationale unless Carbon
   or product accessibility policy changes.
 
+## Reviewed areas with no material finding
+
+These areas were explicitly reviewed. They do not need an issue unless their
+upstream source or product scope changes.
+
+### Foundations and themes
+
+- Generated Carbon color swatches match the pinned palette and have exhaustive
+  value locks.
+- Fixed typography and the existing fluid typography token cascade match the
+  pinned upstream values.
+- `CarbonDuration` and `CarbonEasing` match the core Carbon motion tokens.
+- White, Gray 10, Gray 90, and Gray 100 theme presets are exhaustively locked.
+- `CarbonLayer` implements the three-level token offset model, including the
+  subtle-border offset and `withBackground`.
+- `AnimatedCarbonTheme` interpolates theme data and collapses decorative
+  animation under reduced motion.
+- The contrast sweep documents upstream-inherited exceptions and fails if an
+  allowlisted pair starts passing, preventing stale exceptions.
+
+### Icons, pictograms, and assets
+
+- The icon and pictogram registries match the pinned Carbon commit.
+- Size-specific icon artwork selection has structural tests.
+- Icons are decorative by default and become semantic images only when labeled.
+- Pictograms enforce the documented minimum display size.
+- The SVG path parser/painter and raster-fidelity sweep provide meaningful
+  independent coverage.
+- Bundled IBM Plex Sans, Mono, and Serif families cover the weights used by the
+  current token set. Italic cuts remain an optional completeness decision, not
+  a current component defect.
+
+### Components with strong current behavior
+
+- Buttons, icon buttons, and links have broad state, keyboard, focus, theme,
+  text-scale, and golden coverage.
+- Tags and interactive tag variants have clear controlled APIs and keyboard
+  activation; only small-target policy and static-tag semantics remain in the
+  backlog.
+- Tile variants have controlled selection/expansion and layer-aware visuals.
+- Loading, inline loading, progress bar, and skeletons clearly distinguish
+  essential from decorative motion.
+- Accordion controlled state, focus treatment, and expanded semantics are
+  solid; exclusive-open mode is optional product scope rather than a missing
+  Carbon default.
+- Radio-group and content-switcher roving keyboard behavior, including current
+  RTL handling, is well tested apart from the icon-only label defect.
+- Slider two-handle constraints, keyboard mapping, snapping, and RTL behavior
+  are well covered once the disabled gate is fixed.
+- Date-range selection has a substantial state-machine test suite; the backlog
+  targets the uncovered cancel/reconciliation paths rather than replacing it.
+- Data-table sort, selection, expansion, zebra, batch header, sticky scrolling,
+  and motion behavior are well decomposed and tested for moderate data sizes.
+- Tree-view keyboard navigation and controlled selected/active state are strong;
+  expansion control, focus pruning, and scale are the remaining architectural
+  gaps.
+- Popover placement options, caret geometry, RTL start/end policy, and
+  TapRegion dismissal have extensive focused tests.
+- Tooltip and toggletip hover/focus/dismiss behavior is generally sound;
+  generic popover focus remains intentionally caller-controlled.
+- Menu and overflow-menu roving focus, Home/End, submenu direction, and Escape
+  behavior are strong aside from Unicode typeahead and edge placement.
+- UI Shell header, side-nav rail, and switcher primitives have meaningful
+  keyboard and motion coverage even though responsive composition is not yet
+  automatic.
+
+### Quality and release infrastructure
+
+- Strict analysis and public API documentation are enforced.
+- The package coverage result is substantive; generated const registries are
+  excluded for a documented reason.
+- Linux-authoritative text goldens, strict small-surface goldens, DPR canaries,
+  and narrow-width harnesses form a sound visual baseline.
+- Global leak tracking is enabled for root widget tests.
+- Icon/pictogram lockfile drift is checked on PR CI.
+- Publish uses trusted OIDC credentials and has a dry-run rehearsal.
+- The gallery builds every registered catalog page in widget tests.
+
+### Intentional non-parity that should not be filed as a bug
+
+- React/DOM infrastructure such as prefix providers, hooks, portals,
+  ErrorBoundary, and feature-flag contexts does not map directly to Flutter.
+- Separate React button exports are represented by `CarbonButtonKind`.
+- ToggleSmall is represented by `CarbonToggleSize.sm`.
+- Standalone React `Fluid*` wrappers are represented by `fluid:` plus
+  `CarbonFluidForm`; discoverability needs work, but duplicate classes are not
+  required.
+- FlexGrid/subgrid and full CSS-grid behavior are not present in the current
+  `Wrap`-based grid; this is a documented architectural boundary.
+- Loading spinners and indeterminate progress intentionally keep essential
+  motion when decorative animations are disabled.
+- File upload transport and backend concerns are application responsibilities.
+- Charts would be a separate Carbon Charts scope decision.
+
 ## Upstream version posture
 
 At audit time:
