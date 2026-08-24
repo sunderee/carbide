@@ -106,9 +106,8 @@ void main() {
         final ByteData? png = await tester.runAsync<ByteData?>(
           () => image.toByteData(format: ui.ImageByteFormat.png),
         );
-        File(
-          '${dir.path}/${entry.slug}.png',
-        ).writeAsBytesSync(png!.buffer.asUint8List());
+        File('${dir.path}/${entry.slug}.png')
+            .writeAsBytesSync(png!.buffer.asUint8List());
         shots.add(_Shot(entry.slug, image));
       }
 
@@ -116,9 +115,8 @@ void main() {
       final ByteData? png = await tester.runAsync<ByteData?>(
         () => sheet.toByteData(format: ui.ImageByteFormat.png),
       );
-      File(
-        '$_outDir/contact_sheet_$slug.png',
-      ).writeAsBytesSync(png!.buffer.asUint8List());
+      File('$_outDir/contact_sheet_$slug.png')
+          .writeAsBytesSync(png!.buffer.asUint8List());
 
       // A sanity check so the run still fails loudly if the whole catalog
       // stops rendering (e.g. a host regression), without gating on pixels.
