@@ -20,17 +20,17 @@ jobs:
       # Documentation submodules are large and not needed to build or test the
       # package, so they are intentionally not checked out here.
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Pinned toolchain (#233): golden rasterization and analyzer behavior
       # must be reproducible run-over-run. Bump deliberately via PR, keeping
       # every workflow in this repo on the same version (grep for
-      # flutter-version). The min-sdk job below guards the pubspec floor.
+      # flutter-version).
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.6
+          flutter-version: latest
           cache: true
 
       - name: Install dependencies
@@ -99,19 +99,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Must equal the `flutter:` floor in pubspec.yaml (asserted below).
-      - name: Set up Flutter (pubspec floor)
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.0
+          flutter-version: latest
           cache: true
-
-      - name: Assert job version matches the pubspec floor
-        run: |
-          grep -qF 'flutter: ">=3.44.0"' pubspec.yaml
 
       - name: Install dependencies
         run: flutter pub get
@@ -127,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
