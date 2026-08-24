@@ -266,7 +266,7 @@ known submodule warning.
 **One-time setup (required for the action to work).** Automated publishing only
 works once `carbide` is registered as a trusted publisher: on pub.dev →
 *Admin → Automated publishing*, enable GitHub Actions for repository
-`Bizjak-Tech-OU/carbide` with tag pattern `v[0-9]+.[0-9]+.[0-9]+*`. Until that
+`sunderee/carbide` with tag pattern `v[0-9]+.[0-9]+.[0-9]+*`. Until that
 is configured, `dart pub publish` falls back to interactive auth and the action
 hangs.
 

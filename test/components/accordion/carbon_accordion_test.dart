@@ -292,11 +292,11 @@ void main() {
         name: 'accordion',
         containsText: true,
         size: const Size(360, 260),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 320,
             child: CarbonAccordion(
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonAccordionItem(
                   title: 'Getting started',
                   initiallyOpen: true,

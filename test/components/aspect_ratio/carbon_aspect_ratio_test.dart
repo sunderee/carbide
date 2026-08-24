@@ -31,14 +31,14 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        Directionality(
+        const Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox(
               width: 320,
               child: CarbonAspectRatio(
                 ratio: CarbonAspectRatioValue.r16x9,
-                child: const SizedBox.expand(key: ValueKey<String>('content')),
+                child: SizedBox.expand(key: ValueKey<String>('content')),
               ),
             ),
           ),
@@ -55,14 +55,14 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        Directionality(
+        const Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox(
               height: 200,
               child: CarbonAspectRatio(
                 ratio: CarbonAspectRatioValue.r1x2,
-                child: const SizedBox.expand(key: ValueKey<String>('content')),
+                child: SizedBox.expand(key: ValueKey<String>('content')),
               ),
             ),
           ),

@@ -241,9 +241,9 @@ class _CarbonDialogState extends State<CarbonDialog> {
             children: <Widget>[
               // Non-modal: the page stays interactive; only the dialog
               // surface hit-tests.
-              Positioned.fill(
+              const Positioned.fill(
                 child: IgnorePointer(
-                  child: ColoredBox(color: const Color(0x00000000)),
+                  child: ColoredBox(color: Color(0x00000000)),
                 ),
               ),
               surface,

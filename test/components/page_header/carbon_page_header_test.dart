@@ -138,11 +138,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          CarbonPageHeader(
+          const CarbonPageHeader(
             title: 'Reports',
             breadcrumbBorder: true,
             breadcrumbs: <CarbonBreadcrumbItem>[
-              const CarbonBreadcrumbItem(label: 'Home', isCurrentPage: true),
+              CarbonBreadcrumbItem(label: 'Home', isCurrentPage: true),
             ],
           ),
         ),
@@ -192,10 +192,10 @@ void main() {
     testWidgets('tags and a tabs slot render', (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(
-          CarbonPageHeader(
+          const CarbonPageHeader(
             title: 'Reports',
-            tags: const <Widget>[Text('v2'), Text('beta')],
-            tabs: const Text('TABS'),
+            tags: <Widget>[Text('v2'), Text('beta')],
+            tabs: Text('TABS'),
           ),
         ),
       );

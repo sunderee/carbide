@@ -39,17 +39,17 @@ void main() {
       await _pump(
         tester,
         1056,
-        CarbonGrid(
+        const CarbonGrid(
           children: <Widget>[
             CarbonColumn(
               lg: 8,
-              key: const ValueKey<String>('a'),
-              child: const SizedBox(height: 10),
+              key: ValueKey<String>('a'),
+              child: SizedBox(height: 10),
             ),
             CarbonColumn(
               lg: 8,
-              key: const ValueKey<String>('b'),
-              child: const SizedBox(height: 10),
+              key: ValueKey<String>('b'),
+              child: SizedBox(height: 10),
             ),
           ],
         ),
@@ -72,12 +72,12 @@ void main() {
       await _pump(
         tester,
         400,
-        CarbonGrid(
+        const CarbonGrid(
           children: <Widget>[
             CarbonColumn(
               sm: 2,
-              key: const ValueKey<String>('a'),
-              child: const SizedBox(height: 10),
+              key: ValueKey<String>('a'),
+              child: SizedBox(height: 10),
             ),
           ],
         ),
@@ -95,13 +95,13 @@ void main() {
       await _pump(
         tester,
         1056,
-        CarbonGrid(
+        const CarbonGrid(
           children: <Widget>[
             // Only sm is set → used at lg too.
             CarbonColumn(
               sm: 4,
-              key: const ValueKey<String>('a'),
-              child: const SizedBox(height: 10),
+              key: ValueKey<String>('a'),
+              child: SizedBox(height: 10),
             ),
           ],
         ),
@@ -118,14 +118,14 @@ void main() {
       await _pump(
         tester,
         1056,
-        CarbonGrid(
+        const CarbonGrid(
           children: <Widget>[
             CarbonColumn(
               span: 4,
-              key: const ValueKey<String>('a'),
-              child: const SizedBox(height: 10),
+              key: ValueKey<String>('a'),
+              child: SizedBox(height: 10),
             ),
-            const CarbonColumn(
+            CarbonColumn(
               key: ValueKey<String>('b'),
               child: SizedBox(height: 10),
             ),
@@ -147,13 +147,13 @@ void main() {
     testWidgets('columns relayout when the grid crosses a breakpoint', (
       WidgetTester tester,
     ) async {
-      final Widget grid = CarbonGrid(
+      const Widget grid = CarbonGrid(
         children: <Widget>[
           CarbonColumn(
             sm: 2,
             lg: 8,
-            key: const ValueKey<String>('a'),
-            child: const SizedBox(height: 10),
+            key: ValueKey<String>('a'),
+            child: SizedBox(height: 10),
           ),
         ],
       );
@@ -177,15 +177,15 @@ void main() {
     testWidgets('a width change within one breakpoint re-derives the unit', (
       WidgetTester tester,
     ) async {
-      final Widget column = CarbonColumn(
+      const Widget column = CarbonColumn(
         lg: 8,
-        key: const ValueKey<String>('a'),
-        child: const SizedBox(height: 10),
+        key: ValueKey<String>('a'),
+        child: SizedBox(height: 10),
       );
 
       // 1056 and 1200 both resolve to lg (16 columns, 16px margin).
-      await _pump(tester, 1056, CarbonGrid(children: <Widget>[column]));
-      await _pump(tester, 1200, CarbonGrid(children: <Widget>[column]));
+      await _pump(tester, 1056, const CarbonGrid(children: <Widget>[column]));
+      await _pump(tester, 1200, const CarbonGrid(children: <Widget>[column]));
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
         closeTo(8 * _unit(1200, 16, 16) + 7 * 32, 0.6),
@@ -195,7 +195,7 @@ void main() {
       await _pump(
         tester,
         1200,
-        CarbonGrid(rowSpacing: 8, children: <Widget>[column]),
+        const CarbonGrid(rowSpacing: 8, children: <Widget>[column]),
       );
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
@@ -237,8 +237,8 @@ void main() {
       await _pump(
         tester,
         1056,
-        CarbonGrid(
-          children: const <Widget>[
+        const CarbonGrid(
+          children: <Widget>[
             CarbonColumn(
               lg: 4,
               offset: 2,

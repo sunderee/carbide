@@ -51,9 +51,6 @@ void main() {
     await tester.tap(find.text('Source on GitHub'));
     await tester.pump();
 
-    expect(
-      launcher.launched,
-      contains('https://github.com/Bizjak-Tech-OU/carbide'),
-    );
+    expect(launcher.launched, contains('https://github.com/sunderee/carbide'));
   });
 }

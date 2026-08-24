@@ -111,10 +111,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          CarbonToggletip(
+          const CarbonToggletip(
             defaultOpen: true,
-            content: const Text('Body'),
-            actions: <Widget>[const Text('Cancel'), const Text('Apply')],
+            content: Text('Body'),
+            actions: <Widget>[Text('Cancel'), Text('Apply')],
           ),
         ),
       );

@@ -186,7 +186,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          CarbonContentSwitcher(
+          const CarbonContentSwitcher(
             switches: <CarbonSwitch>[
               CarbonSwitch(icon: CarbonIcons.add),
               CarbonSwitch(text: 'Both', icon: CarbonIcons.add),

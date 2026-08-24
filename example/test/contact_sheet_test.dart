@@ -177,7 +177,7 @@ Future<ui.Image> _montage(
   const double cellH = imgH + labelH;
   const double headerH = 64;
   final int rows = math.max(1, (shots.length / cols).ceil());
-  final double width = cols * cellW;
+  const double width = cols * cellW;
   final double height = headerH + rows * cellH;
 
   final ui.PictureRecorder recorder = ui.PictureRecorder();

@@ -69,7 +69,7 @@ class DemoScaffold extends StatelessWidget {
           ),
           if (controls.isNotEmpty) ...<Widget>[
             const SizedBox(height: CarbonSpacing.spacing07),
-            _SectionLabel('Controls'),
+            const _SectionLabel('Controls'),
             const SizedBox(height: CarbonSpacing.spacing05),
             Wrap(
               spacing: CarbonSpacing.spacing07,
@@ -79,7 +79,7 @@ class DemoScaffold extends StatelessWidget {
           ],
           if (code != null) ...<Widget>[
             const SizedBox(height: CarbonSpacing.spacing07),
-            _SectionLabel('Code'),
+            const _SectionLabel('Code'),
             const SizedBox(height: CarbonSpacing.spacing05),
             _CodeBlock(code!),
           ],

@@ -12,9 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../gallery_controller.dart';
 
 /// The Carbide source repository.
-final Uri _repositoryUrl = Uri.parse(
-  'https://github.com/Bizjak-Tech-OU/carbide',
-);
+final Uri _repositoryUrl = Uri.parse('https://github.com/sunderee/carbide');
 
 /// Opens the Carbide repository in the platform's browser.
 Future<void> _openRepository() async {
@@ -36,7 +34,7 @@ class OverviewPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Carbide', style: CarbonTypeStyles.productiveHeading06),
+          const Text('Carbide', style: CarbonTypeStyles.productiveHeading06),
           const SizedBox(height: CarbonSpacing.spacing03),
           Text(
             'An unofficial Flutter port of the IBM Carbon Design System, built '

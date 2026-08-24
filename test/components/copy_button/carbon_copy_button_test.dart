@@ -77,9 +77,9 @@ void main() {
       // One pump: re-pumping a host with an Overlay does not swap its entry.
       await tester.pumpWidget(
         _host(
-          Column(
+          const Column(
             mainAxisSize: MainAxisSize.min,
-            children: const <Widget>[
+            children: <Widget>[
               CarbonCopyButton(
                 key: ValueKey<String>('sm'),
                 size: CarbonCopySize.sm,

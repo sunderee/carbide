@@ -87,7 +87,7 @@ own buttons follow.
 
 - [Theming & layers](theming-and-layers.md) — the four themes,
   `AnimatedCarbonTheme`, and `CarbonLayer`.
-- [Live gallery](https://bizjak-tech-ou.github.io/carbide/) — every component
+- [Live gallery](https://sunderee.github.io/carbide/) — every component
   with live controls and copyable code.
 - API reference — generated from the source; run `dart doc` locally, or browse
   the published reference once it is available.

@@ -17,6 +17,7 @@ analyzer:
     # always_use_package_imports: error
     annotate_overrides: error
     # annotate_redeclares: error
+    # async_return_with_no_await: error
     # avoid_annotating_with_dynamic: error
     # avoid_as: error
     # avoid_bool_literals_in_conditional_expressions: error
@@ -85,16 +86,19 @@ analyzer:
     # document_ignores: error
     empty_catches: error
     empty_constructor_bodies: error
+    # empty_container_bodies: error
     empty_statements: error
     # enable_null_safety: error
     # eol_at_end_of_file: error
     exhaustive_cases: error
     file_names: error
     # flutter_style_todos: error
+    # future_sync_value: error
     hash_and_equals: error
     implementation_imports: error
     implicit_call_tearoffs: error
     # implicit_reopen: error
+    # initialize_in_field_declaration: error
     # invalid_case_patterns: error
     invalid_runtime_check_with_js_interop_types: error
     # invariant_booleans: error
@@ -109,16 +113,19 @@ analyzer:
     # list_remove_unrelated_type: error
     # literal_only_boolean_expressions: error
     # matching_super_parameters: error
+    # migrate_design_widgets: error
     # missing_code_block_language_in_doc_comment: error
     # missing_whitespace_between_adjacent_strings: error
     # no_adjacent_strings_in_list: error
     # no_default_cases: error
     no_duplicate_case_values: error
+    # no_dynamic_casts: error
     no_leading_underscores_for_library_prefixes: error
     no_leading_underscores_for_local_identifiers: error
     # no_literal_bool_comparisons: error
     no_logic_in_create_state: error
-    # no_runtimeType_toString: error
+    # no_raw_types: error
+    # no_runtimetype_tostring: error
     # no_self_assignments: error
     no_wildcard_variable_uses: error
     non_constant_identifier_names: error
@@ -141,10 +148,10 @@ analyzer:
     # prefer_bool_in_asserts: error
     prefer_collection_literals: error
     prefer_conditional_assignment: error
-    # prefer_const_constructors: error
+    prefer_const_constructors: error
     prefer_const_constructors_in_immutables: error
-    # prefer_const_declarations: error
-    # prefer_const_literals_to_create_immutables: error
+    prefer_const_declarations: error
+    prefer_const_literals_to_create_immutables: error
     # prefer_constructors_over_static_methods: error
     prefer_contains: error
     # prefer_double_quotes: error
@@ -177,7 +184,7 @@ analyzer:
     prefer_typing_uninitialized_variables: error
     # prefer_void_to_null: error
     provide_deprecation_message: error
-    public_member_api_docs: error
+    # public_member_api_docs: error
     recursive_getters: error
     # remove_deprecations_in_breaking_versions: error
     # require_trailing_commas: error
@@ -226,11 +233,13 @@ analyzer:
     unnecessary_nullable_for_final_variable_declarations: error
     unnecessary_overrides: error
     # unnecessary_parenthesis: error
+    # unnecessary_primary_constructor_body: error
     # unnecessary_raw_strings: error
     # unnecessary_statements: error
     unnecessary_string_escapes: error
     unnecessary_string_interpolations: error
     unnecessary_this: error
+    # unnecessary_this_alias: error
     unnecessary_to_list_in_spreads: error
     # unnecessary_type_name_in_constructor: error
     # unnecessary_unawaited: error
@@ -241,6 +250,7 @@ analyzer:
     # unsafe_variance: error
     use_build_context_synchronously: error
     # use_colored_box: error
+    # use_declaring_parameters: error
     # use_decorated_box: error
     # use_enums: error
     use_full_hex_values_for_flutter_colors: error
@@ -263,6 +273,14 @@ analyzer:
     valid_regexps: error
     # var_with_no_type_annotation: error
     void_checks: error
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:
@@ -300,6 +318,10 @@ linter:
     # State: experimental
     # Categories: style
     # - annotate_redeclares
+
+    # Return with no await.
+    # Categories: errorProne
+    # - async_return_with_no_await
 
     # Avoid annotating with `dynamic` when not required.
     # Categories: brevity, style
@@ -393,6 +415,7 @@ linter:
     - avoid_print
 
     # Avoid private typedef functions.
+    # State: deprecated
     # Categories: style
     # - avoid_private_typedef_functions
 
@@ -577,6 +600,10 @@ linter:
     # Categories: brevity, effectiveDart, style
     - empty_constructor_bodies
 
+    # Use `;` instead of `{}` for empty container bodies.
+    # Categories: style
+    # - empty_container_bodies
+
     # Avoid empty statements.
     # Categories: errorProne
     - empty_statements
@@ -601,6 +628,10 @@ linter:
     # Categories: style
     # - flutter_style_todos
 
+    # For synchronous values, `Future.syncValue` is more performant.
+    # Categories: nonPerformant
+    # - future_sync_value
+
     # Always override `hashCode` if overriding `==`.
     # Categories: errorProne
     - hash_and_equals
@@ -617,6 +648,10 @@ linter:
     # State: experimental
     # Categories: errorProne
     # - implicit_reopen
+
+    # Initialize the field in the field's initializer.
+    # Categories: style
+    # - initialize_in_field_declaration
 
     # Use case expressions that are valid in Dart 3.0.
     # State: experimental
@@ -675,6 +710,11 @@ linter:
     # Categories: style
     # - matching_super_parameters
 
+    # Design widgets should be imported from Material or Cupertino packages.
+    # State: experimental
+    # Categories: flutter
+    # - migrate_design_widgets
+
     # A code block is missing a specified language.
     # Categories: errorProne
     # - missing_code_block_language_in_doc_comment
@@ -696,6 +736,10 @@ linter:
     # Categories: errorProne
     - no_duplicate_case_values
 
+    # Avoid implicit casts from `dynamic`.
+    # Categories: errorProne
+    # - no_dynamic_casts
+
     # Avoid leading underscores for library prefixes.
     # Categories: style
     - no_leading_underscores_for_library_prefixes
@@ -712,9 +756,13 @@ linter:
     # Categories: errorProne, flutter
     - no_logic_in_create_state
 
+    # Avoid raw types.
+    # Categories: errorProne
+    # - no_raw_types
+
     # Avoid calling `toString()` on `runtimeType`.
     # Categories: nonPerformant
-    # - no_runtimeType_toString
+    # - no_runtimetype_tostring
 
     # Don't assign a variable to itself.
     # Categories: unintentional
@@ -756,6 +804,7 @@ linter:
     # - omit_obvious_property_types
 
     # Avoid defining a one-member abstract class when a simple function will do.
+    # State: deprecated
     # Categories: effectiveDart, languageFeatureUsage, style
     # - one_member_abstracts
 
@@ -810,7 +859,7 @@ linter:
 
     # Prefer `const` with constant constructors.
     # Categories: style
-    # - prefer_const_constructors
+    - prefer_const_constructors
 
     # Prefer declaring `const` constructors on `@immutable` classes.
     # Categories: style
@@ -818,11 +867,11 @@ linter:
 
     # Prefer `const` over `final` for declarations.
     # Categories: style
-    # - prefer_const_declarations
+    - prefer_const_declarations
 
     # Prefer const literals as parameters of constructors on @immutable classes.
     # Categories: style
-    # - prefer_const_literals_to_create_immutables
+    - prefer_const_literals_to_create_immutables
 
     # Prefer defining constructors instead of static methods to create instances.
     # Categories: style
@@ -961,7 +1010,7 @@ linter:
 
     # Document all public members.
     # Categories: publicInterface, style
-    - public_member_api_docs
+    # - public_member_api_docs
 
     # Property getter recursively returns itself.
     # Categories: errorProne, unintentional
@@ -1075,6 +1124,7 @@ linter:
     # - unnecessary_async
 
     # Unnecessary `await` keyword in return.
+    # State: deprecated
     # Categories: style
     # - unnecessary_await_in_return
 
@@ -1140,7 +1190,6 @@ linter:
     # - unnecessary_null_aware_operator_on_extension_on_nullable
 
     # Unnecessary `null` checks.
-    # State: experimental
     # Categories: brevity, style
     # - unnecessary_null_checks
 
@@ -1159,6 +1208,10 @@ linter:
     # Unnecessary parentheses can be removed.
     # Categories: brevity, style
     # - unnecessary_parenthesis
+
+    # Unnecessary primary constructor bodies can be removed.
+    # Categories: brevity, style
+    # - unnecessary_primary_constructor_body
 
     # Unnecessary raw string.
     # Categories: brevity, style
@@ -1179,6 +1232,11 @@ linter:
     # Don't access members with `this` unless avoiding shadowing.
     # Categories: brevity, effectiveDart, style
     - unnecessary_this
+
+    # Use 'this' directly instead of assigning it to a local variable.
+    # State: experimental
+    # Categories: style
+    # - unnecessary_this_alias
 
     # Unnecessary `toList()` in spreads.
     # Categories: brevity
@@ -1221,6 +1279,10 @@ linter:
     # Use `ColoredBox`.
     # Categories: flutter, style
     # - use_colored_box
+
+    # Use a declaring parameter.
+    # Categories: style
+    # - use_declaring_parameters
 
     # Use `DecoratedBox`.
     # Categories: flutter, style
@@ -1306,10 +1368,10 @@ linter:
     - valid_regexps
 
     # Avoid declaring parameters with `var` and no type annotation.
+    # State: experimental
     # Categories: languageFeatureUsage
     # - var_with_no_type_annotation
 
     # Don't assign to `void`.
     # Categories: style
     - void_checks
-

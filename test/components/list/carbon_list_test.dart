@@ -184,14 +184,14 @@ void main() {
       name: 'list',
       containsText: true,
       size: const Size(320, 320),
-      builder: (BuildContext context) => Center(
+      builder: (BuildContext context) => const Center(
         child: SizedBox(
           width: 280,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const CarbonOrderedList(
+              CarbonOrderedList(
                 children: <CarbonListItem>[
                   CarbonListItem(child: Text('Ordered one')),
                   CarbonListItem(
@@ -205,8 +205,8 @@ void main() {
                   CarbonListItem(child: Text('Ordered three')),
                 ],
               ),
-              const SizedBox(height: 16),
-              const CarbonUnorderedList(
+              SizedBox(height: 16),
+              CarbonUnorderedList(
                 children: <CarbonListItem>[
                   CarbonListItem(child: Text('Unordered one')),
                   CarbonListItem(

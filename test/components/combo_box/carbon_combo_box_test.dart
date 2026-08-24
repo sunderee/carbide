@@ -246,12 +246,12 @@ void main() {
         name: 'combo_box_states',
         containsText: true,
         size: const Size(340, 280),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 300,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonComboBox<String>(
                   titleText: 'Empty',
                   placeholder: 'Filter…',

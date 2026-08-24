@@ -251,37 +251,34 @@ void main() {
         name: 'text_input_states',
         containsText: true,
         size: const Size(340, 440),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 300,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const CarbonTextInput(
+                CarbonTextInput(
                   labelText: 'Default',
                   placeholder: 'Placeholder',
                 ),
-                const SizedBox(height: 12),
-                const CarbonTextInput(
-                  labelText: 'Filled',
-                  initialValue: 'Value',
-                ),
-                const SizedBox(height: 12),
-                const CarbonTextInput(
+                SizedBox(height: 12),
+                CarbonTextInput(labelText: 'Filled', initialValue: 'Value'),
+                SizedBox(height: 12),
+                CarbonTextInput(
                   labelText: 'Invalid',
                   initialValue: 'Bad',
                   invalid: true,
                   invalidText: 'Error message',
                 ),
-                const SizedBox(height: 12),
-                const CarbonTextInput(
+                SizedBox(height: 12),
+                CarbonTextInput(
                   labelText: 'Warning',
                   initialValue: 'Hmm',
                   warn: true,
                   warnText: 'Warning message',
                 ),
-                const SizedBox(height: 12),
-                const CarbonTextInput(
+                SizedBox(height: 12),
+                CarbonTextInput(
                   labelText: 'Disabled',
                   initialValue: 'Off',
                   disabled: true,
@@ -299,19 +296,19 @@ void main() {
         name: 'text_input_fluid_password',
         containsText: true,
         size: const Size(340, 200),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 300,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const CarbonTextInput(
+                CarbonTextInput(
                   labelText: 'Fluid label',
                   initialValue: 'Fluid value',
                   fluid: true,
                 ),
-                const SizedBox(height: 12),
-                const CarbonPasswordInput(
+                SizedBox(height: 12),
+                CarbonPasswordInput(
                   labelText: 'Password',
                   initialValue: 'secret',
                 ),

@@ -71,7 +71,7 @@ void _noop() {}
 /// Carbide widgets that mirror the captured Carbon default stories. Add an
 /// entry (plus a story in tool/fidelity/stories.json) to extend coverage.
 final Map<String, Widget Function()> _builders = <String, Widget Function()>{
-  'button': () => CarbonButton(label: 'Button', onPressed: _noop),
+  'button': () => const CarbonButton(label: 'Button', onPressed: _noop),
   'tag': () => const Wrap(
     spacing: 8,
     runSpacing: 8,
@@ -93,12 +93,12 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
       placeholder: 'Placeholder text',
     ),
   ),
-  'tree-view': () => SizedBox(
+  'tree-view': () => const SizedBox(
     width: 320,
     child: CarbonTreeView(
       label: 'Tree view',
-      initiallyExpandedIds: const <Object>{'a'},
-      nodes: const <CarbonTreeNode>[
+      initiallyExpandedIds: <Object>{'a'},
+      nodes: <CarbonTreeNode>[
         CarbonTreeNode(
           id: 'a',
           label: 'Artificial intelligence',
@@ -111,15 +111,15 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
       ],
     ),
   ),
-  'data-table': () => SizedBox(
+  'data-table': () => const SizedBox(
     width: 640,
     child: CarbonDataTable(
-      columns: const <CarbonTableColumn>[
+      columns: <CarbonTableColumn>[
         CarbonTableColumn(title: 'Name'),
         CarbonTableColumn(title: 'Rule'),
         CarbonTableColumn(title: 'Status'),
       ],
-      rows: const <CarbonTableRow>[
+      rows: <CarbonTableRow>[
         CarbonTableRow(
           cells: <Widget>[
             Text('Load Balancer 1'),
@@ -279,7 +279,7 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
   // composition reproduces that crop, so the builder renders the same
   // trigger + open dialog and the threshold stays wide (drift detection
   // only).
-  'modal': () => SizedBox(
+  'modal': () => const SizedBox(
     width: 640,
     height: 400,
     child: Stack(
@@ -290,10 +290,8 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
           modal: true,
           onRequestClose: _noop,
           children: <Widget>[
-            const CarbonDialogHeader(
-              children: <Widget>[Text('Add a custom domain')],
-            ),
-            const CarbonDialogBody(
+            CarbonDialogHeader(children: <Widget>[Text('Add a custom domain')]),
+            CarbonDialogBody(
               child: Text(
                 'Custom domains direct requests for your apps in this '
                 'Cloud Foundry organization to a URL that you own.',
@@ -334,7 +332,7 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
       ],
     ),
   ),
-  'breadcrumb': () => CarbonBreadcrumb(
+  'breadcrumb': () => const CarbonBreadcrumb(
     items: <CarbonBreadcrumbItem>[
       CarbonBreadcrumbItem(label: 'Breadcrumb 1', onPressed: _noop),
       CarbonBreadcrumbItem(label: 'Breadcrumb 2', onPressed: _noop),
@@ -387,14 +385,14 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'loading': () => const CarbonLoading(),
   'inline-loading': () =>
       const CarbonInlineLoading(description: 'Loading data...'),
-  'overflow-menu': () => CarbonOverflowMenu(
+  'overflow-menu': () => const CarbonOverflowMenu(
     items: <CarbonMenuItem>[
       CarbonMenuItem(label: 'Stop app', onPressed: _noop),
       CarbonMenuItem(label: 'Restart app', onPressed: _noop),
       CarbonMenuItem(label: 'Rename app', onPressed: _noop),
     ],
   ),
-  'link': () => CarbonLink(label: 'Link', onPressed: _noop),
+  'link': () => const CarbonLink(label: 'Link', onPressed: _noop),
 };
 
 void main() {
@@ -638,13 +636,13 @@ Future<ui.Image> _composeSideBySide(
   const double gap = 16;
   const double header = 44;
   const double pad = 16;
-  final double width = pad * 2 + paneW * 2 + gap;
-  final double height = header + paneH + pad;
+  const double width = pad * 2 + paneW * 2 + gap;
+  const double height = header + paneH + pad;
 
   final ui.PictureRecorder recorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(recorder);
   canvas.drawRect(
-    Rect.fromLTWH(0, 0, width, height),
+    const Rect.fromLTWH(0, 0, width, height),
     Paint()..color = const Color(0xFF161616),
   );
   _text(canvas, label, const Offset(pad, 14), const Color(0xFFF4F4F4), 16);
@@ -658,7 +656,7 @@ Future<ui.Image> _composeSideBySide(
   _text(
     canvas,
     'Carbide',
-    Offset(pad + paneW + gap, header - 2),
+    const Offset(pad + paneW + gap, header - 2),
     const Color(0xFF8D8D8D),
     11,
   );
@@ -666,12 +664,12 @@ Future<ui.Image> _composeSideBySide(
   _drawContained(
     canvas,
     reference,
-    Rect.fromLTWH(pad, header, paneW, paneH - 14),
+    const Rect.fromLTWH(pad, header, paneW, paneH - 14),
   );
   _drawContained(
     canvas,
     carbide,
-    Rect.fromLTWH(pad + paneW + gap, header, paneW, paneH - 14),
+    const Rect.fromLTWH(pad + paneW + gap, header, paneW, paneH - 14),
   );
 
   final ui.Picture picture = recorder.endRecording();

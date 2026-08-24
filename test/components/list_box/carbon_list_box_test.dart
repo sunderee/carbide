@@ -493,12 +493,12 @@ void main() {
         name: 'list_box_field_states',
         containsText: true,
         size: const Size(320, 320),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 280,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonListBox(child: Text('Default')),
                 SizedBox(height: 12),
                 CarbonListBox(expanded: true, child: Text('Open')),
@@ -521,11 +521,11 @@ void main() {
         name: 'list_box_menu',
         containsText: true,
         size: const Size(320, 220),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 280,
             child: CarbonListBoxMenu(
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonListBoxMenuItem(isFirst: true, child: Text('Apple')),
                 CarbonListBoxMenuItem(isActive: true, child: Text('Banana')),
                 CarbonListBoxMenuItem(

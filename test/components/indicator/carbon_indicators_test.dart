@@ -49,10 +49,10 @@ void main() {
       WidgetTester tester,
     ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await tester.pumpWidget(_host(CarbonBadgeIndicator()));
+      await tester.pumpWidget(_host(const CarbonBadgeIndicator()));
       expect(find.bySemanticsLabel('New'), findsOneWidget);
 
-      await tester.pumpWidget(_host(CarbonBadgeIndicator(count: 1000)));
+      await tester.pumpWidget(_host(const CarbonBadgeIndicator(count: 1000)));
       expect(find.bySemanticsLabel('999+'), findsOneWidget);
       handle.dispose();
     });
@@ -163,7 +163,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          CarbonShapeIndicator(
+          const CarbonShapeIndicator(
             kind: CarbonShapeIndicatorKind.draft,
             label: 'Draft',
             textSize: 14,

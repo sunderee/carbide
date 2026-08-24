@@ -414,8 +414,10 @@ void main() {
     ) async {
       // Built at runtime (non-const) in a fresh host: the shared Overlay host
       // keeps its first entry, so the multi variant needs its own pump.
-      final CarbonCodeSnippetType type = CarbonCodeSnippetType.multi;
-      await tester.pumpWidget(_host(CarbonCodeSnippetSkeleton(type: type)));
+      const CarbonCodeSnippetType type = CarbonCodeSnippetType.multi;
+      await tester.pumpWidget(
+        _host(const CarbonCodeSnippetSkeleton(type: type)),
+      );
       expect(
         tester
             .widget<CarbonSkeletonText>(find.byType(CarbonSkeletonText))
@@ -441,20 +443,20 @@ void main() {
               child: Overlay(
                 initialEntries: <OverlayEntry>[
                   managedOverlayEntry(
-                    builder: (BuildContext context) => Center(
+                    builder: (BuildContext context) => const Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          const SizedBox(
+                          SizedBox(
                             width: 320,
                             child: CarbonCodeSnippet(code: code),
                           ),
-                          const SizedBox(height: 8),
-                          const CarbonCodeSnippet(
+                          SizedBox(height: 8),
+                          CarbonCodeSnippet(
                             code: 'npm i',
                             type: CarbonCodeSnippetType.inline,
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           SizedBox(
                             width: 320,
                             child: CarbonCodeSnippet(

@@ -294,19 +294,19 @@ void main() {
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(520, 320),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 480,
             child: CarbonDataTable(
               title: 'Routines',
               description: 'Background jobs',
-              columns: const <CarbonTableColumn>[
+              columns: <CarbonTableColumn>[
                 CarbonTableColumn(title: 'Name'),
                 CarbonTableColumn(title: 'Status'),
                 CarbonTableColumn(title: 'Owner'),
               ],
               zebra: true,
-              rows: const <CarbonTableRow>[
+              rows: <CarbonTableRow>[
                 CarbonTableRow(
                   cells: <Widget>[Text('Load'), Text('Running'), Text('Ada')],
                 ),

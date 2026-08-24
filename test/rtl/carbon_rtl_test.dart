@@ -119,11 +119,11 @@ void main() {
             child: Overlay(
               initialEntries: <OverlayEntry>[
                 managedOverlayEntry(
-                  builder: (BuildContext context) => Center(
+                  builder: (BuildContext context) => const Center(
                     child: SizedBox(
                       width: 220,
                       child: CarbonMenu(
-                        children: const <Widget>[
+                        children: <Widget>[
                           CarbonMenuItem(
                             label: 'Share',
                             submenu: <Widget>[

@@ -254,12 +254,12 @@ void main() {
         name: 'multi_select_states',
         containsText: true,
         size: const Size(340, 220),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 300,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonMultiSelect<String>(
                   titleText: 'Empty',
                   label: 'Choose options',
@@ -290,9 +290,9 @@ void main() {
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
             managedOverlayEntry(
-              builder: (BuildContext context) => Padding(
-                padding: const EdgeInsets.all(12),
-                child: const Align(
+              builder: (BuildContext context) => const Padding(
+                padding: EdgeInsets.all(12),
+                child: Align(
                   alignment: Alignment.topCenter,
                   child: SizedBox(
                     width: 280,

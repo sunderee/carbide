@@ -5,7 +5,7 @@ component across all four Carbon themes, with live controls and copyable code
 for each one.
 
 It is deployed to the web here:
-**<https://bizjak-tech-ou.github.io/carbide/>**
+**<https://sunderee.github.io/carbide/>**
 
 ## Run it locally
 

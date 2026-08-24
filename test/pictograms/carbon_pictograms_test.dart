@@ -63,46 +63,42 @@ void main() {
     });
   });
 
-  test(
-    'every pictogram matches its upstream raster',
-    () async {
-      final Stopwatch watch = Stopwatch()..start();
-      final List<String> failures = <String>[];
-      double worst = 0;
-      for (final CarbonIconData pictogram in allCarbonPictograms) {
-        final CarbonIconArtwork artwork = pictogram.artwork.single;
-        const int size = 64;
-        final Uint8List png = File(
-          '$referenceDir/${pictogram.name}_32.png',
-        ).readAsBytesSync();
-        final Uint8List ours = await renderArtworkAlpha(artwork, size, size);
-        final Uint8List reference = await decodePngAlpha(png, size, size);
-        final FidelityResult result = compareAlphaRect(
-          ours,
-          reference,
-          size,
-          size,
-        );
-        if (result.coverageMismatchFraction > worst) {
-          worst = result.coverageMismatchFraction;
-        }
-        if (result.coverageMismatchFraction > maxCoverageMismatch) {
-          failures.add(
-            '${pictogram.name}: coverage '
-            '${(result.coverageMismatchFraction * 100).toStringAsFixed(3)}%',
-          );
-        }
-      }
-      watch.stop();
-      debugPrint(
-        'pictogram sweep: ${allCarbonPictograms.length} assets in '
-        '${watch.elapsed.inSeconds}s; worst coverage mismatch '
-        '${(worst * 100).toStringAsFixed(3)}%',
+  test('every pictogram matches its upstream raster', () async {
+    final Stopwatch watch = Stopwatch()..start();
+    final List<String> failures = <String>[];
+    double worst = 0;
+    for (final CarbonIconData pictogram in allCarbonPictograms) {
+      final CarbonIconArtwork artwork = pictogram.artwork.single;
+      const int size = 64;
+      final Uint8List png = File(
+        '$referenceDir/${pictogram.name}_32.png',
+      ).readAsBytesSync();
+      final Uint8List ours = await renderArtworkAlpha(artwork, size, size);
+      final Uint8List reference = await decodePngAlpha(png, size, size);
+      final FidelityResult result = compareAlphaRect(
+        ours,
+        reference,
+        size,
+        size,
       );
-      expect(failures, isEmpty);
-    },
-    timeout: const Timeout(Duration(minutes: 5)),
-  );
+      if (result.coverageMismatchFraction > worst) {
+        worst = result.coverageMismatchFraction;
+      }
+      if (result.coverageMismatchFraction > maxCoverageMismatch) {
+        failures.add(
+          '${pictogram.name}: coverage '
+          '${(result.coverageMismatchFraction * 100).toStringAsFixed(3)}%',
+        );
+      }
+    }
+    watch.stop();
+    debugPrint(
+      'pictogram sweep: ${allCarbonPictograms.length} assets in '
+      '${watch.elapsed.inSeconds}s; worst coverage mismatch '
+      '${(worst * 100).toStringAsFixed(3)}%',
+    );
+    expect(failures, isEmpty);
+  }, timeout: const Timeout(Duration(minutes: 5)));
 
   group('CarbonPictogram widget', () {
     testWidgets('renders at the 48px minimum by default', (

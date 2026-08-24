@@ -119,19 +119,19 @@ void main() {
       name: 'heading',
       containsText: true,
       size: const Size(320, 220),
-      builder: (BuildContext context) => Center(
+      builder: (BuildContext context) => const Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const CarbonHeading('Heading one'),
+            CarbonHeading('Heading one'),
             CarbonSection(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const CarbonHeading('Heading two'),
-                  CarbonSection(child: const CarbonHeading('Heading three')),
+                  CarbonHeading('Heading two'),
+                  CarbonSection(child: CarbonHeading('Heading three')),
                 ],
               ),
             ),

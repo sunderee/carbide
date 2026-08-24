@@ -69,7 +69,7 @@ void main() {
         name: 'text_input_scaled_1_3',
         containsText: true,
         size: const Size(320, 140),
-        mediaQuery: MediaQueryData(textScaler: TextScaler.linear(1.3)),
+        mediaQuery: const MediaQueryData(textScaler: TextScaler.linear(1.3)),
         builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 280,

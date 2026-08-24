@@ -394,10 +394,10 @@ class CarbonAccordionSkeleton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (int i = 0; i < count; i++)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 1),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 1),
             child: Row(
-              children: const <Widget>[
+              children: <Widget>[
                 Expanded(child: CarbonSkeleton(height: 14)),
                 SizedBox(width: CarbonSpacing.spacing05),
                 CarbonSkeleton(width: 16, height: 16),

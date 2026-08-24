@@ -180,27 +180,27 @@ void main() {
         name: 'text_area_states',
         containsText: true,
         size: const Size(360, 420),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 320,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const CarbonTextArea(
+                CarbonTextArea(
                   labelText: 'Default',
                   placeholder: 'Tell us more',
                   rows: 2,
                 ),
-                const SizedBox(height: 12),
-                const CarbonTextArea(
+                SizedBox(height: 12),
+                CarbonTextArea(
                   labelText: 'With counter',
                   initialValue: 'Some content',
                   rows: 2,
                   enableCounter: true,
                   maxCount: 100,
                 ),
-                const SizedBox(height: 12),
-                const CarbonTextArea(
+                SizedBox(height: 12),
+                CarbonTextArea(
                   labelText: 'Invalid',
                   initialValue: 'Oops',
                   rows: 2,

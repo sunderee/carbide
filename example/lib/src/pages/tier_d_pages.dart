@@ -192,7 +192,7 @@ class _FileUploaderPage extends StatelessWidget {
   const _FileUploaderPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'File uploader',
       description: 'A drop zone plus selected-file rows.',
       previewAlignment: Alignment.topLeft,
@@ -201,14 +201,14 @@ class _FileUploaderPage extends StatelessWidget {
         child: CarbonFileUploader(
           labelTitle: 'Upload files',
           labelDescription: 'Max 5 files, 500kb each.',
-          items: const <CarbonFileUploaderItem>[
+          items: <CarbonFileUploaderItem>[
             CarbonFileUploaderItem(
               name: 'report.pdf',
               status: CarbonFileStatus.complete,
             ),
             CarbonFileUploaderItem(name: 'draft.pdf'),
           ],
-          child: const CarbonFileUploaderDropContainer(
+          child: CarbonFileUploaderDropContainer(
             label: 'Drag and drop files here or click to upload',
           ),
         ),

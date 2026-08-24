@@ -488,7 +488,7 @@ void main() {
         throwsAssertionError,
       );
       expect(
-        () => CarbonCallout(kind: CarbonNotificationKind.warning),
+        () => const CarbonCallout(kind: CarbonNotificationKind.warning),
         returnsNormally,
       );
     });
@@ -560,7 +560,7 @@ void main() {
               children: <Widget>[
                 // A focus anchor before the component, so the first Tab
                 // press moves focus onto the notification's first control.
-                Focus(autofocus: true, child: const SizedBox.shrink()),
+                const Focus(autofocus: true, child: SizedBox.shrink()),
                 child,
               ],
             ),
@@ -740,26 +740,26 @@ void main() {
         name: 'notification_kinds',
         containsText: true,
         size: const Size(480, 300),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 440,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const CarbonInlineNotification(
+                CarbonInlineNotification(
                   kind: CarbonNotificationKind.warning,
                   title: 'Warning',
                   subtitle: 'Black inner path.',
                 ),
-                const SizedBox(height: 12),
-                const CarbonInlineNotification(
+                SizedBox(height: 12),
+                CarbonInlineNotification(
                   kind: CarbonNotificationKind.warningAlt,
                   title: 'Warning alt',
                   subtitle: 'Triangular icon.',
                   lowContrast: true,
                 ),
-                const SizedBox(height: 12),
-                const CarbonInlineNotification(
+                SizedBox(height: 12),
+                CarbonInlineNotification(
                   kind: CarbonNotificationKind.infoSquare,
                   title: 'Info square',
                   subtitle: 'Squared icon.',

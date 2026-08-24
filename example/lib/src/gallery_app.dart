@@ -53,7 +53,7 @@ class _GalleryAppState extends State<GalleryApp> {
         ),
       ],
       errorBuilder: (BuildContext context, GoRouterState state) =>
-          GalleryShell(activeSlug: null, child: const _NotFound()),
+          const GalleryShell(activeSlug: null, child: _NotFound()),
     );
   }
 

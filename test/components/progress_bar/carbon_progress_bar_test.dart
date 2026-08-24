@@ -301,33 +301,33 @@ void main() {
       directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
       containsText: true,
       size: const Size(320, 240),
-      builder: (BuildContext context) => Center(
+      builder: (BuildContext context) => const Center(
         child: SizedBox(
           width: 280,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const CarbonProgressBar(
+              CarbonProgressBar(
                 label: 'Determinate',
                 value: 65,
                 helperText: '65%',
               ),
-              const SizedBox(height: 16),
-              const CarbonProgressBar(
+              SizedBox(height: 16),
+              CarbonProgressBar(
                 label: 'Finished',
                 value: 100,
                 status: CarbonProgressBarStatus.finished,
               ),
-              const SizedBox(height: 16),
-              const CarbonProgressBar(
+              SizedBox(height: 16),
+              CarbonProgressBar(
                 label: 'Error',
                 value: 40,
                 status: CarbonProgressBarStatus.error,
                 helperText: 'Upload failed',
               ),
-              const SizedBox(height: 16),
-              const CarbonProgressBar(
+              SizedBox(height: 16),
+              CarbonProgressBar(
                 label: 'Small',
                 value: 30,
                 size: CarbonProgressBarSize.small,
@@ -350,13 +350,13 @@ void main() {
       containsText: true,
       size: const Size(320, 220),
       pumpBeforeSnapshot: const Duration(milliseconds: 350),
-      builder: (BuildContext context) => Center(
+      builder: (BuildContext context) => const Center(
         child: SizedBox(
           width: 280,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const <Widget>[
+            children: <Widget>[
               CarbonProgressBar(label: 'Indeterminate'),
               SizedBox(height: 16),
               CarbonProgressBar(

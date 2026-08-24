@@ -42,68 +42,60 @@ String referenceNameOf(CarbonIconData icon, CarbonIconArtwork artwork) =>
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test(
-    'every icon asset matches its upstream raster',
-    () async {
-      final Stopwatch watch = Stopwatch()..start();
-      final List<String> failures = <String>[];
-      int assets = 0;
-      double worst = 0;
-      String worstName = '';
+  test('every icon asset matches its upstream raster', () async {
+    final Stopwatch watch = Stopwatch()..start();
+    final List<String> failures = <String>[];
+    int assets = 0;
+    double worst = 0;
+    String worstName = '';
 
-      for (final CarbonIconData icon in allCarbonIcons) {
-        for (final CarbonIconArtwork artwork in icon.artwork) {
-          assets++;
-          final (int width, int height) = dimensionsOf(artwork);
-          final String referenceName = referenceNameOf(icon, artwork);
-          final Uint8List png = File(
-            '$referenceDir/$referenceName',
-          ).readAsBytesSync();
-          final Uint8List ours = await renderArtworkAlpha(
-            artwork,
-            width,
-            height,
+    for (final CarbonIconData icon in allCarbonIcons) {
+      for (final CarbonIconArtwork artwork in icon.artwork) {
+        assets++;
+        final (int width, int height) = dimensionsOf(artwork);
+        final String referenceName = referenceNameOf(icon, artwork);
+        final Uint8List png = File(
+          '$referenceDir/$referenceName',
+        ).readAsBytesSync();
+        final Uint8List ours = await renderArtworkAlpha(artwork, width, height);
+        final Uint8List reference = await decodePngAlpha(png, width, height);
+        final FidelityResult result = compareAlphaRect(
+          ours,
+          reference,
+          width,
+          height,
+        );
+        if (result.coverageMismatchFraction > worst) {
+          worst = result.coverageMismatchFraction;
+          worstName = referenceName;
+        }
+        if (result.coverageMismatchFraction > maxCoverageMismatch) {
+          failures.add(
+            '$referenceName: coverage '
+            '${(result.coverageMismatchFraction * 100).toStringAsFixed(3)}% '
+            '(raw ${(result.mismatchFraction * 100).toStringAsFixed(3)}%)',
           );
-          final Uint8List reference = await decodePngAlpha(png, width, height);
-          final FidelityResult result = compareAlphaRect(
-            ours,
-            reference,
-            width,
-            height,
-          );
-          if (result.coverageMismatchFraction > worst) {
-            worst = result.coverageMismatchFraction;
-            worstName = referenceName;
-          }
-          if (result.coverageMismatchFraction > maxCoverageMismatch) {
-            failures.add(
-              '$referenceName: coverage '
-              '${(result.coverageMismatchFraction * 100).toStringAsFixed(3)}% '
-              '(raw ${(result.mismatchFraction * 100).toStringAsFixed(3)}%)',
-            );
-            Directory(failureDir).createSync(recursive: true);
-            File(
-              '$failureDir/$referenceName',
-            ).writeAsBytesSync(await renderArtworkPng(artwork, width, height));
-          }
+          Directory(failureDir).createSync(recursive: true);
+          File(
+            '$failureDir/$referenceName',
+          ).writeAsBytesSync(await renderArtworkPng(artwork, width, height));
         }
       }
-      watch.stop();
-      debugPrint(
-        'fidelity sweep: $assets assets in ${watch.elapsed.inSeconds}s; '
-        'worst coverage mismatch '
-        '${(worst * 100).toStringAsFixed(3)}% ($worstName)',
-      );
-      expect(
-        failures,
-        isEmpty,
-        reason:
-            'icons differ from upstream rasters; our renders were written to '
-            '$failureDir for comparison against $referenceDir',
-      );
-    },
-    timeout: const Timeout(Duration(minutes: 5)),
-  );
+    }
+    watch.stop();
+    debugPrint(
+      'fidelity sweep: $assets assets in ${watch.elapsed.inSeconds}s; '
+      'worst coverage mismatch '
+      '${(worst * 100).toStringAsFixed(3)}% ($worstName)',
+    );
+    expect(
+      failures,
+      isEmpty,
+      reason:
+          'icons differ from upstream rasters; our renders were written to '
+          '$failureDir for comparison against $referenceDir',
+    );
+  }, timeout: const Timeout(Duration(minutes: 5)));
 
   test(
     'the gate catches a one-pixel geometry error (mutation guard)',

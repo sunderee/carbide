@@ -304,20 +304,20 @@ void main() {
         name: 'search_states',
         containsText: true,
         size: const Size(340, 220),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 300,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const CarbonSearch(),
-                const SizedBox(height: 12),
-                const CarbonSearch(initialValue: 'Carbon'),
-                const SizedBox(height: 12),
-                const CarbonSearch(disabled: true, initialValue: 'Disabled'),
-                const SizedBox(height: 12),
-                const CarbonExpandableSearch(),
+                CarbonSearch(),
+                SizedBox(height: 12),
+                CarbonSearch(initialValue: 'Carbon'),
+                SizedBox(height: 12),
+                CarbonSearch(disabled: true, initialValue: 'Disabled'),
+                SizedBox(height: 12),
+                CarbonExpandableSearch(),
               ],
             ),
           ),

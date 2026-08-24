@@ -352,14 +352,14 @@ class _LoadingPage extends StatelessWidget {
   const _LoadingPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Loading',
       description: 'The spinner and inline loading states.',
       preview: Wrap(
         spacing: CarbonSpacing.spacing09,
         runSpacing: CarbonSpacing.spacing07,
         crossAxisAlignment: WrapCrossAlignment.center,
-        children: const <Widget>[
+        children: <Widget>[
           CarbonLoading(),
           CarbonLoading(small: true),
           CarbonInlineLoading(description: 'Loading…'),
@@ -510,12 +510,12 @@ class _HeadingPage extends StatelessWidget {
   const _HeadingPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Heading',
       description:
           'Semantic headings whose level comes from the ambient CarbonSection.',
       previewAlignment: Alignment.topLeft,
-      preview: const CarbonSection(
+      preview: CarbonSection(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -666,14 +666,14 @@ class _IndicatorsPage extends StatelessWidget {
   const _IndicatorsPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Indicators',
       description: 'Badge, icon, and colour-blind-safe shape status markers.',
       previewAlignment: Alignment.topLeft,
       preview: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: const <Widget>[
+        children: <Widget>[
           Row(
             children: <Widget>[
               CarbonBadgeIndicator(),
@@ -779,14 +779,14 @@ class _SkeletonsPage extends StatelessWidget {
   const _SkeletonsPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Skeletons',
       description: 'Loading placeholders that mimic a component footprint.',
       previewAlignment: Alignment.topLeft,
       preview: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: const <Widget>[
+        children: <Widget>[
           SizedBox(width: 240, child: CarbonTextInputSkeleton()),
           SizedBox(height: 24),
           CarbonCheckboxSkeleton(),

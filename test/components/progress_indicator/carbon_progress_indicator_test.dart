@@ -159,11 +159,11 @@ void main() {
         name: 'progress_indicator',
         containsText: true,
         size: const Size(560, 400),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const <Widget>[
+            children: <Widget>[
               CarbonProgressIndicator(steps: _steps, currentIndex: 1),
               SizedBox(height: 32),
               CarbonProgressIndicator(

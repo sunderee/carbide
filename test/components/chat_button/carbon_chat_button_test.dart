@@ -571,13 +571,13 @@ void main() {
         name: 'ai_skeleton',
         containsText: false,
         size: const Size(280, 200),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 240,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonAISkeletonText(paragraph: true),
                 SizedBox(height: 16),
                 CarbonAISkeletonPlaceholder(width: 80, height: 80),

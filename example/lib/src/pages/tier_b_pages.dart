@@ -120,11 +120,11 @@ class _TextAreaPage extends StatelessWidget {
   const _TextAreaPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Text area',
       description: 'A multi-line field with an optional character counter.',
       previewAlignment: Alignment.topCenter,
-      preview: const SizedBox(
+      preview: SizedBox(
         width: 360,
         child: CarbonTextArea(
           labelText: 'Notes',
@@ -205,11 +205,11 @@ class _SearchPage extends StatelessWidget {
   const _SearchPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Search',
       description: 'A search field with a clear affordance.',
       previewAlignment: Alignment.topCenter,
-      preview: const SizedBox(
+      preview: SizedBox(
         width: 360,
         child: CarbonSearch(placeholder: 'Search components'),
       ),

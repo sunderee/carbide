@@ -644,9 +644,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          CarbonMenu(
+          const CarbonMenu(
             autofocus: false,
-            children: const <Widget>[CarbonMenuItemDivider()],
+            children: <Widget>[CarbonMenuItemDivider()],
           ),
         ),
       );

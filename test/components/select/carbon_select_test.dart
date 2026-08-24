@@ -340,27 +340,27 @@ void main() {
         builder: (BuildContext context) => Overlay(
           initialEntries: <OverlayEntry>[
             managedOverlayEntry(
-              builder: (BuildContext context) => Center(
+              builder: (BuildContext context) => const Center(
                 child: SizedBox(
                   width: 300,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      const CarbonSelect<String>(
+                      CarbonSelect<String>(
                         labelText: 'Default',
                         items: _items,
                         placeholder: 'Choose a fruit',
                         onChanged: _noop,
                       ),
-                      const SizedBox(height: 12),
-                      const CarbonSelect<String>(
+                      SizedBox(height: 12),
+                      CarbonSelect<String>(
                         labelText: 'Selected',
                         items: _items,
                         value: 'b',
                         onChanged: _noop,
                       ),
-                      const SizedBox(height: 12),
-                      const CarbonSelect<String>(
+                      SizedBox(height: 12),
+                      CarbonSelect<String>(
                         labelText: 'Invalid',
                         items: _items,
                         value: 'a',

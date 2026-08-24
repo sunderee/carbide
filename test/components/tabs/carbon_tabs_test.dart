@@ -277,12 +277,12 @@ void main() {
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(440, 220),
-        builder: (BuildContext context) => Center(
+        builder: (BuildContext context) => const Center(
           child: SizedBox(
             width: 400,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const <Widget>[
+              children: <Widget>[
                 CarbonTabs(tabs: _tabs, panels: _panels),
                 SizedBox(height: 24),
                 CarbonTabs(

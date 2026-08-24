@@ -688,11 +688,11 @@ class _ProgressIndicatorPage extends StatelessWidget {
   const _ProgressIndicatorPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Progress indicator',
       description: 'Steps through a multi-stage flow.',
       previewAlignment: Alignment.topLeft,
-      preview: const SizedBox(
+      preview: SizedBox(
         width: 560,
         child: CarbonProgressIndicator(
           currentIndex: 1,

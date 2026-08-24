@@ -438,14 +438,14 @@ void main() {
         name: 'file_uploader',
         containsText: true,
         size: const Size(360, 470),
-        builder: (BuildContext context) => Align(
+        builder: (BuildContext context) => const Align(
           alignment: Alignment.topLeft,
           child: SizedBox(
             width: 320,
             child: CarbonFileUploader(
               labelTitle: 'Upload files',
               labelDescription: 'Max 5 files, 500kb each.',
-              items: const <CarbonFileUploaderItem>[
+              items: <CarbonFileUploaderItem>[
                 CarbonFileUploaderItem(
                   name: 'quarter-report.pdf',
                   status: CarbonFileStatus.complete,
@@ -458,7 +458,7 @@ void main() {
                   errorBody: 'Only PDFs are allowed.',
                 ),
               ],
-              child: const CarbonFileUploaderDropContainer(
+              child: CarbonFileUploaderDropContainer(
                 label: 'Drag and drop files here or click to upload',
               ),
             ),

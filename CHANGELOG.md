@@ -1,5 +1,7 @@
 # Changelog
 
+# 0.4.2
+
 ## 0.4.1
 
 Widen the declared Dart and Flutter SDK floors so Carbide can be consumed on

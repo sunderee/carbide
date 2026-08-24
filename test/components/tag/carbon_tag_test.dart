@@ -435,7 +435,7 @@ void main() {
               children: <Widget>[
                 // A focus anchor before the component, so the first Tab
                 // press moves focus onto the tag's control.
-                Focus(autofocus: true, child: const SizedBox.shrink()),
+                const Focus(autofocus: true, child: SizedBox.shrink()),
                 child,
               ],
             ),

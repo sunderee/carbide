@@ -7,10 +7,10 @@ Carbide brings the [IBM Carbon Design System][carbon] to Flutter, built
 token, theme, and component is implemented from `package:flutter/widgets.dart`,
 so the result follows Carbon's specification rather than Material's.
 
-[**▶ Explore the live gallery**](https://bizjak-tech-ou.github.io/carbide/) —
+[**▶ Explore the live gallery**](https://sunderee.github.io/carbide/) —
 every component, every theme, with live controls and copyable code.
 
-![The Carbide gallery overview](https://raw.githubusercontent.com/Bizjak-Tech-OU/carbide/master/docs/images/overview.png)
+![The Carbide gallery overview](https://raw.githubusercontent.com/sunderee/carbide/master/docs/images/overview.png)
 
 ## Install
 
@@ -106,7 +106,7 @@ CarbonLayer(
 See the [theming & layers guide](docs/theming-and-layers.md) for the full token
 set and the layering rules.
 
-![A component demo on the Gray 90 theme](https://raw.githubusercontent.com/Bizjak-Tech-OU/carbide/master/docs/images/button_dark.png)
+![A component demo on the Gray 90 theme](https://raw.githubusercontent.com/sunderee/carbide/master/docs/images/button_dark.png)
 
 ## Component catalog
 
@@ -127,7 +127,7 @@ Notification, Progress indicator, Structured list.
 **Tier D · Complex & data** — Data table, Date picker, Time picker, File
 uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 
-![The Carbon data table on the White theme](https://raw.githubusercontent.com/Bizjak-Tech-OU/carbide/master/docs/images/data_table.png)
+![The Carbon data table on the White theme](https://raw.githubusercontent.com/sunderee/carbide/master/docs/images/data_table.png)
 
 ## Accessibility & testing
 
