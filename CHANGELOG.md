@@ -2,6 +2,8 @@
 
 # 0.4.2
 
+Change repository links to new owner, and adjust analysis options.
+
 ## 0.4.1
 
 Widen the declared Dart and Flutter SDK floors so Carbide can be consumed on
