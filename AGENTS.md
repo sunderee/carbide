@@ -15,10 +15,9 @@ startup update script already does this.
 
 ### Toolchain
 
-- Flutter is pinned to **3.44.6 (stable)** (bundles Dart 3.12.2), matching the
-  `flutter-version` pin across `.github/workflows/*` and the `pubspec.yaml`
-  floor. The SDK is installed at `~/flutter` and added to `PATH` via `~/.bashrc`.
-  If `flutter` is not found in a non-login shell, run
+- CI and other workflows install the **latest Flutter stable** (no
+  `flutter-version` pin). The SDK on this VM is at `~/flutter` and added to
+  `PATH` via `~/.bashrc`. If `flutter` is not found in a non-login shell, run
   `export PATH="$HOME/flutter/bin:$PATH"`.
 - Only the **web** and (headless) test toolchains are set up. The Android and
   Linux-desktop toolchains are intentionally not installed — the gallery only

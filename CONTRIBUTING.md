@@ -59,18 +59,12 @@ What the number means:
 
 ### CI
 
-Every PR runs on a **pinned Flutter** (`flutter-version:` in
-`.github/workflows/ci.yaml`; all workflows carry the same pin — grep
-`flutter-version` when bumping, and bump via a dedicated PR since golden
-rasterization and analyzer behavior follow the toolchain):
+Every PR runs on the **latest Flutter stable** (`channel: stable` in
+`.github/workflows/ci.yaml`; other workflows use the same setup):
 
 - **Format, analyze, test** — plus the coverage gate (above), the icon
   lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
   golden comparison is strict and authoritative.
-- **Min supported Flutter** — the same suite on the `pubspec.yaml` Flutter
-  floor with goldens skipped (`CARBIDE_SKIP_GOLDENS`), so the declared
-  constraint keeps being true. A grep step fails the job if the pinned
-  floor version and `pubspec.yaml` drift apart.
 - **Gallery — analyze & test** — the example app's suite + contact sheet.
 - **Publish rehearsal** (`publish-rehearsal.yaml`) — on PRs touching
   packaging inputs (`pubspec.yaml`, README, LICENSE, NOTICE, …): a strict

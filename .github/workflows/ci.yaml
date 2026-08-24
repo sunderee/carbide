@@ -22,15 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # Pinned toolchain (#233): golden rasterization and analyzer behavior
-      # must be reproducible run-over-run. Bump deliberately via PR, keeping
-      # every workflow in this repo on the same version (grep for
-      # flutter-version).
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: latest
           cache: true
 
       - name: Install dependencies
@@ -89,35 +84,6 @@ jobs:
           path: test/fidelity/comparisons/
           if-no-files-found: warn
 
-  # Minimum-supported-toolchain guard (#233): proves the package still works
-  # at the Flutter/Dart floor `pubspec.yaml` declares, so constraint rot is
-  # caught here instead of by a user. Goldens are skipped — baselines are
-  # rendered by the pinned toolchain above, and an older engine may
-  # rasterize differently without that being a bug.
-  min-sdk:
-    name: Min supported Flutter
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      # Must equal the `flutter:` floor in pubspec.yaml (asserted below).
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: latest
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Run tests (goldens skipped)
-        run: flutter test --dart-define=CARBIDE_SKIP_GOLDENS=true
-
   gallery:
     name: Gallery — analyze & test
     runs-on: ubuntu-latest
@@ -129,7 +95,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies

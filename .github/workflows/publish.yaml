@@ -37,14 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # Keep in sync with ci.yaml's pin (#233).
-          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
@@ -68,7 +66,7 @@ jobs:
       id-token: write # Required for OIDC authentication with pub.dev.
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Sets up the pub.dev OIDC credential from the workflow's id-token. This
       # is the piece that makes `dart pub publish` non-interactive in CI.
@@ -79,8 +77,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # Keep in sync with ci.yaml's pin (#233).
-          flutter-version: 3.44.6
           cache: true
 
       - name: Install dependencies
