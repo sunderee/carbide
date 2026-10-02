@@ -256,13 +256,19 @@ void main() {
             .first,
       );
       expect(ring.foregroundPainter, isNotNull);
-      // ...and the error ring is suppressed (only the bg DecoratedBox remains).
+      // The error wrapper remains mounted, but paints no error border while
+      // focused. Keeping it mounted preserves the child's editor state.
       expect(
         find.descendant(
           of: find.byType(CarbonField),
-          matching: find.byType(DecoratedBox),
+          matching: find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is DecoratedBox &&
+                widget.position == DecorationPosition.foreground &&
+                (widget.decoration as BoxDecoration).border != null,
+          ),
         ),
-        findsOneWidget,
+        findsNothing,
       );
     });
   });

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Rebind form controllers and focus nodes after widget updates, preserving text,
+  selection, composing state and focus where applicable. Dispose only internally
+  owned resources, including expandable search (#295, #296).
+- Preserve editable state and native browser focus when field chrome changes;
+  expose enabled and disabled fields correctly to the web input engine.
 - Update Carbon references to v11.117.0 and regenerate tokens, icons, pictograms,
   and Storybook references; adapt generators to upstream DTCG sources.
 - Make data-table selectors activatable through assistive technology, preserve

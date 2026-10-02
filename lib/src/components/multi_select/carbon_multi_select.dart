@@ -23,6 +23,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../checkbox/carbon_checkbox.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 import '../list_box/carbon_list_box.dart';
 
@@ -137,7 +138,11 @@ class CarbonMultiSelect<T> extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional external focus node for the field.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   @override
@@ -152,8 +157,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   final TextEditingController _filter = TextEditingController();
-  FocusNode? _internalFocus;
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  late final OwnedFocusNode _focusOwner;
+  FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
   double _triggerWidth = 0;
   bool _hovered = false;
@@ -171,7 +176,10 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_rebuild);
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _rebuild,
+    );
   }
 
   void _rebuild() {
@@ -179,9 +187,14 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   }
 
   @override
+  void didUpdateWidget(CarbonMultiSelect<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _focusOwner.update(widget.focusNode);
+  }
+
+  @override
   void dispose() {
-    _focus.removeListener(_rebuild);
-    _internalFocus?.dispose();
+    _focusOwner.dispose();
     _filter.dispose();
     super.dispose();
   }

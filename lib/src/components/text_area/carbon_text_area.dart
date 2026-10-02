@@ -16,6 +16,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
 /// How the character counter is computed.
@@ -71,7 +72,10 @@ class CarbonTextArea extends StatefulWidget {
   /// The field label.
   final String labelText;
 
-  /// An external controller.
+  /// A caller-owned controller, rebound when this property changes.
+  ///
+  /// Removing it creates an internal controller seeded with its text, selection,
+  /// and composing range. Caller-owned controllers are never disposed here.
   final TextEditingController? controller;
 
   /// The initial text.
@@ -129,7 +133,11 @@ class CarbonTextArea extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.
@@ -147,29 +155,37 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
-  TextEditingController? _internalController;
-  FocusNode? _internalFocus;
+  late final OwnedTextEditingController _controllerOwner;
+  late final OwnedFocusNode _focusOwner;
 
-  TextEditingController get _controller =>
-      widget.controller ?? (_internalController ??= TextEditingController());
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  TextEditingController get _controller => _controllerOwner.value;
+  FocusNode get _focus => _focusOwner.value;
 
   @override
   void initState() {
     super.initState();
-    if (widget.controller == null) {
-      _internalController = TextEditingController(text: widget.initialValue);
-    }
-    _controller.addListener(_onChange);
-    _focus.addListener(_onChange);
+    _controllerOwner = OwnedTextEditingController(
+      external: widget.controller,
+      initialText: widget.initialValue,
+      onChanged: _onChange,
+    );
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _onChange,
+    );
+  }
+
+  @override
+  void didUpdateWidget(CarbonTextArea oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _controllerOwner.update(widget.controller);
+    _focusOwner.update(widget.focusNode);
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onChange);
-    _focus.removeListener(_onChange);
-    _internalController?.dispose();
-    _internalFocus?.dispose();
+    _controllerOwner.dispose();
+    _focusOwner.dispose();
     super.dispose();
   }
 
@@ -206,6 +222,7 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: widget.labelText,
+        enabled: !widget.disabled,
         child: Stack(
           children: <Widget>[
             if (widget.placeholder != null && _controller.text.isEmpty)
@@ -220,6 +237,7 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
             EditableText(
               controller: _controller,
               focusNode: _focus,
+              selectAllOnFocus: _focusOwner.selectAllOnFocus,
               readOnly: !enabled,
               autofocus: widget.autofocus,
               onChanged: widget.onChanged,
@@ -297,17 +315,20 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
         ],
       );
     }
-    if (_focus.hasFocus) {
-      box = CarbonFocusRing(visible: true, child: box);
-    } else if (invalid) {
-      box = DecoratedBox(
+    // Keep the editor's ancestors stable when focus or validation changes;
+    // replacing this wrapper would remount EditableText and close its input.
+    box = CarbonFocusRing(
+      visible: _focus.hasFocus,
+      child: DecoratedBox(
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
-          border: Border.all(color: theme.supportError, width: 2),
+          border: invalid && !_focus.hasFocus
+              ? Border.all(color: theme.supportError, width: 2)
+              : null,
         ),
         child: box,
-      );
-    }
+      ),
+    );
 
     final Widget? message = widget.invalid && widget.invalidText != null
         ? CarbonFieldRequirement(widget.invalidText!)

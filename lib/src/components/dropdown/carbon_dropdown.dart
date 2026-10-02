@@ -21,6 +21,7 @@ import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 import '../list_box/carbon_list_box.dart';
 
@@ -161,7 +162,11 @@ class CarbonDropdown<T> extends StatefulWidget {
   /// keep the standard height (`--list-box__wrapper--fluid--condensed`).
   final bool condensed;
 
-  /// An optional external focus node for the trigger.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to autofocus the trigger.
@@ -178,8 +183,8 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
 
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
-  FocusNode? _internalFocus;
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  late final OwnedFocusNode _focusOwner;
+  FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
   double _triggerWidth = 0;
 
@@ -195,7 +200,10 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_rebuild);
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _rebuild,
+    );
   }
 
   void _rebuild() {
@@ -203,9 +211,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   @override
+  void didUpdateWidget(CarbonDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _focusOwner.update(widget.focusNode);
+  }
+
+  @override
   void dispose() {
-    _focus.removeListener(_rebuild);
-    _internalFocus?.dispose();
+    _focusOwner.dispose();
     super.dispose();
   }
 

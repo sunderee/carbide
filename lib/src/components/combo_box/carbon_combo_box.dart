@@ -22,6 +22,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 import '../list_box/carbon_list_box.dart';
 
@@ -132,7 +133,11 @@ class CarbonComboBox<T> extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional external focus node for the input.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   @override
@@ -147,8 +152,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final TextEditingController _controller;
-  FocusNode? _internalFocus;
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  late final OwnedFocusNode _focusOwner;
+  FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
   double _triggerWidth = 0;
   bool _hovered = false;
@@ -173,12 +178,16 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: _selected?.label ?? '');
-    _focus.addListener(_onFocusChange);
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _onFocusChange,
+    );
   }
 
   @override
   void didUpdateWidget(CarbonComboBox<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _focusOwner.update(widget.focusNode);
     if (widget.selectedItem != oldWidget.selectedItem) {
       final String text = _selected?.label ?? '';
       if (text != _controller.text) _controller.text = text;
@@ -187,8 +196,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   @override
   void dispose() {
-    _focus.removeListener(_onFocusChange);
-    _internalFocus?.dispose();
+    _focusOwner.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -296,7 +304,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
           return OverlayPortal(
             controller: _overlay,
             overlayChildBuilder: _buildMenu,
-            child: _buildField(context),
+            child: TapRegion(groupId: this, child: _buildField(context)),
           );
         },
       ),
@@ -348,86 +356,100 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         ? Border.all(color: theme.supportError, width: 2)
         : Border(bottom: BorderSide(color: borderColor));
 
-    final Widget editable = _ComboInput(
-      controller: _controller,
-      focusNode: _focus,
-      enabled: enabled,
-      placeholder: widget.placeholder,
-      style: CarbonTypeStyles.bodyCompact01.copyWith(
-        color: widget.disabled ? theme.textDisabled : theme.textPrimary,
-      ),
-      placeholderColor: theme.textPlaceholder,
-      cursorColor: theme.focus,
-      onChanged: _onText,
-    );
-
-    return MergeSemantics(
+    final Widget editable = MergeSemantics(
       child: Semantics(
         textField: true,
         label: widget.titleText,
-        child: Focus(
-          // Intercepts navigation keys before the editor's text actions; an
-          // ancestor onKeyEvent runs before Shortcuts/Actions.
-          canRequestFocus: false,
-          skipTraversal: true,
-          onKeyEvent: _onKey,
-          child: MouseRegion(
-            onEnter: (_) => setState(() => _hovered = true),
-            onExit: (_) => setState(() => _hovered = false),
-            child: CarbonFocusRing(
-              visible: focused,
-              inset: true,
-              child: AnimatedContainer(
-                duration: CarbonDuration.fast01,
-                curve: CarbonEasing.standardProductive,
-                height: _fluid ? 64 : widget.size.height,
-                decoration: BoxDecoration(
-                  color: background,
-                  gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
-                  border: border,
-                ),
-                padding: const EdgeInsetsDirectional.only(
-                  start: CarbonSpacing.spacing05,
-                  end: CarbonSpacing.spacing04,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      // Fluid stacks the label-01 title above the input
-                      // (the house centered-column fluid treatment).
-                      child: _fluid
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                ExcludeSemantics(
-                                  child: Text(
-                                    widget.titleText,
-                                    style: CarbonTypeStyles.label01.copyWith(
-                                      color: widget.disabled
-                                          ? theme.textDisabled
-                                          : theme.textSecondary,
-                                    ),
+        enabled: enabled,
+        child: _ComboInput(
+          controller: _controller,
+          focusNode: _focus,
+          selectAllOnFocus: _focusOwner.selectAllOnFocus,
+          enabled: enabled,
+          placeholder: widget.placeholder,
+          style: CarbonTypeStyles.bodyCompact01.copyWith(
+            color: widget.disabled ? theme.textDisabled : theme.textPrimary,
+          ),
+          placeholderColor: theme.textPlaceholder,
+          cursorColor: theme.focus,
+          onChanged: _onText,
+        ),
+      ),
+    );
+
+    // Keep menu controls separate from the native text input. Merging their
+    // tap actions into it would make clicking the input toggle the menu.
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      child: Focus(
+        // Intercepts navigation keys before the editor's text actions; an
+        // ancestor onKeyEvent runs before Shortcuts/Actions.
+        canRequestFocus: false,
+        skipTraversal: true,
+        onKeyEvent: _onKey,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: CarbonFocusRing(
+            visible: focused,
+            inset: true,
+            child: AnimatedContainer(
+              duration: CarbonDuration.fast01,
+              curve: CarbonEasing.standardProductive,
+              height: _fluid ? 64 : widget.size.height,
+              decoration: BoxDecoration(
+                color: background,
+                gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
+                border: border,
+              ),
+              padding: const EdgeInsetsDirectional.only(
+                start: CarbonSpacing.spacing05,
+                end: CarbonSpacing.spacing04,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    // Fluid stacks the label-01 title above the input
+                    // (the house centered-column fluid treatment).
+                    child: _fluid
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              ExcludeSemantics(
+                                child: Text(
+                                  widget.titleText,
+                                  style: CarbonTypeStyles.label01.copyWith(
+                                    color: widget.disabled
+                                        ? theme.textDisabled
+                                        : theme.textSecondary,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                editable,
-                              ],
-                            )
-                          : editable,
-                    ),
-                    if (_controller.text.isNotEmpty && enabled) ...<Widget>[
-                      const SizedBox(width: CarbonSpacing.spacing03),
-                      CarbonListBoxSelection(onClear: _clear),
-                    ],
-                    // The AI label sits before the menu chevron
-                    // (`_list-box.scss` decorator placement).
-                    if (widget.aiLabel != null) ...<Widget>[
-                      const SizedBox(width: CarbonSpacing.spacing03),
-                      widget.aiLabel!,
-                    ],
+                              ),
+                              const SizedBox(height: 2),
+                              editable,
+                            ],
+                          )
+                        : editable,
+                  ),
+                  if (_controller.text.isNotEmpty && enabled) ...<Widget>[
                     const SizedBox(width: CarbonSpacing.spacing03),
-                    GestureDetector(
+                    CarbonListBoxSelection(onClear: _clear),
+                  ],
+                  // The AI label sits before the menu chevron
+                  // (`_list-box.scss` decorator placement).
+                  if (widget.aiLabel != null) ...<Widget>[
+                    const SizedBox(width: CarbonSpacing.spacing03),
+                    widget.aiLabel!,
+                  ],
+                  const SizedBox(width: CarbonSpacing.spacing03),
+                  Semantics(
+                    button: true,
+                    enabled: enabled,
+                    expanded: _overlay.isShowing,
+                    label: widget.titleText,
+                    child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: enabled
                           ? () {
@@ -440,8 +462,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                         disabled: widget.disabled,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -465,6 +487,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         followerAnchor: Alignment.topLeft,
         showWhenUnlinked: false,
         child: TapRegion(
+          groupId: this,
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
             child: CarbonListBoxMenu(
@@ -499,6 +522,7 @@ class _ComboInput extends StatelessWidget {
   const _ComboInput({
     required this.controller,
     required this.focusNode,
+    required this.selectAllOnFocus,
     required this.enabled,
     required this.placeholder,
     required this.style,
@@ -509,6 +533,7 @@ class _ComboInput extends StatelessWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool? selectAllOnFocus;
   final bool enabled;
   final String? placeholder;
   final TextStyle style;
@@ -535,6 +560,7 @@ class _ComboInput extends StatelessWidget {
         EditableText(
           controller: controller,
           focusNode: focusNode,
+          selectAllOnFocus: selectAllOnFocus,
           readOnly: !enabled,
           onChanged: onChanged,
           style: style,

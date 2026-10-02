@@ -122,3 +122,11 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/tabs_release_contract_test.dart
           -d web-server
+
+      - name: Drive form ownership and native input test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/form_ownership_test.dart
+          -d web-server

@@ -23,6 +23,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
+import '../../utils/owned_listenable.dart';
 import '../../utils/scroll_into_view.dart';
 import '../form/carbon_form.dart';
 
@@ -145,7 +146,11 @@ class CarbonSelect<T> extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.
@@ -162,8 +167,8 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
 
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
-  FocusNode? _internalFocus;
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  late final OwnedFocusNode _focusOwner;
+  FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
   double _triggerWidth = 0;
 
@@ -187,7 +192,10 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_rebuild);
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _rebuild,
+    );
   }
 
   void _rebuild() {
@@ -197,9 +205,14 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   }
 
   @override
+  void didUpdateWidget(CarbonSelect<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _focusOwner.update(widget.focusNode);
+  }
+
+  @override
   void dispose() {
-    _focus.removeListener(_rebuild);
-    _internalFocus?.dispose();
+    _focusOwner.dispose();
     super.dispose();
   }
 

@@ -147,6 +147,31 @@ void main() {
   });
 
   group('keyboard', () {
+    testWidgets('field taps stay inside the open menu session', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode focus = FocusNode();
+      addTearDown(focus.dispose);
+      await tester.pumpWidget(
+        TapRegionSurface(
+          child: ColoredBox(
+            color: const Color(0xFFFFFFFF),
+            child: combo(focusNode: focus),
+          ),
+        ),
+      );
+      focus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonListBoxMenu), findsOneWidget);
+      await tester.tap(find.byType(EditableText));
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonListBoxMenu), findsOneWidget);
+      expect(focus.hasFocus, isTrue);
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      expect(find.byType(CarbonListBoxMenu), findsNothing);
+    });
+
     testWidgets('Down opens; arrows move; Enter selects highlighted', (
       WidgetTester tester,
     ) async {
@@ -210,8 +235,16 @@ void main() {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(combo());
       expect(
-        tester.getSemantics(find.bySemanticsLabel('Fruit')),
+        tester.getSemantics(find.byType(EditableText)),
         isSemantics(label: 'Fruit', isTextField: true),
+      );
+      expect(
+        tester.getSemantics(find.byType(CarbonListBoxMenuIcon)),
+        isSemantics(label: 'Fruit', isButton: true, hasTapAction: true),
+      );
+      expect(
+        tester.getSemantics(find.byType(EditableText)).id,
+        isNot(tester.getSemantics(find.byType(CarbonListBoxMenuIcon)).id),
       );
       handle.dispose();
     });
