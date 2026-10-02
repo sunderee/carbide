@@ -140,17 +140,49 @@ void main() {
           ),
         ),
       );
-      // Interactive steps currently expose no SemanticsAction.tap (the
-      // GestureDetector sits inside the step's ExcludeSemantics and the
-      // outer Semantics has no onTap — TODO(#226)), so the guidelines
-      // have no step node to measure yet; the gate still guards every
-      // node that does expose a tap action.
       await expectA11y(tester);
       handle.dispose();
     });
   });
 
   group('goldens', () {
+    testWidgets('interactive horizontal and vertical focus across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'progress_indicator_interactive',
+        containsText: true,
+        size: const Size(560, 440),
+        builder: (BuildContext context) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              CarbonProgressIndicator(
+                steps: _steps,
+                currentIndex: 1,
+                interactive: true,
+                onStepSelected: (_) {},
+              ),
+              const SizedBox(height: 32),
+              CarbonProgressIndicator(
+                steps: _steps,
+                currentIndex: 1,
+                vertical: true,
+                interactive: true,
+                onStepSelected: (_) {},
+              ),
+            ],
+          ),
+        ),
+        afterPump: (WidgetTester tester) async {
+          Focus.of(tester.element(find.text('Account').first)).requestFocus();
+          await tester.pumpAndSettle();
+        },
+      );
+    });
+
     testWidgets('horizontal + vertical across themes', (
       WidgetTester tester,
     ) async {

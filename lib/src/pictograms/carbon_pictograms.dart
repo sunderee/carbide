@@ -1630,14 +1630,14 @@ abstract final class CarbonPictograms {
   /// The Carbon `event--streams--02` pictogram.
   static const CarbonIconData eventStreams02 = e_.eventStreams02;
 
-  /// The Carbon `expand--horz` pictogram.
-  static const CarbonIconData expandHorz = e_.expandHorz;
+  /// The Carbon `expand--horizontal` pictogram.
+  static const CarbonIconData expandHorizontal = e_.expandHorizontal;
 
   /// The Carbon `expand--user` pictogram.
   static const CarbonIconData expandUser = e_.expandUser;
 
-  /// The Carbon `expand--vert` pictogram.
-  static const CarbonIconData expandVert = e_.expandVert;
+  /// The Carbon `expand--vertical` pictogram.
+  static const CarbonIconData expandVertical = e_.expandVertical;
 
   /// The Carbon `expansion` pictogram.
   static const CarbonIconData expansion = e_.expansion;
@@ -2277,6 +2277,9 @@ abstract final class CarbonPictograms {
   /// The Carbon `ibm--bob` pictogram.
   static const CarbonIconData ibmBob = i_.ibmBob;
 
+  /// The Carbon `ibm--champion-star` pictogram.
+  static const CarbonIconData ibmChampionStar = i_.ibmChampionStar;
+
   /// The Carbon `ibm--cloud` pictogram.
   static const CarbonIconData ibmCloud = i_.ibmCloud;
 
@@ -2489,6 +2492,9 @@ abstract final class CarbonPictograms {
 
   /// The Carbon `intercom` pictogram.
   static const CarbonIconData intercom = i_.intercom;
+
+  /// The Carbon `international--standard` pictogram.
+  static const CarbonIconData internationalStandard = i_.internationalStandard;
 
   /// The Carbon `internet-of-things` pictogram.
   static const CarbonIconData internetOfThings = i_.internetOfThings;
@@ -4581,6 +4587,12 @@ abstract final class CarbonPictograms {
   /// The Carbon `unify--endpoint--management` pictogram.
   static const CarbonIconData unifyEndpointManagement =
       u_.unifyEndpointManagement;
+
+  /// The Carbon `union` pictogram.
+  static const CarbonIconData union = u_.union;
+
+  /// The Carbon `union--act` pictogram.
+  static const CarbonIconData unionAct = u_.unionAct;
 
   /// The Carbon `united-governance` pictogram.
   static const CarbonIconData unitedGovernance = u_.unitedGovernance;

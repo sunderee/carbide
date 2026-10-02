@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Update Carbon references to v11.117.0 and regenerate tokens, icons, pictograms,
+  and Storybook references; adapt generators to upstream DTCG sources.
+- Make data-table selectors activatable through assistive technology, preserve
+  mixed/disabled state, and hide and clip inactive batch actions (#292).
+- Add keyboard and assistive-technology activation to progress steps, with
+  announced states and keyboard focus highlighting in both layouts (#293).
+- Validate tab/panel contracts and safely reconcile selection in both tab
+  layouts, including release builds (#294). Tab constructors are no longer
+  const because list-length assertions require runtime evaluation.
+
 # 0.4.2
 
 Change repository links to new owner, and adjust analysis options.

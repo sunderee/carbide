@@ -1,86 +1,29 @@
 #!/usr/bin/env python3
-"""Generate Carbide's theme tokens from the pinned Carbon source.
+"""Generate the ported Carbon theme tokens from authoritative DTCG JSON.
 
-Reads the four Carbon theme files (Apache-2.0) and emits:
-  - lib/src/theme/carbon_theme_data.dart   (`CarbonThemeData` + 4 built-ins)
-  - test/theme/carbon_theme_data_test.dart (an exhaustive value lock)
+Reads themes/src/dtcg/themes.json and the button, tag, and notification
+component files. Resolves palette/theme aliases, per-theme alpha modifiers,
+and DTCG color objects into CarbonThemeData and exhaustive value tests.
+The public token subset stays stable: syntax, other chat tokens, status, and
+content-switcher remain outside this generator's scope.
 
-Ported token groups:
-- the core semantic color tokens: the region from `colorScheme` up to (but
-  not including) the syntax-highlighting section;
-- the button, tag, and notification component tokens
-  (themes/src/component-tokens/{button,tag,notification}/tokens.ts), folded
-  into CarbonThemeData exactly as Carbon v11 folds component tokens into the
-  theme zone. The notification tokens reference the button tertiary tokens
-  cross-theme (an inverse notification surface hosts the "opposite" theme's
-  tertiary button) and per-theme core tokens via aliased imports
-  (`textInverse as textInverseG100`, …); both forms are resolved here. The
-  `notificationActionHover` block omits g90/g100 upstream — the SCSS overlay
-  (styles/scss/components/notification/_tokens.scss) supplies
-  `theme.$layer-hover` for those themes, which is mirrored in
-  MISSING_KEY_CORE_FALLBACKS;
-- the AI token group (the `ai-*` tokens between `//// AI - Experimental` and
-  `// Chat tokens`): gradient stops (aura/border), popover, skeleton, and caret
-  colors. These are flat `Color`s — the gradients and shadows are composed by
-  the consuming component (AI Label) from the stop colors.
-- the chat-button token subset (`chatButton*` from the `// Chat button
-  tokens` region) — the only chat tokens a shipped component (Chat Button)
-  consumes; the rest of the chat family stays out of scope.
-
-Syntax-highlighting and chat tokens, the remaining component-token groups
-(status, content-switcher — ported with their components), and the
-type/layout re-exports are out of scope here.
-
-Run from the repository root:  python3 tool/generate_carbon_themes.py
-Re-run when bumping the Carbon submodule; review the diff.
+Run from the repository root: python3 tool/generate_carbon_themes.py
 """
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
+from generate_carbon_colors import parse as parse_colors
+
 ROOT = Path(__file__).resolve().parent.parent
-COLORS_SRC = ROOT / "documentation/carbon/packages/colors/src/colors.ts"
 THEME_DIR = ROOT / "documentation/carbon/packages/themes/src"
 THEMES = {"white": "white", "gray10": "g10", "gray90": "g90", "gray100": "g100"}
 TITLES = {"white": "White", "gray10": "Gray 10", "gray90": "Gray 90", "gray100": "Gray 100"}
 LIB_OUT = ROOT / "lib/src/theme/carbon_theme_data.dart"
 TEST_OUT = ROOT / "test/theme/carbon_theme_data_test.dart"
-
-EXPORT = re.compile(r"^export const (\w+) = (.+);$", re.M)
-ALPHA_CALL = re.compile(r"^(?:adjustAlpha|rgba)\(\s*(\w+)\s*,\s*([\d.]+)\s*\)$")
-LIGHTNESS = re.compile(r"^adjustLightness\(\s*(\w+)\s*,\s*(-?[\d.]+)\s*\)$")
-RGBA_STR = re.compile(r"^'rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)'$")
-HEX_LITERAL = re.compile(r"^'#([0-9a-fA-F]{6})'$")
-
-# Component-token sources folded into the theme (Carbon v11 semantics).
-# Order matters: notification/tokens.ts references buttonTertiary* blocks,
-# so button/tokens.ts must be parsed first.
-COMPONENT_TOKEN_FILES = (
-    THEME_DIR / "component-tokens/button/tokens.ts",
-    THEME_DIR / "component-tokens/tag/tokens.ts",
-    THEME_DIR / "component-tokens/notification/tokens.ts",
-)
-COMPONENT_THEME_KEYS = {
-    "white": "whiteTheme",
-    "gray10": "g10",
-    "gray90": "g90",
-    "gray100": "g100",
-}
-# Aliased per-theme core-token imports used by notification/tokens.ts
-# (`textInverse as textInverseG100`, …). Suffix → theme field.
-ALIAS_THEMES = {"White": "white", "G10": "gray10", "G90": "gray90", "G100": "gray100"}
-# Keys a component-token block omits upstream, filled from the theme's own
-# core tokens per the SCSS overlay in
-# styles/scss/components/notification/_tokens.scss (theme.$layer-hover).
-MISSING_KEY_CORE_FALLBACKS = {
-    ("notificationActionHover", "gray90"): "layerHover01",
-    ("notificationActionHover", "gray100"): "layerHover01",
-}
-CONST_BLOCK = re.compile(r"^(?:export )?const (\w+) = \{([^}]*)\};", re.M)
-BLOCK_ENTRY = re.compile(r"(\w+):\s*([^,\n]+)")
-RGB_SLASH = re.compile(r"^rgb\((\d+)\s+(\d+)\s+(\d+)\s*/\s*(\d+)%\)$")
 
 HEADER = """// Copyright 2026 Bizjak Tech OÜ
 //
@@ -93,209 +36,251 @@ HEADER = """// Copyright 2026 Bizjak Tech OÜ
 // Design System (@carbon/themes). See the NOTICE file for attribution.
 """
 
+# Explicit public subset and ordering; expand deliberately when porting a group.
+PORTED_TOKENS = [
+    'background',
+    'backgroundInverse',
+    'backgroundBrand',
+    'backgroundActive',
+    'backgroundHover',
+    'backgroundInverseHover',
+    'backgroundSelected',
+    'backgroundSelectedHover',
+    'layer01',
+    'layerActive01',
+    'layerBackground01',
+    'layerHover01',
+    'layerSelected01',
+    'layerSelectedHover01',
+    'layer02',
+    'layerActive02',
+    'layerBackground02',
+    'layerHover02',
+    'layerSelected02',
+    'layerSelectedHover02',
+    'layer03',
+    'layerActive03',
+    'layerBackground03',
+    'layerHover03',
+    'layerSelected03',
+    'layerSelectedHover03',
+    'layerSelectedInverse',
+    'layerSelectedDisabled',
+    'layerAccent01',
+    'layerAccentActive01',
+    'layerAccentHover01',
+    'layerAccent02',
+    'layerAccentActive02',
+    'layerAccentHover02',
+    'layerAccent03',
+    'layerAccentActive03',
+    'layerAccentHover03',
+    'field01',
+    'fieldHover01',
+    'field02',
+    'fieldHover02',
+    'field03',
+    'fieldHover03',
+    'borderSubtle00',
+    'borderSubtle01',
+    'borderSubtleSelected01',
+    'borderSubtle02',
+    'borderSubtleSelected02',
+    'borderSubtle03',
+    'borderSubtleSelected03',
+    'borderStrong01',
+    'borderStrong02',
+    'borderStrong03',
+    'borderTile01',
+    'borderTile02',
+    'borderTile03',
+    'borderInverse',
+    'borderInteractive',
+    'borderDisabled',
+    'textPrimary',
+    'textSecondary',
+    'textPlaceholder',
+    'textHelper',
+    'textError',
+    'textInverse',
+    'textOnColor',
+    'textOnColorDisabled',
+    'textDisabled',
+    'linkPrimary',
+    'linkPrimaryHover',
+    'linkSecondary',
+    'linkInverse',
+    'linkVisited',
+    'linkInverseVisited',
+    'linkInverseActive',
+    'linkInverseHover',
+    'iconPrimary',
+    'iconSecondary',
+    'iconInverse',
+    'iconOnColor',
+    'iconOnColorDisabled',
+    'iconDisabled',
+    'iconInteractive',
+    'supportError',
+    'supportSuccess',
+    'supportWarning',
+    'supportInfo',
+    'supportErrorInverse',
+    'supportSuccessInverse',
+    'supportWarningInverse',
+    'supportInfoInverse',
+    'supportCautionMinor',
+    'supportCautionMajor',
+    'supportCautionUndefined',
+    'focus',
+    'focusInset',
+    'focusInverse',
+    'skeletonBackground',
+    'skeletonElement',
+    'interactive',
+    'highlight',
+    'overlay',
+    'toggleOff',
+    'shadow',
+    'buttonSeparator',
+    'buttonPrimary',
+    'buttonSecondary',
+    'buttonTertiary',
+    'buttonDangerPrimary',
+    'buttonDangerSecondary',
+    'buttonDangerActive',
+    'buttonPrimaryActive',
+    'buttonSecondaryActive',
+    'buttonTertiaryActive',
+    'buttonDangerHover',
+    'buttonPrimaryHover',
+    'buttonSecondaryHover',
+    'buttonTertiaryHover',
+    'buttonDisabled',
+    'tagBackgroundRed',
+    'tagColorRed',
+    'tagHoverRed',
+    'tagBackgroundMagenta',
+    'tagColorMagenta',
+    'tagHoverMagenta',
+    'tagBackgroundPurple',
+    'tagColorPurple',
+    'tagHoverPurple',
+    'tagBackgroundBlue',
+    'tagColorBlue',
+    'tagHoverBlue',
+    'tagBackgroundCyan',
+    'tagColorCyan',
+    'tagHoverCyan',
+    'tagBackgroundTeal',
+    'tagColorTeal',
+    'tagHoverTeal',
+    'tagBackgroundGreen',
+    'tagColorGreen',
+    'tagHoverGreen',
+    'tagBackgroundGray',
+    'tagColorGray',
+    'tagHoverGray',
+    'tagBackgroundCoolGray',
+    'tagColorCoolGray',
+    'tagHoverCoolGray',
+    'tagBackgroundWarmGray',
+    'tagColorWarmGray',
+    'tagHoverWarmGray',
+    'tagBorderRed',
+    'tagBorderBlue',
+    'tagBorderCyan',
+    'tagBorderTeal',
+    'tagBorderGreen',
+    'tagBorderMagenta',
+    'tagBorderPurple',
+    'tagBorderGray',
+    'tagBorderCoolGray',
+    'tagBorderWarmGray',
+    'notificationBackgroundError',
+    'notificationBackgroundSuccess',
+    'notificationBackgroundInfo',
+    'notificationBackgroundWarning',
+    'notificationActionHover',
+    'notificationActionTertiaryInverse',
+    'notificationActionTertiaryInverseActive',
+    'notificationActionTertiaryInverseHover',
+    'notificationActionTertiaryInverseText',
+    'notificationActionTertiaryInverseTextOnColorDisabled',
+    'aiInnerShadow',
+    'aiAuraStartSm',
+    'aiAuraStart',
+    'aiAuraEnd',
+    'aiBorderStrong',
+    'aiBorderStart',
+    'aiBorderEnd',
+    'aiDropShadow',
+    'aiAuraHoverBackground',
+    'aiAuraHoverStart',
+    'aiAuraHoverEnd',
+    'aiPopoverBackground',
+    'aiPopoverShadowOuter01',
+    'aiPopoverShadowOuter02',
+    'aiSkeletonBackground',
+    'aiSkeletonElementBackground',
+    'aiOverlay',
+    'aiPopoverCaretCenter',
+    'aiPopoverCaretBottom',
+    'aiPopoverCaretBottomBackgroundActions',
+    'aiPopoverCaretBottomBackground',
+    'chatButton',
+    'chatButtonHover',
+    'chatButtonTextHover',
+    'chatButtonActive',
+    'chatButtonSelected',
+    'chatButtonTextSelected',
+]
 
-def color_values() -> dict[str, str]:
-    """Map every Carbon color name to its `RRGGBB` hex (aliases resolved)."""
-    text = COLORS_SRC.read_text()
-    values: dict[str, str] = {}
-    for line in text.splitlines():
-        m = re.match(r"^export const (\w+) = '#([0-9a-fA-F]{6})';$", line)
-        if m:
-            values[m.group(1)] = m.group(2).upper()
-            continue
-        m = re.match(r"^export const (\w+) = (\w+);$", line)
-        if m and m.group(2) in values:
-            values[m.group(1)] = values[m.group(2)]
-    return values
+
+def camel(path: str) -> str:
+    return re.sub(r"[.-]([a-z0-9])", lambda match: match[1].upper(), path)
 
 
-def adjust_lightness(hexv: str, shift: float) -> str:
-    """Replicate @carbon/themes `adjustLightness` (via the JS `color` lib).
+def flatten_tokens(node: dict, path: tuple = ()) -> dict:
+    """Keep dual-role nodes: a token may also contain child tokens."""
+    tokens = {}
+    if "carbon.themes" in node.get("$extensions", {}):
+        tokens[".".join(path)] = node
+    for key, child in node.items():
+        if not key.startswith("$") and isinstance(child, dict):
+            tokens.update(flatten_tokens(child, (*path, key)))
+    return tokens
 
-    The key subtlety is that the lib rounds the HSL channels *before* converting
-    back to RGB, so a naive HSLColor round-trip would differ by one step.
-    """
-    r, g, b = (int(hexv[i : i + 2], 16) / 255 for i in (0, 2, 4))
-    high, low = max(r, g, b), min(r, g, b)
-    lightness = (high + low) / 2
-    saturation = 0.0
-    hue = 0.0
-    if high != low:
-        delta = high - low
-        saturation = (
-            delta / (2 - high - low) if lightness > 0.5 else delta / (high + low)
-        )
-        if high == r:
-            hue = (g - b) / delta + (6 if g < b else 0)
-        elif high == g:
-            hue = (b - r) / delta + 2
+
+def resolve_token(path, theme, tokens, palette, visiting=()):
+    if path in visiting:
+        raise ValueError(f"cyclic token reference: {path}")
+    extensions = tokens[path]["$extensions"]
+    values = extensions["carbon.themes"]
+    if theme not in values:
+        # _notification.scss supplies layer-hover on dark action surfaces.
+        if path != "notification.action-hover" or theme not in ("g90", "g100"):
+            raise ValueError(f"missing {theme} value for {path}")
+        return resolve_token("layer.hover.01", theme, tokens, palette, (*visiting, path))
+    value = values[theme]
+    alpha = extensions.get("org.carbon", {}).get("alphaModifiers", {}).get(theme)
+    if isinstance(value, dict):
+        alpha = value.get("alpha", alpha)
+        value = value["value"] if "value" in value else value["hex"]
+    if value.startswith("{"):
+        reference = value[1:-1]
+        name = camel(reference.replace(".default", ""))
+        if name in palette:
+            result = f"CarbonColors.{name}"
         else:
-            hue = (r - g) / delta + 4
-        hue /= 6
-    hue, saturation, lightness = (
-        round(hue * 360),
-        round(saturation * 100),
-        round(lightness * 100 + shift),
-    )
-    h, s, light = hue / 360, saturation / 100, lightness / 100
-    if s == 0:
-        channels = [light, light, light]
+            result = resolve_token(reference, theme, tokens, palette, (*visiting, path))
     else:
-        q = light * (1 + s) if light < 0.5 else light + s - light * s
-        p = 2 * light - q
-        channels = []
-        for t in (h + 1 / 3, h, h - 1 / 3):
-            t = t % 1
-            if t < 1 / 6:
-                channels.append(p + (q - p) * 6 * t)
-            elif t < 1 / 2:
-                channels.append(q)
-            elif t < 2 / 3:
-                channels.append(p + (q - p) * (2 / 3 - t) * 6)
-            else:
-                channels.append(p)
-    return "".join(f"{round(c * 255):02X}" for c in channels)
-
-
-def hex_to_name(values: dict[str, str]) -> dict[str, str]:
-    """Reverse palette map preferring canonical (non-Hover) names."""
-    reverse: dict[str, str] = {}
-    for name, hexv in values.items():
-        if "Hover" not in name:
-            reverse.setdefault(hexv, name)
-    return reverse
-
-
-def parse_component_tokens(colors: set, reverse: dict, core_resolved: dict):
-    """Returns (order, {field: {token: dart_expr}}) for the component files.
-
-    [core_resolved] maps theme field → {core token: dart expr}; it backs the
-    theme-suffixed aliases (`textInverseG100`) and the missing-key fallbacks.
-    """
-    order: list[str] = []
-    resolved: dict[str, dict[str, str]] = {f: {} for f in THEMES}
-    blocks: dict[str, dict[str, str]] = {}
-
-    def expr(raw: str) -> str:
-        raw = raw.strip().rstrip(",").strip()
-        if raw.startswith("'") and raw.endswith("'"):
-            inner = raw.strip("'")
-            m = RGB_SLASH.match(inner)
-            if m:
-                r, g, b, pct = m.groups()
-                return f"const Color.fromRGBO({r}, {g}, {b}, {int(pct) / 100})"
-            assert inner.startswith("#"), f"unexpected literal: {inner}"
-            hexv = inner.lstrip("#").upper()
-            name = reverse.get(hexv)
-            return f"CarbonColors.{name}" if name else f"const Color(0xFF{hexv})"
-        m = re.fullmatch(r"(\w+)\.(\w+)", raw)
-        if m:
-            # Member access into an earlier block (buttonTertiary.g100).
-            block, key = m.group(1), m.group(2)
-            return expr(blocks[block][key])
-        assert re.fullmatch(r"\w+", raw), f"unhandled expr: {raw}"
-        if raw in colors:
-            return f"CarbonColors.{raw}"
-        m = re.fullmatch(r"(\w+?)(White|G10|G90|G100)", raw)
-        if m and m.group(1) in core_resolved[ALIAS_THEMES[m.group(2)]]:
-            # A theme-suffixed core-token alias (textInverseG100).
-            return core_resolved[ALIAS_THEMES[m.group(2)]][m.group(1)]
-        raise ValueError(f"unknown identifier: {raw}")
-
-    for path in COMPONENT_TOKEN_FILES:
-        for m in CONST_BLOCK.finditer(path.read_text()):
-            name, body = m.group(1), m.group(2)
-            entries = dict(BLOCK_ENTRY.findall(body))
-            blocks[name] = entries
-            order.append(name)
-            for field, key in COMPONENT_THEME_KEYS.items():
-                if key in entries:
-                    resolved[field][name] = expr(entries[key])
-                else:
-                    core = MISSING_KEY_CORE_FALLBACKS[(name, field)]
-                    resolved[field][name] = core_resolved[field][core]
-    return order, resolved
-
-
-def core_region(theme_file: Path) -> dict[str, str]:
-    text = theme_file.read_text()
-    region = text[: text.index("// Syntax highlighting")]
-    return {m.group(1): m.group(2).strip() for m in EXPORT.finditer(region)}
-
-
-AI_MARKERS = ("//// AI - Experimental", "// Chat tokens")
-CHAT_BUTTON_MARKER = "// Chat button tokens"
-
-
-def chat_button_region(theme_file: Path) -> dict[str, str]:
-    """Parse the `chatButton*` tokens (the shipped Chat Button subset)."""
-    text = theme_file.read_text()
-    region = text[text.index(CHAT_BUTTON_MARKER) :]
-    return {
-        m.group(1): m.group(2).strip()
-        for m in EXPORT.finditer(region)
-        if m.group(1).startswith("chatButton")
-    }
-
-
-def ai_region(theme_file: Path) -> dict[str, str]:
-    """Parse the AI token group (aura/border stops, popover, skeleton, caret).
-
-    Spans `//// AI - Experimental` up to `// Chat tokens`, so the chat-* tokens
-    (the out-of-scope chat family) are excluded.
-    """
-    text = theme_file.read_text()
-    start, end = (text.index(marker) for marker in AI_MARKERS)
-    return {
-        m.group(1): m.group(2).strip()
-        for m in EXPORT.finditer(text[start:end])
-    }
-
-
-def num(value: str) -> str:
-    return value if "." in value else f"{value}.0"
-
-
-def resolve(expr, tokens, colors, values) -> str:
-    m = HEX_LITERAL.match(expr)
-    if m:
-        return f"const Color(0xFF{m.group(1).upper()})"
-    m = RGBA_STR.match(expr)
-    if m:
-        r, g, b, a = m.groups()
-        return f"const Color.fromRGBO({r}, {g}, {b}, {num(a)})"
-    m = LIGHTNESS.match(expr)
-    if m:
-        base = resolve_color(m.group(1), tokens, colors, values)
-        hexv = values[base.split(".")[1]]
-        return f"const Color(0xFF{adjust_lightness(hexv, float(m.group(2)))})"
-    m = ALPHA_CALL.match(expr)
-    if m:
-        base = resolve_color(m.group(1), tokens, colors, values)
-        return f"_alpha({base}, {num(m.group(2))})"
-    if re.fullmatch(r"\w+", expr):
-        # A bare reference: a palette color, or another token — which may
-        # itself be an alpha/lightness composition (e.g. chatButtonHover →
-        # backgroundHover → rgba(gray50, 0.12)), so recurse through the
-        # full resolver rather than the plain-color-only helper.
-        if expr in colors:
-            return f"CarbonColors.{expr}"
-        if expr in tokens:
-            return resolve(tokens[expr], tokens, colors, values)
-        raise ValueError(f"unknown identifier: {expr}")
-    raise ValueError(f"unhandled expr: {expr}")
-
-
-def resolve_color(ident, tokens, colors, values) -> str:
-    if ident in colors:
-        return f"CarbonColors.{ident}"
-    if ident in tokens:
-        resolved = resolve(tokens[ident], tokens, colors, values)
-        assert resolved.startswith("CarbonColors."), (
-            f"expected {ident} to resolve to a plain color, got {resolved}"
-        )
-        return resolved
-    raise ValueError(f"unknown identifier: {ident}")
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+            raise ValueError(f"unsupported color: {value}")
+        reverse = {hexv: name for name, hexv in reversed(list(palette.items())) if "Hover" not in name}
+        name = reverse.get(value[1:].upper())
+        result = f"CarbonColors.{name}" if name else f"const Color(0xFF{value[1:].upper()})"
+    return f"_alpha({result}, {float(alpha)})" if alpha is not None else result
 
 
 def section_of(name: str) -> str:
@@ -304,63 +289,20 @@ def section_of(name: str) -> str:
 
 
 def build():
-    colors = set(color_values())
-    values = color_values()
-    raw: dict[str, dict[str, str]] = {}
-    ai_raw: dict[str, dict[str, str]] = {}
-    chat_raw: dict[str, dict[str, str]] = {}
-    brightness: dict[str, str] = {}
-    for field, slug in THEMES.items():
-        region = core_region(THEME_DIR / f"{slug}.ts")
-        brightness[field] = "light" if region.pop("colorScheme").strip("'") == "light" else "dark"
-        raw[field] = region
-        ai_raw[field] = ai_region(THEME_DIR / f"{slug}.ts")
-        chat_raw[field] = chat_button_region(THEME_DIR / f"{slug}.ts")
-
-    order = list(raw["white"])
-    for field, region in raw.items():
-        assert set(region) == set(order), f"{field} token set differs"
-
-    ai_order = list(ai_raw["white"])
-    for field, region in ai_raw.items():
-        assert set(region) == set(ai_order), f"{field} AI token set differs"
-
+    tokens = {}
+    dtcg = THEME_DIR / "dtcg"
+    sources = [dtcg / "themes.json"]
+    sources += [dtcg / "components" / f"{name}.json" for name in ("button", "tag", "notification")]
+    for source in sources:
+        tokens.update(flatten_tokens(json.loads(source.read_text())))
+    paths = {camel(path): path for path in tokens}
+    palette = {name: argb[4:] for name, argb in parse_colors()}
     resolved = {
-        field: {n: resolve(region[n], region, colors, values) for n in order}
-        for field, region in raw.items()
+        field: {name: resolve_token(paths[name], slug, tokens, palette) for name in PORTED_TOKENS}
+        for field, slug in THEMES.items()
     }
-
-    component_order, component_resolved = parse_component_tokens(
-        colors, hex_to_name(values), resolved
-    )
-    order += component_order
-    for field in resolved:
-        resolved[field].update(component_resolved[field])
-
-    # AI tokens last (the newest, experimental group). A few reference a core
-    # semantic token (e.g. aiAuraHoverBackground → layerHover01), so resolve
-    # against the combined core+AI space; all bottom out at palette colors or
-    # hex literals.
-    for field in resolved:
-        combined = {**raw[field], **ai_raw[field]}
-        for token in ai_order:
-            resolved[field][token] = resolve(
-                ai_raw[field][token], combined, colors, values
-            )
-    order += ai_order
-
-    # Chat-button tokens (all reference core tokens or palette colors).
-    chat_order = list(chat_raw["white"])
-    for field, region in chat_raw.items():
-        assert set(region) == set(chat_order), f"{field} chat set differs"
-    for field in resolved:
-        combined = {**raw[field], **chat_raw[field]}
-        for token in chat_order:
-            resolved[field][token] = resolve(
-                chat_raw[field][token], combined, colors, values
-            )
-    order += chat_order
-    return order, brightness, resolved
+    brightness = {field: "light" if field in ("white", "gray10") else "dark" for field in THEMES}
+    return PORTED_TOKENS, brightness, resolved
 
 
 def emit_lib(order, brightness, resolved) -> str:

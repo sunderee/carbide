@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [master]
   pull_request:
@@ -33,6 +34,7 @@ jobs:
 
       - name: Icon lockfile drift guard
         run: |
+          python3 tool/test_carbon_generation.py
           python3 tool/test_icons_lock.py
           python3 tool/check_icons_lock.py
 

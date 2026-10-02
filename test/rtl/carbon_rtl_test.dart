@@ -416,16 +416,16 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _rtlHost(
-          const SizedBox(
+          SizedBox(
             width: 400,
             child: CarbonTabs(
               variant: CarbonTabVariant.contained,
-              tabs: <CarbonTab>[
+              tabs: const <CarbonTab>[
                 CarbonTab(label: 'One'),
                 CarbonTab(label: 'Two'),
                 CarbonTab(label: 'Three'),
               ],
-              panels: <Widget>[Text('P1'), Text('P2'), Text('P3')],
+              panels: const <Widget>[Text('P1'), Text('P2'), Text('P3')],
             ),
           ),
         ),

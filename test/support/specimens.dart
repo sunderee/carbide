@@ -127,15 +127,15 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
       const CarbonBreadcrumbItem(label: 'Reports', isCurrentPage: true),
     ],
   ),
-  'tabs (contained)': (_) => const SizedBox(
+  'tabs (contained)': (_) => SizedBox(
     width: 400,
     child: CarbonTabs(
       variant: CarbonTabVariant.contained,
-      tabs: <CarbonTab>[
+      tabs: const <CarbonTab>[
         CarbonTab(label: 'One'),
         CarbonTab(label: 'Two'),
       ],
-      panels: <Widget>[Text('1'), Text('2')],
+      panels: const <Widget>[Text('1'), Text('2')],
     ),
   ),
   'content switcher': (_) => CarbonContentSwitcher(

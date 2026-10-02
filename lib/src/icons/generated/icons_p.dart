@@ -31,6 +31,23 @@ const CarbonIconData package = CarbonIconData(
   ],
 );
 
+/// The Carbon `package--library` icon data.
+const CarbonIconData packageLibrary = CarbonIconData(
+  name: 'package--library',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,28H4c-1.103,0-2-.8975-2-2V6c0-1.103.897-2,2-2h10c1.103,0,2,.897,2,2v4h12c1.1025,0,2,.897,2,2v14c0,1.1025-.8975,2-2,2ZM4,12h-.0015l.0015,14h24v-14H4ZM4,10h10v-4H4v4ZM22,21H7v-2h15v2ZM25,17H7v-2h18v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `package-node` icon data.
 const CarbonIconData packageNode = CarbonIconData(
   name: 'package-node',
@@ -293,6 +310,23 @@ const CarbonIconData parameter = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M6,13V8H9V6H6A2.0023,2.0023,0,0,0,4,8v5a2.0023,2.0023,0,0,1-2,2v2a2.0023,2.0023,0,0,1,2,2v5a2.0023,2.0023,0,0,0,2,2H9V24H6V19a3.9756,3.9756,0,0,0-1.3823-3A3.9756,3.9756,0,0,0,6,13Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `parameter--action` icon data.
+const CarbonIconData parameterAction = CarbonIconData(
+  name: 'parameter--action',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16,29H2v-2h13V5H2v-2h14c.5522,0,1,.4478,1,1v6h9c.5527,0,1,.4478,1,1v10c0,.5527-.4473,1-1,1h-9v6c0,.5527-.4478,1-1,1ZM17,20h8v-8h-8v8Z',
         ),
       ],
     ),
@@ -2453,6 +2487,23 @@ const CarbonIconData portfolio = CarbonIconData(
   ],
 );
 
+/// The Carbon `portfolio--groups` icon data.
+const CarbonIconData portfolioGroups = CarbonIconData(
+  name: 'portfolio--groups',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30h-4v-2h4V4h-4v-2h4c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM8,30h-4c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h4v2h-4v24h4v2ZM24,25H8c-1.103,0-2-.8975-2-2v-9c0-1.103.897-2,2-2h3v-3c0-1.103.897-2,2-2h6c1.1025,0,2,.897,2,2v3h3c1.1025,0,2,.897,2,2v9c0,1.1025-.8975,2-2,2ZM8,14v9h16v-9H8ZM13,12h6v-3h-6v3Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `portfolio--management` icon data.
 const CarbonIconData portfolioManagement = CarbonIconData(
   name: 'portfolio--management',
@@ -2568,55 +2619,55 @@ const CarbonIconData power = CarbonIconData(
 );
 
 /// The Carbon `power-enterprise-pools-metered-capacity-integration` icon data.
-const CarbonIconData
-powerEnterprisePoolsMeteredCapacityIntegration = CarbonIconData(
-  name: 'power-enterprise-pools-metered-capacity-integration',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M16.0166,29.9937c-7.7085,0-13.9863-6.2646-13.9995-13.9761-.0068-3.7358,1.4443-7.2534,4.0854-9.9043l1.417,1.4121c-2.2642,2.272-3.5083,5.2866-3.5024,8.4888.0054,3.2056,1.2588,6.2168,3.5293,8.4795,2.2651,2.2573,5.2725,3.5,8.4702,3.5h.021c1.3477-.0024,2.6533-.2212,3.8799-.6514l.6611,1.8877c-1.4385.5039-2.9653.7612-4.5381.7637h-.0239Z',
-        ),
-        CarbonIconShape(
-          d: 'M15,16h2v4h2c1.1046,0,2,.8954,2,2v3h-2v-3h-2v3h-2v-3h-2v3h-2v-3c0-1.1046.8954-2,2-2h2v-4Z',
-        ),
-        CarbonIconShape(
-          d: 'M23,26h0c.5523,0,1,.4477,1,1h0c0,.5523-.4477,1-1,1h0c-.5523,0-1-.4477-1-1h0c0-.5523.4477-1,1-1Z',
-        ),
-        CarbonIconShape(
-          d: 'M9,4h0c.5523,0,1,.4477,1,1h0c0,.5523-.4477,1-1,1h0c-.5523,0-1-.4477-1-1h0c0-.5523.4477-1,1-1Z',
-        ),
-        CarbonIconShape(
-          d: 'M20.9199,10.1064c-.4219-2.332-2.4678-4.1064-4.9199-4.1064s-4.498,1.7744-4.9199,4.1064c-1.7637.417-3.0801,2.0049-3.0801,3.8936,0,2.2061,1.7939,4,4,4h1v-2h-1c-1.1025,0-2-.8975-2-2s.8975-2,2-2h1v-1c0-1.6543,1.3457-3,3-3s3,1.3457,3,3v1h1c1.1025,0,2,.8975,2,2s-.8975,2-2,2h-1v2h1c2.2061,0,4-1.7939,4-4,0-1.8887-1.3164-3.4766-3.0801-3.8936Z',
-        ),
-        CarbonIconShape(
-          d: 'M25.8999,25.8885l-1.4141-1.4141c2.2681-2.2681,3.5171-5.2808,3.5171-8.4829,0-6.6167-5.3833-12-12-12-1.3491,0-2.6548.2168-3.8809.644l-.6582-1.8887c1.4385-.501,2.9653-.7554,4.5391-.7554,7.7197,0,14,6.2803,14,14,0,3.7363-1.457,7.251-4.103,9.897Z',
+const CarbonIconData powerEnterprisePoolsMeteredCapacityIntegration =
+    CarbonIconData(
+      name: 'power-enterprise-pools-metered-capacity-integration',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16.0166,29.9937c-7.7085,0-13.9863-6.2646-13.9995-13.9761-.0068-3.7358,1.4443-7.2534,4.0854-9.9043l1.417,1.4121c-2.2642,2.272-3.5083,5.2866-3.5024,8.4888.0054,3.2056,1.2588,6.2168,3.5293,8.4795,2.2651,2.2573,5.2725,3.5,8.4702,3.5h.021c1.3477-.0024,2.6533-.2212,3.8799-.6514l.6611,1.8877c-1.4385.5039-2.9653.7612-4.5381.7637h-.0239Z',
+            ),
+            CarbonIconShape(
+              d: 'M15,16h2v4h2c1.1046,0,2,.8954,2,2v3h-2v-3h-2v3h-2v-3h-2v3h-2v-3c0-1.1046.8954-2,2-2h2v-4Z',
+            ),
+            CarbonIconShape(
+              d: 'M23,26h0c.5523,0,1,.4477,1,1h0c0,.5523-.4477,1-1,1h0c-.5523,0-1-.4477-1-1h0c0-.5523.4477-1,1-1Z',
+            ),
+            CarbonIconShape(
+              d: 'M9,4h0c.5523,0,1,.4477,1,1h0c0,.5523-.4477,1-1,1h0c-.5523,0-1-.4477-1-1h0c0-.5523.4477-1,1-1Z',
+            ),
+            CarbonIconShape(
+              d: 'M20.9199,10.1064c-.4219-2.332-2.4678-4.1064-4.9199-4.1064s-4.498,1.7744-4.9199,4.1064c-1.7637.417-3.0801,2.0049-3.0801,3.8936,0,2.2061,1.7939,4,4,4h1v-2h-1c-1.1025,0-2-.8975-2-2s.8975-2,2-2h1v-1c0-1.6543,1.3457-3,3-3s3,1.3457,3,3v1h1c1.1025,0,2,.8975,2,2s-.8975,2-2,2h-1v2h1c2.2061,0,4-1.7939,4-4,0-1.8887-1.3164-3.4766-3.0801-3.8936Z',
+            ),
+            CarbonIconShape(
+              d: 'M25.8999,25.8885l-1.4141-1.4141c2.2681-2.2681,3.5171-5.2808,3.5171-8.4829,0-6.6167-5.3833-12-12-12-1.3491,0-2.6548.2168-3.8809.644l-.6582-1.8887c1.4385-.501,2.9653-.7554,4.5391-.7554,7.7197,0,14,6.2803,14,14,0,3.7363-1.457,7.251-4.103,9.897Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `power-virtual-server-disaster-recovery-automation` icon data.
-const CarbonIconData
-powerVirtualServerDisasterRecoveryAutomation = CarbonIconData(
-  name: 'power-virtual-server-disaster-recovery-automation',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M9,16h0c0,.3369.024.6749.0714,1.006l-1.9795.2832c-.061-.4238-.0919-.858-.0919-1.2892,0-4.9629,4.0376-9,9-9,2.0435,0,4.0444.7041,5.6348,1.9814l-1.2529,1.5596c-1.2544-1.0083-2.7696-1.541-4.3819-1.541-3.8599,0-6.9999,3.1401-6.9999,7.0001h-.0001ZM8,20c0,.5522.4478,1,1,1s1-.4478,1-1-.4478-1-1-1-1,.4478-1,1ZM16,4c6.6166,0,12,5.3833,12,12h2c0-7.7197-6.2803-14-14-14-1.6431,0-3.2529.2822-4.7846.8389l.6836,1.8799c1.3115-.4771,2.6913-.7188,4.101-.7188ZM22,12c0,.5522.4478,1,1,1s1-.4478,1-1-.4478-1-1-1-1,.4478-1,1ZM9,6c.5522,0,1-.4478,1-1s-.4478-1-1-1-1,.4478-1,1,.4478,1,1,1ZM4,16h0c0-3.2051,1.2481-6.2188,3.5147-8.4854l-1.4141-1.4141c-2.6445,2.6445-4.1006,6.1603-4.1006,9.8995,0,7.7197,6.2803,14,14,14v-2c-6.6166,0-12-5.3832-12-12ZM28.5,25.5c0,1.6543-1.3457,3-3,3s-3-1.3457-3-3c0-.4617.1135-.8942.3006-1.2853l-5.5153-5.5153c-.3911.1871-.8236.3006-1.2853.3006-1.6543,0-3-1.3457-3-3s1.3457-3,3-3,3,1.3457,3,3c0,.4617-.1135.8942-.3006,1.2853l5.5153,5.5153c.3911-.1871.8236-.3006,1.2853-.3006,1.6543,0,3,1.3456,3,2.9999h0ZM16,17c.5513,0,1-.4487,1-1s-.4487-1-1-1-1,.4487-1,1,.4487,1,1,1ZM26.5,25.5c0-.5518-.4482-1-1-1s-1,.4482-1,1,.4482,1,1,1,1-.4482,1-1Z',
+const CarbonIconData powerVirtualServerDisasterRecoveryAutomation =
+    CarbonIconData(
+      name: 'power-virtual-server-disaster-recovery-automation',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M9,16h0c0,.3369.024.6749.0714,1.006l-1.9795.2832c-.061-.4238-.0919-.858-.0919-1.2892,0-4.9629,4.0376-9,9-9,2.0435,0,4.0444.7041,5.6348,1.9814l-1.2529,1.5596c-1.2544-1.0083-2.7696-1.541-4.3819-1.541-3.8599,0-6.9999,3.1401-6.9999,7.0001h-.0001ZM8,20c0,.5522.4478,1,1,1s1-.4478,1-1-.4478-1-1-1-1,.4478-1,1ZM16,4c6.6166,0,12,5.3833,12,12h2c0-7.7197-6.2803-14-14-14-1.6431,0-3.2529.2822-4.7846.8389l.6836,1.8799c1.3115-.4771,2.6913-.7188,4.101-.7188ZM22,12c0,.5522.4478,1,1,1s1-.4478,1-1-.4478-1-1-1-1,.4478-1,1ZM9,6c.5522,0,1-.4478,1-1s-.4478-1-1-1-1,.4478-1,1,.4478,1,1,1ZM4,16h0c0-3.2051,1.2481-6.2188,3.5147-8.4854l-1.4141-1.4141c-2.6445,2.6445-4.1006,6.1603-4.1006,9.8995,0,7.7197,6.2803,14,14,14v-2c-6.6166,0-12-5.3832-12-12ZM28.5,25.5c0,1.6543-1.3457,3-3,3s-3-1.3457-3-3c0-.4617.1135-.8942.3006-1.2853l-5.5153-5.5153c-.3911.1871-.8236.3006-1.2853.3006-1.6543,0-3-1.3457-3-3s1.3457-3,3-3,3,1.3457,3,3c0,.4617-.1135.8942-.3006,1.2853l5.5153,5.5153c.3911-.1871.8236-.3006,1.2853-.3006,1.6543,0,3,1.3456,3,2.9999h0ZM16,17c.5513,0,1-.4487,1-1s-.4487-1-1-1-1,.4487-1,1,.4487,1,1,1ZM26.5,25.5c0-.5518-.4482-1-1-1s-1,.4482-1,1,.4482,1,1,1,1-.4482,1-1Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `PPT` icon data.
 const CarbonIconData pPT = CarbonIconData(
@@ -2990,6 +3041,23 @@ const CarbonIconData product = CarbonIconData(
   ],
 );
 
+/// The Carbon `product-categories` icon data.
+const CarbonIconData productCategories = CarbonIconData(
+  name: 'product-categories',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30h-8c-1.1025,0-2-.8975-2-2v-10.5195c0-.6108.2734-1.1797.75-1.5615l4-3.1997c.7363-.5903,1.7637-.5889,2.5,0l4,3.1997c.4766.3818.75.9507.75,1.5615v10.5195c0,1.1025-.8975,2-2,2ZM24,14.2808l-4,3.1997v10.5195h8v-10.5195l-4-3.1997ZM15,28H4c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h22c1.1025,0,2,.897,2,2v6h-2v-6h-6v6c0,1.103-.8975,2-2,2h-6c-1.103,0-2-.897-2-2v-6h-6v22h11v2ZM12,4v6h6v-6h-6ZM26,20c0-1.1046-.8954-2-2-2s-2,.8954-2,2,.8954,2,2,2,2-.8954,2-2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `production-environment` icon data.
 const CarbonIconData productionEnvironment = CarbonIconData(
   name: 'production-environment',
@@ -3246,6 +3314,23 @@ const CarbonIconData purchase = CarbonIconData(
           d: 'M28,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V8A2,2,0,0,0,28,6Zm0,2v3H4V8ZM4,24V13H28V24Z',
         ),
         CarbonIconShape(d: 'M6,20 h10 v2 h-10 z'),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `purchasing-organizations` icon data.
+const CarbonIconData purchasingOrganizations = CarbonIconData(
+  name: 'purchasing-organizations',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16,16c-1.1046,0-2-.8954-2-2s.8954-2,2-2,2,.8954,2,2-.8954,2-2,2ZM31,23v8h-8v-3h-14.5c-3.58,0-6.5-2.92-6.5-6.5,0-3.41,2.65-6.22,6-6.48v2.01c-2.25.25-4,2.16-4,4.47,0,2.48,2.02,4.5,4.5,4.5h14.5v-3h8ZM29,25h-4v4h4v-4ZM22.3,14.3c0,1.36-.45,2.71-1.27,3.79,0,0-.15.21-.19.24l-4.84,5.72-4.99-5.9c-.86-1.14-1.32-2.49-1.31-3.85,0-3.47,2.82-6.3,6.3-6.3s6.3,2.83,6.3,6.3ZM20.3,14.3c0-2.37-1.93-4.3-4.3-4.3s-4.3,1.93-4.3,4.3c0,.93.31,1.85.88,2.6l.13.17,3.29,3.88,3.44-4.07c.56-.74.86-1.65.86-2.58ZM30,10.5c0,3.41-2.65,6.22-6,6.48v-2.01c2.25-.25,4-2.16,4-4.47,0-2.48-2.02-4.5-4.5-4.5h-14.5v3H1V1h8v3h14.5c3.58,0,6.5,2.92,6.5,6.5ZM7,3H3v4h4V3Z',
+        ),
       ],
     ),
   ],

@@ -244,6 +244,23 @@ const CarbonIconData dataBaseAlt = CarbonIconData(
   ],
 );
 
+/// The Carbon `database--backups` icon data.
+const CarbonIconData databaseBackups = CarbonIconData(
+  name: 'database--backups',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M7,9c-.5523,0-1-.4477-1-1s.4477-1,1-1,1,.4477,1,1-.4477,1-1,1ZM8,16c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM8,24c0-.5523-.4477-1-1-1s-1,.4477-1,1,.4477,1,1,1,1-.4477,1-1ZM27.2012,29.9297c.6787-.1387,1.293-.4688,1.7744-.9521.6514-.6494,1.0244-1.5527,1.0244-2.4775,0-1.4961-.9688-2.8174-2.3379-3.3008-.25-.6416-.6318-1.2344-1.1299-1.7412-.9541-.9404-2.209-1.458-3.5322-1.458-1.5791,0-3.0615.7539-3.9961,2h-.0039c-1.0664,0-2.0708.416-2.8271,1.1729-.7563.7559-1.1729,1.7607-1.1729,2.8271,0,2.2061,1.7944,4,4,4h7.5c.2334,0,.4658-.0254.7012-.0703ZM20.1182,24l.2891-.501c.5312-.9248,1.5254-1.499,2.5928-1.499.7949,0,1.5508.3135,2.1162.8701.3867.3945.6611.8799.7939,1.4053l.1631.6455.6582.0986c.7236.1084,1.2686.7441,1.2686,1.4805,0,.3975-.1592.7842-.4385,1.0635-.2061.2061-.4697.3467-.7471.4043-.1006.0186-.208.0322-.3145.0322h-7.5c-1.1025,0-2-.8975-2-2,0-.5322.208-1.0342.5869-1.4131s.8809-.5869,1.4131-.5869h1.1182ZM13,27H4v-6h9v-2H4v-6h16v3h2V5c0-1.103-.8975-2-2-2H4c-1.103,0-2,.897-2,2v22c0,1.1025.897,2,2,2h9v-2ZM4,5h16v6H4v-6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `database--datastax` icon data.
 const CarbonIconData databaseDatastax = CarbonIconData(
   name: 'database--datastax',
@@ -2452,6 +2469,74 @@ const CarbonIconData directionMergeFilled = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M28,2H4A2,2,0,0,0,2,4V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V4A2,2,0,0,0,28,2ZM17.8784,15.4648l2.6572,2.6563A4.9682,4.9682,0,0,1,22,21.6567V26H20V21.6567a2.9821,2.9821,0,0,0-.8784-2.1215l-2.6572-2.6563A5.0021,5.0021,0,0,1,16,16.3135a5.0021,5.0021,0,0,1-.4644.5654l-2.6572,2.6567A2.9805,2.9805,0,0,0,12,21.6567V26H10V21.6567a4.9682,4.9682,0,0,1,1.4644-3.5356l2.6572-2.6567A2.9805,2.9805,0,0,0,15,13.3433V8.8281l-4.5859,4.586L9,12l7-7,7,7-1.4141,1.4141L17,8.8281v4.5152A2.9821,2.9821,0,0,0,17.8784,15.4648Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `direction--merge-left` icon data.
+const CarbonIconData directionMergeLeft = CarbonIconData(
+  name: 'direction--merge-left',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M12,28h-2v-6.3428c0-1.3359.52-2.5918,1.4644-3.5361l2.6572-2.6567c.5581-.5586.8784-1.3315.8784-2.1211v-5.5176l-4.5938,4.5825-1.4121-1.416,7.0059-6.9893,7.0059,6.9893-1.4121,1.416-4.5938-4.5825v14.1743h-2v-4.5859l-2.1216,2.1211c-.5664.5664-.8784,1.3203-.8784,2.1221v6.3428Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `direction--merge-left--filled` icon data.
+const CarbonIconData directionMergeLeftFilled = CarbonIconData(
+  name: 'direction--merge-left--filled',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,2H4c-1.1,0-2,.9-2,2v24c0,1.1.9,2,2,2h24c1.1,0,2-.9,2-2V4c0-1.1-.9-2-2-2ZM21.59,13.41l-4.59-4.58v13.17h-2v-4.59l-2.12,2.13c-.57.56-.88,1.32-.88,2.12v4.34h-2v-4.34c0-1.34.52-2.59,1.46-3.54l2.66-2.66c.56-.55.88-1.33.88-2.12v-4.51l-4.59,4.58-1.42-1.42,7.01-6.99,7.01,6.99-1.42,1.42Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `direction--merge-right` icon data.
+const CarbonIconData directionMergeRight = CarbonIconData(
+  name: 'direction--merge-right',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,28h-2v-6.3428c0-.8018-.3125-1.5557-.8789-2.1221l-2.1211-2.1211v4.5859h-2V7.8257l-4.5938,4.5825-1.4121-1.416,7.0059-6.9893,7.0059,6.9893-1.4121,1.416-4.5938-4.5825v5.5176c0,.8013.3125,1.5547.8789,2.1206l2.6562,2.6572c.9443.9443,1.4648,2.2002,1.4648,3.5361v6.3428Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `direction--merge-right--filled` icon data.
+const CarbonIconData directionMergeRightFilled = CarbonIconData(
+  name: 'direction--merge-right--filled',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,2H4c-1.1,0-2,.9-2,2v24c0,1.1.9,2,2,2h24c1.1,0,2-.9,2-2V4c0-1.1-.9-2-2-2ZM17.88,15.46l2.66,2.66c.94.95,1.46,2.2,1.46,3.54v4.34h-2v-4.34c0-.8-.31-1.56-.88-2.12l-2.12-2.13v4.59h-2v-13.17l-4.59,4.58-1.42-1.42,7.01-6.99,7.01,6.99-1.42,1.42-4.59-4.58v4.51c0,.8.31,1.56.88,2.12Z',
         ),
       ],
     ),

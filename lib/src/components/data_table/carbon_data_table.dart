@@ -12,6 +12,7 @@
 // / expansion / toolbar features build on. No Material DataTable — equal-flex
 // columns shared between the header and body rows.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -265,18 +266,36 @@ class CarbonDataTable extends StatelessWidget {
     // selected, indeterminate on a partial selection.
     final bool allSelected =
         rows.isNotEmpty && selectedRows.length == rows.length;
+    final bool partlySelected = selectedRows.isNotEmpty && !allSelected;
     final Widget? selectAll = selection == CarbonTableSelection.multi
-        ? Semantics(
-            label: 'Select all rows',
-            checked: allSelected,
-            child: ExcludeSemantics(
-              child: CarbonCheckbox(
-                label: '',
-                value: allSelected,
-                indeterminate: selectedRows.isNotEmpty && !allSelected,
-                onChanged: onSelectionChanged != null
-                    ? (_) => _toggleAll()
-                    : null,
+        ? MergeSemantics(
+            child: Semantics(
+              label: 'Select all rows',
+              checked: partlySelected ? null : allSelected,
+              mixed: partlySelected,
+              // Flutter 3.47's web SemanticCheckable maps mixed to aria-checked
+              // false. Keep the native flag and announce the state in the same
+              // node's value until the engine preserves mixed in the DOM.
+              value: kIsWeb && partlySelected ? 'Partially selected' : null,
+              enabled: onSelectionChanged != null,
+              onTap: onSelectionChanged != null ? _toggleAll : null,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onSelectionChanged != null ? _toggleAll : null,
+                child: SizedBox(
+                  width: CarbonSpacing.spacing09,
+                  height: size.height,
+                  child: Center(
+                    child: CarbonCheckbox(
+                      label: '',
+                      value: allSelected,
+                      indeterminate: partlySelected,
+                      onChanged: onSelectionChanged != null
+                          ? (_) => _toggleAll()
+                          : null,
+                    ),
+                  ),
+                ),
               ),
             ),
           )
@@ -306,6 +325,7 @@ class CarbonDataTable extends StatelessWidget {
               child: rowIndex == null
                   ? (selectAll ?? const SizedBox.shrink())
                   : _RowSelector(
+                      height: size.height,
                       multi: selection == CarbonTableSelection.multi,
                       selected: selectedRows.contains(rowIndex),
                       label: 'Select row ${rowIndex + 1}',
@@ -873,12 +893,14 @@ class _ExpandedDetail extends StatelessWidget {
 /// The leading per-row selector — a checkbox (multi) or radio (single).
 class _RowSelector extends StatelessWidget {
   const _RowSelector({
+    required this.height,
     required this.multi,
     required this.selected,
     required this.label,
     required this.onChanged,
   });
 
+  final double height;
   final bool multi;
   final bool selected;
   final String label;
@@ -886,22 +908,37 @@ class _RowSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      checked: selected,
-      inMutuallyExclusiveGroup: !multi,
-      child: ExcludeSemantics(
-        child: multi
-            ? CarbonCheckbox(
-                label: '',
-                value: selected,
-                onChanged: onChanged != null ? (_) => onChanged!() : null,
-              )
-            : CarbonRadioButton(
-                label: '',
-                selected: selected,
-                onSelected: onChanged,
-              ),
+    return MergeSemantics(
+      // Web checkable roles retain their initial checkbox/radio kind. Replace
+      // the node when selection mode changes so the role follows the control.
+      key: ValueKey<bool>(multi),
+      child: Semantics(
+        label: label,
+        checked: selected,
+        inMutuallyExclusiveGroup: !multi,
+        enabled: onChanged != null,
+        onTap: onChanged,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onChanged,
+          child: SizedBox(
+            width: CarbonSpacing.spacing09,
+            height: height,
+            child: Center(
+              child: multi
+                  ? CarbonCheckbox(
+                      label: '',
+                      value: selected,
+                      onChanged: onChanged != null ? (_) => onChanged!() : null,
+                    )
+                  : CarbonRadioButton(
+                      label: '',
+                      selected: selected,
+                      onSelected: onChanged,
+                    ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -966,23 +1003,28 @@ class _BatchHeader extends StatelessWidget {
 
     // Both children lay out at their natural (min-height-backed) size and
     // the band takes the taller of the two, so text scaling can grow the
-    // bar without the header capping it. The slid-away bar stays hidden
-    // by the Stack's default clip.
-    return Stack(
-      children: <Widget>[
-        header,
-        // Slide the bar down over the header when a selection exists
-        // (`_data-table-action.scss` `--batch-actions`: transform
-        // $duration-fast-02 motion(standard, productive)).
-        AnimatedSlide(
-          offset: active ? Offset.zero : const Offset(0, -1),
-          duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-              ? Duration.zero
-              : CarbonDuration.fast02,
-          curve: CarbonEasing.standardProductive,
-          child: IgnorePointer(ignoring: !active, child: bar),
-        ),
-      ],
+    // bar without the header capping it. Clip explicitly: Stack only clips
+    // layout overflow, whereas AnimatedSlide creates paint overflow.
+    return ClipRect(
+      child: Stack(
+        children: <Widget>[
+          header,
+          // Slide the bar down over the header when a selection exists
+          // (`_data-table-action.scss` `--batch-actions`: transform
+          // $duration-fast-02 motion(standard, productive)).
+          AnimatedSlide(
+            offset: active ? Offset.zero : const Offset(0, -1),
+            duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                ? Duration.zero
+                : CarbonDuration.fast02,
+            curve: CarbonEasing.standardProductive,
+            child: ExcludeSemantics(
+              excluding: !active,
+              child: IgnorePointer(ignoring: !active, child: bar),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -114,3 +114,11 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/gallery_smoke_test.dart
           -d web-server
+
+      - name: Drive tabs release contract test
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/tabs_release_contract_test.dart
+          -d web-server

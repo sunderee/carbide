@@ -198,44 +198,44 @@ void main() {
     test('red90', () => expect(CarbonColors.red90, const Color(0xFF520408)));
     test('red100', () => expect(CarbonColors.red100, const Color(0xFF2D0709)));
     test(
-      'red100Hover',
-      () => expect(CarbonColors.red100Hover, const Color(0xFF540D11)),
-    );
-    test(
-      'red90Hover',
-      () => expect(CarbonColors.red90Hover, const Color(0xFF66050A)),
-    );
-    test(
-      'red80Hover',
-      () => expect(CarbonColors.red80Hover, const Color(0xFF921118)),
-    );
-    test(
-      'red70Hover',
-      () => expect(CarbonColors.red70Hover, const Color(0xFFC21E25)),
-    );
-    test(
-      'red60Hover',
-      () => expect(CarbonColors.red60Hover, const Color(0xFFB81922)),
-    );
-    test(
-      'red50Hover',
-      () => expect(CarbonColors.red50Hover, const Color(0xFFEE0713)),
-    );
-    test(
-      'red40Hover',
-      () => expect(CarbonColors.red40Hover, const Color(0xFFFF6168)),
-    );
-    test(
-      'red30Hover',
-      () => expect(CarbonColors.red30Hover, const Color(0xFFFF99A0)),
+      'red10Hover',
+      () => expect(CarbonColors.red10Hover, const Color(0xFFFFE0E0)),
     );
     test(
       'red20Hover',
       () => expect(CarbonColors.red20Hover, const Color(0xFFFFC2C5)),
     );
     test(
-      'red10Hover',
-      () => expect(CarbonColors.red10Hover, const Color(0xFFFFE0E0)),
+      'red30Hover',
+      () => expect(CarbonColors.red30Hover, const Color(0xFFFF99A0)),
+    );
+    test(
+      'red40Hover',
+      () => expect(CarbonColors.red40Hover, const Color(0xFFFF6168)),
+    );
+    test(
+      'red50Hover',
+      () => expect(CarbonColors.red50Hover, const Color(0xFFEE0713)),
+    );
+    test(
+      'red60Hover',
+      () => expect(CarbonColors.red60Hover, const Color(0xFFB81922)),
+    );
+    test(
+      'red70Hover',
+      () => expect(CarbonColors.red70Hover, const Color(0xFFC21E25)),
+    );
+    test(
+      'red80Hover',
+      () => expect(CarbonColors.red80Hover, const Color(0xFF921118)),
+    );
+    test(
+      'red90Hover',
+      () => expect(CarbonColors.red90Hover, const Color(0xFF66050A)),
+    );
+    test(
+      'red100Hover',
+      () => expect(CarbonColors.red100Hover, const Color(0xFF540D11)),
     );
     test(
       'magenta10',
@@ -278,44 +278,44 @@ void main() {
       () => expect(CarbonColors.magenta100, const Color(0xFF2A0A18)),
     );
     test(
-      'magenta100Hover',
-      () => expect(CarbonColors.magenta100Hover, const Color(0xFF53142F)),
-    );
-    test(
-      'magenta90Hover',
-      () => expect(CarbonColors.magenta90Hover, const Color(0xFF68032E)),
-    );
-    test(
-      'magenta80Hover',
-      () => expect(CarbonColors.magenta80Hover, const Color(0xFF8E0B43)),
-    );
-    test(
-      'magenta70Hover',
-      () => expect(CarbonColors.magenta70Hover, const Color(0xFFBF1D63)),
-    );
-    test(
-      'magenta60Hover',
-      () => expect(CarbonColors.magenta60Hover, const Color(0xFFB0215F)),
-    );
-    test(
-      'magenta50Hover',
-      () => expect(CarbonColors.magenta50Hover, const Color(0xFFE3176F)),
-    );
-    test(
-      'magenta40Hover',
-      () => expect(CarbonColors.magenta40Hover, const Color(0xFFFF57A0)),
-    );
-    test(
-      'magenta30Hover',
-      () => expect(CarbonColors.magenta30Hover, const Color(0xFFFF94C3)),
+      'magenta10Hover',
+      () => expect(CarbonColors.magenta10Hover, const Color(0xFFFFE0EF)),
     );
     test(
       'magenta20Hover',
       () => expect(CarbonColors.magenta20Hover, const Color(0xFFFFBDDA)),
     );
     test(
-      'magenta10Hover',
-      () => expect(CarbonColors.magenta10Hover, const Color(0xFFFFE0EF)),
+      'magenta30Hover',
+      () => expect(CarbonColors.magenta30Hover, const Color(0xFFFF94C3)),
+    );
+    test(
+      'magenta40Hover',
+      () => expect(CarbonColors.magenta40Hover, const Color(0xFFFF57A0)),
+    );
+    test(
+      'magenta50Hover',
+      () => expect(CarbonColors.magenta50Hover, const Color(0xFFE3176F)),
+    );
+    test(
+      'magenta60Hover',
+      () => expect(CarbonColors.magenta60Hover, const Color(0xFFB0215F)),
+    );
+    test(
+      'magenta70Hover',
+      () => expect(CarbonColors.magenta70Hover, const Color(0xFFBF1D63)),
+    );
+    test(
+      'magenta80Hover',
+      () => expect(CarbonColors.magenta80Hover, const Color(0xFF8E0B43)),
+    );
+    test(
+      'magenta90Hover',
+      () => expect(CarbonColors.magenta90Hover, const Color(0xFF68032E)),
+    );
+    test(
+      'magenta100Hover',
+      () => expect(CarbonColors.magenta100Hover, const Color(0xFF53142F)),
     );
     test(
       'purple10',
@@ -358,44 +358,44 @@ void main() {
       () => expect(CarbonColors.purple100, const Color(0xFF1C0F30)),
     );
     test(
-      'purple100Hover',
-      () => expect(CarbonColors.purple100Hover, const Color(0xFF341C59)),
-    );
-    test(
-      'purple90Hover',
-      () => expect(CarbonColors.purple90Hover, const Color(0xFF40197B)),
-    );
-    test(
-      'purple80Hover',
-      () => expect(CarbonColors.purple80Hover, const Color(0xFF5B24AD)),
-    );
-    test(
-      'purple70Hover',
-      () => expect(CarbonColors.purple70Hover, const Color(0xFF7C3DD6)),
-    );
-    test(
-      'purple60Hover',
-      () => expect(CarbonColors.purple60Hover, const Color(0xFF7822FB)),
-    );
-    test(
-      'purple50Hover',
-      () => expect(CarbonColors.purple50Hover, const Color(0xFF9352FF)),
-    );
-    test(
-      'purple40Hover',
-      () => expect(CarbonColors.purple40Hover, const Color(0xFFAE7AFF)),
-    );
-    test(
-      'purple30Hover',
-      () => expect(CarbonColors.purple30Hover, const Color(0xFFC5A3FF)),
+      'purple10Hover',
+      () => expect(CarbonColors.purple10Hover, const Color(0xFFEDE5FF)),
     );
     test(
       'purple20Hover',
       () => expect(CarbonColors.purple20Hover, const Color(0xFFDCC7FF)),
     );
     test(
-      'purple10Hover',
-      () => expect(CarbonColors.purple10Hover, const Color(0xFFEDE5FF)),
+      'purple30Hover',
+      () => expect(CarbonColors.purple30Hover, const Color(0xFFC5A3FF)),
+    );
+    test(
+      'purple40Hover',
+      () => expect(CarbonColors.purple40Hover, const Color(0xFFAE7AFF)),
+    );
+    test(
+      'purple50Hover',
+      () => expect(CarbonColors.purple50Hover, const Color(0xFF9352FF)),
+    );
+    test(
+      'purple60Hover',
+      () => expect(CarbonColors.purple60Hover, const Color(0xFF7822FB)),
+    );
+    test(
+      'purple70Hover',
+      () => expect(CarbonColors.purple70Hover, const Color(0xFF7C3DD6)),
+    );
+    test(
+      'purple80Hover',
+      () => expect(CarbonColors.purple80Hover, const Color(0xFF5B24AD)),
+    );
+    test(
+      'purple90Hover',
+      () => expect(CarbonColors.purple90Hover, const Color(0xFF40197B)),
+    );
+    test(
+      'purple100Hover',
+      () => expect(CarbonColors.purple100Hover, const Color(0xFF341C59)),
     );
     test('blue10', () => expect(CarbonColors.blue10, const Color(0xFFEDF5FF)));
     test('blue20', () => expect(CarbonColors.blue20, const Color(0xFFD0E2FF)));
@@ -411,44 +411,44 @@ void main() {
       () => expect(CarbonColors.blue100, const Color(0xFF001141)),
     );
     test(
-      'blue100Hover',
-      () => expect(CarbonColors.blue100Hover, const Color(0xFF001F75)),
-    );
-    test(
-      'blue90Hover',
-      () => expect(CarbonColors.blue90Hover, const Color(0xFF00258A)),
-    );
-    test(
-      'blue80Hover',
-      () => expect(CarbonColors.blue80Hover, const Color(0xFF0039C7)),
-    );
-    test(
-      'blue70Hover',
-      () => expect(CarbonColors.blue70Hover, const Color(0xFF0053FF)),
-    );
-    test(
-      'blue60Hover',
-      () => expect(CarbonColors.blue60Hover, const Color(0xFF0050E6)),
-    );
-    test(
-      'blue50Hover',
-      () => expect(CarbonColors.blue50Hover, const Color(0xFF1F70FF)),
-    );
-    test(
-      'blue40Hover',
-      () => expect(CarbonColors.blue40Hover, const Color(0xFF5C97FF)),
-    );
-    test(
-      'blue30Hover',
-      () => expect(CarbonColors.blue30Hover, const Color(0xFF8AB6FF)),
+      'blue10Hover',
+      () => expect(CarbonColors.blue10Hover, const Color(0xFFDBEBFF)),
     );
     test(
       'blue20Hover',
       () => expect(CarbonColors.blue20Hover, const Color(0xFFB8D3FF)),
     );
     test(
-      'blue10Hover',
-      () => expect(CarbonColors.blue10Hover, const Color(0xFFDBEBFF)),
+      'blue30Hover',
+      () => expect(CarbonColors.blue30Hover, const Color(0xFF8AB6FF)),
+    );
+    test(
+      'blue40Hover',
+      () => expect(CarbonColors.blue40Hover, const Color(0xFF5C97FF)),
+    );
+    test(
+      'blue50Hover',
+      () => expect(CarbonColors.blue50Hover, const Color(0xFF1F70FF)),
+    );
+    test(
+      'blue60Hover',
+      () => expect(CarbonColors.blue60Hover, const Color(0xFF0050E6)),
+    );
+    test(
+      'blue70Hover',
+      () => expect(CarbonColors.blue70Hover, const Color(0xFF0053FF)),
+    );
+    test(
+      'blue80Hover',
+      () => expect(CarbonColors.blue80Hover, const Color(0xFF0039C7)),
+    );
+    test(
+      'blue90Hover',
+      () => expect(CarbonColors.blue90Hover, const Color(0xFF00258A)),
+    );
+    test(
+      'blue100Hover',
+      () => expect(CarbonColors.blue100Hover, const Color(0xFF001F75)),
     );
     test('cyan10', () => expect(CarbonColors.cyan10, const Color(0xFFE5F6FF)));
     test('cyan20', () => expect(CarbonColors.cyan20, const Color(0xFFBAE6FF)));
@@ -909,16 +909,16 @@ void main() {
       CarbonColors.red80,
       CarbonColors.red90,
       CarbonColors.red100,
-      CarbonColors.red100Hover,
-      CarbonColors.red90Hover,
-      CarbonColors.red80Hover,
-      CarbonColors.red70Hover,
-      CarbonColors.red60Hover,
-      CarbonColors.red50Hover,
-      CarbonColors.red40Hover,
-      CarbonColors.red30Hover,
-      CarbonColors.red20Hover,
       CarbonColors.red10Hover,
+      CarbonColors.red20Hover,
+      CarbonColors.red30Hover,
+      CarbonColors.red40Hover,
+      CarbonColors.red50Hover,
+      CarbonColors.red60Hover,
+      CarbonColors.red70Hover,
+      CarbonColors.red80Hover,
+      CarbonColors.red90Hover,
+      CarbonColors.red100Hover,
       CarbonColors.magenta10,
       CarbonColors.magenta20,
       CarbonColors.magenta30,
@@ -929,16 +929,16 @@ void main() {
       CarbonColors.magenta80,
       CarbonColors.magenta90,
       CarbonColors.magenta100,
-      CarbonColors.magenta100Hover,
-      CarbonColors.magenta90Hover,
-      CarbonColors.magenta80Hover,
-      CarbonColors.magenta70Hover,
-      CarbonColors.magenta60Hover,
-      CarbonColors.magenta50Hover,
-      CarbonColors.magenta40Hover,
-      CarbonColors.magenta30Hover,
-      CarbonColors.magenta20Hover,
       CarbonColors.magenta10Hover,
+      CarbonColors.magenta20Hover,
+      CarbonColors.magenta30Hover,
+      CarbonColors.magenta40Hover,
+      CarbonColors.magenta50Hover,
+      CarbonColors.magenta60Hover,
+      CarbonColors.magenta70Hover,
+      CarbonColors.magenta80Hover,
+      CarbonColors.magenta90Hover,
+      CarbonColors.magenta100Hover,
       CarbonColors.purple10,
       CarbonColors.purple20,
       CarbonColors.purple30,
@@ -949,16 +949,16 @@ void main() {
       CarbonColors.purple80,
       CarbonColors.purple90,
       CarbonColors.purple100,
-      CarbonColors.purple100Hover,
-      CarbonColors.purple90Hover,
-      CarbonColors.purple80Hover,
-      CarbonColors.purple70Hover,
-      CarbonColors.purple60Hover,
-      CarbonColors.purple50Hover,
-      CarbonColors.purple40Hover,
-      CarbonColors.purple30Hover,
-      CarbonColors.purple20Hover,
       CarbonColors.purple10Hover,
+      CarbonColors.purple20Hover,
+      CarbonColors.purple30Hover,
+      CarbonColors.purple40Hover,
+      CarbonColors.purple50Hover,
+      CarbonColors.purple60Hover,
+      CarbonColors.purple70Hover,
+      CarbonColors.purple80Hover,
+      CarbonColors.purple90Hover,
+      CarbonColors.purple100Hover,
       CarbonColors.blue10,
       CarbonColors.blue20,
       CarbonColors.blue30,
@@ -969,16 +969,16 @@ void main() {
       CarbonColors.blue80,
       CarbonColors.blue90,
       CarbonColors.blue100,
-      CarbonColors.blue100Hover,
-      CarbonColors.blue90Hover,
-      CarbonColors.blue80Hover,
-      CarbonColors.blue70Hover,
-      CarbonColors.blue60Hover,
-      CarbonColors.blue50Hover,
-      CarbonColors.blue40Hover,
-      CarbonColors.blue30Hover,
-      CarbonColors.blue20Hover,
       CarbonColors.blue10Hover,
+      CarbonColors.blue20Hover,
+      CarbonColors.blue30Hover,
+      CarbonColors.blue40Hover,
+      CarbonColors.blue50Hover,
+      CarbonColors.blue60Hover,
+      CarbonColors.blue70Hover,
+      CarbonColors.blue80Hover,
+      CarbonColors.blue90Hover,
+      CarbonColors.blue100Hover,
       CarbonColors.cyan10,
       CarbonColors.cyan20,
       CarbonColors.cyan30,

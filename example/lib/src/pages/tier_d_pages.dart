@@ -58,6 +58,8 @@ class _DataTablePageState extends State<_DataTablePage> {
   int? _sortColumn;
   CarbonSortDirection _sortDir = CarbonSortDirection.none;
   Set<int> _selected = <int>{};
+  bool _multi = true;
+  bool _selectionEnabled = true;
 
   static const List<List<String>> _data = <List<String>>[
     <String>['Load balancer 1', 'HTTP', 'Active'],
@@ -80,9 +82,13 @@ class _DataTablePageState extends State<_DataTablePage> {
         title: 'Load balancers',
         description: 'A list of your edge load balancers.',
         zebra: true,
-        selection: CarbonTableSelection.multi,
+        selection: _multi
+            ? CarbonTableSelection.multi
+            : CarbonTableSelection.single,
         selectedRows: _selected,
-        onSelectionChanged: (Set<int> s) => setState(() => _selected = s),
+        onSelectionChanged: _selectionEnabled
+            ? (Set<int> s) => setState(() => _selected = s)
+            : null,
         sortColumnIndex: _sortColumn,
         sortDirection: _sortDir,
         onSort: (int col) => setState(() {
@@ -109,7 +115,23 @@ class _DataTablePageState extends State<_DataTablePage> {
             ),
         ],
       ),
-      code: 'CarbonDataTable(columns: <…>[…], rows: <…>[…], zebra: true);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Multi-select',
+          value: _multi,
+          onChanged: (bool value) => setState(() {
+            _multi = value;
+            _selected = <int>{};
+          }),
+        ),
+        boolKnob(
+          label: 'Selection enabled',
+          value: _selectionEnabled,
+          onChanged: (bool value) => setState(() => _selectionEnabled = value),
+        ),
+      ],
+      code:
+          'CarbonDataTable(columns: <…>[…], rows: <…>[…], selection: CarbonTableSelection.${_multi ? 'multi' : 'single'}, onSelectionChanged: ${_selectionEnabled ? '(rows) { … }' : 'null'});',
     );
   }
 }

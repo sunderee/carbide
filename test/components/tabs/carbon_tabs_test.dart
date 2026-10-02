@@ -49,9 +49,7 @@ void main() {
     testWidgets('tab transition tokens match _tabs.scss', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       // `__nav-item`: color / border-bottom-color / outline
       // $duration-fast-01 motion(standard, productive).
       final AnimatedContainer tab = tester.widget(
@@ -64,8 +62,8 @@ void main() {
     testWidgets('reduced motion is instant', (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
             child: CarbonTabs(tabs: _tabs, panels: _panels),
           ),
         ),
@@ -96,9 +94,7 @@ void main() {
     testWidgets('first panel shown by default; tapping switches', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       expect(find.text('Overview panel'), findsOneWidget);
       expect(find.text('Details panel'), findsNothing);
       await tester.tap(find.text('Details'));
@@ -108,9 +104,7 @@ void main() {
     });
 
     testWidgets('disabled tab does not activate', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
       expect(find.text('Settings panel'), findsNothing);
@@ -144,9 +138,7 @@ void main() {
     testWidgets('Right/Left move + activate, skipping disabled', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       // Focus the first tab, then arrow across.
       tester
           .widget<Focus>(
@@ -178,9 +170,7 @@ void main() {
     testWidgets('line: selected tab has a 2px interactive underline', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       await tester.pumpAndSettle();
       final Border border = decorationOf(tester, 'Overview').border! as Border;
       expect(border.bottom.width, 2);
@@ -198,7 +188,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          const CarbonTabs(
+          CarbonTabs(
             tabs: _tabs,
             panels: _panels,
             variant: CarbonTabVariant.contained,
@@ -239,9 +229,7 @@ void main() {
   group('semantics', () {
     testWidgets('tabs expose selected state', (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       expect(
         tester.getSemantics(find.bySemanticsLabel('Overview')),
         isSemantics(label: 'Overview', isSelected: true),
@@ -259,9 +247,7 @@ void main() {
       final SemanticsHandle handle = tester.ensureSemantics();
       // The Dart default is already lg (48px); _tabs.scss defaults the tab
       // bar to md (40px), which would sit below the 48dp android guideline.
-      await tester.pumpWidget(
-        _host(const CarbonTabs(tabs: _tabs, panels: _panels)),
-      );
+      await tester.pumpWidget(_host(CarbonTabs(tabs: _tabs, panels: _panels)));
       await expectA11y(tester);
       handle.dispose();
     });
@@ -277,14 +263,14 @@ void main() {
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(440, 220),
-        builder: (BuildContext context) => const Center(
+        builder: (BuildContext context) => Center(
           child: SizedBox(
             width: 400,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 CarbonTabs(tabs: _tabs, panels: _panels),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 CarbonTabs(
                   tabs: _tabs,
                   panels: _panels,

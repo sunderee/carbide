@@ -527,6 +527,23 @@ const CarbonIconData encryption = CarbonIconData(
   ],
 );
 
+/// The Carbon `end-to-end--monitoring` icon data.
+const CarbonIconData endToEndMonitoring = CarbonIconData(
+  name: 'end-to-end--monitoring',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,13c-1.31,0-2.42.83-2.82,2h-5.18v-3h-.68l2.2-4.04c.16.03.32.04.48.04,1.65,0,3-1.35,3-3s-1.35-3-3-3-3,1.35-3,3c0,.77.29,1.47.77,2l-2.73,5h-2.08l-2.73-5c.48-.53.77-1.23.77-2,0-1.66-1.34-3-3-3s-3,1.34-3,3,1.34,3,3,3c.16,0,.32-.01.47-.04l2.21,4.04h-.68v3h-5.17c-.41-1.16-1.53-2-2.83-2-1.65,0-3,1.35-3,3s1.35,3,3,3c1.3,0,2.42-.84,2.83-2h5.17v3h.68l-2.2,4.04c-.16-.03-.32-.04-.48-.04-1.65,0-3,1.35-3,3s1.35,3,3,3,3-1.35,3-3c0-.77-.29-1.47-.77-2l2.73-5h2.08l2.73,5c-.48.53-.77,1.23-.77,2,0,1.66,1.34,3,3,3s3-1.34,3-3-1.34-3-3-3c-.16,0-.32.01-.47.04l-2.21-4.04h.68v-3h5.18c.4,1.17,1.51,2,2.82,2,1.66,0,3-1.34,3-3s-1.34-3-3-3ZM22,4c.55,0,1,.45,1,1s-.45,1-1,1-1-.45-1-1,.45-1,1-1ZM4,17c-.55,0-1-.45-1-1s.45-1,1-1,1,.45,1,1-.45,1-1,1ZM10,28c-.55,0-1-.45-1-1s.45-1,1-1,1,.45,1,1-.45,1-1,1ZM18,18h-4v-4h4v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `energy--renewable` icon data.
 const CarbonIconData energyRenewable = CarbonIconData(
   name: 'energy--renewable',
@@ -1096,7 +1113,7 @@ const CarbonIconData executionHistory = CarbonIconData(
       viewBoxHeight: 32,
       shapes: <CarbonIconShape>[
         CarbonIconShape(
-          d: 'M18,22c0,3.8599-3.1401,7-7,7v-2c2.7568,0,5-2.2432,5-5s-2.2432-5-5-5c-2.045,0-3.8025,1.2373-4.5762,3h2.5762v2H3v-6h2v2.4131c1.2245-2.0405,3.4521-3.4131,6-3.4131,3.8599,0,7,3.1401,7,7ZM28,5v22c0,1.103-.8975,2-2,2h-6v-2h6v-4h-6v-2h6v-4h-6v-2h6v-4H4v-6c0-1.103.8975-2,2-2h20c1.1025,0,2,.897,2,2ZM26,5H6v4h20v-4Z',
+          d: 'M18,22c0,3.9-3.1,7-7,7v-2c2.8,0,5-2.2,5-5s-2.2-5-5-5-3.8,1.2-4.6,3h2.6v2H3v-6h2v2.4c1.2-2,3.5-3.4,6-3.4,3.9,0,7,3.1,7,7ZM28,5v22c0,1.1-.9,2-2,2h-6v-2h6v-4h-6v-2h6v-4h-6v-2h6v-4H4v-6c0-1.1.9-2,2-2h20c1.1,0,2,.9,2,2ZM26,5H6v4h20v-4Z',
         ),
       ],
     ),

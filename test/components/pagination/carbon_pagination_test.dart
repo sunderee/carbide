@@ -49,14 +49,16 @@ BuildContext? _focusedContext(WidgetTester tester) =>
     tester.binding.focusManager.primaryFocus?.context;
 
 /// The label of the [CarbonSelect] that owns focus, or null.
-String? _focusedSelectLabel(WidgetTester tester) => _focusedContext(
-  tester,
-)?.findAncestorWidgetOfExactType<CarbonSelect<int>>()?.labelText;
+String? _focusedSelectLabel(WidgetTester tester) =>
+    _focusedContext(tester)
+        ?.findAncestorWidgetOfExactType<CarbonSelect<int>>()
+        ?.labelText;
 
 /// The label of the [CarbonButton] that owns focus, or null.
-String? _focusedButtonLabel(WidgetTester tester) => _focusedContext(
-  tester,
-)?.findAncestorWidgetOfExactType<CarbonButton>()?.label;
+String? _focusedButtonLabel(WidgetTester tester) =>
+    _focusedContext(tester)
+        ?.findAncestorWidgetOfExactType<CarbonButton>()
+        ?.label;
 
 void main() {
   setUp(() {

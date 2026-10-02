@@ -67,20 +67,26 @@ HEADER = """// Copyright 2026 Bizjak Tech OÜ
 """
 
 
+def normalize_styles(text: str) -> str:
+    """Normalize named v11 scale/weight exports and tree-shaking annotations."""
+    text = text.replace("/*#__PURE__*/ ", "")
+    text = re.sub(r"\bscale(\d{2})\b", lambda m: f"scale[{int(m[1]) - 1}]", text)
+    text = re.sub(r"fontWeight: (light|regular|semibold)\b", r"fontWeight: fontWeights.\1", text)
+    return re.sub(r"fontFamily: (mono|serif)\b", r"fontFamily: fontFamilies.\1", text)
+
+
 def scale_steps() -> list[int]:
     text = (TYPE_DIR / "scale.ts").read_text()
-    body = re.search(r"export const scale = \[([\s\S]*?)\];", text).group(1)
-    return [int(n) for n in re.findall(r"\d+", body)]
+    return [int(value) for value in re.findall(r"export const scale\d{2} = (\d+);", text)]
 
 
 def weights() -> dict[str, int]:
     text = (TYPE_DIR / "fontWeight.ts").read_text()
-    block = re.search(r"fontWeights = \{([\s\S]*?)\};", text).group(1)
-    return {m.group(1): int(m.group(2)) for m in re.finditer(r"(\w+): (\d+)", block)}
+    return {name: int(value) for name, value in re.findall(r"export const (light|regular|semibold) = (\d+);", text)}
 
 
 def parse_objects() -> dict[str, str]:
-    text = (TYPE_DIR / "styles.ts").read_text()
+    text = normalize_styles((TYPE_DIR / "styles.ts").read_text())
     return {
         m.group(1): m.group(2)
         for m in re.finditer(r"export const (\w+) = (\{[^{}]*\});", text)

@@ -18,6 +18,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from generate_carbon_type import normalize_styles, scale_steps, weights
+
 ROOT = Path(__file__).resolve().parent.parent
 TYPE_DIR = ROOT / "documentation/carbon/packages/type/src"
 LIB_OUT = ROOT / "lib/src/foundations/fluid_typography.dart"
@@ -62,18 +64,6 @@ HEADER = """// Copyright 2026 Bizjak Tech OÜ
 """
 
 
-def scale_steps() -> list[int]:
-    body = re.search(
-        r"export const scale = \[([\s\S]*?)\];", (TYPE_DIR / "scale.ts").read_text()
-    ).group(1)
-    return [int(n) for n in re.findall(r"\d+", body)]
-
-
-def weights() -> dict[str, int]:
-    block = re.search(
-        r"fontWeights = \{([\s\S]*?)\};", (TYPE_DIR / "fontWeight.ts").read_text()
-    ).group(1)
-    return {m.group(1): int(m.group(2)) for m in re.finditer(r"(\w+): (\d+)", block)}
 
 
 SCALE = scale_steps()
@@ -239,7 +229,7 @@ def emit_test(parsed: dict[str, tuple]) -> str:
 
 
 def main() -> None:
-    text = (TYPE_DIR / "styles.ts").read_text()
+    text = normalize_styles((TYPE_DIR / "styles.ts").read_text())
     parsed = {name: parse(text, name) for name in OBJECTS}
     LIB_OUT.write_text(emit_lib(parsed))
     TEST_OUT.write_text(emit_test(parsed))

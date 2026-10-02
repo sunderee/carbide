@@ -10,6 +10,33 @@
 
 import '../carbon_icon_data.dart';
 
+/// The Carbon `ibm--ai-financial-instrument-sustainability-check` icon data.
+const CarbonIconData ibmAiFinancialInstrumentSustainabilityCheck =
+    CarbonIconData(
+      name: 'ibm--ai-financial-instrument-sustainability-check',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16,23.4142 L11.293,18.7072 L12.707,17.2928 L16,20.5858 L27.293,9.2928 L28.707,10.7072 L16,23.4142 z',
+            ),
+            CarbonIconShape(
+              d: 'm12.707,8.7073l-1.4141-1.4141-4.2928,4.2928-2.5861-2.5863,4.293-4.2925-1.4141-1.4141-5,4.9995c-.1875.1875-.293.4419-.293.707s.1055.5195.293.707l7,7.0005,1.4141-1.4141-2.2929-2.293,4.2929-4.2929Z',
+            ),
+            CarbonIconShape(
+              d: 'm16,30c-7.7197,0-14-6.2804-14-14h2c0,6.6168,5.3833,12,12,12s12-5.3832,12-12h2c0,7.7196-6.2803,14-14,14Z',
+            ),
+            CarbonIconShape(
+              d: 'm24.3076,7.3407c-2.2446-2.1543-5.1948-3.3407-8.3076-3.3407-.9365,0-1.8682.108-2.77.321l-.46-1.9463c1.0522-.2487,2.1387-.3748,3.23-.3748,3.6313,0,7.0737,1.3843,9.6924,3.8978l-1.3848,1.4429Z',
+            ),
+          ],
+        ),
+      ],
+    );
+
 /// The Carbon `ibm--ai-on-z` icon data.
 const CarbonIconData ibmAiOnZ = CarbonIconData(
   name: 'ibm--ai-on-z',
@@ -90,22 +117,22 @@ const CarbonIconData ibmAppConnectEnterprise = CarbonIconData(
 );
 
 /// The Carbon `ibm--application-and-discovery-delivery-intelligence` icon data.
-const CarbonIconData
-ibmApplicationAndDiscoveryDeliveryIntelligence = CarbonIconData(
-  name: 'ibm--application-and-discovery-delivery-intelligence',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M9,6h-2v10h2V6ZM28.5039,8.1362L16.5039,1.1362c-.1558-.0908-.3298-.1362-.5039-.1362s-.3481.0454-.5039.1362l-4,2.3333c-.3071.1792-.4961.5081-.4961.8638v8.6667h2V4.9076l3-1.7499,11,6.4166v3.4257h2v-4c0-.3557-.189-.6846-.4961-.8638ZM4.9987,22.4315v-13.4315h-1.9987v14.006c0,.3559.1889.6849.4958.8642l10.4971,6.1298,1.0072-1.7282h-.0001s-10.0013-5.8403-10.0013-5.8403ZM22,26.9999h2v-9.9999h-2v9.9999ZM27,27h2v-6h-2v6ZM17,27h2v-8h-2v8Z',
+const CarbonIconData ibmApplicationAndDiscoveryDeliveryIntelligence =
+    CarbonIconData(
+      name: 'ibm--application-and-discovery-delivery-intelligence',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M9,6h-2v10h2V6ZM28.5039,8.1362L16.5039,1.1362c-.1558-.0908-.3298-.1362-.5039-.1362s-.3481.0454-.5039.1362l-4,2.3333c-.3071.1792-.4961.5081-.4961.8638v8.6667h2V4.9076l3-1.7499,11,6.4166v3.4257h2v-4c0-.3557-.189-.6846-.4961-.8638ZM4.9987,22.4315v-13.4315h-1.9987v14.006c0,.3559.1889.6849.4958.8642l10.4971,6.1298,1.0072-1.7282h-.0001s-10.0013-5.8403-10.0013-5.8403ZM22,26.9999h2v-9.9999h-2v9.9999ZM27,27h2v-6h-2v6ZM17,27h2v-8h-2v8Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm--aspera` icon data.
 const CarbonIconData ibmAspera = CarbonIconData(
@@ -559,22 +586,22 @@ const CarbonIconData ibmCloudDirectLink2DedicatedHosting = CarbonIconData(
 );
 
 /// The Carbon `ibm-cloud--essential-security-and-observability-services` icon data.
-const CarbonIconData
-ibmCloudEssentialSecurityAndObservabilityServices = CarbonIconData(
-  name: 'ibm-cloud--essential-security-and-observability-services',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M16,5.0002v-2c7.168,0,13,5.832,13,13h-2c0-6.0654-4.9346-11-11-11ZM16,27c-6.0654,0-11-4.9344-11-10.9998h-2c0,7.168,5.832,12.9998,13,12.9998h2v-1.9999h-2ZM4.2769,12.3044l-1.8389,1.0618-1-1.7324,1.8396-1.0623c-.1661-.4971-.2776-1.0193-.2776-1.5715s.1115-1.0745.2776-1.5715l-1.8396-1.0623,1-1.7324,1.8389,1.0618c.7053-.7937,1.6443-1.3745,2.7231-1.5945v-2.1011h2v2.1011c1.0788.22,2.0178.8008,2.7231,1.5945l1.8389-1.0618,1,1.7324-1.8396,1.0623c.1661.4971.2776,1.0193.2776,1.5715s-.1115,1.0745-.2776,1.5715l1.8396,1.0623-1,1.7324-1.8389-1.0618c-.7053.7937-1.6443,1.3745-2.7231,1.5945v2.1011h-2v-2.1011c-1.0788-.22-2.0178-.8008-2.7231-1.5945ZM5,9c0,1.6543,1.3457,3,3,3s3-1.3457,3-3-1.3457-3-3-3-3,1.3457-3,3ZM30,18v6.4678c0,1.9238-1.123,3.6973-2.8613,4.5195l-2.1387,1.0127-2.1387-1.0117c-1.7383-.8232-2.8613-2.5977-2.8613-4.5205v-6.4678h10ZM28,20h-6v4.4678c0,1.1543.6738,2.2188,1.7168,2.7119l1.2832.6074,1.2832-.6074c1.043-.4932,1.7168-1.5576,1.7168-2.7119v-4.4678Z',
+const CarbonIconData ibmCloudEssentialSecurityAndObservabilityServices =
+    CarbonIconData(
+      name: 'ibm-cloud--essential-security-and-observability-services',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16,5.0002v-2c7.168,0,13,5.832,13,13h-2c0-6.0654-4.9346-11-11-11ZM16,27c-6.0654,0-11-4.9344-11-10.9998h-2c0,7.168,5.832,12.9998,13,12.9998h2v-1.9999h-2ZM4.2769,12.3044l-1.8389,1.0618-1-1.7324,1.8396-1.0623c-.1661-.4971-.2776-1.0193-.2776-1.5715s.1115-1.0745.2776-1.5715l-1.8396-1.0623,1-1.7324,1.8389,1.0618c.7053-.7937,1.6443-1.3745,2.7231-1.5945v-2.1011h2v2.1011c1.0788.22,2.0178.8008,2.7231,1.5945l1.8389-1.0618,1,1.7324-1.8396,1.0623c.1661.4971.2776,1.0193.2776,1.5715s-.1115,1.0745-.2776,1.5715l1.8396,1.0623-1,1.7324-1.8389-1.0618c-.7053.7937-1.6443,1.3745-2.7231,1.5945v2.1011h-2v-2.1011c-1.0788-.22-2.0178-.8008-2.7231-1.5945ZM5,9c0,1.6543,1.3457,3,3,3s3-1.3457,3-3-1.3457-3-3-3-3,1.3457-3,3ZM30,18v6.4678c0,1.9238-1.123,3.6973-2.8613,4.5195l-2.1387,1.0127-2.1387-1.0117c-1.7383-.8232-2.8613-2.5977-2.8613-4.5205v-6.4678h10ZM28,20h-6v4.4678c0,1.1543.6738,2.2188,1.7168,2.7119l1.2832.6074,1.2832-.6074c1.043-.4932,1.7168-1.5576,1.7168-2.7119v-4.4678Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-cloud--event-notification` icon data.
 const CarbonIconData ibmCloudEventNotification = CarbonIconData(
@@ -1327,31 +1354,31 @@ const CarbonIconData ibmCloudSecurityComplianceCenter = CarbonIconData(
 );
 
 /// The Carbon `ibm-cloud--security-compliance-center-workload-protection` icon data.
-const CarbonIconData
-ibmCloudSecurityComplianceCenterWorkloadProtection = CarbonIconData(
-  name: 'ibm-cloud--security-compliance-center-workload-protection',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M20,18v6.5c0,1.9,1.1,3.7,2.9,4.5l2.1,1l2.1-1c1.7-0.8,2.9-2.6,2.9-4.5V18H20z M28,24.5c0,1.2-0.7,2.2-1.7,2.7L25,27.8 l-1.3-0.6c-1-0.5-1.7-1.6-1.7-2.7V20h6V24.5z',
-        ),
-        CarbonIconShape(
-          d: 'M16,20c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4h-2c0-1.1-0.9-2-2-2s-2,0.9-2,2s0.9,2,2,2V20z',
-        ),
-        CarbonIconShape(
-          d: 'M16,25c-5,0-9-4-9-9s4-9,9-9s9,4,9,9h-2c0-3.9-3.1-7-7-7s-7,3.1-7,7s3.1,7,7,7V25z',
-        ),
-        CarbonIconShape(
-          d: 'M16,30C8.3,30,2,23.7,2,16S8.3,2,16,2s14,6.3,14,14h-2c0-6.6-5.4-12-12-12S4,9.4,4,16s5.4,12,12,12V30z',
+const CarbonIconData ibmCloudSecurityComplianceCenterWorkloadProtection =
+    CarbonIconData(
+      name: 'ibm-cloud--security-compliance-center-workload-protection',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M20,18v6.5c0,1.9,1.1,3.7,2.9,4.5l2.1,1l2.1-1c1.7-0.8,2.9-2.6,2.9-4.5V18H20z M28,24.5c0,1.2-0.7,2.2-1.7,2.7L25,27.8 l-1.3-0.6c-1-0.5-1.7-1.6-1.7-2.7V20h6V24.5z',
+            ),
+            CarbonIconShape(
+              d: 'M16,20c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4h-2c0-1.1-0.9-2-2-2s-2,0.9-2,2s0.9,2,2,2V20z',
+            ),
+            CarbonIconShape(
+              d: 'M16,25c-5,0-9-4-9-9s4-9,9-9s9,4,9,9h-2c0-3.9-3.1-7-7-7s-7,3.1-7,7s3.1,7,7,7V25z',
+            ),
+            CarbonIconShape(
+              d: 'M16,30C8.3,30,2,23.7,2,16S8.3,2,16,2s14,6.3,14,14h-2c0-6.6-5.4-12-12-12S4,9.4,4,16s5.4,12,12,12V30z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-cloud--security-groups` icon data.
 const CarbonIconData ibmCloudSecurityGroups = CarbonIconData(
@@ -1989,6 +2016,23 @@ const CarbonIconData ibmEloPublishing = CarbonIconData(
   ],
 );
 
+/// The Carbon `ibm--engineering-ai-hub` icon data.
+const CarbonIconData ibmEngineeringAiHub = CarbonIconData(
+  name: 'ibm--engineering-ai-hub',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M21,5.9999c0-2.757-2.243-4.9999-5-4.9999-1.78,0-3.439.958-4.331,2.5-.3193.5537-.5326,1.1621-.629,1.7939-1.1793-.8418-2.5921-1.2942-4.041-1.2939C3.14,4,0,7.14,0,10.9999c0,2.6982,1.5367,5.0402,3.7786,6.2082-1.0787.9178-1.7786,2.2678-1.7786,3.7918,0,2.757,2.243,5,5,5,.73,0,1.4193-.1666,2.0447-.4498.269,2.5077,2.3672,4.4678,4.9464,4.4678.1453,0,.282-.0306.4243-.0428.0374-.0038.0751-.0065.112-.0113,2.5057-.271,4.4637-2.3682,4.4637-4.9459h-2c0,1.6542-1.3458,3-3,3-1.1415,0-2.1241-.6483-2.631-1.5891-.2222-.438-.36-.9227-.36-1.429,0-.4123.084-.8053.2352-1.1633.4597-1.0682,1.5211-1.8187,2.7559-1.8187.3287,0,.6395.0662.9357.1643l.635-1.8879c-.4967-.1653-1.0185-.2764-1.5707-.2764-.5231,0-1.0176.1027-1.4915.2518-.0925.0223-.1823.0544-.2725.0846-.0739.028-.1511.0475-.2233.0789-.0192.0082-.0396.0121-.0587.0208-.1433-1.2966-.7848-2.4395-1.7219-3.2465,2.241-1.1683,3.7769-3.5099,3.7769-6.2075,0-.1459-.0133-.2908-.0224-.436.6197.2758,1.3015.436,2.0224.436,2.757,0,5-2.243,5-5ZM13.401,4.5c.5379-.9267,1.5275-1.4979,2.599-1.5,1.654,0,3,1.346,3,2.9999s-1.3459,3-3,3-3-1.346-3-3h-.029c.035-.576.171-1.0519.43-1.4999ZM10,20.9999c0,1.654-1.3459,3-3,3s-3-1.346-3-3,1.346-3,3-3,3,1.346,3,3ZM7.001,15.9999c-2.757,0-5-2.243-5-5s2.243-5,5-5,5,2.243,5,5-2.243,5-5,5ZM30.991,16.018v-2h-4v2h.994v5h-.994v2h4v-2h-1.006v-5h1.006ZM19.089,23.0155l.587-2h3.583l.621,2h2.11l-2.794-9h-3.564l-2.641,9h2.099-.001ZM21.143,16.0155h.564l.931,3h-2.376l.88-3h.001Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `ibm--engineering-lifecycle-mgmt` icon data.
 const CarbonIconData ibmEngineeringLifecycleMgmt = CarbonIconData(
   name: 'ibm--engineering-lifecycle-mgmt',
@@ -2057,31 +2101,31 @@ const CarbonIconData ibmEngineeringSystemsDesignRhapsody = CarbonIconData(
 );
 
 /// The Carbon `ibm--engineering-systems-design-rhapsody-model-manager` icon data.
-const CarbonIconData
-ibmEngineeringSystemsDesignRhapsodyModelManager = CarbonIconData(
-  name: 'ibm--engineering-systems-design-rhapsody-model-manager',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'm27,30h-8c-2.2061,0-4-1.7939-4-4,0-1.8887,1.3164-3.4766,3.0801-3.8936.4219-2.332,2.4678-4.1064,4.9199-4.1064s4.498,1.7744,4.9199,4.1064c1.7637.417,3.0801,2.0049,3.0801,3.8936,0,2.2061-1.7939,4-4,4Zm-8-2h8c1.1025,0,2-.8975,2-2s-.8975-2-2-2h-1v-1c0-1.6543-1.3457-3-3-3s-3,1.3457-3,3v1h-1c-1.1025,0-2,.8975-2,2s.8975,2,2,2Z',
-        ),
-        CarbonIconShape(
-          d: 'm12,27h-2c-3.8599,0-7-3.1401-7-7v-2h2v2c0,2.7568,2.2432,5,5,5h2v2Z',
-        ),
-        CarbonIconShape(
-          d: 'm27,15v-4c0-3.8599-3.1401-7-7-7h-7v2h7c2.7568,0,5,2.2432,5,5v4h2Z',
-        ),
-        CarbonIconShape(
-          d: 'm10,8V4c0-1.1046-.8954-2-2-2H2v13h2v-5h1.48l2.34,5h2.18l-2.33-5h.33c1.1046,0,2-.8954,2-2ZM4,4h4v4h-4V4Z',
+const CarbonIconData ibmEngineeringSystemsDesignRhapsodyModelManager =
+    CarbonIconData(
+      name: 'ibm--engineering-systems-design-rhapsody-model-manager',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'm27,30h-8c-2.2061,0-4-1.7939-4-4,0-1.8887,1.3164-3.4766,3.0801-3.8936.4219-2.332,2.4678-4.1064,4.9199-4.1064s4.498,1.7744,4.9199,4.1064c1.7637.417,3.0801,2.0049,3.0801,3.8936,0,2.2061-1.7939,4-4,4Zm-8-2h8c1.1025,0,2-.8975,2-2s-.8975-2-2-2h-1v-1c0-1.6543-1.3457-3-3-3s-3,1.3457-3,3v1h-1c-1.1025,0-2,.8975-2,2s.8975,2,2,2Z',
+            ),
+            CarbonIconShape(
+              d: 'm12,27h-2c-3.8599,0-7-3.1401-7-7v-2h2v2c0,2.7568,2.2432,5,5,5h2v2Z',
+            ),
+            CarbonIconShape(
+              d: 'm27,15v-4c0-3.8599-3.1401-7-7-7h-7v2h7c2.7568,0,5,2.2432,5,5v4h2Z',
+            ),
+            CarbonIconShape(
+              d: 'm10,8V4c0-1.1046-.8954-2-2-2H2v13h2v-5h1.48l2.34,5h2.18l-2.33-5h.33c1.1046,0,2-.8954,2-2ZM4,4h4v4h-4V4Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm--engineering-systems-design-rhapsody-sn1` icon data.
 const CarbonIconData ibmEngineeringSystemsDesignRhapsodySn1 = CarbonIconData(
@@ -2376,6 +2420,23 @@ const CarbonIconData ibmHybridControlPlane = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M25.9741,5.2722c.094-1.049-.353-2.1171-1.2834-2.7515-1.3672-.9323-3.2377-.5786-4.1699.7886-.9324,1.3672-.5786,3.2377.7886,4.17,1.1953.8152,2.7754.6469,3.7769-.3221,4.3311,3.9611,5.2244,10.6123,1.8237,15.5992-.17.2493-.356.4807-.541.713l1.4255,1.4256c.2671-.3244.5266-.658.7678-1.0117,4.0869-5.9932,2.8654-14.0513-2.5881-18.611h-.0001ZM23.8264,5.5635c-.3107.4556-.9343.5735-1.3899.2629-.4557-.3107-.5736-.9344-.2629-1.39.3107-.4556.9343-.5735,1.39-.2629.4556.3107.5736.9344.2628,1.39ZM5.4291,8.108c-1.057,1.55-1.724,3.2413-2.0836,4.9717-.7174.1605-1.3798.5748-1.8257,1.2286-.9323,1.3672-.5786,3.2377.7886,4.17,1.3672.9323,3.2378.5786,4.17-.7886.9323-1.3672.5786-3.2377-.7886-4.17-.1185-.0808-.2449-.1394-.37-.201.3212-1.4211.8916-2.8082,1.7616-4.0839,2.5192-3.6941,6.7516-5.5295,10.9186-5.1864v-1.9999c-4.8071-.3378-9.6655,1.7991-12.5709,6.0595ZM4.8256,16.5626c-.3107.4556-.9344.5735-1.39.2629s-.5735-.9344-.2629-1.39c.3108-.4556.9346-.5735,1.3901-.2628.4556.3107.5735.9344.2628,1.39h0ZM24.6907,24.5207c-1.3672-.9323-3.2377-.5786-4.1699.7886-.4666.6842-.611,1.4944-.4675,2.2501-3.2477.863-6.8291.3889-9.8184-1.6495-1.8677-1.2736-3.2495-2.9903-4.1278-4.9098h-2.1733c.9833,2.5778,2.7272,4.8934,5.1743,6.5622,3.66,2.4959,8.0802,2.9792,12.0132,1.7589.064.0518.1189.111.1881.1582,1.3672.9323,3.2377.5786,4.1699-.7886.9324-1.3671.5786-3.2377-.7886-4.17h0ZM23.8264,27.5635c-.3107.4556-.9343.5735-1.3899.2629-.4557-.3107-.5736-.9344-.2629-1.39.3107-.4556.9343-.5735,1.39-.2629.4556.3107.5736.9344.2628,1.39Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `ibm--i` icon data.
+const CarbonIconData ibmI = CarbonIconData(
+  name: 'ibm--i',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M0.327,21v-1.694h1.26v-6.384h-1.26v-1.694h4.648v1.694h-1.26v6.384h1.26V21H0.327z M6.753,11.228H11.5 c0.812,0,1.444,0.229,1.897,0.686c0.465,0.489,0.71,1.146,0.679,1.82c0.008,0.324-0.042,0.646-0.147,0.952 c-0.085,0.24-0.218,0.459-0.392,0.644c-0.161,0.166-0.358,0.293-0.575,0.371c-0.227,0.081-0.466,0.126-0.707,0.133v0.084 c0.25,0.002,0.498,0.045,0.735,0.125c0.259,0.086,0.5,0.222,0.707,0.4c0.226,0.197,0.409,0.437,0.539,0.707 c0.154,0.333,0.228,0.697,0.217,1.064c0.002,0.37-0.062,0.737-0.189,1.085c-0.118,0.327-0.296,0.628-0.525,0.889 c-0.222,0.251-0.494,0.453-0.798,0.595c-0.316,0.146-0.66,0.221-1.009,0.217h-5.18L6.753,11.228L6.753,11.228z M8.881,15.232h2.114 c0.454,0.041,0.855-0.293,0.896-0.747c0.005-0.05,0.005-0.099,0-0.149v-0.42c0.041-0.454-0.293-0.855-0.747-0.896 c-0.05-0.005-0.099-0.005-0.149,0H8.881V15.232z M8.881,19.207h2.45c0.243,0.013,0.482-0.07,0.665-0.231 c0.17-0.172,0.259-0.408,0.245-0.65V17.85c0.014-0.242-0.075-0.478-0.245-0.65c-0.183-0.161-0.422-0.244-0.665-0.231h-2.45V19.207z M23.4,14.588h-0.042l-0.714,1.428l-1.905,3.459l-1.862-3.445l-0.742-1.54h-0.042V21h-2.002v-9.772h2.254l2.394,4.578h0.028 l2.366-4.578H25.4V21h-2C23.4,21,23.4,14.588,23.4,14.588z M30.371,12.866c-0.332,0.03-0.662-0.073-0.917-0.287 c-0.193-0.195-0.296-0.461-0.287-0.735v-0.308c-0.01-0.274,0.094-0.54,0.287-0.735c0.552-0.383,1.282-0.383,1.834,0 c0.193,0.195,0.297,0.461,0.287,0.735v0.308c0.01,0.274-0.094,0.54-0.287,0.735C31.032,12.793,30.702,12.896,30.371,12.866z M29.335,13.65h2.072V21h-2.072V13.65z',
         ),
       ],
     ),
@@ -2698,29 +2759,29 @@ const CarbonIconData ibmOpenEnterpriseLanguages = CarbonIconData(
 );
 
 /// The Carbon `ibm--openshift-container-platform-on-vpc-for-regulated-industries` icon data.
-const CarbonIconData
-ibmOpenshiftContainerPlatformOnVpcForRegulatedIndustries = CarbonIconData(
-  name: 'ibm--openshift-container-platform-on-vpc-for-regulated-industries',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(d: 'M18,27 a1,1 0 1 0 2,0 a1,1 0 1 0 -2,0 z'),
-        CarbonIconShape(
-          d: 'm29,31h-13c-1.1028,0-2-.8972-2-2v-4c0-1.1028.8972-2,2-2h13c1.1028,0,2,.8972,2,2v4c0,1.1028-.8972,2-2,2Zm-13-6v4h13v-4h-13Z',
-        ),
-        CarbonIconShape(
-          d: 'm29,21h-13c-1.1028,0-2-.8972-2-2v-4c0-1.1028.8972-2,2-2h13c1.1028,0,2,.8972,2,2v4c0,1.1028-.8972,2-2,2Zm-13-6v4h13v-4h-13Z',
-        ),
-        CarbonIconShape(
-          d: 'm12,27.2998c-4.6531-1.6523-8-6.0869-8-11.2998,0-6.6167,5.3833-12,12-12,4.8311,0,8.9937,2.876,10.8945,7h2.1665c-2.0188-5.2544-7.1045-9-13.061-9-7.7197,0-14,6.2803-14,14,0,6.3291,4.2246,11.6846,10,13.4102v-2.1104Z',
+const CarbonIconData ibmOpenshiftContainerPlatformOnVpcForRegulatedIndustries =
+    CarbonIconData(
+      name: 'ibm--openshift-container-platform-on-vpc-for-regulated-industries',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(d: 'M18,27 a1,1 0 1 0 2,0 a1,1 0 1 0 -2,0 z'),
+            CarbonIconShape(
+              d: 'm29,31h-13c-1.1028,0-2-.8972-2-2v-4c0-1.1028.8972-2,2-2h13c1.1028,0,2,.8972,2,2v4c0,1.1028-.8972,2-2,2Zm-13-6v4h13v-4h-13Z',
+            ),
+            CarbonIconShape(
+              d: 'm29,21h-13c-1.1028,0-2-.8972-2-2v-4c0-1.1028.8972-2,2-2h13c1.1028,0,2,.8972,2,2v4c0,1.1028-.8972,2-2,2Zm-13-6v4h13v-4h-13Z',
+            ),
+            CarbonIconShape(
+              d: 'm12,27.2998c-4.6531-1.6523-8-6.0869-8-11.2998,0-6.6167,5.3833-12,12-12,4.8311,0,8.9937,2.876,10.8945,7h2.1665c-2.0188-5.2544-7.1045-9-13.061-9-7.7197,0-14,6.2803-14,14,0,6.3291,4.2246,11.6846,10,13.4102v-2.1104Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-partner-plus` icon data.
 const CarbonIconData ibmPartnerPlus = CarbonIconData(
@@ -3007,37 +3068,37 @@ const CarbonIconData ibmSapOnPower = CarbonIconData(
 );
 
 /// The Carbon `ibm--secure-infrastructure-on-vpc-for-regulated-industries` icon data.
-const CarbonIconData
-ibmSecureInfrastructureOnVpcForRegulatedIndustries = CarbonIconData(
-  name: 'ibm--secure-infrastructure-on-vpc-for-regulated-industries',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'm9,21H3c-1.1028,0-2-.8972-2-2v-6c0-1.1028.8972-2,2-2h6c1.1028,0,2,.8972,2,2v6c0,1.1028-.8972,2-2,2ZM3,13v6h6v-6s-6,0-6,0Z',
-        ),
-        CarbonIconShape(
-          d: 'm16,30c-.3618,0-.7205-.0138-1.0757-.0406-4.3528-.3312-8.3611-2.7313-10.7229-6.4202l1.6846-1.0784c2.0247,3.1628,5.4602,5.2205,9.1899,5.5043.3047.0231.613.0349.9241.0349v2Z',
-        ),
-        CarbonIconShape(
-          d: 'm23,30l-2.1-1c-1.7-.8-2.9-2.6-2.9-4.5v-6.5h10v6.5c0,1.9-1.1,3.7-2.9,4.5l-2.1,1Zm-3-10v4.5c0,1.2.7,2.2,1.7,2.7l1.3.6,1.3-.6c1-.5,1.7-1.6,1.7-2.7v-4.5h-6Z',
-        ),
-        CarbonIconShape(
-          d: 'm27.3025,12c.4539,1.2817.6975,2.6211.6975,4h2c0-1.3691-.1987-2.7085-.584-4h-2.1135Z',
-        ),
-        CarbonIconShape(
-          d: 'm27,10h-3c-1.1028,0-2-.8972-2-2v-3c0-1.1028.8972-2,2-2h3c1.1028,0,2,.8972,2,2v3c0,1.1028-.8972,2-2,2Zm-3-5v3h3v-3h-3Z',
-        ),
-        CarbonIconShape(
-          d: 'm20,2.5835c-1.2915-.3853-2.6309-.5835-4-.5835-4.7976,0-9.2083,2.415-11.7983,6.4604l1.6841,1.0786c2.2209-3.4683,6.002-5.5391,10.1143-5.5391,1.3787,0,2.7188.2437,4,.6978v-2.1143Z',
+const CarbonIconData ibmSecureInfrastructureOnVpcForRegulatedIndustries =
+    CarbonIconData(
+      name: 'ibm--secure-infrastructure-on-vpc-for-regulated-industries',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'm9,21H3c-1.1028,0-2-.8972-2-2v-6c0-1.1028.8972-2,2-2h6c1.1028,0,2,.8972,2,2v6c0,1.1028-.8972,2-2,2ZM3,13v6h6v-6s-6,0-6,0Z',
+            ),
+            CarbonIconShape(
+              d: 'm16,30c-.3618,0-.7205-.0138-1.0757-.0406-4.3528-.3312-8.3611-2.7313-10.7229-6.4202l1.6846-1.0784c2.0247,3.1628,5.4602,5.2205,9.1899,5.5043.3047.0231.613.0349.9241.0349v2Z',
+            ),
+            CarbonIconShape(
+              d: 'm23,30l-2.1-1c-1.7-.8-2.9-2.6-2.9-4.5v-6.5h10v6.5c0,1.9-1.1,3.7-2.9,4.5l-2.1,1Zm-3-10v4.5c0,1.2.7,2.2,1.7,2.7l1.3.6,1.3-.6c1-.5,1.7-1.6,1.7-2.7v-4.5h-6Z',
+            ),
+            CarbonIconShape(
+              d: 'm27.3025,12c.4539,1.2817.6975,2.6211.6975,4h2c0-1.3691-.1987-2.7085-.584-4h-2.1135Z',
+            ),
+            CarbonIconShape(
+              d: 'm27,10h-3c-1.1028,0-2-.8972-2-2v-3c0-1.1028.8972-2,2-2h3c1.1028,0,2,.8972,2,2v3c0,1.1028-.8972,2-2,2Zm-3-5v3h3v-3h-3Z',
+            ),
+            CarbonIconShape(
+              d: 'm20,2.5835c-1.2915-.3853-2.6309-.5835-4-.5835-4.7976,0-9.2083,2.415-11.7983,6.4604l1.6841,1.0786c2.2209-3.4683,6.002-5.5391,10.1143-5.5391,1.3787,0,2.7188.2437,4,.6978v-2.1143Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-security` icon data.
 const CarbonIconData ibmSecurity = CarbonIconData(
@@ -3094,22 +3155,22 @@ const CarbonIconData ibmSoftwareWatsonxDataAnalyzeAndProcess = CarbonIconData(
 );
 
 /// The Carbon `ibm-software--watsonx--data--structured--enrichment` icon data.
-const CarbonIconData
-ibmSoftwareWatsonxDataStructuredEnrichment = CarbonIconData(
-  name: 'ibm-software--watsonx--data--structured--enrichment',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M28,26h-2c0-1.1885.5767-2.0088,1.0854-2.7324.4907-.6978.9146-1.3003.9146-2.2676,0-1.6543-1.3457-3-3-3s-3,1.3457-3,3c0,.9673.4238,1.5698.9146,2.2676.5088.7236,1.0854,1.5439,1.0854,2.7324h-2c0-.5298-.2607-.9268-.7217-1.582-.5693-.8101-1.2783-1.8179-1.2783-3.418,0-2.7568,2.2432-5,5-5s5,2.2432,5,5c0,1.6001-.709,2.6079-1.2783,3.418-.4609.6553-.7217,1.0522-.7217,1.582ZM28,28h-6v2h6v-2ZM4,24h14v2H4c-1.1045,0-2-.8955-2-2V4c0-1.1045.8955-2,2-2h22c1.1045,0,2,.8955,2,2v10h-2v-5H4v15ZM4,7h22v-3H4v3ZM6,13h5v-2h-5v2ZM13,13h5v-2h-5v2ZM6,17h5v-2h-5v2ZM13,17h5v-2h-5v2ZM6,21h5v-2h-5v2ZM13,21h5v-2h-5v2Z',
+const CarbonIconData ibmSoftwareWatsonxDataStructuredEnrichment =
+    CarbonIconData(
+      name: 'ibm-software--watsonx--data--structured--enrichment',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M28,26h-2c0-1.1885.5767-2.0088,1.0854-2.7324.4907-.6978.9146-1.3003.9146-2.2676,0-1.6543-1.3457-3-3-3s-3,1.3457-3,3c0,.9673.4238,1.5698.9146,2.2676.5088.7236,1.0854,1.5439,1.0854,2.7324h-2c0-.5298-.2607-.9268-.7217-1.582-.5693-.8101-1.2783-1.8179-1.2783-3.418,0-2.7568,2.2432-5,5-5s5,2.2432,5,5c0,1.6001-.709,2.6079-1.2783,3.418-.4609.6553-.7217,1.0522-.7217,1.582ZM28,28h-6v2h6v-2ZM4,24h14v2H4c-1.1045,0-2-.8955-2-2V4c0-1.1045.8955-2,2-2h22c1.1045,0,2,.8955,2,2v10h-2v-5H4v15ZM4,7h22v-3H4v3ZM6,13h5v-2h-5v2ZM13,13h5v-2h-5v2ZM6,17h5v-2h-5v2ZM13,17h5v-2h-5v2ZM6,21h5v-2h-5v2ZM13,21h5v-2h-5v2Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-software--watsonx--data--structured--import` icon data.
 const CarbonIconData ibmSoftwareWatsonxDataStructuredImport = CarbonIconData(
@@ -3129,22 +3190,22 @@ const CarbonIconData ibmSoftwareWatsonxDataStructuredImport = CarbonIconData(
 );
 
 /// The Carbon `ibm-software--watsonx--data--unstructured--enrichment` icon data.
-const CarbonIconData
-ibmSoftwareWatsonxDataUnstructuredEnrichment = CarbonIconData(
-  name: 'ibm-software--watsonx--data--unstructured--enrichment',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M27,26h-2c0-1.1885.5767-2.0088,1.0854-2.7324.4907-.6978.9146-1.3003.9146-2.2676,0-1.6543-1.3457-3-3-3s-3,1.3457-3,3c0,.9673.4238,1.5698.9146,2.2676.5088.7236,1.0854,1.5439,1.0854,2.7324h-2c0-.5298-.2607-.9268-.7217-1.582-.5693-.8101-1.2783-1.8179-1.2783-3.418,0-2.7568,2.2432-5,5-5s5,2.2432,5,5c0,1.6001-.709,2.6079-1.2783,3.418-.4609.6553-.7217,1.0522-.7217,1.582ZM27,28h-6v2h6v-2ZM27.7236,13h-11.4468l5.7231-10.0156,5.7236,10.0156h0ZM19.7236,11h4.5527l-2.2764-3.9844-2.2764,3.9844h0ZM9,14c-2.7571,0-5-2.2429-5-5s2.2429-5,5-5,5,2.2429,5,5-2.2429,5-5,5ZM9,6c-1.6543,0-3,1.3457-3,3s1.3457,3,3,3,3-1.3457,3-3-1.3457-3-3-3ZM16,27.0007H6v-10.0007h10v10.0007ZM8,25.0007h6v-6.0007h-6v6.0007Z',
+const CarbonIconData ibmSoftwareWatsonxDataUnstructuredEnrichment =
+    CarbonIconData(
+      name: 'ibm-software--watsonx--data--unstructured--enrichment',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M27,26h-2c0-1.1885.5767-2.0088,1.0854-2.7324.4907-.6978.9146-1.3003.9146-2.2676,0-1.6543-1.3457-3-3-3s-3,1.3457-3,3c0,.9673.4238,1.5698.9146,2.2676.5088.7236,1.0854,1.5439,1.0854,2.7324h-2c0-.5298-.2607-.9268-.7217-1.582-.5693-.8101-1.2783-1.8179-1.2783-3.418,0-2.7568,2.2432-5,5-5s5,2.2432,5,5c0,1.6001-.709,2.6079-1.2783,3.418-.4609.6553-.7217,1.0522-.7217,1.582ZM27,28h-6v2h6v-2ZM27.7236,13h-11.4468l5.7231-10.0156,5.7236,10.0156h0ZM19.7236,11h4.5527l-2.2764-3.9844-2.2764,3.9844h0ZM9,14c-2.7571,0-5-2.2429-5-5s2.2429-5,5-5,5,2.2429,5,5-2.2429,5-5,5ZM9,6c-1.6543,0-3,1.3457-3,3s1.3457,3,3,3,3-1.3457,3-3-1.3457-3-3-3ZM16,27.0007H6v-10.0007h10v10.0007ZM8,25.0007h6v-6.0007h-6v6.0007Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-software--watsonx--data--unstructured--import` icon data.
 const CarbonIconData ibmSoftwareWatsonxDataUnstructuredImport = CarbonIconData(
@@ -3819,28 +3880,28 @@ const CarbonIconData ibmWatsonxCodeAssistant = CarbonIconData(
 );
 
 /// The Carbon `ibm-watsonx--code-assistant-for-enterprise-java-applications` icon data.
-const CarbonIconData
-ibmWatsonxCodeAssistantForEnterpriseJavaApplications = CarbonIconData(
-  name: 'ibm-watsonx--code-assistant-for-enterprise-java-applications',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M29.9916,19h-2v-7c0-2.7614-2.2386-5-5-5h-8.9948v-2h8.9948c3.866,0,7,3.134,7,7v7ZM11.9916,28h-3c-3.86,0-7-3.14-7-7v-5h2v5c0,2.757,2.243,5,5,5h3v2Z',
-        ),
-        CarbonIconShape(
-          d: 'M9.9916,14h-4c-1.103,0-2-.897-2-2v-2h2v2h4V2h2v10c0,1.103-.897,2-2,2Z',
-        ),
-        CarbonIconShape(
-          d: 'M28.15,26l-2.58,2.58,1.41,1.42,4-4-4-4-1.42,1.41,2.59,2.59ZM16.81,26l2.58-2.58-1.41-1.42-4,4,4,4,1.42-1.41-2.59-2.59ZM21.98,31l-1.915-.577,2.915-9.423,1.915.577-2.915,9.423Z',
+const CarbonIconData ibmWatsonxCodeAssistantForEnterpriseJavaApplications =
+    CarbonIconData(
+      name: 'ibm-watsonx--code-assistant-for-enterprise-java-applications',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M29.9916,19h-2v-7c0-2.7614-2.2386-5-5-5h-8.9948v-2h8.9948c3.866,0,7,3.134,7,7v7ZM11.9916,28h-3c-3.86,0-7-3.14-7-7v-5h2v5c0,2.757,2.243,5,5,5h3v2Z',
+            ),
+            CarbonIconShape(
+              d: 'M9.9916,14h-4c-1.103,0-2-.897-2-2v-2h2v2h4V2h2v10c0,1.103-.897,2-2,2Z',
+            ),
+            CarbonIconShape(
+              d: 'M28.15,26l-2.58,2.58,1.41,1.42,4-4-4-4-1.42,1.41,2.59,2.59ZM16.81,26l2.58-2.58-1.41-1.42-4,4,4,4,1.42-1.41-2.59-2.59ZM21.98,31l-1.915-.577,2.915-9.423,1.915.577-2.915,9.423Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-watsonx--code-assistant-for-z` icon data.
 const CarbonIconData ibmWatsonxCodeAssistantForZ = CarbonIconData(
@@ -3920,22 +3981,22 @@ const CarbonIconData ibmWatsonxCodeAssistantForZUnderstand = CarbonIconData(
 );
 
 /// The Carbon `ibm-watsonx--code-assistant-for-z-validation-assistant` icon data.
-const CarbonIconData
-ibmWatsonxCodeAssistantForZValidationAssistant = CarbonIconData(
-  name: 'ibm-watsonx--code-assistant-for-z-validation-assistant',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M16,2c-7.73,0-14,6.2821-14,14.0269,0,5.0697,2.69,9.5082,6.71,11.9731l1.1-1.6632c-3.48-2.104-5.81-5.9314-5.81-10.3098,0-6.6428,5.37-12.0231,12-12.0231s12,5.396,12,12.0388h2c0-7.7449-6.27-14.0426-14-14.0426ZM14,21.414l-5-5.001,1.413-1.413,3.587,3.586,7.585-7.586,1.415,1.415-9,8.999ZM26.58,24.41l1.42-1.41,4,4-4,4-1.41-1.42,2.58-2.58-2.59-2.59ZM22.5,32l-1.9149-.5771,2.9149-9.4229,1.9149.5771-2.9149,9.4229ZM19.42,29.59l-1.42,1.41-4-4,4-4,1.41,1.42-2.58,2.58,2.59,2.59Z',
+const CarbonIconData ibmWatsonxCodeAssistantForZValidationAssistant =
+    CarbonIconData(
+      name: 'ibm-watsonx--code-assistant-for-z-validation-assistant',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16,2c-7.73,0-14,6.2821-14,14.0269,0,5.0697,2.69,9.5082,6.71,11.9731l1.1-1.6632c-3.48-2.104-5.81-5.9314-5.81-10.3098,0-6.6428,5.37-12.0231,12-12.0231s12,5.396,12,12.0388h2c0-7.7449-6.27-14.0426-14-14.0426ZM14,21.414l-5-5.001,1.413-1.413,3.587,3.586,7.585-7.586,1.415,1.415-9,8.999ZM26.58,24.41l1.42-1.41,4,4-4,4-1.41-1.42,2.58-2.58-2.59-2.59ZM22.5,32l-1.9149-.5771,2.9149-9.4229,1.9149.5771-2.9149,9.4229ZM19.42,29.59l-1.42,1.41-4-4,4-4,1.41,1.42-2.58,2.58,2.59,2.59Z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm-watsonx--orchestrate` icon data.
 const CarbonIconData ibmWatsonxOrchestrate = CarbonIconData(

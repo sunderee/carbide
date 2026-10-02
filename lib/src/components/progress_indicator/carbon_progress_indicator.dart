@@ -20,6 +20,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/interaction.dart';
 
 /// A single step in a [CarbonProgressIndicator].
 class CarbonProgressStep {
@@ -47,6 +48,11 @@ class CarbonProgressStep {
 enum _StepState { complete, current, incomplete, invalid, disabled }
 
 /// A stepper showing progress through a sequence of [steps].
+///
+/// When [interactive] and [onStepSelected] are supplied, enabled steps support
+/// pointer, Enter/Space, and assistive-technology activation. The focus ring
+/// follows keyboard focus highlighting. Each step announces its progress state
+/// on the same semantics node as its label and activation action.
 ///
 /// ```dart
 /// CarbonProgressIndicator(
@@ -81,7 +87,7 @@ class CarbonProgressIndicator extends StatelessWidget {
   /// Whether steps are clickable.
   final bool interactive;
 
-  /// Called with the index of a tapped step (when [interactive]).
+  /// Called with the index of an activated step (when [interactive]).
   final ValueChanged<int>? onStepSelected;
 
   _StepState _stateOf(int index) {
@@ -124,7 +130,7 @@ class CarbonProgressIndicator extends StatelessWidget {
   }
 }
 
-class _Step extends StatefulWidget {
+class _Step extends StatelessWidget {
   const _Step({
     required this.step,
     required this.state,
@@ -142,38 +148,31 @@ class _Step extends StatefulWidget {
   final VoidCallback? onTap;
 
   @override
-  State<_Step> createState() => _StepWidgetState();
-}
-
-class _StepWidgetState extends State<_Step> {
-  bool _focused = false;
-
-  @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final Color lineColor = widget.lineComplete
+    final Color lineColor = lineComplete
         ? theme.interactive
         : theme.borderSubtle00;
 
-    final Color labelColor = widget.state == _StepState.disabled
+    final Color labelColor = state == _StepState.disabled
         ? theme.textDisabled
-        : widget.state == _StepState.invalid
+        : state == _StepState.invalid
         ? theme.supportError
         : theme.textPrimary;
 
-    final Widget glyph = _StepGlyph(state: widget.state);
+    final Widget glyph = _StepGlyph(state: state);
 
     final Widget label = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          widget.step.label,
+          step.label,
           style: CarbonTypeStyles.bodyCompact01.copyWith(color: labelColor),
         ),
-        if (widget.step.secondaryLabel != null)
+        if (step.secondaryLabel != null)
           Text(
-            widget.step.secondaryLabel!,
+            step.secondaryLabel!,
             style: CarbonTypeStyles.label01.copyWith(
               color: theme.textSecondary,
             ),
@@ -181,14 +180,14 @@ class _StepWidgetState extends State<_Step> {
       ],
     );
 
-    final Widget content = widget.vertical
+    final Widget content = vertical
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Column(
                 children: <Widget>[
                   glyph,
-                  if (!widget.isLast)
+                  if (!isLast)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: SizedBox(
@@ -213,7 +212,7 @@ class _StepWidgetState extends State<_Step> {
                     children: <Widget>[
                       glyph,
                       const SizedBox(width: CarbonSpacing.spacing03),
-                      if (!widget.isLast)
+                      if (!isLast)
                         Padding(
                           padding: const EdgeInsets.only(top: 7),
                           child: SizedBox(
@@ -231,32 +230,45 @@ class _StepWidgetState extends State<_Step> {
             ],
           );
 
-    Widget step = content;
-    if (widget.onTap != null) {
-      step = Focus(
-        onFocusChange: (bool f) => setState(() => _focused = f),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onTap,
-          child: CarbonFocusRing(visible: _focused, inset: true, child: step),
-        ),
+    Widget body = ExcludeSemantics(child: content);
+    if (onTap != null) {
+      body = CarbonInteraction(
+        onPressed: onTap,
+        builder: (BuildContext context, Set<WidgetState> states) =>
+            CarbonFocusRing(
+              visible: states.contains(WidgetState.focused),
+              inset: true,
+              child: ConstrainedBox(
+                // Interactive steps retain their glyph size but offer a full
+                // 48px pointer and assistive-technology activation region.
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                child: ExcludeSemantics(child: content),
+              ),
+            ),
       );
     }
 
-    return Semantics(
-      label: widget.step.label,
-      button: widget.onTap != null,
-      selected: widget.state == _StepState.current,
-      enabled: widget.state != _StepState.disabled,
-      child: ExcludeSemantics(
+    return MergeSemantics(
+      child: Semantics(
+        container: true,
+        label: step.label,
+        value: switch (state) {
+          _StepState.complete => 'Complete',
+          _StepState.current => 'Current',
+          _StepState.incomplete => 'Incomplete',
+          _StepState.invalid => 'Invalid',
+          _StepState.disabled => 'Disabled',
+        },
+        onTap: onTap,
+        button: onTap != null,
+        selected: state == _StepState.current,
+        enabled: state != _StepState.disabled,
         child: Padding(
           padding: EdgeInsetsDirectional.only(
-            end: widget.vertical || widget.isLast ? 0 : CarbonSpacing.spacing05,
-            bottom: widget.vertical && !widget.isLast
-                ? CarbonSpacing.spacing03
-                : 0,
+            end: vertical || isLast ? 0 : CarbonSpacing.spacing05,
+            bottom: vertical && !isLast ? CarbonSpacing.spacing03 : 0,
           ),
-          child: step,
+          child: body,
         ),
       ),
     );

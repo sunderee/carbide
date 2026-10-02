@@ -3576,6 +3576,40 @@ const CarbonIconData starReview = CarbonIconData(
   ],
 );
 
+/// The Carbon `state--definition` icon data.
+const CarbonIconData stateDefinition = CarbonIconData(
+  name: 'state--definition',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,27H4c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h24c1.1025,0,2,.897,2,2v18c0,1.1025-.8975,2-2,2ZM4,7h-.0015l.0015,18h24V7H4ZM26,12H6v-2h20v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `state--exhibit` icon data.
+const CarbonIconData stateExhibit = CarbonIconData(
+  name: 'state--exhibit',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,30h-12c-4.4111,0-8-3.5889-8-8v-12C2,5.5889,5.5889,2,10,2h12c4.4111,0,8,3.5889,8,8v12c0,4.4111-3.5889,8-8,8ZM10,4c-3.3086,0-6,2.6914-6,6v12c0,3.3086,2.6914,6,6,6h12c3.3086,0,6-2.6914,6-6v-12c0-3.3086-2.6914-6-6-6h-12ZM24,21h-8c-1.103,0-2-.8076-2-1.7998v-3.1875l-3.9805,3.9902-1.416-1.4121,1.5864-1.5908h-4.1719v-2h4.1719l-1.5913-1.5957,1.416-1.4121,3.9854,3.9951v-3.1875c0-.9922.897-1.7998,2-1.7998h8c1.1025,0,2,.8076,2,1.7998v6.4004c0,.9922-.8975,1.7998-2,1.7998ZM16,18.9834l8,.0166v-6h-8v5.9834ZM23,17h-6v-2h6v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `stay-inside` icon data.
 const CarbonIconData stayInside = CarbonIconData(
   name: 'stay-inside',
@@ -3629,6 +3663,23 @@ const CarbonIconData stemLeafPlot = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M7,10a3,3,0,1,1,3-3A3.0033,3.0033,0,0,1,7,10ZM7,6A1,1,0,1,0,8,7,1.0011,1.0011,0,0,0,7,6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `stepzen--graph-server` icon data.
+const CarbonIconData stepzenGraphServer = CarbonIconData(
+  name: 'stepzen--graph-server',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M18.82,15c-.41-1.16-1.52-2-2.82-2s-2.41.84-2.82,2h-3.18v-3c0-1.1.9-2,2-2h6v-2h-6c-2.21,0-4,1.79-4,4v5h5.18c.41,1.16,1.52,2,2.82,2s2.41-.84,2.82-2h3.18v3c0,1.1-.9,2-2,2h-6v2h6c2.21,0,4-1.79,4-4v-5h-5.18ZM16,17c-.55,0-1-.45-1-1s.45-1,1-1,1,.45,1,1-.45,1-1,1ZM5,17h-2v-5C3,7.0376,7.0376,3,12,3h13.5859c.8115,0,1.5371.4849,1.8477,1.2349s.1406,1.6055-.4336,2.1792l-6.293,6.293-1.4141-1.4141,6.293-6.293h-13.5859c-3.8599,0-7,3.1401-7,7v5ZM20,29H6.4141c-.8115,0-1.5371-.4844-1.8477-1.2344s-.1406-1.6055.4336-2.1797l6.293-6.293,1.4141,1.4141-6.293,6.293h13.5859c3.8594,0,7-3.1406,7-7v-5h2v5c0,4.9629-4.0371,9-9,9Z',
         ),
       ],
     ),
@@ -4195,6 +4246,23 @@ const CarbonIconData subnetAclRules = CarbonIconData(
         CarbonIconShape(d: 'M18,9 h12 v2 h-12 z'),
         CarbonIconShape(
           d: 'M22,24v4H6V16h8V14H10V8a4.0008,4.0008,0,0,1,7.6675-1.6L19.5005,5.6A6.001,6.001,0,0,0,8,8v6H6a2.0023,2.0023,0,0,0-2,2V28a2.0023,2.0023,0,0,0,2,2H22a2.0023,2.0023,0,0,0,2-2V24Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `subprocess` icon data.
+const CarbonIconData subprocess = CarbonIconData(
+  name: 'subprocess',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,26H4c-1.103,0-2-.8975-2-2V8c0-1.103.897-2,2-2h24c1.1025,0,2,.897,2,2v16c0,1.1025-.8975,2-2,2ZM4,8h-.0015l.0015,16h24V8H4ZM17,22h-2v-3h-3v-2h3v-3h2v3h3v2h-3v3Z',
         ),
       ],
     ),
