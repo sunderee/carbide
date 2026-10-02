@@ -230,7 +230,7 @@ class _Step extends StatelessWidget {
             ],
           );
 
-    Widget body = content;
+    Widget body = ExcludeSemantics(child: content);
     if (onTap != null) {
       body = CarbonInteraction(
         onPressed: onTap,
@@ -242,27 +242,27 @@ class _Step extends StatelessWidget {
                 // Interactive steps retain their glyph size but offer a full
                 // 48px pointer and assistive-technology activation region.
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                child: content,
+                child: ExcludeSemantics(child: content),
               ),
             ),
       );
     }
 
-    return Semantics(
-      container: true,
-      label: step.label,
-      value: switch (state) {
-        _StepState.complete => 'Complete',
-        _StepState.current => 'Current',
-        _StepState.incomplete => 'Incomplete',
-        _StepState.invalid => 'Invalid',
-        _StepState.disabled => 'Disabled',
-      },
-      onTap: onTap,
-      button: onTap != null,
-      selected: state == _StepState.current,
-      enabled: state != _StepState.disabled,
-      child: ExcludeSemantics(
+    return MergeSemantics(
+      child: Semantics(
+        container: true,
+        label: step.label,
+        value: switch (state) {
+          _StepState.complete => 'Complete',
+          _StepState.current => 'Current',
+          _StepState.incomplete => 'Incomplete',
+          _StepState.invalid => 'Invalid',
+          _StepState.disabled => 'Disabled',
+        },
+        onTap: onTap,
+        button: onTap != null,
+        selected: state == _StepState.current,
+        enabled: state != _StepState.disabled,
         child: Padding(
           padding: EdgeInsetsDirectional.only(
             end: vertical || isLast ? 0 : CarbonSpacing.spacing05,

@@ -12,6 +12,7 @@
 // / expansion / toolbar features build on. No Material DataTable — equal-flex
 // columns shared between the header and body rows.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -267,13 +268,17 @@ class CarbonDataTable extends StatelessWidget {
         rows.isNotEmpty && selectedRows.length == rows.length;
     final bool partlySelected = selectedRows.isNotEmpty && !allSelected;
     final Widget? selectAll = selection == CarbonTableSelection.multi
-        ? Semantics(
-            label: 'Select all rows',
-            checked: partlySelected ? null : allSelected,
-            mixed: partlySelected,
-            enabled: onSelectionChanged != null,
-            onTap: onSelectionChanged != null ? _toggleAll : null,
-            child: ExcludeSemantics(
+        ? MergeSemantics(
+            child: Semantics(
+              label: 'Select all rows',
+              checked: partlySelected ? null : allSelected,
+              mixed: partlySelected,
+              // Flutter 3.47's web SemanticCheckable maps mixed to aria-checked
+              // false. Keep the native flag and announce the state in the same
+              // node's value until the engine preserves mixed in the DOM.
+              value: kIsWeb && partlySelected ? 'Partially selected' : null,
+              enabled: onSelectionChanged != null,
+              onTap: onSelectionChanged != null ? _toggleAll : null,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: onSelectionChanged != null ? _toggleAll : null,
@@ -903,13 +908,16 @@ class _RowSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      checked: selected,
-      inMutuallyExclusiveGroup: !multi,
-      enabled: onChanged != null,
-      onTap: onChanged,
-      child: ExcludeSemantics(
+    return MergeSemantics(
+      // Web checkable roles retain their initial checkbox/radio kind. Replace
+      // the node when selection mode changes so the role follows the control.
+      key: ValueKey<bool>(multi),
+      child: Semantics(
+        label: label,
+        checked: selected,
+        inMutuallyExclusiveGroup: !multi,
+        enabled: onChanged != null,
+        onTap: onChanged,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onChanged,

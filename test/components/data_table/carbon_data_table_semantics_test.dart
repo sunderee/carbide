@@ -6,6 +6,7 @@
 import 'dart:ui' show CheckedState;
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -85,17 +86,20 @@ void main() {
             selection == CarbonTableSelection.multi ? <int>{0, 1} : <int>{1},
           );
           expect(calls, 2);
-          // Exercise the existing control's keyboard path independently of AT.
-          Focus.of(
-            tester.element(
-              find
-                  .descendant(
-                    of: find.bySemanticsLabel('Select row 1'),
-                    matching: find.byType(GestureDetector),
-                  )
-                  .last,
+          final SemanticsNode focusTarget = tester.getSemantics(
+            find.bySemanticsLabel('Select row 1'),
+          );
+          expect(
+            focusTarget.getSemanticsData().hasAction(SemanticsAction.focus),
+            isTrue,
+          );
+          tester.binding.platformDispatcher.onSemanticsActionEvent!(
+            SemanticsActionEvent(
+              type: SemanticsAction.focus,
+              nodeId: focusTarget.id,
+              viewId: tester.view.viewId,
             ),
-          ).requestFocus();
+          );
           await tester.pump();
           await tester.sendKeyEvent(LogicalKeyboardKey.space);
           await tester.pumpAndSettle();
@@ -135,6 +139,61 @@ void main() {
     });
   }
 
+  testWidgets('switching selection modes updates role and keeps activation', (
+    WidgetTester tester,
+  ) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    try {
+      CarbonTableSelection selection = CarbonTableSelection.multi;
+      Set<int> selected = <int>{};
+      late StateSetter update;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              update = setState;
+              return _table(
+                selection,
+                selected,
+                (Set<int> next) => setState(() => selected = next),
+              );
+            },
+          ),
+        ),
+      );
+      for (final CarbonTableSelection mode in <CarbonTableSelection>[
+        CarbonTableSelection.single,
+        CarbonTableSelection.multi,
+      ]) {
+        update(() {
+          selection = mode;
+          selected = <int>{};
+        });
+        await tester.pumpAndSettle();
+        final SemanticsNode row = tester.getSemantics(
+          find.bySemanticsLabel('Select row 1'),
+        );
+        expect(
+          row,
+          isSemantics(
+            isInMutuallyExclusiveGroup: mode == CarbonTableSelection.single,
+          ),
+        );
+        tester.binding.platformDispatcher.onSemanticsActionEvent!(
+          SemanticsActionEvent(
+            type: SemanticsAction.tap,
+            nodeId: row.id,
+            viewId: tester.view.viewId,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(selected, <int>{0});
+      }
+    } finally {
+      handle.dispose();
+    }
+  });
+
   testWidgets(
     'select-all activates, announces mixed state, selects and clears',
     (WidgetTester tester) async {
@@ -158,7 +217,10 @@ void main() {
         );
         expect(
           tester.getSemantics(find.bySemanticsLabel('Select all rows')),
-          isSemantics(isCheckStateMixed: true),
+          isSemantics(
+            isCheckStateMixed: true,
+            value: kIsWeb ? 'Partially selected' : '',
+          ),
         );
         for (final Set<int> expected in <Set<int>>[
           <int>{0, 1},

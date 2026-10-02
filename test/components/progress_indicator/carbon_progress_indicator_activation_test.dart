@@ -51,7 +51,20 @@ void main() {
         );
         await tester.pump();
         expect(calls, <int>[1]);
-        Focus.of(tester.element(find.text('Complete'))).requestFocus();
+        final SemanticsNode complete = tester.getSemantics(
+          find.bySemanticsLabel('Complete'),
+        );
+        expect(
+          complete.getSemanticsData().hasAction(SemanticsAction.focus),
+          isTrue,
+        );
+        tester.binding.platformDispatcher.onSemanticsActionEvent!(
+          SemanticsActionEvent(
+            type: SemanticsAction.focus,
+            nodeId: complete.id,
+            viewId: tester.view.viewId,
+          ),
+        );
         await tester.pump();
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         await tester.pump();
@@ -89,17 +102,25 @@ void main() {
             .simulatedAccessibilityTraversal()
             .where(
               (SemanticsNode node) => _steps.any(
-                (CarbonProgressStep step) => step.label == node.label,
+                (CarbonProgressStep step) =>
+                    step.label == node.getSemanticsData().label,
               ),
             )
             .toList();
         expect(nodes, hasLength(5));
+        expect(
+          tester.semantics.simulatedAccessibilityTraversal().where(
+            (SemanticsNode node) =>
+                node.getSemanticsData().hasAction(SemanticsAction.tap),
+          ),
+          hasLength(4),
+        );
         for (int i = 0; i < _steps.length; i++) {
           final SemanticsNode node = tester.getSemantics(
             find.bySemanticsLabel(_steps[i].label),
           );
           expect(
-            node.value,
+            node.getSemanticsData().value,
             <String>[
               'Complete',
               'Current',
