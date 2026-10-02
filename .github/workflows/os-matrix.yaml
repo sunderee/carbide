@@ -130,3 +130,11 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/form_ownership_test.dart
           -d web-server
+
+      - name: Drive text-area native limit and composition test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/text_area_limit_test.dart
+          -d web-server

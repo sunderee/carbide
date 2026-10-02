@@ -8,6 +8,9 @@
 //   styles/scss/components/fluid-text-area/_fluid-text-area.scss
 //   react/src/components/TextArea/TextArea.tsx
 
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
@@ -16,12 +19,14 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/native_text_composition.dart';
 import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
+import 'text_area_limit.dart';
 
-/// How the character counter is computed.
+/// The unit used by the text-area input limit and counter.
 enum CarbonCounterMode {
-  /// Counts characters.
+  /// Counts user-perceived characters (Unicode grapheme clusters).
   character,
 
   /// Counts whitespace-separated words.
@@ -67,6 +72,10 @@ class CarbonTextArea extends StatefulWidget {
        assert(
          !enableCounter || maxCount != null,
          'enableCounter requires maxCount',
+       ),
+       assert(
+         maxCount == null || maxCount >= 0,
+         'maxCount must be non-negative',
        );
 
   /// The field label.
@@ -120,10 +129,26 @@ class CarbonTextArea extends StatefulWidget {
   /// Shows the character/word counter beside the label.
   final bool enableCounter;
 
-  /// The maximum count (required when [enableCounter]).
+  /// Limits committed user input, even when [enableCounter] is false.
+  ///
+  /// Must be non-negative, or null for unlimited input. Required when
+  /// [enableCounter] is true. [CarbonCounterMode.character] counts Unicode
+  /// grapheme clusters: emoji, flags, ZWJ sequences and combining accents each
+  /// count as one user-perceived character. [CarbonCounterMode.word] counts
+  /// whitespace-separated words. Pasted content is truncated to fit while
+  /// preserving surrounding text and whole graphemes/words.
+  ///
+  /// Active IME composition may temporarily exceed the limit; it is enforced
+  /// when composition commits. The counter always reflects the actual text.
+  /// Initial and programmatic controller values are not rewritten, including
+  /// when this limit decreases. The next committed user edit enforces the new
+  /// limit, truncating the whole value if surrounding text alone exceeds it.
   final int? maxCount;
 
-  /// Whether the counter counts characters or words.
+  /// The unit used by both [maxCount] and the optional counter.
+  ///
+  /// Character capacity is exposed as semantic max/current lengths. Word
+  /// capacity is announced in the field hint instead of a character limit.
   final CarbonCounterMode counterMode;
 
   /// An optional AI presence decorator (a `CarbonAILabel`), anchored to the
@@ -157,6 +182,10 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
 
   late final OwnedTextEditingController _controllerOwner;
   late final OwnedFocusNode _focusOwner;
+  late final TextAreaLimitFormatter _limit;
+  late final NativeTextComposition _nativeComposition;
+  final GlobalKey<EditableTextState> _editableKey =
+      GlobalKey<EditableTextState>();
 
   TextEditingController get _controller => _controllerOwner.value;
   FocusNode get _focus => _focusOwner.value;
@@ -171,19 +200,32 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
     );
     _focusOwner = OwnedFocusNode(
       external: widget.focusNode,
-      onChanged: _onChange,
+      onChanged: _onFocusChange,
+    );
+    _nativeComposition = NativeTextComposition(
+      isFocused: () => _focus.hasFocus,
+      onCommit: _commitComposition,
+    );
+    _limit = TextAreaLimitFormatter(
+      maxCount: widget.maxCount,
+      words: widget.counterMode == CarbonCounterMode.word,
+      resolveComposition: _nativeComposition.resolve,
     );
   }
 
   @override
   void didUpdateWidget(CarbonTextArea oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _limit
+      ..maxCount = widget.maxCount
+      ..words = widget.counterMode == CarbonCounterMode.word;
     _controllerOwner.update(widget.controller);
     _focusOwner.update(widget.focusNode);
   }
 
   @override
   void dispose() {
+    _nativeComposition.dispose();
     _controllerOwner.dispose();
     _focusOwner.dispose();
     super.dispose();
@@ -195,13 +237,36 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
     }
   }
 
-  int get _count {
-    final String text = _controller.text;
-    if (widget.counterMode == CarbonCounterMode.word) {
-      return text.trim().isEmpty ? 0 : text.trim().split(RegExp(r'\s+')).length;
+  void _onFocusChange() {
+    _onChange();
+    if (!_focus.hasFocus && !_controller.value.composing.isCollapsed) {
+      final String composingText = _controller.text;
+      // EditableText may clear composing metadata while closing its input
+      // connection. Finish the known composition after that focus transition.
+      scheduleMicrotask(() {
+        if (mounted && !_focus.hasFocus) {
+          _commitComposition(composingText);
+        }
+      });
     }
-    return text.characters.length;
   }
+
+  void _commitComposition([String? expectedText]) {
+    if (mounted &&
+        !widget.disabled &&
+        !widget.readOnly &&
+        (expectedText == null || expectedText == _controller.text)) {
+      _editableKey.currentState?.userUpdateTextEditingValue(
+        _limit.commit(_controller.value),
+        SelectionChangedCause.keyboard,
+      );
+    }
+  }
+
+  int get _count => countTextAreaText(
+    _controller.text,
+    words: widget.counterMode == CarbonCounterMode.word,
+  );
 
   CarbonFieldStatus get _status => widget.invalid
       ? CarbonFieldStatus.invalid
@@ -223,6 +288,15 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
       child: Semantics(
         label: widget.labelText,
         enabled: !widget.disabled,
+        maxValueLength: widget.counterMode == CarbonCounterMode.character
+            ? widget.maxCount
+            : null,
+        currentValueLength: _controller.text.characters.length,
+        hint:
+            widget.counterMode == CarbonCounterMode.word &&
+                widget.maxCount != null
+            ? '$_count of ${widget.maxCount} words'
+            : null,
         child: Stack(
           children: <Widget>[
             if (widget.placeholder != null && _controller.text.isEmpty)
@@ -235,12 +309,14 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
                 ),
               ),
             EditableText(
+              key: _editableKey,
               controller: _controller,
               focusNode: _focus,
               selectAllOnFocus: _focusOwner.selectAllOnFocus,
               readOnly: !enabled,
               autofocus: widget.autofocus,
               onChanged: widget.onChanged,
+              inputFormatters: <TextInputFormatter>[_limit],
               style: style,
               cursorColor: theme.focus,
               backgroundCursorColor: theme.textPlaceholder,
