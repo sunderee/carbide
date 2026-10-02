@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Gate every slider interaction on its current disabled/read-only policy,
+  including both handles, the value input, pending events and accessibility
+  actions. Disabled sliders cannot receive focus; read-only sliders remain
+  focusable for value inspection. Fix native web slider names and values (#297).
 - Treat number-input typing as a draft. Enter, Done, blur, and step actions
   commit a finite, clamped value and normalize the displayed text before
   notifying the caller. Share field chrome for warning/invalid precedence,

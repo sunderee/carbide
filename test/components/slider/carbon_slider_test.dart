@@ -262,7 +262,7 @@ void main() {
   });
 
   group('goldens', () {
-    testWidgets('single + range + disabled across themes', (
+    testWidgets('single + range + disabled + focused read-only across themes', (
       WidgetTester tester,
     ) async {
       await expectThemeGoldens(
@@ -272,7 +272,21 @@ void main() {
         // accent / overlay side re-snapshots under RTL.
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
-        size: const Size(420, 220),
+        size: const Size(420, 460),
+        afterPump: (WidgetTester tester) async {
+          final FocusNode focus = tester
+              .widget<Focus>(
+                find
+                    .ancestor(
+                      of: find.byType(AnimatedScale).at(4),
+                      matching: find.byType(Focus),
+                    )
+                    .first,
+              )
+              .focusNode!;
+          focus.requestFocus();
+          await tester.pumpAndSettle();
+        },
         builder: (BuildContext context) => Center(
           child: SizedBox(
             width: 380,
@@ -298,12 +312,33 @@ void main() {
                   onUpperChanged: (_) {},
                 ),
                 const SizedBox(height: 16),
-                const CarbonSlider(
+                CarbonSlider(
                   labelText: 'Disabled',
                   value: 60,
                   min: 0,
                   max: 100,
-                  hideTextInput: true,
+                  disabled: true,
+                  onChanged: (_) {},
+                ),
+                const SizedBox(height: 16),
+                CarbonSlider(
+                  labelText: 'Read only',
+                  value: 40,
+                  min: 0,
+                  max: 100,
+                  readOnly: true,
+                  onChanged: (_) {},
+                ),
+                const SizedBox(height: 16),
+                CarbonSlider(
+                  labelText: 'Read-only range',
+                  value: 25,
+                  upperValue: 70,
+                  min: 0,
+                  max: 100,
+                  readOnly: true,
+                  onChanged: (_) {},
+                  onUpperChanged: (_) {},
                 ),
               ],
             ),

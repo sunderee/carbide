@@ -350,7 +350,9 @@ class _SliderPageState extends State<_SliderPage> {
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Slider',
-      description: 'A draggable value with a paired number field.',
+      description:
+          'A draggable value with a paired number field. Disabled controls '
+          'skip focus; read-only controls allow focus and value inspection.',
       previewAlignment: Alignment.topCenter,
       preview: SizedBox(
         width: 360,
