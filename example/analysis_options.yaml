@@ -189,8 +189,8 @@ analyzer:
     # remove_deprecations_in_breaking_versions: error
     # require_trailing_commas: error
     secure_pubspec_urls: error
-    # simple_directive_paths: error
-    # simplify_variable_pattern: error
+    simple_directive_paths: error
+    simplify_variable_pattern: error
     sized_box_for_whitespace: error
     # sized_box_shrink_expand: error
     slash_for_doc_comments: error
@@ -202,7 +202,7 @@ analyzer:
     # specify_nonobvious_property_types: error
     strict_top_level_inference: error
     # super_goes_last: error
-    # switch_on_type: error
+    switch_on_type: error
     # test_types_in_equals: error
     # throw_in_finally: error
     # tighten_type_of_initializing_formals: error
@@ -242,7 +242,7 @@ analyzer:
     # unnecessary_this_alias: error
     unnecessary_to_list_in_spreads: error
     # unnecessary_type_name_in_constructor: error
-    # unnecessary_unawaited: error
+    unnecessary_unawaited: error
     unnecessary_underscores: error
     # unreachable_from_main: error
     unrelated_type_equality_checks: error
@@ -278,9 +278,6 @@ analyzer:
     - android/**
     - ios/**
     - web/**
-    - windows/**
-    - macos/**
-    - linux/**
 
 linter:
   rules:
@@ -616,7 +613,7 @@ linter:
     # Categories: style
     # - eol_at_end_of_file
 
-    # Define case clauses for all constants in enum-like classes.
+    # Define case clauses for all constants in enum-like types.
     # Categories: errorProne
     - exhaustive_cases
 
@@ -711,7 +708,6 @@ linter:
     # - matching_super_parameters
 
     # Design widgets should be imported from Material or Cupertino packages.
-    # State: experimental
     # Categories: flutter
     # - migrate_design_widgets
 
@@ -1030,11 +1026,11 @@ linter:
 
     # Use simple directive paths.
     # Categories: style
-    # - simple_directive_paths
+    - simple_directive_paths
 
     # Avoid unnecessary member names in variable patterns.
     # Categories: style
-    # - simplify_variable_pattern
+    - simplify_variable_pattern
 
     # `SizedBox` for whitespace.
     # Categories: flutter, style
@@ -1083,7 +1079,7 @@ linter:
 
     # Avoid switch statements on a 'Type'.
     # Categories: unintentional, style, languageFeatureUsage, errorProne
-    # - switch_on_type
+    - switch_on_type
 
     # Test type of argument in `operator ==(Object other)`.
     # Categories: errorProne
@@ -1248,7 +1244,7 @@ linter:
 
     # Unnecessary use of 'unawaited'.
     # Categories: brevity, unintentional, unusedCode
-    # - unnecessary_unawaited
+    - unnecessary_unawaited
 
     # Unnecessary underscores can be removed.
     # Categories: brevity, style
@@ -1375,3 +1371,4 @@ linter:
     # Don't assign to `void`.
     # Categories: style
     - void_checks
+

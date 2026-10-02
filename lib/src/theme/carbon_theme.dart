@@ -109,14 +109,11 @@ class _AnimatedCarbonThemeState
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _data =
-        visitor(
-              _data,
-              widget.data,
-              (dynamic value) =>
-                  _CarbonThemeDataTween(begin: value as CarbonThemeData),
-            )
-            as _CarbonThemeDataTween?;
+    _data = visitor(
+      _data,
+      widget.data,
+      (dynamic value) => _CarbonThemeDataTween(begin: value as CarbonThemeData),
+    ) as _CarbonThemeDataTween?;
   }
 
   @override

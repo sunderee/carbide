@@ -54,9 +54,8 @@ void main() {
         assets++;
         final (int width, int height) = dimensionsOf(artwork);
         final String referenceName = referenceNameOf(icon, artwork);
-        final Uint8List png = File(
-          '$referenceDir/$referenceName',
-        ).readAsBytesSync();
+        final Uint8List png = File('$referenceDir/$referenceName')
+            .readAsBytesSync();
         final Uint8List ours = await renderArtworkAlpha(artwork, width, height);
         final Uint8List reference = await decodePngAlpha(png, width, height);
         final FidelityResult result = compareAlphaRect(
@@ -76,9 +75,8 @@ void main() {
             '(raw ${(result.mismatchFraction * 100).toStringAsFixed(3)}%)',
           );
           Directory(failureDir).createSync(recursive: true);
-          File(
-            '$failureDir/$referenceName',
-          ).writeAsBytesSync(await renderArtworkPng(artwork, width, height));
+          File('$failureDir/$referenceName')
+              .writeAsBytesSync(await renderArtworkPng(artwork, width, height));
         }
       }
     }
@@ -118,9 +116,8 @@ void main() {
         ],
       );
       final (int width, int height) = dimensionsOf(displaced);
-      final Uint8List png = File(
-        '$referenceDir/${CarbonIcons.add.name}_32.png',
-      ).readAsBytesSync();
+      final Uint8List png = File('$referenceDir/${CarbonIcons.add.name}_32.png')
+          .readAsBytesSync();
       final Uint8List ours = await renderArtworkAlpha(displaced, width, height);
       final Uint8List reference = await decodePngAlpha(png, width, height);
       final FidelityResult result = compareAlphaRect(

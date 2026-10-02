@@ -266,22 +266,22 @@ const CarbonIconData ibmEngineeringSystemsDesignRhapsody = CarbonIconData(
 );
 
 /// The Carbon `ibm--engineering-systems-design-rhapsody--model-manager` pictogram data.
-const CarbonIconData
-ibmEngineeringSystemsDesignRhapsodyModelManager = CarbonIconData(
-  name: 'ibm--engineering-systems-design-rhapsody--model-manager',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M16,31.36c-0.059,0-0.117-0.015-0.171-0.043l-13-7C2.713,24.254,2.64,24.133,2.64,24V10h0.72v13.785l12.28,6.612V17h0.72v13.397 l12.28-6.612V10h0.721v14c0,0.133-0.073,0.254-0.189,0.317l-13,7C16.117,31.346,16.059,31.36,16,31.36z M16,15.36 c-0.059,0-0.117-0.014-0.171-0.043L2.856,8.332C2.816,8.314,2.78,8.289,2.748,8.257C2.622,8.131,2.606,7.93,2.712,7.786 c0.041-0.055,0.094-0.095,0.154-0.119l12.963-6.984c0.106-0.058,0.234-0.058,0.342,0l12.964,6.983 c0.018,0.007,0.034,0.015,0.05,0.024C29.293,7.756,29.36,7.873,29.36,8s-0.067,0.245-0.176,0.31 c-0.013,0.008-0.026,0.015-0.039,0.021L16.17,15.317C16.117,15.346,16.059,15.36,16,15.36z M3.763,8.002L16,14.591l12.238-6.59 L16,1.409L3.763,8.002z',
+const CarbonIconData ibmEngineeringSystemsDesignRhapsodyModelManager =
+    CarbonIconData(
+      name: 'ibm--engineering-systems-design-rhapsody--model-manager',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16,31.36c-0.059,0-0.117-0.015-0.171-0.043l-13-7C2.713,24.254,2.64,24.133,2.64,24V10h0.72v13.785l12.28,6.612V17h0.72v13.397 l12.28-6.612V10h0.721v14c0,0.133-0.073,0.254-0.189,0.317l-13,7C16.117,31.346,16.059,31.36,16,31.36z M16,15.36 c-0.059,0-0.117-0.014-0.171-0.043L2.856,8.332C2.816,8.314,2.78,8.289,2.748,8.257C2.622,8.131,2.606,7.93,2.712,7.786 c0.041-0.055,0.094-0.095,0.154-0.119l12.963-6.984c0.106-0.058,0.234-0.058,0.342,0l12.964,6.983 c0.018,0.007,0.034,0.015,0.05,0.024C29.293,7.756,29.36,7.873,29.36,8s-0.067,0.245-0.176,0.31 c-0.013,0.008-0.026,0.015-0.039,0.021L16.17,15.317C16.117,15.346,16.059,15.36,16,15.36z M3.763,8.002L16,14.591l12.238-6.59 L16,1.409L3.763,8.002z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm--engineering-test-management` pictogram data.
 const CarbonIconData ibmEngineeringTestManagement = CarbonIconData(
@@ -641,22 +641,22 @@ const CarbonIconData ibmZAndCloudModernizationStack = CarbonIconData(
 );
 
 /// The Carbon `ibm--z-and-cloud-modernization-stack-provisioning` pictogram data.
-const CarbonIconData
-ibmZAndCloudModernizationStackProvisioning = CarbonIconData(
-  name: 'ibm--z-and-cloud-modernization-stack-provisioning',
-  artwork: <CarbonIconArtwork>[
-    CarbonIconArtwork(
-      size: 32,
-      viewBoxWidth: 32,
-      viewBoxHeight: 32,
-      shapes: <CarbonIconShape>[
-        CarbonIconShape(
-          d: 'M16,30.36 c-0.062,0-0.125-0.017-0.181-0.05l-12-7C3.708,23.246,3.64,23.128,3.64,23v-5h0.72v4.793L16,29.583l4.09-2.386l0.363,0.621 l-4.271,2.492C16.125,30.344,16.062,30.36,16,30.36z M23.909,25.803l-0.363-0.621l4.094-2.389V9.207l-4.101-2.392l0.363-0.622 l4.279,2.496C28.292,8.753,28.36,8.872,28.36,9v14c0,0.128-0.068,0.246-0.179,0.311L23.909,25.803z M21,21.36h-4 c-0.199,0-0.36-0.161-0.36-0.36v-4c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4 C21.36,21.199,21.199,21.36,21,21.36z M17.36,20.64h3.279v-3.28H17.36V20.64z M14,21.36h-4c-0.199,0-0.36-0.161-0.36-0.36v-4 c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4C14.36,21.199,14.199,21.36,14,21.36z M10.36,20.64h3.28v-3.28 h-3.28V20.64z M21,14.36h-4c-0.199,0-0.36-0.161-0.36-0.36v-4c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4 C21.36,14.199,21.199,14.36,21,14.36z M17.36,13.64h3.279v-3.28H17.36V13.64z M4.36,14H3.64V9c0-0.128,0.068-0.247,0.179-0.311l12-7 c0.111-0.065,0.251-0.065,0.362,0l4.266,2.488l-0.363,0.622L16,2.417L4.36,9.207V14z',
+const CarbonIconData ibmZAndCloudModernizationStackProvisioning =
+    CarbonIconData(
+      name: 'ibm--z-and-cloud-modernization-stack-provisioning',
+      artwork: <CarbonIconArtwork>[
+        CarbonIconArtwork(
+          size: 32,
+          viewBoxWidth: 32,
+          viewBoxHeight: 32,
+          shapes: <CarbonIconShape>[
+            CarbonIconShape(
+              d: 'M16,30.36 c-0.062,0-0.125-0.017-0.181-0.05l-12-7C3.708,23.246,3.64,23.128,3.64,23v-5h0.72v4.793L16,29.583l4.09-2.386l0.363,0.621 l-4.271,2.492C16.125,30.344,16.062,30.36,16,30.36z M23.909,25.803l-0.363-0.621l4.094-2.389V9.207l-4.101-2.392l0.363-0.622 l4.279,2.496C28.292,8.753,28.36,8.872,28.36,9v14c0,0.128-0.068,0.246-0.179,0.311L23.909,25.803z M21,21.36h-4 c-0.199,0-0.36-0.161-0.36-0.36v-4c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4 C21.36,21.199,21.199,21.36,21,21.36z M17.36,20.64h3.279v-3.28H17.36V20.64z M14,21.36h-4c-0.199,0-0.36-0.161-0.36-0.36v-4 c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4C14.36,21.199,14.199,21.36,14,21.36z M10.36,20.64h3.28v-3.28 h-3.28V20.64z M21,14.36h-4c-0.199,0-0.36-0.161-0.36-0.36v-4c0-0.199,0.161-0.36,0.36-0.36h4c0.199,0,0.36,0.161,0.36,0.36v4 C21.36,14.199,21.199,14.36,21,14.36z M17.36,13.64h3.279v-3.28H17.36V13.64z M4.36,14H3.64V9c0-0.128,0.068-0.247,0.179-0.311l12-7 c0.111-0.065,0.251-0.065,0.362,0l4.266,2.488l-0.363,0.622L16,2.417L4.36,9.207V14z',
+            ),
+          ],
         ),
       ],
-    ),
-  ],
-);
+    );
 
 /// The Carbon `ibm--z-and-linuxone-multi-frame` pictogram data.
 const CarbonIconData ibmZAndLinuxoneMultiFrame = CarbonIconData(

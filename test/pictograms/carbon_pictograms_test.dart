@@ -70,9 +70,8 @@ void main() {
     for (final CarbonIconData pictogram in allCarbonPictograms) {
       final CarbonIconArtwork artwork = pictogram.artwork.single;
       const int size = 64;
-      final Uint8List png = File(
-        '$referenceDir/${pictogram.name}_32.png',
-      ).readAsBytesSync();
+      final Uint8List png = File('$referenceDir/${pictogram.name}_32.png')
+          .readAsBytesSync();
       final Uint8List ours = await renderArtworkAlpha(artwork, size, size);
       final Uint8List reference = await decodePngAlpha(png, size, size);
       final FidelityResult result = compareAlphaRect(

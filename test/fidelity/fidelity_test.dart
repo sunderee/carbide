@@ -32,6 +32,7 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../support/overlay_entries.dart';
 
 const String _refDir = 'test/fidelity/references';
@@ -404,9 +405,9 @@ void main() {
       markTestSkipped('submodule not checked out');
       return;
     }
-    final Map<String, dynamic> manifest =
-        jsonDecode(File('$_refDir/manifest.json').readAsStringSync())
-            as Map<String, dynamic>;
+    final Map<String, dynamic> manifest = jsonDecode(
+      File('$_refDir/manifest.json').readAsStringSync(),
+    ) as Map<String, dynamic>;
     // Fresh captures stamp a top-level version; the hand-merged manifest
     // carries per-batch stamps. Use the newest non-null one.
     final List<String> stamped = <String>[

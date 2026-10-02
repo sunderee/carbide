@@ -7,8 +7,10 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 /// Builds a widget from the current set of interaction [states].
-typedef CarbonInteractionBuilder =
-    Widget Function(BuildContext context, Set<WidgetState> states);
+typedef CarbonInteractionBuilder = Widget Function(
+  BuildContext context,
+  Set<WidgetState> states,
+);
 
 /// The reusable interactive base for Carbon components.
 ///
