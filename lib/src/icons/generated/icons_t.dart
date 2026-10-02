@@ -618,6 +618,23 @@ const CarbonIconData taskTools = CarbonIconData(
   ],
 );
 
+/// The Carbon `task--user` icon data.
+const CarbonIconData taskUser = CarbonIconData(
+  name: 'task--user',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M30,30h-2v-2c0-.5518-.4482-1-1-1h-6c-.5518,0-1,.4482-1,1v2h-2v-2c0-1.6543,1.3457-3,3-3h6c1.6543,0,3,1.3457,3,3v2ZM15,30H7c-1.103,0-2-.8975-2-2V7c0-1.103.897-2,2-2h3v-1c0-1.103.897-2,2-2h8c1.1025,0,2,.897,2,2v6h-12v-3h-3v21h8v2ZM12,8h8v-4h-8v4ZM24,24c-2.2061,0-4-1.7939-4-4s1.7939-4,4-4,4,1.7939,4,4-1.7939,4-4,4ZM24,18c-1.1025,0-2,.8975-2,2s.8975,2,2,2,2-.8975,2-2-.8975-2-2-2ZM27,13h-2v-6h-3v-2h3c1.1025,0,2,.897,2,2v6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `task--view` icon data.
 const CarbonIconData taskView = CarbonIconData(
   name: 'task--view',
@@ -2331,6 +2348,40 @@ const CarbonIconData tIF = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M2,11 L5,11 L5,23 L7,23 L7,11 L10,11 L10,9 L2,9 L2,11 z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `tilde` icon data.
+const CarbonIconData tilde = CarbonIconData(
+  name: 'tilde',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M19.9805,18.5488c-1.6572,0-3.1748-.7959-4.541-1.7207-3.5117-2.375-5.25-1.1172-6.729.376l-1.4209-1.4077c1.9028-1.9233,4.6768-3.731,9.2705-.6245,2.4849,1.6802,4.2925,2.1191,6.7241-.3706l1.4316,1.3975c-1.6826,1.7231-3.2637,2.3501-4.7354,2.3501Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `tilde--large` icon data.
+const CarbonIconData tildeLarge = CarbonIconData(
+  name: 'tilde--large',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M21.208,18.9814c-2.127,0-4.0459-.998-5.7681-2.1636-4.896-3.3105-7.396-1.4707-9.7295.8862l-1.4209-1.4077c2.7676-2.7935,6.3901-5.1123,12.2705-1.1348,3.3022,2.2329,6.0815,2.8696,9.7241-.8604l1.4316,1.3975c-2.3574,2.4136-4.5234,3.2827-6.5078,3.2827Z',
         ),
       ],
     ),

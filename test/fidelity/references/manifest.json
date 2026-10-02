@@ -1,192 +1,840 @@
 {
   "source": "https://react.carbondesignsystem.com",
+  "capturedAt": "2026-10-02T12:53:36.975Z",
+  "carbonReactVersion": "1.117.0",
   "themes": [
     "white",
     "g10",
     "g90",
     "g100"
   ],
-  "captures": [
-    {
-      "capturedAt": "2026-06-18T08:56:32.531Z",
-      "carbonReactVersion": null,
-      "_comment": "Pre-#230 batch; live-Storybook version was not recorded at capture time.",
-      "components": [
-        "accordion",
-        "button",
-        "checkbox",
-        "data-table",
-        "dropdown",
-        "multiselect",
-        "notification",
-        "tabs",
-        "tag",
-        "text-input",
-        "toggle",
-        "tree-view"
-      ]
-    },
-    {
-      "capturedAt": "2026-07-10T05:30:00Z",
-      "carbonReactVersion": "1.111.1",
-      "_comment": "Live Storybook at capture ran @carbon/react 1.111.1 (submodule pin: 1.111.0 \u2014 one patch apart).",
-      "components": [
-        "breadcrumb",
-        "code-snippet",
-        "combo-box",
-        "content-switcher",
-        "date-picker",
-        "inline-loading",
-        "link",
-        "loading",
-        "modal",
-        "number-input",
-        "overflow-menu",
-        "pagination",
-        "progress-bar",
-        "progress-indicator",
-        "radio-button",
-        "search",
-        "select",
-        "slider",
-        "structured-list",
-        "tile",
-        "tooltip"
-      ]
-    }
-  ],
   "stories": [
     {
       "component": "button",
-      "storyId": "components-button--default"
+      "storyId": "components-button--default",
+      "threshold": 0.64
     },
     {
       "component": "tag",
-      "storyId": "components-tag--read-only"
+      "storyId": "components-tag--read-only",
+      "threshold": 0.21
     },
     {
       "component": "checkbox",
-      "storyId": "components-checkbox--default"
+      "storyId": "components-checkbox--default",
+      "threshold": 0.3
     },
     {
       "component": "toggle",
-      "storyId": "components-toggle--default"
+      "storyId": "components-toggle--default",
+      "threshold": 0.28
     },
     {
       "component": "text-input",
-      "storyId": "components-textinput--default"
+      "storyId": "components-textinput--default",
+      "threshold": 0.12
     },
     {
       "component": "dropdown",
-      "storyId": "components-dropdown--default"
+      "storyId": "components-dropdown--default",
+      "threshold": 0.1
     },
     {
       "component": "tabs",
-      "storyId": "components-tabs--default"
+      "storyId": "components-tabs--default",
+      "threshold": 0.13
     },
     {
       "component": "accordion",
-      "storyId": "components-accordion--default"
+      "storyId": "components-accordion--default",
+      "threshold": 0.09
     },
     {
       "component": "tree-view",
-      "storyId": "components-treeview--default"
+      "storyId": "components-treeview--default",
+      "threshold": 0.14
     },
     {
       "component": "multiselect",
-      "storyId": "components-multiselect--default"
+      "storyId": "components-multiselect--default",
+      "threshold": 0.11
     },
     {
       "component": "data-table",
-      "storyId": "components-datatable-basic--default"
+      "storyId": "components-datatable-basic--default",
+      "threshold": 0.1
     },
     {
       "component": "notification",
-      "storyId": "components-notifications-inline--default"
+      "storyId": "components-notifications-inline--default",
+      "threshold": 0.44
     },
     {
       "component": "search",
-      "storyId": "components-search--default"
+      "storyId": "components-search--default",
+      "threshold": 0.1
     },
     {
       "component": "number-input",
-      "storyId": "components-numberinput--default"
+      "storyId": "components-numberinput--default",
+      "threshold": 0.09
     },
     {
       "component": "select",
-      "storyId": "components-select--default"
+      "storyId": "components-select--default",
+      "threshold": 0.1
     },
     {
       "component": "combo-box",
-      "storyId": "components-combobox--default"
+      "storyId": "components-combobox--default",
+      "threshold": 0.12
     },
     {
       "component": "date-picker",
-      "storyId": "components-datepicker--default"
+      "storyId": "components-datepicker--default",
+      "threshold": 0.12
     },
     {
       "component": "radio-button",
-      "storyId": "components-radiobutton--default"
+      "storyId": "components-radiobutton--default",
+      "threshold": 0.18
     },
     {
       "component": "slider",
-      "storyId": "components-slider--default"
+      "storyId": "components-slider--default",
+      "threshold": 0.1
     },
     {
       "component": "modal",
-      "storyId": "components-modal--default"
+      "storyId": "components-modal--default",
+      "threshold": 0.44
     },
     {
       "component": "tooltip",
-      "storyId": "components-tooltip--default"
+      "storyId": "components-tooltip--default",
+      "threshold": 0.24
     },
     {
       "component": "progress-bar",
-      "storyId": "components-progressbar--default"
+      "storyId": "components-progressbar--default",
+      "threshold": 0.22
     },
     {
       "component": "progress-indicator",
-      "storyId": "components-progressindicator--default"
+      "storyId": "components-progressindicator--default",
+      "threshold": 0.1
     },
     {
       "component": "breadcrumb",
-      "storyId": "components-breadcrumb--default"
+      "storyId": "components-breadcrumb--default",
+      "threshold": 0.16
     },
     {
       "component": "pagination",
-      "storyId": "components-pagination--default"
+      "storyId": "components-pagination--default",
+      "threshold": 0.12
     },
     {
       "component": "code-snippet",
-      "storyId": "components-codesnippet--singleline"
+      "storyId": "components-codesnippet--singleline",
+      "threshold": 0.13
     },
     {
       "component": "content-switcher",
-      "storyId": "components-contentswitcher--default"
+      "storyId": "components-contentswitcher--default",
+      "threshold": 0.13
     },
     {
       "component": "structured-list",
-      "storyId": "components-structuredlist--default"
+      "storyId": "components-structuredlist--default",
+      "threshold": 0.11
     },
     {
       "component": "tile",
-      "storyId": "components-tile--default"
+      "storyId": "components-tile--default",
+      "threshold": 0.08
     },
     {
       "component": "loading",
-      "storyId": "components-loading--default"
+      "storyId": "components-loading--default",
+      "threshold": 0.21
     },
     {
       "component": "inline-loading",
-      "storyId": "components-inlineloading--default"
+      "storyId": "components-inlineloading--default",
+      "threshold": 0.14
     },
     {
       "component": "overflow-menu",
-      "storyId": "components-overflowmenu--default"
+      "storyId": "components-overflowmenu--default",
+      "threshold": 0.07
     },
     {
       "component": "link",
-      "storyId": "components-link--default"
+      "storyId": "components-link--default",
+      "threshold": 0.18
+    }
+  ],
+  "results": [
+    {
+      "component": "button",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "button",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "button",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "button",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "tag",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "tag",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "tag",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "tag",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "checkbox",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "checkbox",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "checkbox",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "checkbox",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "toggle",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "toggle",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "toggle",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "toggle",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "text-input",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "text-input",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "text-input",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "text-input",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "dropdown",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "dropdown",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "dropdown",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "dropdown",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "tabs",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "tabs",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "tabs",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "tabs",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "accordion",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "accordion",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "accordion",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "accordion",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "tree-view",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "tree-view",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "tree-view",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "tree-view",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "multiselect",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "multiselect",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "multiselect",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "multiselect",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "data-table",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "data-table",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "data-table",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "data-table",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "notification",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "notification",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "notification",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "notification",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "search",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "search",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "search",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "search",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "number-input",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "number-input",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "number-input",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "number-input",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "select",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "select",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "select",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "select",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "combo-box",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "combo-box",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "combo-box",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "combo-box",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "date-picker",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "date-picker",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "date-picker",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "date-picker",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "radio-button",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "radio-button",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "radio-button",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "radio-button",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "slider",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "slider",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "slider",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "slider",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "modal",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "modal",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "modal",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "modal",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "tooltip",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "tooltip",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "tooltip",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "tooltip",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "progress-bar",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "progress-bar",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "progress-bar",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "progress-bar",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "progress-indicator",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "progress-indicator",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "progress-indicator",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "progress-indicator",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "breadcrumb",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "breadcrumb",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "breadcrumb",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "breadcrumb",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "pagination",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "pagination",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "pagination",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "pagination",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "code-snippet",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "code-snippet",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "code-snippet",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "code-snippet",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "content-switcher",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "content-switcher",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "content-switcher",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "content-switcher",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "structured-list",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "structured-list",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "structured-list",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "structured-list",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "tile",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "tile",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "tile",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "tile",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "loading",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "loading",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "loading",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "loading",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "inline-loading",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "inline-loading",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "inline-loading",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "inline-loading",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "overflow-menu",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "overflow-menu",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "overflow-menu",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "overflow-menu",
+      "theme": "g100",
+      "ok": true
+    },
+    {
+      "component": "link",
+      "theme": "white",
+      "ok": true
+    },
+    {
+      "component": "link",
+      "theme": "g10",
+      "ok": true
+    },
+    {
+      "component": "link",
+      "theme": "g90",
+      "ok": true
+    },
+    {
+      "component": "link",
+      "theme": "g100",
+      "ok": true
     }
   ]
 }

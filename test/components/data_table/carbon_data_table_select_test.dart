@@ -188,6 +188,39 @@ void main() {
   });
 
   group('batch actions', () {
+    testWidgets('inactive batch actions stay out of the accessibility tree', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(_host(const _Selectable()));
+        expect(
+          tester.semantics.simulatedAccessibilityTraversal().map(
+            (node) => node.label,
+          ),
+          isNot(contains('Cancel')),
+        );
+        await tester.tap(find.bySemanticsLabel('Select row 1'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.semantics.simulatedAccessibilityTraversal().map(
+            (node) => node.label,
+          ),
+          contains('Cancel'),
+        );
+        await tester.tap(find.bySemanticsLabel('Cancel'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.semantics.simulatedAccessibilityTraversal().map(
+            (node) => node.label,
+          ),
+          isNot(contains('Cancel')),
+        );
+      } finally {
+        handle.dispose();
+      }
+    });
+
     testWidgets('bar appears with a count and a working action', (
       WidgetTester tester,
     ) async {
@@ -222,6 +255,30 @@ void main() {
   });
 
   group('goldens', () {
+    testWidgets('inactive batch bar is clipped below the table title', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'data_table_unselected',
+        containsText: true,
+        size: const Size(560, 320),
+        builder: (BuildContext context) => Center(
+          child: SizedBox(
+            width: 520,
+            child: CarbonDataTable(
+              title: 'Load balancers',
+              description: 'Available services',
+              columns: _columns,
+              rows: _rows(),
+              selection: CarbonTableSelection.multi,
+              onSelectionChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+    });
+
     testWidgets('multi-select with a batch bar across themes', (
       WidgetTester tester,
     ) async {

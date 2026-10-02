@@ -78,5 +78,5 @@ explicit so nobody mistakes golden-only coverage for an upstream gate:
 Reference freshness: `manifest.json` stamps the `@carbon/react` version
 the live Storybook ran at capture; the fidelity suite warns when the
 submodule pin drifts ≥2 minors ahead. Re-capture on submodule bumps
-(the references currently target the v11.111.x line, matching the
-v11.111.0 pin).
+(the references currently target @carbon/react 1.117.0, matching the
+v11.117.0 pin).

@@ -433,6 +433,23 @@ const CarbonIconData facilityGroupAlternate = CarbonIconData(
   ],
 );
 
+/// The Carbon `facility--groups` icon data.
+const CarbonIconData facilityGroups = CarbonIconData(
+  name: 'facility--groups',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30h-4v-2h4V4h-4v-2h4c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM8,30h-4c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h4v2h-4v24h4v2ZM16,27.0459l-6.8892-8.1533c-1.1455-1.5078-1.7744-3.3667-1.7715-5.2344,0-4.7734,3.8853-8.6582,8.6606-8.6582s8.6611,3.8853,8.6611,8.6606c.001,1.8672-.6201,3.7144-1.748,5.1987h0s-.2041.2705-.2432.3193l-6.6699,7.8672ZM10.9048,17.9453l5.0952,6.0088,5.3193-6.3018c.8662-1.1411,1.3428-2.5576,1.3418-3.9912,0-3.6733-2.9883-6.6611-6.6611-6.6611s-6.6606,2.9873-6.6606,6.6597c-.002,1.4341.4824,2.8618,1.3638,4.0229l.2017.2627ZM19,16h-2v-4h-2v4h-2v-4c0-1.103.897-2,2-2h2c1.1025,0,2,.897,2,2v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `factor` icon data.
 const CarbonIconData factor = CarbonIconData(
   name: 'factor',
@@ -787,6 +804,23 @@ const CarbonIconData filterEdit = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M29.71,11.29l-3-3a1,1,0,0,0-1.42,0L16,17.59V22h4.41l9.3-9.29A1,1,0,0,0,29.71,11.29ZM19.59,20H18V18.41l5-5L24.59,15ZM26,13.59,24.41,12,26,10.41,27.59,12Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `filter--filled` icon data.
+const CarbonIconData filterFilled = CarbonIconData(
+  name: 'filter--filled',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M18,28h-4c-1.1,0-2-.9-2-2v-7.59l-7.41-7.41c-.38-.37-.59-.88-.59-1.41v-3.59c0-1.1.9-2,2-2h20c1.1,0,2,.9,2,2v3.59c0,.53-.21,1.04-.59,1.41l-7.41,7.41v7.59c0,1.1-.9,2-2,2Z',
         ),
       ],
     ),
@@ -1374,6 +1408,40 @@ const CarbonIconData flow = CarbonIconData(
   ],
 );
 
+/// The Carbon `flow--branch` icon data.
+const CarbonIconData flowBranch = CarbonIconData(
+  name: 'flow--branch',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M26,28c-1.8604,0-3.4287-1.2764-3.873-3h-4.127c-2.7568,0-5-2.2432-5-5v-8c0-1.6543-1.3457-3-3-3h-.1265c-.4453,1.7231-2.0132,3-3.8735,3-2.2056,0-4-1.7944-4-4s1.7944-4,4-4c1.8604,0,3.4282,1.2769,3.8735,3h12.2534c.4443-1.7231,2.0127-3,3.873-3,2.2061,0,4,1.7944,4,4s-1.7939,4-4,4c-1.8604,0-3.4287-1.2769-3.873-3h-8.1294c.6289.8364,1.0024,1.8755,1.0024,3v8c0,1.6543,1.3457,3,3,3h4.127c.4443-1.7236,2.0127-3,3.873-3,2.2061,0,4,1.7939,4,4s-1.7939,4-4,4ZM26,22c-1.1025,0-2,.8975-2,2s.8975,2,2,2,2-.8975,2-2-.8975-2-2-2ZM26,6c-1.1025,0-2,.897-2,2s.8975,2,2,2,2-.897,2-2-.8975-2-2-2ZM6,6c-1.103,0-2,.897-2,2s.897,2,2,2,2-.897,2-2-.897-2-2-2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `flow--conditional` icon data.
+const CarbonIconData flowConditional = CarbonIconData(
+  name: 'flow--conditional',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22.3408,23.6562c-.5117,0-1.0244-.1953-1.4141-.585l-5.6572-5.6572c-.1265-.127-.2324-.2656-.3184-.4141h-5.0776c-.4453,1.7236-2.0132,3-3.8735,3-2.2056,0-4-1.7939-4-4s1.7944-4,4-4c1.8604,0,3.4282,1.2769,3.8735,3h5.0776c.0859-.1479.1919-.2876.3184-.4141l5.6572-5.6567c.7793-.7803,2.0488-.7803,2.8281,0l5.6572,5.6567c.7783.7803.7783,2.0479.001,2.8271l-5.6582,5.6582c-.3896.3896-.9023.585-1.4141.585ZM22.3408,10.3433l-5.6572,5.6567,5.6572,5.6572,5.6572-5.6572-5.6572-5.6567ZM6,14c-1.103,0-2,.897-2,2s.897,2,2,2,2-.8975,2-2-.897-2-2-2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `flow--connection` icon data.
 const CarbonIconData flowConnection = CarbonIconData(
   name: 'flow--connection',
@@ -1422,6 +1490,23 @@ const CarbonIconData flowLogsVpc = CarbonIconData(
         CarbonIconShape(d: 'M18,27 h8 v2 h-8 z'),
         CarbonIconShape(
           d: 'M24,4a3.9962,3.9962,0,0,0-3.8579,3H12V4H4v8h8V9h8.1421a3.94,3.94,0,0,0,.4248,1.019L10.019,20.5669A3.9521,3.9521,0,0,0,8,20a4,4,0,1,0,3.8579,5H16V23H11.8579a3.94,3.94,0,0,0-.4248-1.019L21.981,11.4331A3.9521,3.9521,0,0,0,24,12a4,4,0,0,0,0-8ZM10,10H6V6h4ZM8,26a2,2,0,1,1,2-2A2.0023,2.0023,0,0,1,8,26ZM24,10a2,2,0,1,1,2-2A2.0023,2.0023,0,0,1,24,10Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `flow--merge` icon data.
+const CarbonIconData flowMerge = CarbonIconData(
+  name: 'flow--merge',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M6,28c-2.2056,0-4-1.7939-4-4s1.7944-4,4-4c1.8604,0,3.4282,1.2764,3.8735,3h4.1265c1.6543,0,3-1.3457,3-3v-8c0-1.1245.373-2.1636,1.002-3h-8.1284c-.4453,1.7231-2.0132,3-3.8735,3-2.2056,0-4-1.7944-4-4s1.7944-4,4-4c1.8604,0,3.4282,1.2769,3.8735,3h12.2534c.4443-1.7231,2.0127-3,3.873-3,2.2061,0,4,1.7944,4,4s-1.7939,4-4,4c-1.8604,0-3.4287-1.2769-3.873-3h-.127c-1.6543,0-3,1.3457-3,3v8c0,2.7568-2.2432,5-5,5h-4.1265c-.4453,1.7236-2.0132,3-3.8735,3ZM6,22c-1.103,0-2,.8975-2,2s.897,2,2,2,2-.8975,2-2-.897-2-2-2ZM26,6c-1.1025,0-2,.897-2,2s.8975,2,2,2,2-.897,2-2-.8975-2-2-2ZM6,6c-1.103,0-2,.897-2,2s.897,2,2,2,2-.897,2-2-.897-2-2-2Z',
         ),
       ],
     ),

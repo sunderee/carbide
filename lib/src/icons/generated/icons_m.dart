@@ -494,6 +494,23 @@ const CarbonIconData marineWarning = CarbonIconData(
   ],
 );
 
+/// The Carbon `markdown` icon data.
+const CarbonIconData markdown = CarbonIconData(
+  name: 'markdown',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,5H4c-1.1,0-2,.9-2,2v18c0,1.1.9,2,2,2h24c1.1,0,2-.9,2-2V7c0-1.1-.9-2-2-2ZM28,25H4V7h24v18ZM26,18l-5,5-5-5,1.41-1.41,2.59,2.59v-10.18h2v10.18l2.59-2.59,1.41,1.41ZM12,9l-1.52,5-.48,1.98-.46-1.98-1.54-5h-2v14h2v-8l-.16-2,.58,2,1.58,4.63,1.58-4.63.58-2-.16,2v8h2v-14h-2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `material-request` icon data.
 const CarbonIconData materialRequest = CarbonIconData(
   name: 'material-request',
@@ -785,6 +802,57 @@ const CarbonIconData messageQueue = CarbonIconData(
         CarbonIconShape(d: 'M7,16 h18 v2 h-18 z'),
         CarbonIconShape(d: 'M7,11 h18 v2 h-18 z'),
         CarbonIconShape(d: 'M7,6 h18 v2 h-18 z'),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `metadata--definition` icon data.
+const CarbonIconData metadataDefinition = CarbonIconData(
+  name: 'metadata--definition',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30H4c-1.103,0-2-.8975-2-2l.0059-24.1499c.1084-1.0776.9639-1.8501,1.9941-1.8501h24c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM4,4l-.001.0474.001,23.9526h24V4H4ZM21.0142,23.9821v2.0187h-4.8174c-5.8038,0-9.1989-3.8539-9.1989-9.4512s3.5328-9.589,9.1989-9.589c5.2762,0,8.809,3.3493,8.809,8.5796,0,3.6475-1.6746,5.8038-4.2898,5.8038-1.6517,0-2.7757-.8717-2.8675-2.1563h-.1147c-.2982,1.2617-1.124,2.1104-2.6381,2.1104-2.0187,0-3.5327-1.6287-3.5327-4.7485s1.514-4.7486,3.5327-4.7486c1.2617,0,2.0876.7799,2.3628,1.7893h.1147v-1.5829h2.5464v6.1709c0,.757.367,1.147,1.0093,1.147,1.0323,0,1.7435-1.1011,1.7435-3.441v-.6423c0-3.9228-2.7758-6.2856-6.6756-6.2856-4.3127,0-7.0655,2.9822-7.0655,7.1573v.8717c0,4.1751,2.7528,6.9967,7.0655,6.9967h4.8174ZM16.0363,19.2106c.7799,0,1.5369-.7341,1.5369-1.4223v-2.661c0-.7112-.734-1.2388-1.5369-1.2388-1.1012,0-1.8123.78-1.8123,1.8811v1.5599c0,1.1011.7111,1.8811,1.8123,1.8811Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `metadata--definition--semantic` icon data.
+const CarbonIconData metadataDefinitionSemantic = CarbonIconData(
+  name: 'metadata--definition--semantic',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30H4c-1.103,0-2-.8975-2-2l.0059-24.1499c.1084-1.0776.9639-1.8501,1.9941-1.8501h24c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM4,4l-.001.0474.001,23.9526h24V4H4ZM23,14v-2h-3v-3h-2v3h-4v-3h-2v3h-3v2h3v4h-3v2h3v3h2v-3h4v3h2v-3h3v-2h-3v-4h3ZM18,18h-4v-4h4v4Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `metadata--usage` icon data.
+const CarbonIconData metadataUsage = CarbonIconData(
+  name: 'metadata--usage',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M21,30h-10c-4.9624,0-9-4.0371-9-9v-10C2,6.0376,6.0376,2,11,2h10c4.9629,0,9,4.0376,9,9v10c0,4.9629-4.0371,9-9,9ZM11,4c-3.8599,0-7,3.1401-7,7v10c0,3.8594,3.1401,7,7,7h10c3.8594,0,7-3.1406,7-7v-10c0-3.8599-3.1406-7-7-7h-10ZM21.0142,23.9821v2.0187h-4.8174c-5.8038,0-9.1989-3.8539-9.1989-9.4512s3.5328-9.589,9.1989-9.589c5.2762,0,8.809,3.3493,8.809,8.5796,0,3.6475-1.6746,5.8038-4.2898,5.8038-1.6517,0-2.7757-.8717-2.8675-2.1563h-.1147c-.2982,1.2617-1.124,2.1104-2.6381,2.1104-2.0187,0-3.5327-1.6287-3.5327-4.7485s1.514-4.7486,3.5327-4.7486c1.2617,0,2.0876.7799,2.3628,1.7893h.1147v-1.5829h2.5464v6.1709c0,.757.367,1.147,1.0093,1.147,1.0323,0,1.7435-1.1011,1.7435-3.441v-.6423c0-3.9228-2.7758-6.2856-6.6756-6.2856-4.3127,0-7.0655,2.9822-7.0655,7.1573v.8717c0,4.1751,2.7528,6.9967,7.0655,6.9967h4.8174ZM16.0363,19.2106c.7799,0,1.5369-.7341,1.5369-1.4223v-2.661c0-.7112-.734-1.2388-1.5369-1.2388-1.1012,0-1.8123.78-1.8123,1.8811v1.5599c0,1.1011.7111,1.8811,1.8123,1.8811Z',
+        ),
       ],
     ),
   ],
@@ -1121,6 +1189,23 @@ const CarbonIconData minusPlus = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M24,28h-2v-4h-4v-2h4v-4h2v4h4v2h-4v4ZM6.707,26.707l-1.4141-1.4141L25.293,5.293l1.4141,1.4141L6.707,26.707ZM14,10H4v-2h10v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `missing-data--warning` icon data.
+const CarbonIconData missingDataWarning = CarbonIconData(
+  name: 'missing-data--warning',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M15,30H7c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h10c.2656,0,.5195.1055.707.293l7,7c.1875.1875.293.4419.293.707v4h-2v-2h-6c-1.103,0-2-.897-2-2v-6H7v24h8v2ZM17,4.4141v5.5859h5.5859l-5.5859-5.5859ZM15,23h-5v-2h5v2ZM20,18h-10v-2h10v2ZM30.91,28.94l-6.28-11.57c-.19-.35-.63-.47-.98-.28-.11.07-.21.16-.28.28l-6.28,11.57c-.19.34-.06.78.29.97.1.06.22.09.34.09h12.5601c.4,0,.72-.32.72-.72,0-.12-.03-.24-.09-.34ZM23.25,21h1.5v4h-1.5v-4ZM24,28c-.55,0-1-.45-1-1s.45-1,1-1,1,.45,1,1-.45,1-1,1Z',
         ),
       ],
     ),

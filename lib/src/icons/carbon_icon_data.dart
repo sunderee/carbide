@@ -91,8 +91,10 @@ class CarbonIconArtwork {
   /// The viewBox width the [shapes] are expressed in.
   final double viewBoxWidth;
 
-  /// The viewBox height. Equal to [viewBoxWidth] for all sized artwork;
-  /// bespoke glyph assets can be rectangular (the caret glyphs are 8×4).
+  /// The viewBox height, preserved from the upstream SVG.
+  ///
+  /// Sized artwork is approximately square; bespoke glyph assets can be
+  /// rectangular (the caret glyphs are 8×4).
   final double viewBoxHeight;
 
   /// The visible shapes, in paint order.

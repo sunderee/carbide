@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Carbide's color tokens from the pinned Carbon source.
 
-Reads `documentation/carbon/packages/colors/src/colors.ts` (Apache-2.0) and
+Reads `documentation/carbon/packages/colors/src/dtcg/colors.json` (Apache-2.0) and
 emits:
   - lib/src/foundations/colors.dart   (the `CarbonColors` constants)
   - test/foundations/colors_test.dart (an exhaustive value lock)
@@ -12,16 +12,14 @@ Re-run when bumping the Carbon submodule; review the diff.
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "documentation/carbon/packages/colors/src/colors.ts"
+SRC = ROOT / "documentation/carbon/packages/colors/src/dtcg/colors.json"
 LIB_OUT = ROOT / "lib/src/foundations/colors.dart"
 TEST_OUT = ROOT / "test/foundations/colors_test.dart"
-
-HEX = re.compile(r"^export const (\w+) = '(#[0-9a-fA-F]+)';", re.M)
-ALIAS = re.compile(r"^export const (\w+) = (\w+);", re.M)
 
 LICENSE_HEADER = """// Copyright 2026 Bizjak Tech OÜ
 //
@@ -58,22 +56,21 @@ def doc_for(name: str, argb: str) -> str:
 
 
 def parse() -> list[tuple[str, str]]:
-    text = SRC.read_text()
-    values: dict[str, str] = {}
-    order: list[str] = []
-    for line in text.splitlines():
-        m = HEX.match(line)
-        if m:
-            name, hx = m.group(1), m.group(2)
-            values[name] = to_argb(hx)
-            order.append(name)
-            continue
-        m = ALIAS.match(line)
-        if m and m.group(2) in values:
-            name, target = m.group(1), m.group(2)
-            values[name] = values[target]
-            order.append(name)
-    return [(n, values[n]) for n in order]
+    entries = []
+
+    def visit(node, path=()):
+        if "$value" in node:
+            name = "".join(path)
+            entries.append((name, to_argb(node["$value"])))
+            # Upstream js-colors.js keeps these public compatibility aliases.
+            if name in ("black", "white"):
+                entries.append(("black100" if name == "black" else "white0", to_argb(node["$value"])))
+        for key, child in node.items():
+            if not key.startswith("$") and isinstance(child, dict):
+                visit(child, (*path, key))
+
+    visit(json.loads(SRC.read_text()))
+    return entries
 
 
 def emit_lib(entries: list[tuple[str, str]]) -> str:

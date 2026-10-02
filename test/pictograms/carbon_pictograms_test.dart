@@ -35,7 +35,7 @@ void main() {
 
   group('structure', () {
     test('the full pictogram registry is generated (1,572)', () {
-      expect(allCarbonPictograms, hasLength(1572));
+      expect(allCarbonPictograms, hasLength(1576));
     });
 
     test('names are unique; each has one 32-grid artwork', () {

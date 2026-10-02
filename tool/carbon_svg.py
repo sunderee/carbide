@@ -187,6 +187,10 @@ def extract(svg_file: Path):
 
     def walk(el: ET.Element, transform):
         tag = strip_ns(el.tag)
+        # Adobe exports retain a named artboard rectangle with 0.01 × 0.01
+        # opacity. It is metadata, not monochrome artwork (Carbon 11.117).
+        if tag == "rect" and el.get("id") == "Transparent_Rectangle":
+            return
         if tag in DROP_TAGS:
             return
         matrix = mat_mul(transform, parse_transform(el.get("transform")))

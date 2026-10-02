@@ -31,6 +31,23 @@ const CarbonIconData package = CarbonIconData(
   ],
 );
 
+/// The Carbon `package--library` icon data.
+const CarbonIconData packageLibrary = CarbonIconData(
+  name: 'package--library',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,28H4c-1.103,0-2-.8975-2-2V6c0-1.103.897-2,2-2h10c1.103,0,2,.897,2,2v4h12c1.1025,0,2,.897,2,2v14c0,1.1025-.8975,2-2,2ZM4,12h-.0015l.0015,14h24v-14H4ZM4,10h10v-4H4v4ZM22,21H7v-2h15v2ZM25,17H7v-2h18v2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `package-node` icon data.
 const CarbonIconData packageNode = CarbonIconData(
   name: 'package-node',
@@ -293,6 +310,23 @@ const CarbonIconData parameter = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M6,13V8H9V6H6A2.0023,2.0023,0,0,0,4,8v5a2.0023,2.0023,0,0,1-2,2v2a2.0023,2.0023,0,0,1,2,2v5a2.0023,2.0023,0,0,0,2,2H9V24H6V19a3.9756,3.9756,0,0,0-1.3823-3A3.9756,3.9756,0,0,0,6,13Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `parameter--action` icon data.
+const CarbonIconData parameterAction = CarbonIconData(
+  name: 'parameter--action',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16,29H2v-2h13V5H2v-2h14c.5522,0,1,.4478,1,1v6h9c.5527,0,1,.4478,1,1v10c0,.5527-.4473,1-1,1h-9v6c0,.5527-.4478,1-1,1ZM17,20h8v-8h-8v8Z',
         ),
       ],
     ),
@@ -2453,6 +2487,23 @@ const CarbonIconData portfolio = CarbonIconData(
   ],
 );
 
+/// The Carbon `portfolio--groups` icon data.
+const CarbonIconData portfolioGroups = CarbonIconData(
+  name: 'portfolio--groups',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30h-4v-2h4V4h-4v-2h4c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM8,30h-4c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h4v2h-4v24h4v2ZM24,25H8c-1.103,0-2-.8975-2-2v-9c0-1.103.897-2,2-2h3v-3c0-1.103.897-2,2-2h6c1.1025,0,2,.897,2,2v3h3c1.1025,0,2,.897,2,2v9c0,1.1025-.8975,2-2,2ZM8,14v9h16v-9H8ZM13,12h6v-3h-6v3Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `portfolio--management` icon data.
 const CarbonIconData portfolioManagement = CarbonIconData(
   name: 'portfolio--management',
@@ -2990,6 +3041,23 @@ const CarbonIconData product = CarbonIconData(
   ],
 );
 
+/// The Carbon `product-categories` icon data.
+const CarbonIconData productCategories = CarbonIconData(
+  name: 'product-categories',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30h-8c-1.1025,0-2-.8975-2-2v-10.5195c0-.6108.2734-1.1797.75-1.5615l4-3.1997c.7363-.5903,1.7637-.5889,2.5,0l4,3.1997c.4766.3818.75.9507.75,1.5615v10.5195c0,1.1025-.8975,2-2,2ZM24,14.2808l-4,3.1997v10.5195h8v-10.5195l-4-3.1997ZM15,28H4c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h22c1.1025,0,2,.897,2,2v6h-2v-6h-6v6c0,1.103-.8975,2-2,2h-6c-1.103,0-2-.897-2-2v-6h-6v22h11v2ZM12,4v6h6v-6h-6ZM26,20c0-1.1046-.8954-2-2-2s-2,.8954-2,2,.8954,2,2,2,2-.8954,2-2Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `production-environment` icon data.
 const CarbonIconData productionEnvironment = CarbonIconData(
   name: 'production-environment',
@@ -3246,6 +3314,23 @@ const CarbonIconData purchase = CarbonIconData(
           d: 'M28,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V8A2,2,0,0,0,28,6Zm0,2v3H4V8ZM4,24V13H28V24Z',
         ),
         CarbonIconShape(d: 'M6,20 h10 v2 h-10 z'),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `purchasing-organizations` icon data.
+const CarbonIconData purchasingOrganizations = CarbonIconData(
+  name: 'purchasing-organizations',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16,16c-1.1046,0-2-.8954-2-2s.8954-2,2-2,2,.8954,2,2-.8954,2-2,2ZM31,23v8h-8v-3h-14.5c-3.58,0-6.5-2.92-6.5-6.5,0-3.41,2.65-6.22,6-6.48v2.01c-2.25.25-4,2.16-4,4.47,0,2.48,2.02,4.5,4.5,4.5h14.5v-3h8ZM29,25h-4v4h4v-4ZM22.3,14.3c0,1.36-.45,2.71-1.27,3.79,0,0-.15.21-.19.24l-4.84,5.72-4.99-5.9c-.86-1.14-1.32-2.49-1.31-3.85,0-3.47,2.82-6.3,6.3-6.3s6.3,2.83,6.3,6.3ZM20.3,14.3c0-2.37-1.93-4.3-4.3-4.3s-4.3,1.93-4.3,4.3c0,.93.31,1.85.88,2.6l.13.17,3.29,3.88,3.44-4.07c.56-.74.86-1.65.86-2.58ZM30,10.5c0,3.41-2.65,6.22-6,6.48v-2.01c2.25-.25,4-2.16,4-4.47,0-2.48-2.02-4.5-4.5-4.5h-14.5v3H1V1h8v3h14.5c3.58,0,6.5,2.92,6.5,6.5ZM7,3H3v4h4V3Z',
+        ),
       ],
     ),
   ],

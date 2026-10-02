@@ -581,6 +581,23 @@ const CarbonIconData redefinition = CarbonIconData(
   ],
 );
 
+/// The Carbon `red-hat-ai-inference-on-ibm-cloud` icon data.
+const CarbonIconData redHatAiInferenceOnIbmCloud = CarbonIconData(
+  name: 'red-hat-ai-inference-on-ibm-cloud',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M16,30v-2c2.9131,0,5.7227-1.0576,7.9121-2.9785,2.1904-1.9209,3.6055-4.5684,3.9854-7.4541.3799-2.8882-.3018-5.8125-1.9189-8.2339-1.6191-2.4219-4.0596-4.1709-6.873-4.9248-2.8125-.7539-5.8008-.46-8.4131.8291-2.6123,1.2876-4.6646,3.479-5.7788,6.1699-1.1147,2.6909-1.2129,5.6919-.2769,8.4497.9365,2.7588,2.8408,5.0791,5.3633,6.5342l-1,1.7324c-2.9424-1.6982-5.1646-4.4053-6.2568-7.624-1.0923-3.2178-.9775-6.7183.3228-9.8579,1.2998-3.1392,3.6943-5.6958,6.7417-7.1982,3.0483-1.5034,6.5327-1.8472,9.8154-.9668,3.2822.8794,6.1289,2.9194,8.0176,5.7451s2.6836,6.2368,2.2393,9.606c-.4424,3.3672-2.0938,6.4561-4.6494,8.6973-2.5537,2.2402-5.832,3.4746-9.2305,3.4746ZM17,24h-2c0-3.8594-3.1401-7-7-7v-2c3.8599,0,7-3.1401,7-7h2c0,3.8599,3.1406,7,7,7v2c-3.8594,0-7,3.1406-7,7ZM12.1206,16c1.6602.8584,3.021,2.2188,3.8794,3.8789.8584-1.6602,2.2188-3.0205,3.8789-3.8789-1.6602-.8584-3.0205-2.2192-3.8789-3.8794-.8584,1.6602-2.2192,3.021-3.8794,3.8794Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `red-hat-ai-instructlab-on-ibm-cloud` icon data.
 const CarbonIconData redHatAiInstructlabOnIbmCloud = CarbonIconData(
   name: 'red-hat-ai-instructlab-on-ibm-cloud',
@@ -1027,6 +1044,23 @@ const CarbonIconData repoSourceCode = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M28,8H16l-3.4-3.4C12.2,4.2,11.7,4,11.2,4H4C2.9,4,2,4.9,2,6v20c0,1.1,0.9,2,2,2h7v-2H4V6h7.2l3.4,3.4l0.6,0.6H28v8h2v-8 C30,8.9,29.1,8,28,8z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `representation--textual` icon data.
+const CarbonIconData representationTextual = CarbonIconData(
+  name: 'representation--textual',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,30H4c-1.103,0-2-.8975-2-2l.0059-24.1499c.1084-1.0776.9639-1.8501,1.9941-1.8501h16.0898c.4883,0,.958.1777,1.3232.5l7.9102,6.9795c.4307.3804.6768.9268.6768,1.5v17.0205c0,1.1025-.8975,2-2,2ZM18,4l-14.001.0474.001,23.9526h24v-15h-8c-1.1025,0-2-.897-2-2v-7ZM20,4v7l8-.0205-7.9102-6.9795h-.0898ZM13,12h-7v-2h7v2ZM11,8h-5v-2h5v2ZM15.1304,16.3164h-3.2508v9.6836h-2.6143v-9.6836h-3.2508v-2.322h9.1159v2.322ZM18.8037,26h-2.5456v-9.03h2.5456v1.9608h.086c.2064-.9976.8944-1.9608,2.3048-1.9608h.4472v2.3736h-.6364c-1.4792,0-2.2016.3268-2.2016,1.376v5.2804Z',
         ),
       ],
     ),

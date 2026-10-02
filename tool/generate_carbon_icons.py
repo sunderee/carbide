@@ -242,7 +242,7 @@ def main() -> None:
         artwork = []
         for size in sorted(icons[name]["assets"], key=sort_key):
             vbw, vbh, shapes = extract(icons[name]["assets"][size])
-            assert size == "glyph" or vbw == vbh, f"non-square sized art: {name}"
+            assert vbw > 0 and vbh > 0, f"invalid viewBox: {name}"
             artwork.append((size, vbw, vbh, shapes))
         entries.append((ident, name, artwork))
     entries.sort(key=lambda e: e[0].lower().lstrip("$"))

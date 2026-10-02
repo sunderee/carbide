@@ -17,8 +17,8 @@ import '../spike/support.dart';
 import 'all_icons.dart';
 
 void main() {
-  test('the full Carbon registry is generated (2,715 icons)', () {
-    expect(allCarbonIcons, hasLength(2715));
+  test('the full Carbon registry is generated (2,775 icons)', () {
+    expect(allCarbonIcons, hasLength(2775));
   });
 
   test('asset counts match the source tree', () {
@@ -30,12 +30,12 @@ void main() {
         bySize[artwork.size] = (bySize[artwork.size] ?? 0) + 1;
       }
     }
-    expect(assets, 2809);
+    expect(assets, 2869);
     expect(bySize[null], 18, reason: 'bespoke glyph assets');
     expect(bySize[16], 68);
     expect(bySize[20], 9);
     expect(bySize[24], 8);
-    expect(bySize[32], 2706);
+    expect(bySize[32], 2766);
   });
 
   test('icon names are unique and artwork is ordered', () {
@@ -53,7 +53,9 @@ void main() {
       }
       for (final CarbonIconArtwork artwork in icon.artwork) {
         if (artwork.size != null) {
-          expect(artwork.viewBoxWidth, artwork.viewBoxHeight);
+          // Upstream content-navigator-sync--loading is 32.0007 × 32.
+          // Preserve its viewBox exactly instead of rounding its geometry.
+          expect(artwork.viewBoxWidth, closeTo(artwork.viewBoxHeight, 0.001));
         }
       }
     }

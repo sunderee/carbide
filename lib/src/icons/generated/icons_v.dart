@@ -510,6 +510,23 @@ const CarbonIconData view = CarbonIconData(
   ],
 );
 
+/// The Carbon `view--definition` icon data.
+const CarbonIconData viewDefinition = CarbonIconData(
+  name: 'view--definition',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M28,2H4c-1.03,0-1.89.77-1.99,1.85l-.01,24.15c0,1.1.9,2,2,2h24c1.1,0,2-.9,2-2V4c0-1.1-.9-2-2-2ZM28,28H4V4h24v24ZM25,13h-7c-.55,0-1,.45-1,1v1h-2v-4c0-.55-.45-1-1-1h-7c-.55,0-1,.45-1,1v7c0,.55.45,1,1,1h7c.55,0,1-.45,1-1v-1h2v4c0,.55.45,1,1,1h7c.55,0,1-.45,1-1v-7c0-.55-.45-1-1-1ZM13,17h-5v-5h5v5ZM24,20h-5v-5h5v5Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `view--filled` icon data.
 const CarbonIconData viewFilled = CarbonIconData(
   name: 'view--filled',
@@ -522,6 +539,23 @@ const CarbonIconData viewFilled = CarbonIconData(
         CarbonIconShape(d: 'M12,16 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0 z'),
         CarbonIconShape(
           d: 'M30.94,15.66A16.69,16.69,0,0,0,16,5,16.69,16.69,0,0,0,1.06,15.66a1,1,0,0,0,0,.68A16.69,16.69,0,0,0,16,27,16.69,16.69,0,0,0,30.94,16.34,1,1,0,0,0,30.94,15.66ZM16,22.5A6.5,6.5,0,1,1,22.5,16,6.51,6.51,0,0,1,16,22.5Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `view--matrix` icon data.
+const CarbonIconData viewMatrix = CarbonIconData(
+  name: 'view--matrix',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M27,30h-6v-2h6V4h-6v-2h6c1.1025,0,2,.897,2,2v24c0,1.1025-.8975,2-2,2ZM11,30h-6c-1.103,0-2-.8975-2-2V4c0-1.103.897-2,2-2h6v2h-6v24h6v2ZM21,22h4v4h-4v-4ZM14,22h4v4h-4v-4ZM7,22h4v4h-4v-4ZM21,14h4v4h-4v-4ZM14,14h4v4h-4v-4ZM7,14h4v4h-4v-4ZM21,6h4v4h-4v-4ZM14,6h4v4h-4v-4ZM7,6h4v4h-4v-4Z',
         ),
       ],
     ),
@@ -642,6 +676,23 @@ const CarbonIconData viewOffFilled = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'M4.53,21.81l5-5A6.84,6.84,0,0,1,9.5,16,6.51,6.51,0,0,1,16,9.5a6.84,6.84,0,0,1,.79.05l3.78-3.77A14.39,14.39,0,0,0,16,5,16.69,16.69,0,0,0,1.06,15.66a1,1,0,0,0,0,.68A15.86,15.86,0,0,0,4.53,21.81Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `view--table` icon data.
+const CarbonIconData viewTable = CarbonIconData(
+  name: 'view--table',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M27,2H5c-1.1,0-2,.9-2,2v24c0,1.1.9,2,2,2h22c1.1,0,2-.9,2-2V4c0-1.1-.9-2-2-2ZM27,12h-6v-6h6v6ZM27,20h-6v-6h6v6ZM5,6h6v6h-6v-6ZM19,6v6h-6v-6h6ZM5,14h6v6h-6v-6ZM13,14h6v6h-6v-6ZM5,22h6v6h-6v-6ZM13,22h6v6h-6v-6ZM27,28h-6v-6h6v6Z',
         ),
       ],
     ),

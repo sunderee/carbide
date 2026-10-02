@@ -27,6 +27,23 @@ const CarbonIconData umbrella = CarbonIconData(
   ],
 );
 
+/// The Carbon `unassigned--work-order` icon data.
+const CarbonIconData unassignedWorkOrder = CarbonIconData(
+  name: 'unassigned--work-order',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M24,16c-2.21,0-4,1.79-4,4s1.79,4,4,4,4-1.79,4-4-1.79-4-4-4ZM24,22c-1.1,0-2-.9-2-2s.9-2,2-2,2,.9,2,2-.9,2-2,2ZM27,25h-6c-1.65,0-3,1.35-3,3v2h2v-2c0-.55.45-1,1-1h6c.55,0,1,.45,1,1v2h2v-2c0-1.65-1.35-3-3-3ZM12,12v7h2v-7h-2ZM13,21c-.55,0-1,.45-1,1s.45,1,1,1,1-.45,1-1-.45-1-1-1ZM21,5h-3v-1c0-1.1-.9-2-2-2h-6c-1.1,0-2,.9-2,2v1h-3c-1.1,0-2,.9-2,2v19c0,1.1.9,2,2,2h9v-2H5V7h3v2h10v-2h3v6h2v-6c0-1.1-.9-2-2-2ZM10,7v-3h6v3h-6Z',
+        ),
+      ],
+    ),
+  ],
+);
+
 /// The Carbon `undefined` icon data.
 const CarbonIconData undefined = CarbonIconData(
   name: 'undefined',
@@ -213,6 +230,24 @@ const CarbonIconData unlocked = CarbonIconData(
       shapes: <CarbonIconShape>[
         CarbonIconShape(
           d: 'M24,14H12V8a4,4,0,0,1,8,0h2A6,6,0,0,0,10,8v6H8a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H24a2,2,0,0,0,2-2V16A2,2,0,0,0,24,14Zm0,14H8V16H24Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `unlocked--filled` icon data.
+const CarbonIconData unlockedFilled = CarbonIconData(
+  name: 'unlocked--filled',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M12,8v6h12c1.1046,0,2,.8954,2,2v12c0,1.1046-.8954,2-2,2H8c-1.1046,0-2-.8954-2-2v-12c0-1.1046.8954-2,2-2h2v-6c0-3.3137,2.6863-6,6-6s6,2.6863,6,6h-2c0-2.2091-1.7909-4-4-4s-4,1.7909-4,4Z',
+          evenOdd: true,
         ),
       ],
     ),
@@ -468,6 +503,23 @@ const CarbonIconData useCaseDefinition = CarbonIconData(
         ),
         CarbonIconShape(
           d: 'm2,4v24c0,1.1046.8954,2,2,2h24c1.1046,0,2-.8954,2-2V4c0-1.1046-.8954-2-2-2H4c-1.1046,0-2,.8954-2,2Zm26,24H4V4h24v24Z',
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The Carbon `use-case--include` icon data.
+const CarbonIconData useCaseInclude = CarbonIconData(
+  name: 'use-case--include',
+  artwork: <CarbonIconArtwork>[
+    CarbonIconArtwork(
+      size: 32,
+      viewBoxWidth: 32,
+      viewBoxHeight: 32,
+      shapes: <CarbonIconShape>[
+        CarbonIconShape(
+          d: 'M22,30h-12c-4.4111,0-8-3.5889-8-8v-12C2,5.5889,5.5889,2,10,2h12c4.4111,0,8,3.5889,8,8v12c0,4.4111-3.5889,8-8,8ZM10,4c-3.3086,0-6,2.6914-6,6v12c0,3.3086,2.6914,6,6,6h12c3.3086,0,6-2.6914,6-6v-12c0-3.3086-2.6914-6-6-6h-12ZM21,21c-2.7529,0-4.9932-2.2363-5-4.9873l-3.9805,3.9902-1.416-1.4121,1.5864-1.5908h-6.1719v-2h6.1719l-1.5913-1.5957,1.416-1.4121,3.9854,3.9951c.0068-2.751,2.2471-4.9873,5-4.9873,2.7568,0,5,2.2432,5,5s-2.2432,5-5,5ZM21,13c-1.6543,0-3,1.3457-3,3s1.3457,3,3,3,3-1.3457,3-3-1.3457-3-3-3Z',
         ),
       ],
     ),

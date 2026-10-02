@@ -684,26 +684,55 @@ class _NotificationPage extends StatelessWidget {
   }
 }
 
-class _ProgressIndicatorPage extends StatelessWidget {
+class _ProgressIndicatorPage extends StatefulWidget {
   const _ProgressIndicatorPage();
+
+  @override
+  State<_ProgressIndicatorPage> createState() => _ProgressIndicatorPageState();
+}
+
+class _ProgressIndicatorPageState extends State<_ProgressIndicatorPage> {
+  int _currentIndex = 1;
+  bool _vertical = false;
+  bool _interactive = true;
+
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Progress indicator',
-      description: 'Steps through a multi-stage flow.',
+      description:
+          'Steps through a multi-stage flow. Select a step to navigate.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
         width: 560,
         child: CarbonProgressIndicator(
-          currentIndex: 1,
-          steps: <CarbonProgressStep>[
+          currentIndex: _currentIndex,
+          vertical: _vertical,
+          interactive: _interactive,
+          onStepSelected: (int index) => setState(() => _currentIndex = index),
+          steps: const <CarbonProgressStep>[
             CarbonProgressStep(label: 'Account'),
             CarbonProgressStep(label: 'Profile'),
             CarbonProgressStep(label: 'Confirm'),
+            CarbonProgressStep(label: 'Problem', invalid: true),
+            CarbonProgressStep(label: 'Locked', disabled: true),
           ],
         ),
       ),
-      code: 'CarbonProgressIndicator(currentIndex: 1, steps: <…>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Vertical',
+          value: _vertical,
+          onChanged: (bool value) => setState(() => _vertical = value),
+        ),
+        boolKnob(
+          label: 'Interactive',
+          value: _interactive,
+          onChanged: (bool value) => setState(() => _interactive = value),
+        ),
+      ],
+      code:
+          'CarbonProgressIndicator(currentIndex: $_currentIndex, vertical: $_vertical, interactive: $_interactive, onStepSelected: (index) { … }, steps: <…>[…]);',
     );
   }
 }

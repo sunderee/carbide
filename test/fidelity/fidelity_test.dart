@@ -166,16 +166,16 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
       ],
     ),
   ),
-  'tabs': () => const SizedBox(
+  'tabs': () => SizedBox(
     width: 480,
     child: CarbonTabs(
-      tabs: <CarbonTab>[
+      tabs: const <CarbonTab>[
         CarbonTab(label: 'Dashboard'),
         CarbonTab(label: 'Monitoring'),
         CarbonTab(label: 'Activity'),
         CarbonTab(label: 'Settings'),
       ],
-      panels: <Widget>[
+      panels: const <Widget>[
         Text('Tab Panel 1'),
         Text('Tab Panel 2'),
         Text('Tab Panel 3'),

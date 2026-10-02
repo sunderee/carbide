@@ -66,7 +66,14 @@ class CarbonTab {
 
 /// A tabbed interface: a row of [tabs] with a matching panel each.
 ///
-/// Selection is controlled when [onChanged] is provided, otherwise managed
+/// [tabs] must be non-empty, with exactly one entry in [panels] per tab.
+/// A supplied [selectedIndex] must be in `[0, tabs.length)`. These contracts
+/// are asserted in debug builds. In release builds, selection clamps to the
+/// available tab/panel pairs; no pairs render an empty panel. Reconciliation
+/// does not call [onChanged], and switching to internal selection keeps the
+/// last visible selection.
+///
+/// Selection is controlled when [selectedIndex] is provided, otherwise managed
 /// internally. Left/Right (Home/End) move and activate tabs. When the
 /// platform requests reduced motion, tab state transitions complete
 /// instantly.
@@ -82,7 +89,9 @@ class CarbonTab {
 /// ```
 class CarbonTabs extends StatefulWidget {
   /// Creates a tabbed interface.
-  const CarbonTabs({
+  // List-length validation cannot be evaluated in a const constructor call.
+  // ignore: prefer_const_constructors_in_immutables
+  CarbonTabs({
     required this.tabs,
     required this.panels,
     super.key,
@@ -90,7 +99,13 @@ class CarbonTabs extends StatefulWidget {
     this.onChanged,
     this.variant = CarbonTabVariant.line,
     this.size = CarbonFieldSize.lg,
-  });
+  }) : assert(tabs.isNotEmpty, 'tabs must not be empty'),
+       assert(panels.length == tabs.length, 'each tab must have a panel'),
+       assert(
+         selectedIndex == null ||
+             (selectedIndex >= 0 && selectedIndex < tabs.length),
+         'selectedIndex must identify a tab',
+       );
 
   /// The tabs.
   final List<CarbonTab> tabs;
@@ -121,18 +136,23 @@ class _CarbonTabsState extends State<CarbonTabs> {
   List<FocusNode> _makeNodes() =>
       List<FocusNode>.generate(widget.tabs.length, (_) => FocusNode());
 
-  int get _current => widget.selectedIndex ?? _selected;
+  int _clampIndex(int index) =>
+      _safeTabIndex(index, widget.tabs.length, widget.panels.length);
+
+  int get _current => _clampIndex(widget.selectedIndex ?? _selected);
 
   @override
   void didUpdateWidget(CarbonTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.tabs.length != oldWidget.tabs.length) {
+    if (widget.tabs.length != _nodes.length) {
       for (final FocusNode node in _nodes) {
         node.dispose();
       }
       _nodes = _makeNodes();
-      if (_selected >= widget.tabs.length) _selected = 0;
     }
+    _selected = _clampIndex(
+      widget.selectedIndex ?? oldWidget.selectedIndex ?? _selected,
+    );
   }
 
   @override
@@ -227,7 +247,7 @@ class _CarbonTabsState extends State<CarbonTabs> {
                 : <Widget>[...tabWidgets, const Expanded(child: _LineFiller())],
           ),
         ),
-        if (widget.panels.isNotEmpty)
+        if (widget.tabs.isNotEmpty && widget.panels.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: CarbonSpacing.spacing05),
             child: Semantics(
@@ -266,6 +286,13 @@ enum CarbonTabsVerticalSize {
 
 /// Vertical tabs: a scrollable column of contained tabs beside its panel.
 ///
+/// [tabs] must be non-empty, with exactly one entry in [panels] per tab.
+/// A supplied [selectedIndex] must be in `[0, tabs.length)`. These contracts
+/// are asserted in debug builds. In release builds, selection clamps to the
+/// available tab/panel pairs; no pairs render an empty panel. Reconciliation
+/// does not call [onChanged], and switching to internal selection keeps the
+/// last visible selection.
+///
 /// Ports upstream `TabsVertical`/`TabListVertical`, which always render the
 /// contained visual style (`--tabs--vertical --tabs--contained`). The tab
 /// list takes a quarter of the available width (the upstream grid spans),
@@ -279,7 +306,9 @@ enum CarbonTabsVerticalSize {
 /// unbounded host falls back to the tabs' natural height without scrolling.
 class CarbonTabsVertical extends StatefulWidget {
   /// Creates vertical tabs.
-  const CarbonTabsVertical({
+  // List-length validation cannot be evaluated in a const constructor call.
+  // ignore: prefer_const_constructors_in_immutables
+  CarbonTabsVertical({
     required this.tabs,
     required this.panels,
     super.key,
@@ -287,7 +316,13 @@ class CarbonTabsVertical extends StatefulWidget {
     this.onChanged,
     this.size = CarbonTabsVerticalSize.xl,
     this.height,
-  }) : assert(tabs.length > 0, 'tabs must not be empty');
+  }) : assert(tabs.isNotEmpty, 'tabs must not be empty'),
+       assert(panels.length == tabs.length, 'each tab must have a panel'),
+       assert(
+         selectedIndex == null ||
+             (selectedIndex >= 0 && selectedIndex < tabs.length),
+         'selectedIndex must identify a tab',
+       );
 
   /// The tabs. Dismissable tabs are unsupported in the vertical variant.
   final List<CarbonTab> tabs;
@@ -323,7 +358,10 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
   List<FocusNode> _makeNodes() =>
       List<FocusNode>.generate(widget.tabs.length, (_) => FocusNode());
 
-  int get _current => widget.selectedIndex ?? _selected;
+  int _clampIndex(int index) =>
+      _safeTabIndex(index, widget.tabs.length, widget.panels.length);
+
+  int get _current => _clampIndex(widget.selectedIndex ?? _selected);
 
   @override
   void initState() {
@@ -334,13 +372,15 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
   @override
   void didUpdateWidget(CarbonTabsVertical oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.tabs.length != oldWidget.tabs.length) {
+    if (widget.tabs.length != _nodes.length) {
       for (final FocusNode node in _nodes) {
         node.dispose();
       }
       _nodes = _makeNodes();
-      if (_selected >= widget.tabs.length) _selected = 0;
     }
+    _selected = _clampIndex(
+      widget.selectedIndex ?? oldWidget.selectedIndex ?? _selected,
+    );
   }
 
   @override
@@ -552,7 +592,7 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
                         container: true,
                         child: KeyedSubtree(
                           key: ValueKey<int>(_current),
-                          child: widget.panels.isEmpty
+                          child: widget.tabs.isEmpty || widget.panels.isEmpty
                               ? const SizedBox.shrink()
                               : widget.panels[_current],
                         ),
@@ -896,4 +936,11 @@ class _TabButtonState extends State<_TabButton> {
       ),
     );
   }
+}
+
+// Parallel-list safeguards also run without constructor assertions. Keeping
+// this shared prevents horizontal and vertical release behavior from drifting.
+int _safeTabIndex(int index, int tabCount, int panelCount) {
+  final int pairs = tabCount < panelCount ? tabCount : panelCount;
+  return pairs == 0 ? 0 : index.clamp(0, pairs - 1);
 }

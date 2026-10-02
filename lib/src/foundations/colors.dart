@@ -190,35 +190,35 @@ abstract final class CarbonColors {
   /// Carbon `red100` swatch (#2D0709).
   static const Color red100 = Color(0xFF2D0709);
 
-  /// Hover-state variant of [red100] (#540D11).
-  static const Color red100Hover = Color(0xFF540D11);
-
-  /// Hover-state variant of [red90] (#66050A).
-  static const Color red90Hover = Color(0xFF66050A);
-
-  /// Hover-state variant of [red80] (#921118).
-  static const Color red80Hover = Color(0xFF921118);
-
-  /// Hover-state variant of [red70] (#C21E25).
-  static const Color red70Hover = Color(0xFFC21E25);
-
-  /// Hover-state variant of [red60] (#B81922).
-  static const Color red60Hover = Color(0xFFB81922);
-
-  /// Hover-state variant of [red50] (#EE0713).
-  static const Color red50Hover = Color(0xFFEE0713);
-
-  /// Hover-state variant of [red40] (#FF6168).
-  static const Color red40Hover = Color(0xFFFF6168);
-
-  /// Hover-state variant of [red30] (#FF99A0).
-  static const Color red30Hover = Color(0xFFFF99A0);
+  /// Hover-state variant of [red10] (#FFE0E0).
+  static const Color red10Hover = Color(0xFFFFE0E0);
 
   /// Hover-state variant of [red20] (#FFC2C5).
   static const Color red20Hover = Color(0xFFFFC2C5);
 
-  /// Hover-state variant of [red10] (#FFE0E0).
-  static const Color red10Hover = Color(0xFFFFE0E0);
+  /// Hover-state variant of [red30] (#FF99A0).
+  static const Color red30Hover = Color(0xFFFF99A0);
+
+  /// Hover-state variant of [red40] (#FF6168).
+  static const Color red40Hover = Color(0xFFFF6168);
+
+  /// Hover-state variant of [red50] (#EE0713).
+  static const Color red50Hover = Color(0xFFEE0713);
+
+  /// Hover-state variant of [red60] (#B81922).
+  static const Color red60Hover = Color(0xFFB81922);
+
+  /// Hover-state variant of [red70] (#C21E25).
+  static const Color red70Hover = Color(0xFFC21E25);
+
+  /// Hover-state variant of [red80] (#921118).
+  static const Color red80Hover = Color(0xFF921118);
+
+  /// Hover-state variant of [red90] (#66050A).
+  static const Color red90Hover = Color(0xFF66050A);
+
+  /// Hover-state variant of [red100] (#540D11).
+  static const Color red100Hover = Color(0xFF540D11);
 
   // magenta
   /// Carbon `magenta10` swatch (#FFF0F7).
@@ -251,35 +251,35 @@ abstract final class CarbonColors {
   /// Carbon `magenta100` swatch (#2A0A18).
   static const Color magenta100 = Color(0xFF2A0A18);
 
-  /// Hover-state variant of [magenta100] (#53142F).
-  static const Color magenta100Hover = Color(0xFF53142F);
-
-  /// Hover-state variant of [magenta90] (#68032E).
-  static const Color magenta90Hover = Color(0xFF68032E);
-
-  /// Hover-state variant of [magenta80] (#8E0B43).
-  static const Color magenta80Hover = Color(0xFF8E0B43);
-
-  /// Hover-state variant of [magenta70] (#BF1D63).
-  static const Color magenta70Hover = Color(0xFFBF1D63);
-
-  /// Hover-state variant of [magenta60] (#B0215F).
-  static const Color magenta60Hover = Color(0xFFB0215F);
-
-  /// Hover-state variant of [magenta50] (#E3176F).
-  static const Color magenta50Hover = Color(0xFFE3176F);
-
-  /// Hover-state variant of [magenta40] (#FF57A0).
-  static const Color magenta40Hover = Color(0xFFFF57A0);
-
-  /// Hover-state variant of [magenta30] (#FF94C3).
-  static const Color magenta30Hover = Color(0xFFFF94C3);
+  /// Hover-state variant of [magenta10] (#FFE0EF).
+  static const Color magenta10Hover = Color(0xFFFFE0EF);
 
   /// Hover-state variant of [magenta20] (#FFBDDA).
   static const Color magenta20Hover = Color(0xFFFFBDDA);
 
-  /// Hover-state variant of [magenta10] (#FFE0EF).
-  static const Color magenta10Hover = Color(0xFFFFE0EF);
+  /// Hover-state variant of [magenta30] (#FF94C3).
+  static const Color magenta30Hover = Color(0xFFFF94C3);
+
+  /// Hover-state variant of [magenta40] (#FF57A0).
+  static const Color magenta40Hover = Color(0xFFFF57A0);
+
+  /// Hover-state variant of [magenta50] (#E3176F).
+  static const Color magenta50Hover = Color(0xFFE3176F);
+
+  /// Hover-state variant of [magenta60] (#B0215F).
+  static const Color magenta60Hover = Color(0xFFB0215F);
+
+  /// Hover-state variant of [magenta70] (#BF1D63).
+  static const Color magenta70Hover = Color(0xFFBF1D63);
+
+  /// Hover-state variant of [magenta80] (#8E0B43).
+  static const Color magenta80Hover = Color(0xFF8E0B43);
+
+  /// Hover-state variant of [magenta90] (#68032E).
+  static const Color magenta90Hover = Color(0xFF68032E);
+
+  /// Hover-state variant of [magenta100] (#53142F).
+  static const Color magenta100Hover = Color(0xFF53142F);
 
   // purple
   /// Carbon `purple10` swatch (#F6F2FF).
@@ -312,35 +312,35 @@ abstract final class CarbonColors {
   /// Carbon `purple100` swatch (#1C0F30).
   static const Color purple100 = Color(0xFF1C0F30);
 
-  /// Hover-state variant of [purple100] (#341C59).
-  static const Color purple100Hover = Color(0xFF341C59);
-
-  /// Hover-state variant of [purple90] (#40197B).
-  static const Color purple90Hover = Color(0xFF40197B);
-
-  /// Hover-state variant of [purple80] (#5B24AD).
-  static const Color purple80Hover = Color(0xFF5B24AD);
-
-  /// Hover-state variant of [purple70] (#7C3DD6).
-  static const Color purple70Hover = Color(0xFF7C3DD6);
-
-  /// Hover-state variant of [purple60] (#7822FB).
-  static const Color purple60Hover = Color(0xFF7822FB);
-
-  /// Hover-state variant of [purple50] (#9352FF).
-  static const Color purple50Hover = Color(0xFF9352FF);
-
-  /// Hover-state variant of [purple40] (#AE7AFF).
-  static const Color purple40Hover = Color(0xFFAE7AFF);
-
-  /// Hover-state variant of [purple30] (#C5A3FF).
-  static const Color purple30Hover = Color(0xFFC5A3FF);
+  /// Hover-state variant of [purple10] (#EDE5FF).
+  static const Color purple10Hover = Color(0xFFEDE5FF);
 
   /// Hover-state variant of [purple20] (#DCC7FF).
   static const Color purple20Hover = Color(0xFFDCC7FF);
 
-  /// Hover-state variant of [purple10] (#EDE5FF).
-  static const Color purple10Hover = Color(0xFFEDE5FF);
+  /// Hover-state variant of [purple30] (#C5A3FF).
+  static const Color purple30Hover = Color(0xFFC5A3FF);
+
+  /// Hover-state variant of [purple40] (#AE7AFF).
+  static const Color purple40Hover = Color(0xFFAE7AFF);
+
+  /// Hover-state variant of [purple50] (#9352FF).
+  static const Color purple50Hover = Color(0xFF9352FF);
+
+  /// Hover-state variant of [purple60] (#7822FB).
+  static const Color purple60Hover = Color(0xFF7822FB);
+
+  /// Hover-state variant of [purple70] (#7C3DD6).
+  static const Color purple70Hover = Color(0xFF7C3DD6);
+
+  /// Hover-state variant of [purple80] (#5B24AD).
+  static const Color purple80Hover = Color(0xFF5B24AD);
+
+  /// Hover-state variant of [purple90] (#40197B).
+  static const Color purple90Hover = Color(0xFF40197B);
+
+  /// Hover-state variant of [purple100] (#341C59).
+  static const Color purple100Hover = Color(0xFF341C59);
 
   // blue
   /// Carbon `blue10` swatch (#EDF5FF).
@@ -373,35 +373,35 @@ abstract final class CarbonColors {
   /// Carbon `blue100` swatch (#001141).
   static const Color blue100 = Color(0xFF001141);
 
-  /// Hover-state variant of [blue100] (#001F75).
-  static const Color blue100Hover = Color(0xFF001F75);
-
-  /// Hover-state variant of [blue90] (#00258A).
-  static const Color blue90Hover = Color(0xFF00258A);
-
-  /// Hover-state variant of [blue80] (#0039C7).
-  static const Color blue80Hover = Color(0xFF0039C7);
-
-  /// Hover-state variant of [blue70] (#0053FF).
-  static const Color blue70Hover = Color(0xFF0053FF);
-
-  /// Hover-state variant of [blue60] (#0050E6).
-  static const Color blue60Hover = Color(0xFF0050E6);
-
-  /// Hover-state variant of [blue50] (#1F70FF).
-  static const Color blue50Hover = Color(0xFF1F70FF);
-
-  /// Hover-state variant of [blue40] (#5C97FF).
-  static const Color blue40Hover = Color(0xFF5C97FF);
-
-  /// Hover-state variant of [blue30] (#8AB6FF).
-  static const Color blue30Hover = Color(0xFF8AB6FF);
+  /// Hover-state variant of [blue10] (#DBEBFF).
+  static const Color blue10Hover = Color(0xFFDBEBFF);
 
   /// Hover-state variant of [blue20] (#B8D3FF).
   static const Color blue20Hover = Color(0xFFB8D3FF);
 
-  /// Hover-state variant of [blue10] (#DBEBFF).
-  static const Color blue10Hover = Color(0xFFDBEBFF);
+  /// Hover-state variant of [blue30] (#8AB6FF).
+  static const Color blue30Hover = Color(0xFF8AB6FF);
+
+  /// Hover-state variant of [blue40] (#5C97FF).
+  static const Color blue40Hover = Color(0xFF5C97FF);
+
+  /// Hover-state variant of [blue50] (#1F70FF).
+  static const Color blue50Hover = Color(0xFF1F70FF);
+
+  /// Hover-state variant of [blue60] (#0050E6).
+  static const Color blue60Hover = Color(0xFF0050E6);
+
+  /// Hover-state variant of [blue70] (#0053FF).
+  static const Color blue70Hover = Color(0xFF0053FF);
+
+  /// Hover-state variant of [blue80] (#0039C7).
+  static const Color blue80Hover = Color(0xFF0039C7);
+
+  /// Hover-state variant of [blue90] (#00258A).
+  static const Color blue90Hover = Color(0xFF00258A);
+
+  /// Hover-state variant of [blue100] (#001F75).
+  static const Color blue100Hover = Color(0xFF001F75);
 
   // cyan
   /// Carbon `cyan10` swatch (#E5F6FF).

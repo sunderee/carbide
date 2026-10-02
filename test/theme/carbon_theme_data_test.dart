@@ -50,7 +50,7 @@ void main() {
     expect(CarbonThemeData.white.layer02, CarbonColors.white);
     expect(CarbonThemeData.white.layerActive02, CarbonColors.gray30);
     expect(CarbonThemeData.white.layerBackground02, CarbonColors.gray10);
-    expect(CarbonThemeData.white.layerHover02, CarbonColors.whiteHover);
+    expect(CarbonThemeData.white.layerHover02, CarbonColors.gray10Hover);
     expect(CarbonThemeData.white.layerSelected02, CarbonColors.gray20);
     expect(
       CarbonThemeData.white.layerSelectedHover02,
@@ -79,7 +79,7 @@ void main() {
     expect(CarbonThemeData.white.field01, CarbonColors.gray10);
     expect(CarbonThemeData.white.fieldHover01, CarbonColors.gray10Hover);
     expect(CarbonThemeData.white.field02, CarbonColors.white);
-    expect(CarbonThemeData.white.fieldHover02, CarbonColors.whiteHover);
+    expect(CarbonThemeData.white.fieldHover02, CarbonColors.gray10Hover);
     expect(CarbonThemeData.white.field03, CarbonColors.gray10);
     expect(CarbonThemeData.white.fieldHover03, CarbonColors.gray10Hover);
     expect(CarbonThemeData.white.borderSubtle00, CarbonColors.gray20);
@@ -148,13 +148,13 @@ void main() {
     expect(CarbonThemeData.white.focus, CarbonColors.blue60);
     expect(CarbonThemeData.white.focusInset, CarbonColors.white);
     expect(CarbonThemeData.white.focusInverse, CarbonColors.white);
-    expect(CarbonThemeData.white.skeletonBackground, CarbonColors.whiteHover);
+    expect(CarbonThemeData.white.skeletonBackground, CarbonColors.gray10Hover);
     expect(CarbonThemeData.white.skeletonElement, CarbonColors.gray30);
     expect(CarbonThemeData.white.interactive, CarbonColors.blue60);
     expect(CarbonThemeData.white.highlight, CarbonColors.blue20);
     expect(CarbonThemeData.white.overlay, _alpha(CarbonColors.black, 0.6));
     expect(CarbonThemeData.white.toggleOff, CarbonColors.gray50);
-    expect(CarbonThemeData.white.shadow, const Color.fromRGBO(0, 0, 0, 0.3));
+    expect(CarbonThemeData.white.shadow, _alpha(CarbonColors.black, 0.3));
     expect(CarbonThemeData.white.buttonSeparator, CarbonColors.gray20);
     expect(CarbonThemeData.white.buttonPrimary, CarbonColors.blue60);
     expect(CarbonThemeData.white.buttonSecondary, CarbonColors.gray80);
@@ -166,9 +166,12 @@ void main() {
     expect(CarbonThemeData.white.buttonSecondaryActive, CarbonColors.gray60);
     expect(CarbonThemeData.white.buttonTertiaryActive, CarbonColors.blue80);
     expect(CarbonThemeData.white.buttonDangerHover, const Color(0xFFB81921));
-    expect(CarbonThemeData.white.buttonPrimaryHover, const Color(0xFF0050E6));
-    expect(CarbonThemeData.white.buttonSecondaryHover, const Color(0xFF474747));
-    expect(CarbonThemeData.white.buttonTertiaryHover, const Color(0xFF0050E6));
+    expect(CarbonThemeData.white.buttonPrimaryHover, CarbonColors.blue60Hover);
+    expect(
+      CarbonThemeData.white.buttonSecondaryHover,
+      CarbonColors.gray80Hover,
+    );
+    expect(CarbonThemeData.white.buttonTertiaryHover, CarbonColors.blue60Hover);
     expect(CarbonThemeData.white.buttonDisabled, CarbonColors.gray30);
     expect(CarbonThemeData.white.tagBackgroundRed, CarbonColors.red20);
     expect(CarbonThemeData.white.tagColorRed, CarbonColors.red70);
@@ -238,7 +241,7 @@ void main() {
       CarbonThemeData.white.notificationBackgroundWarning,
       CarbonColors.yellow10,
     );
-    expect(CarbonThemeData.white.notificationActionHover, CarbonColors.white0);
+    expect(CarbonThemeData.white.notificationActionHover, CarbonColors.white);
     expect(
       CarbonThemeData.white.notificationActionTertiaryInverse,
       CarbonColors.white,
@@ -360,7 +363,7 @@ void main() {
     expect(CarbonThemeData.gray10.layer01, CarbonColors.white);
     expect(CarbonThemeData.gray10.layerActive01, CarbonColors.gray30);
     expect(CarbonThemeData.gray10.layerBackground01, CarbonColors.gray10);
-    expect(CarbonThemeData.gray10.layerHover01, CarbonColors.whiteHover);
+    expect(CarbonThemeData.gray10.layerHover01, CarbonColors.gray10Hover);
     expect(CarbonThemeData.gray10.layerSelected01, CarbonColors.gray20);
     expect(
       CarbonThemeData.gray10.layerSelectedHover01,
@@ -378,7 +381,7 @@ void main() {
     expect(CarbonThemeData.gray10.layer03, CarbonColors.white);
     expect(CarbonThemeData.gray10.layerActive03, CarbonColors.gray30);
     expect(CarbonThemeData.gray10.layerBackground03, CarbonColors.gray10);
-    expect(CarbonThemeData.gray10.layerHover03, CarbonColors.whiteHover);
+    expect(CarbonThemeData.gray10.layerHover03, CarbonColors.gray10Hover);
     expect(CarbonThemeData.gray10.layerSelected03, CarbonColors.gray20);
     expect(
       CarbonThemeData.gray10.layerSelectedHover03,
@@ -396,11 +399,11 @@ void main() {
     expect(CarbonThemeData.gray10.layerAccentActive03, CarbonColors.gray40);
     expect(CarbonThemeData.gray10.layerAccentHover03, CarbonColors.gray20Hover);
     expect(CarbonThemeData.gray10.field01, CarbonColors.white);
-    expect(CarbonThemeData.gray10.fieldHover01, CarbonColors.whiteHover);
+    expect(CarbonThemeData.gray10.fieldHover01, CarbonColors.gray10Hover);
     expect(CarbonThemeData.gray10.field02, CarbonColors.gray10);
     expect(CarbonThemeData.gray10.fieldHover02, CarbonColors.gray10Hover);
     expect(CarbonThemeData.gray10.field03, CarbonColors.white);
-    expect(CarbonThemeData.gray10.fieldHover03, CarbonColors.whiteHover);
+    expect(CarbonThemeData.gray10.fieldHover03, CarbonColors.gray10Hover);
     expect(CarbonThemeData.gray10.borderSubtle00, CarbonColors.gray30);
     expect(CarbonThemeData.gray10.borderSubtle01, CarbonColors.gray20);
     expect(CarbonThemeData.gray10.borderSubtleSelected01, CarbonColors.gray30);
@@ -473,7 +476,7 @@ void main() {
     expect(CarbonThemeData.gray10.highlight, CarbonColors.blue20);
     expect(CarbonThemeData.gray10.overlay, _alpha(CarbonColors.black, 0.6));
     expect(CarbonThemeData.gray10.toggleOff, CarbonColors.gray50);
-    expect(CarbonThemeData.gray10.shadow, const Color.fromRGBO(0, 0, 0, 0.3));
+    expect(CarbonThemeData.gray10.shadow, _alpha(CarbonColors.black, 0.3));
     expect(CarbonThemeData.gray10.buttonSeparator, CarbonColors.gray20);
     expect(CarbonThemeData.gray10.buttonPrimary, CarbonColors.blue60);
     expect(CarbonThemeData.gray10.buttonSecondary, CarbonColors.gray80);
@@ -485,12 +488,15 @@ void main() {
     expect(CarbonThemeData.gray10.buttonSecondaryActive, CarbonColors.gray60);
     expect(CarbonThemeData.gray10.buttonTertiaryActive, CarbonColors.blue80);
     expect(CarbonThemeData.gray10.buttonDangerHover, const Color(0xFFB81921));
-    expect(CarbonThemeData.gray10.buttonPrimaryHover, const Color(0xFF0050E6));
+    expect(CarbonThemeData.gray10.buttonPrimaryHover, CarbonColors.blue60Hover);
     expect(
       CarbonThemeData.gray10.buttonSecondaryHover,
-      const Color(0xFF474747),
+      CarbonColors.gray80Hover,
     );
-    expect(CarbonThemeData.gray10.buttonTertiaryHover, const Color(0xFF0050E6));
+    expect(
+      CarbonThemeData.gray10.buttonTertiaryHover,
+      CarbonColors.blue60Hover,
+    );
     expect(CarbonThemeData.gray10.buttonDisabled, CarbonColors.gray30);
     expect(CarbonThemeData.gray10.tagBackgroundRed, CarbonColors.red20);
     expect(CarbonThemeData.gray10.tagColorRed, CarbonColors.red70);
@@ -560,7 +566,7 @@ void main() {
       CarbonThemeData.gray10.notificationBackgroundWarning,
       CarbonColors.yellow10,
     );
-    expect(CarbonThemeData.gray10.notificationActionHover, CarbonColors.white0);
+    expect(CarbonThemeData.gray10.notificationActionHover, CarbonColors.white);
     expect(
       CarbonThemeData.gray10.notificationActionTertiaryInverse,
       CarbonColors.white,
@@ -822,15 +828,15 @@ void main() {
     expect(CarbonThemeData.gray90.buttonSecondaryActive, CarbonColors.gray80);
     expect(CarbonThemeData.gray90.buttonTertiaryActive, CarbonColors.gray30);
     expect(CarbonThemeData.gray90.buttonDangerHover, const Color(0xFFB81921));
-    expect(CarbonThemeData.gray90.buttonPrimaryHover, const Color(0xFF0050E6));
+    expect(CarbonThemeData.gray90.buttonPrimaryHover, CarbonColors.blue60Hover);
     expect(
       CarbonThemeData.gray90.buttonSecondaryHover,
-      const Color(0xFF5E5E5E),
+      CarbonColors.gray60Hover,
     );
     expect(CarbonThemeData.gray90.buttonTertiaryHover, CarbonColors.gray10);
     expect(
       CarbonThemeData.gray90.buttonDisabled,
-      const Color.fromRGBO(141, 141, 141, 0.3),
+      _alpha(CarbonColors.gray50, 0.3),
     );
     expect(CarbonThemeData.gray90.tagBackgroundRed, CarbonColors.red70);
     expect(CarbonThemeData.gray90.tagColorRed, CarbonColors.red20);
@@ -914,7 +920,7 @@ void main() {
     );
     expect(
       CarbonThemeData.gray90.notificationActionTertiaryInverseHover,
-      const Color(0xFF0050E6),
+      CarbonColors.blue60Hover,
     );
     expect(
       CarbonThemeData.gray90.notificationActionTertiaryInverseText,
@@ -1165,7 +1171,10 @@ void main() {
     expect(CarbonThemeData.gray100.focus, CarbonColors.white);
     expect(CarbonThemeData.gray100.focusInset, CarbonColors.gray100);
     expect(CarbonThemeData.gray100.focusInverse, CarbonColors.blue60);
-    expect(CarbonThemeData.gray100.skeletonBackground, const Color(0xFF292929));
+    expect(
+      CarbonThemeData.gray100.skeletonBackground,
+      CarbonColors.gray100Hover,
+    );
     expect(CarbonThemeData.gray100.skeletonElement, CarbonColors.gray80);
     expect(CarbonThemeData.gray100.interactive, CarbonColors.blue50);
     expect(CarbonThemeData.gray100.highlight, CarbonColors.blue90);
@@ -1183,15 +1192,18 @@ void main() {
     expect(CarbonThemeData.gray100.buttonSecondaryActive, CarbonColors.gray80);
     expect(CarbonThemeData.gray100.buttonTertiaryActive, CarbonColors.gray30);
     expect(CarbonThemeData.gray100.buttonDangerHover, const Color(0xFFB81921));
-    expect(CarbonThemeData.gray100.buttonPrimaryHover, const Color(0xFF0050E6));
+    expect(
+      CarbonThemeData.gray100.buttonPrimaryHover,
+      CarbonColors.blue60Hover,
+    );
     expect(
       CarbonThemeData.gray100.buttonSecondaryHover,
-      const Color(0xFF5E5E5E),
+      CarbonColors.gray60Hover,
     );
     expect(CarbonThemeData.gray100.buttonTertiaryHover, CarbonColors.gray10);
     expect(
       CarbonThemeData.gray100.buttonDisabled,
-      const Color.fromRGBO(141, 141, 141, 0.3),
+      _alpha(CarbonColors.gray50, 0.3),
     );
     expect(CarbonThemeData.gray100.tagBackgroundRed, CarbonColors.red70);
     expect(CarbonThemeData.gray100.tagColorRed, CarbonColors.red20);
@@ -1281,7 +1293,7 @@ void main() {
     );
     expect(
       CarbonThemeData.gray100.notificationActionTertiaryInverseHover,
-      const Color(0xFF0050E6),
+      CarbonColors.blue60Hover,
     );
     expect(
       CarbonThemeData.gray100.notificationActionTertiaryInverseText,

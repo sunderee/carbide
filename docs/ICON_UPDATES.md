@@ -15,16 +15,28 @@ the gitlink — no submodule checkout needed).
    git submodule update --remote --merge -- documentation/carbon
    ```
 
-2. **Regenerate data, references, and the lockfiles** (icons and pictograms
+2. **Regenerate tokens, data, references, and the lockfiles** (icons and pictograms
    share the workflow and the drift guard):
 
    ```sh
+   python3 tool/generate_carbon_colors.py
+   python3 tool/generate_carbon_type.py
+   python3 tool/generate_carbon_fluid_type.py
+   python3 tool/generate_carbon_themes.py
+   python3 tool/test_carbon_generation.py
    python3 tool/generate_carbon_icons.py        # data + lockfile + diff report
    python3 tool/generate_icon_references.py     # upstream rasters (needs rsvg-convert)
    python3 tool/generate_carbon_pictograms.py
    python3 tool/generate_pictogram_references.py
    dart format lib test
    ```
+
+   Carbon 11.117 uses DTCG JSON for colors and themes. The generators read
+   those authoritative files directly, preserve palette aliases and the
+   ported theme subset, and resolve per-theme opacity and token references.
+   `test_carbon_generation.py` runs without a submodule checkout in CI.
+   Re-capture Storybook references with `tool/fidelity/capture.sh` after a bump.
+   Regenerate text goldens through the Linux workflow in `CONTRIBUTING.md`.
 
    The generator prints a categorized **diff report** against the previous
    lockfile: `added` / `modified` / `removed` / `newlyDeprecated` /
