@@ -10,6 +10,8 @@
 // Modal: a centered dialog over a scrim with a focus trap, Escape-to-close and
 // a header / scrolling body / footer-button layout.
 
+import 'dart:async';
+
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -47,7 +49,14 @@ enum CarbonModalSize {
 ///
 /// Controlled via [open]; respond to [onClose] (fired by the close button, an
 /// outside tap, or Escape). Focus is trapped within the dialog while open and
-/// restored to the launcher on close.
+/// restored to the launcher on close if it is still attached and focusable.
+/// Passive and confirmation modals initially focus the first available control
+/// (normally Close). Destructive modals focus an enabled secondary action when
+/// available, otherwise the first available control; they never automatically
+/// focus the destructive primary action.
+///
+/// The pointer-dismiss scrim is excluded from semantics. Assistive technology
+/// uses the named close button or Escape instead of a full-screen dismiss node.
 ///
 /// Opening plays the upstream entrance transition — the modal fades in while
 /// the dialog container slides down from −24px (`moderate-02` ×
@@ -172,6 +181,7 @@ class _CarbonModalState extends State<CarbonModal> {
       _restoreFocus = FocusManager.instance.primaryFocus;
       _overlay.show();
       _entered = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusOnOpen());
     }
   }
 
@@ -196,12 +206,19 @@ class _CarbonModalState extends State<CarbonModal> {
         // Mount hidden first so the entrance transition plays.
         setState(() => _entered = false);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && widget.open) setState(() => _entered = true);
+          if (mounted && widget.open) {
+            setState(() => _entered = true);
+            _focusOnOpen();
+          }
         });
       } else if (!widget.open && _overlay.isShowing) {
         _overlay.hide();
         _entered = false;
-        _restoreFocus?.requestFocus();
+        final FocusNode? launcher = _restoreFocus;
+        _restoreFocus = null;
+        if (launcher?.context != null && launcher!.canRequestFocus) {
+          launcher.requestFocus();
+        }
       }
     }
 
@@ -213,8 +230,38 @@ class _CarbonModalState extends State<CarbonModal> {
     }
   }
 
+  void _focusOnOpen() {
+    // Let descendant autofocus requests win before choosing a fallback.
+    scheduleMicrotask(() {
+      if (!mounted ||
+          !widget.open ||
+          _scope.context == null ||
+          (_scope.hasFocus && _scope.focusedChild != null)) {
+        return;
+      }
+      if (_scope.focusedChild != null) {
+        _scope.requestFocus();
+      } else if (widget.danger) {
+        final FocusNode? safe = _scope.traversalDescendants
+            .where(
+              (FocusNode node) =>
+                  node.context
+                      ?.findAncestorWidgetOfExactType<CarbonButton>()
+                      ?.kind !=
+                  CarbonButtonKind.danger,
+            )
+            .firstOrNull;
+        (safe ?? _scope).requestFocus();
+      } else if (!_scope.nextFocus()) {
+        _scope.requestFocus();
+      }
+    });
+  }
+
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
+    if (widget.open &&
+        widget.onClose != null &&
+        event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.escape) {
       widget.onClose?.call();
       return KeyEventResult.handled;
@@ -258,15 +305,17 @@ class _CarbonModalState extends State<CarbonModal> {
               children: <Widget>[
                 // The scrim.
                 Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: widget.preventCloseOnClickOutside
-                        ? null
-                        : widget.onClose,
-                    child: ColoredBox(
-                      color: widget.aiLabel != null && !widget.aiRevert
-                          ? theme.aiOverlay
-                          : theme.overlay,
+                  child: ExcludeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: widget.preventCloseOnClickOutside
+                          ? null
+                          : widget.onClose,
+                      child: ColoredBox(
+                        color: widget.aiLabel != null && !widget.aiRevert
+                            ? theme.aiOverlay
+                            : theme.overlay,
+                      ),
                     ),
                   ),
                 ),
@@ -289,6 +338,7 @@ class _CarbonModalState extends State<CarbonModal> {
                             // Swallow taps so they do not reach the scrim.
                             child: GestureDetector(
                               onTap: () {},
+                              excludeFromSemantics: true,
                               child: _Dialog(
                                 title: widget.title,
                                 label: widget.label,
@@ -443,7 +493,7 @@ class _Dialog extends StatelessWidget {
                     icon: CarbonIcons.close,
                     iconDescription: closeLabel,
                     kind: CarbonButtonKind.ghost,
-                    size: CarbonButtonSize.md,
+                    size: CarbonButtonSize.lg,
                     onPressed: onClose,
                   ),
                 ],
@@ -485,6 +535,8 @@ class _Dialog extends StatelessWidget {
                           label: secondaryButton!.label,
                           kind: CarbonButtonKind.secondary,
                           size: CarbonButtonSize.xl,
+                          autofocus:
+                              danger && secondaryButton!.onPressed != null,
                           onPressed: secondaryButton!.onPressed,
                         ),
                       ),

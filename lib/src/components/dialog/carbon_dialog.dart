@@ -19,6 +19,8 @@
 // CarbonModal there is no outside-tap dismissal — the native dialog element
 // does not close on backdrop clicks.
 
+import 'dart:async';
+
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -34,6 +36,18 @@ import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
 
 /// A composable Carbon dialog.
+///
+/// Modal dialogs contain keyboard traversal and restore focus to the opener
+/// on close if it is still attached and focusable. Initial focus follows a
+/// descendant's `autofocus` request, otherwise the first available control
+/// (normally Close). For a destructive dialog, set `autofocus: true` on the
+/// non-destructive action, such as Cancel. Passive and confirmation dialogs
+/// normally start at Close. A non-modal dialog leaves existing focus unchanged
+/// on opening and closing, and permits traversal to the page behind it.
+///
+/// The modal backdrop is excluded from semantics and does not dismiss on tap.
+/// The named close control and Escape provide keyboard-accessible dismissal;
+/// Escape only requests close while focus is inside the dialog.
 ///
 /// Opening plays the upstream entrance transition — opacity +
 /// translateY(−24px) at `moderate-02` × `entrance, expressive`. Under
@@ -108,6 +122,7 @@ class _CarbonDialogState extends State<CarbonDialog> {
       _restoreFocus = FocusManager.instance.primaryFocus;
       _overlay.show();
       _entered = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusOnOpen());
     }
   }
 
@@ -132,12 +147,21 @@ class _CarbonDialogState extends State<CarbonDialog> {
         // Mount hidden first so the entrance transition plays.
         setState(() => _entered = false);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && widget.open) setState(() => _entered = true);
+          if (mounted && widget.open) {
+            setState(() => _entered = true);
+            _focusOnOpen();
+          }
         });
       } else if (!widget.open && _overlay.isShowing) {
         _overlay.hide();
         _entered = false;
-        if (widget.modal) _restoreFocus?.requestFocus();
+        final FocusNode? launcher = _restoreFocus;
+        _restoreFocus = null;
+        if (widget.modal &&
+            launcher?.context != null &&
+            launcher!.canRequestFocus) {
+          launcher.requestFocus();
+        }
       }
     }
 
@@ -149,8 +173,28 @@ class _CarbonDialogState extends State<CarbonDialog> {
     }
   }
 
+  void _focusOnOpen() {
+    // Honor a caller's autofocus choice before selecting the first control.
+    scheduleMicrotask(() {
+      if (!mounted ||
+          !widget.open ||
+          !widget.modal ||
+          _scope.context == null ||
+          (_scope.hasFocus && _scope.focusedChild != null)) {
+        return;
+      }
+      if (_scope.focusedChild != null) {
+        _scope.requestFocus();
+      } else if (!_scope.nextFocus()) {
+        _scope.requestFocus();
+      }
+    });
+  }
+
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
+    if (widget.open &&
+        widget.onRequestClose != null &&
+        event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.escape) {
       widget.onRequestClose?.call();
       return KeyEventResult.handled;
@@ -235,8 +279,10 @@ class _CarbonDialogState extends State<CarbonDialog> {
 
     if (!widget.modal) {
       return Positioned.fill(
-        child: IgnorePointer(
-          ignoring: false,
+        child: Focus(
+          onKeyEvent: _onKey,
+          canRequestFocus: false,
+          includeSemantics: false,
           child: Stack(
             children: <Widget>[
               // Non-modal: the page stays interactive; only the dialog
@@ -268,12 +314,14 @@ class _CarbonDialogState extends State<CarbonDialog> {
               // (the native dialog element does not close on backdrop
               // clicks).
               Positioned.fill(
-                child: AnimatedOpacity(
-                  duration: reducedMotion
-                      ? Duration.zero
-                      : CarbonDuration.moderate02,
-                  opacity: _entered ? 1 : 0,
-                  child: ColoredBox(color: theme.overlay),
+                child: ExcludeSemantics(
+                  child: AnimatedOpacity(
+                    duration: reducedMotion
+                        ? Duration.zero
+                        : CarbonDuration.moderate02,
+                    opacity: _entered ? 1 : 0,
+                    child: ColoredBox(color: theme.overlay),
+                  ),
                 ),
               ),
               surface,
