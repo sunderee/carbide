@@ -15,13 +15,15 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/overlay_entries.dart';
+
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
   child: CarbonTheme(
     data: CarbonThemeData.white,
     child: Overlay(
       initialEntries: <OverlayEntry>[
-        OverlayEntry(builder: (BuildContext context) => child),
+        managedOverlayEntry(builder: (BuildContext context) => child),
       ],
     ),
   ),

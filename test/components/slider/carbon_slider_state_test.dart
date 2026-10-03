@@ -46,6 +46,7 @@ void main() {
             ('read-only', false, true, true),
             ('both', true, true, true),
             ('no callback', false, false, false),
+            ('read-only no callback', false, true, false),
           ]) {
         testWidgets('$name range=$range $direction gates every interaction', (
           WidgetTester tester,
@@ -106,7 +107,14 @@ void main() {
               final SemanticsNode node = tester.getSemantics(
                 find.byType(AnimatedScale).at(i),
               );
-              expect(node, isSemantics(isSlider: true, isEnabled: enabled));
+              expect(
+                node,
+                isSemantics(
+                  isSlider: true,
+                  isEnabled: enabled,
+                  hint: focusable && readOnly ? 'Nur lesen' : '',
+                ),
+              );
               if (!enabled) {
                 expect(
                   node.getSemanticsData().hasAction(
@@ -347,6 +355,7 @@ class _FixtureState extends State<_Fixture> {
         step: 5,
         disabled: disabled,
         readOnly: readOnly,
+        readOnlyHint: 'Nur lesen',
         onChanged: !callback
             ? null
             : (num next) {

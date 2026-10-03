@@ -252,6 +252,9 @@ class _CheckboxPageState extends State<_CheckboxPage> {
   bool _b = false;
   bool _ai = false;
 
+  bool _disabled = false;
+  bool _readOnly = false;
+
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -265,6 +268,8 @@ class _CheckboxPageState extends State<_CheckboxPage> {
           CarbonCheckbox(
             label: 'Subscribe to updates',
             value: _a,
+            disabled: _disabled,
+            readOnly: _readOnly,
             onChanged: (bool v) => setState(() => _a = v),
             aiLabel: _ai
                 ? const CarbonAILabel(size: CarbonAILabelSize.mini)
@@ -274,6 +279,8 @@ class _CheckboxPageState extends State<_CheckboxPage> {
           CarbonCheckbox(
             label: 'Enable analytics',
             value: _b,
+            disabled: _disabled,
+            readOnly: _readOnly,
             onChanged: (bool v) => setState(() => _b = v),
           ),
           const SizedBox(height: CarbonSpacing.spacing03),
@@ -285,6 +292,17 @@ class _CheckboxPageState extends State<_CheckboxPage> {
         ],
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+
         boolKnob(
           label: 'AI label',
           value: _ai,
@@ -305,6 +323,9 @@ class _RadioPage extends StatefulWidget {
 class _RadioPageState extends State<_RadioPage> {
   String _value = 'standard';
 
+  bool _disabled = false;
+  bool _readOnly = false;
+
   @override
   Widget build(BuildContext context) {
     Widget radio(String value, String label) => Padding(
@@ -312,6 +333,8 @@ class _RadioPageState extends State<_RadioPage> {
       child: CarbonRadioButton(
         label: label,
         selected: _value == value,
+        disabled: _disabled,
+        readOnly: _readOnly,
         onSelected: () => setState(() => _value = value),
       ),
     );
@@ -328,6 +351,18 @@ class _RadioPageState extends State<_RadioPage> {
           radio('overnight', 'Overnight'),
         ],
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+      ],
       code: 'CarbonRadioButton(label: \'…\', selected: …, onSelected: …);',
     );
   }
@@ -342,6 +377,9 @@ class _TogglePage extends StatefulWidget {
 class _TogglePageState extends State<_TogglePage> {
   bool _on = true;
 
+  bool _disabled = false;
+  bool _readOnly = false;
+
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -351,8 +389,22 @@ class _TogglePageState extends State<_TogglePage> {
       preview: CarbonToggle(
         labelText: 'Notifications',
         toggled: _on,
+        disabled: _disabled,
+        readOnly: _readOnly,
         onToggled: (bool v) => setState(() => _on = v),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+      ],
       code: "CarbonToggle(labelText: 'Notifications', toggled: true);",
     );
   }

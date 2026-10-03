@@ -89,10 +89,15 @@ jobs:
           test/components/tree_view
           test/components/data_table
           test/components/list
+          test/components/modal test/components/dialog
+          test/components/binary_controls test/components/checkbox
+          test/components/radio_button test/components/toggle
 
   gallery-web-integration:
     name: Gallery integration test — web
-    timeout-minutes: 15
+    # All preceding fixtures consumed the 15-minute budget before the added
+    # binary-control fixture could complete. Keep a bounded 20-minute budget.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -198,4 +203,20 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/list_markers_test.dart
+          -d web-server
+
+      - name: Drive modal and dialog native focus contracts in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/dialog_focus_test.dart
+          -d web-server
+
+      - name: Drive binary-control native read-only contracts in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/binary_control_state_test.dart
           -d web-server
