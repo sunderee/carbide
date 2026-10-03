@@ -17,6 +17,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/native_range_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/native_text_value.dart';
 import '../form/carbon_form.dart';
 
@@ -49,6 +50,7 @@ class CarbonSlider extends StatefulWidget {
     this.hideTextInput = false,
     this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
   }) : assert(max > min, 'max must exceed min'),
@@ -92,6 +94,9 @@ class CarbonSlider extends StatefulWidget {
 
   /// Blocks adjustments while allowing focus and value inspection.
   final bool readOnly;
+
+  /// Localizable read-only announcement for the slider handles.
+  final String readOnlyHint;
 
   /// Whether invalid.
   final bool invalid;
@@ -145,9 +150,15 @@ class _CarbonSliderState extends State<CarbonSlider> {
     super.dispose();
   }
 
-  bool get _disabled => widget.disabled || widget.onChanged == null;
+  CarbonControlState get _state => CarbonControlState.resolve(
+    hasCallback: widget.onChanged != null,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
 
-  bool get _enabled => !_disabled && !widget.readOnly;
+  bool get _disabled => _state.isDisabled;
+
+  bool get _enabled => _state.canActivate;
 
   String _format(num v) =>
       widget.formatLabel?.call(v) ??
@@ -449,6 +460,7 @@ class _CarbonSliderState extends State<CarbonSlider> {
               onIncrease: canIncrease ? () => setValue(next) : null,
               onDecrease: canDecrease ? () => setValue(previous) : null,
               enabled: _enabled,
+              hint: _state.semanticsHint(widget.readOnlyHint),
               child: AnimatedScale(
                 scale: focused ? 1.4286 : 1,
                 duration: const Duration(milliseconds: 70),
@@ -493,7 +505,11 @@ class _ValueInput extends StatefulWidget {
   final bool disabled;
   final bool readOnly;
   final String labelText;
-  bool get enabled => !disabled && !readOnly;
+  bool get enabled => CarbonControlState.resolve(
+    hasCallback: true,
+    disabled: disabled,
+    readOnly: readOnly,
+  ).canActivate;
   final bool invalid;
   final ValueChanged<num> onSubmitted;
 

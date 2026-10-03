@@ -59,6 +59,33 @@ bool Function()? captureNativeControlFocus() {
   };
 }
 
+/// Captures a guarded native request for a newly focused read-only control.
+///
+/// The caller confirms framework ownership before invoking the callback after
+/// semantics updates. A different native target chosen since capture wins.
+/// No DOM listeners or long-lived element references are retained.
+bool Function()? captureReadOnlyControlFocus(String identifier) {
+  if (!_document.hasFocus()) return null;
+  final _Element? previous = _document.activeElement;
+  return () {
+    if (!_document.hasFocus()) return false;
+    final _Element? target = _document.querySelector(
+      '[flt-semantics-identifier="$identifier"]',
+    );
+    if (target == null || !target.isConnected) return false;
+    final _Element? active = target.getRootNode().activeElement;
+    if (active == target) return true;
+    if (active != previous &&
+        active != null &&
+        active.tagName != 'BODY' &&
+        active.tagName != 'FLUTTER-VIEW') {
+      return false;
+    }
+    target.focus(_FocusOptions(preventScroll: true));
+    return target.getRootNode().activeElement == target;
+  };
+}
+
 @JS('document')
 external _Document get _document;
 

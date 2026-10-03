@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Make checkbox, radio, toggle and slider use a shared interaction policy.
+  Read-only binary controls remain focusable, expose their value, announce a
+  localizable read-only hint and use Carbon's outlined styling. Add explicit
+  disabled flags to binary controls and radio groups; null callbacks still
+  disable them. Read-only radio groups allow focus navigation without changing
+  selection (#310).
+
 - Exclude modal scrims from accessibility traversal and give the modal close
   button a 48×48 target while preserving its icon. Verify modal/dialog focus
   containment and restoration, choose safe initial focus, ignore disposed

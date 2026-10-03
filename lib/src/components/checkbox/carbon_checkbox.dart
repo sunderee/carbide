@@ -14,6 +14,8 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
+import '../../utils/control_state.dart';
+import '../../utils/control_semantics.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon checkbox.
@@ -25,6 +27,10 @@ import '../form/carbon_form.dart';
 ///
 /// Group several with [CarbonCheckboxGroup] for a shared legend and
 /// group-level validation.
+///
+/// A null callback or [disabled] disables focus and editing. [readOnly]
+/// retains focus and the announced value while preventing activation. Its
+/// [readOnlyHint] announces non-editability and can be localized.
 class CarbonCheckbox extends StatelessWidget {
   /// Creates a checkbox.
   const CarbonCheckbox({
@@ -34,7 +40,9 @@ class CarbonCheckbox extends StatelessWidget {
     this.onChanged,
     this.indeterminate = false,
     this.invalid = false,
+    this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.focusNode,
     this.autofocus = false,
     this.aiLabel,
@@ -63,6 +71,12 @@ class CarbonCheckbox extends StatelessWidget {
   /// Renders read-only (non-editable but not greyed).
   final bool readOnly;
 
+  /// Disables focus and editing, independently of callback availability.
+  final bool disabled;
+
+  /// Localizable read-only announcement; ignored when disabled.
+  final String readOnlyHint;
+
   /// An optional focus node.
   final FocusNode? focusNode;
 
@@ -78,21 +92,31 @@ class CarbonCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool enabled = onChanged != null && !readOnly;
+    final CarbonControlState state = CarbonControlState.resolve(
+      hasCallback: onChanged != null,
+      disabled: disabled,
+      readOnly: readOnly,
+    );
+    final bool enabled = state.canActivate;
 
-    return Semantics(
+    return CarbonControlSemantics(
       checked: indeterminate ? null : value,
       mixed: indeterminate,
-      enabled: onChanged != null,
+      state: state,
+      readOnlyHint: readOnlyHint,
+      focusNode: focusNode,
+      onActivate: enabled ? () => onChanged!(!value) : null,
       label: label,
-      child: CarbonInteraction(
-        enabled: enabled,
+      builder: (FocusNode focus) => CarbonInteraction(
+        enabled: state.canFocus,
+        includeSemantics: false,
+        readOnly: state.isReadOnly,
         onPressed: enabled ? () => onChanged!(!value) : null,
-        focusNode: focusNode,
+        focusNode: focus,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final bool focused = states.contains(WidgetState.focused);
-          final bool disabled = onChanged == null;
+          final bool disabled = state.isDisabled;
 
           final Color glyph = theme.iconInverse;
           final Color fill = disabled
@@ -104,9 +128,10 @@ class CarbonCheckbox extends StatelessWidget {
           final Widget box = _CheckboxBox(
             checked: value,
             indeterminate: indeterminate,
-            borderColor: fill,
-            fillColor: fill,
-            glyphColor: glyph,
+            borderColor: state.isReadOnly ? theme.iconDisabled : fill,
+            fillColor: state.isReadOnly ? const Color(0x00000000) : fill,
+            glyphColor: state.isReadOnly ? theme.textPrimary : glyph,
+            outlined: state.isReadOnly,
             focusColor: theme.focus,
             focused: focused,
           );
@@ -173,6 +198,7 @@ class _CheckboxBox extends StatelessWidget {
     required this.glyphColor,
     required this.focusColor,
     required this.focused,
+    required this.outlined,
   });
 
   final bool checked;
@@ -182,6 +208,7 @@ class _CheckboxBox extends StatelessWidget {
   final Color glyphColor;
   final Color focusColor;
   final bool focused;
+  final bool outlined;
 
   @override
   Widget build(BuildContext context) => SizedBox.square(
@@ -194,6 +221,7 @@ class _CheckboxBox extends StatelessWidget {
         borderColor: borderColor,
         fillColor: fillColor,
         glyphColor: glyphColor,
+        outlined: outlined,
       ),
     ),
   );
@@ -207,6 +235,7 @@ class _CheckboxPainter extends CustomPainter {
     required this.borderColor,
     required this.fillColor,
     required this.glyphColor,
+    required this.outlined,
   });
 
   final bool checked;
@@ -214,6 +243,7 @@ class _CheckboxPainter extends CustomPainter {
   final Color borderColor;
   final Color fillColor;
   final Color glyphColor;
+  final bool outlined;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -224,7 +254,8 @@ class _CheckboxPainter extends CustomPainter {
     final bool filled = checked || indeterminate;
     if (filled) {
       canvas.drawRRect(box, Paint()..color = fillColor);
-    } else {
+    }
+    if (!filled || outlined) {
       // 1px border, inset by half the stroke so it stays inside the 16px box.
       final RRect inset = RRect.fromRectAndRadius(
         (Offset.zero & size).deflate(0.5),
@@ -272,7 +303,8 @@ class _CheckboxPainter extends CustomPainter {
       indeterminate != old.indeterminate ||
       borderColor != old.borderColor ||
       fillColor != old.fillColor ||
-      glyphColor != old.glyphColor;
+      glyphColor != old.glyphColor ||
+      outlined != old.outlined;
 }
 
 /// The 2px `focus` ring drawn 1px outside the box (`outline-offset: 1px`).
