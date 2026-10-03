@@ -373,7 +373,6 @@ void main() {
   testWidgets(
     'binary enabled, read-only and disabled visuals across themes (#310)',
     (WidgetTester tester) async {
-      final FocusNode readOnlyFocus = FocusNode();
       final FocusHighlightStrategy old =
           FocusManager.instance.highlightStrategy;
       FocusManager.instance.highlightStrategy =
@@ -387,13 +386,23 @@ void main() {
           size: const Size(800, 540),
           containsText: true,
           afterPump: (WidgetTester tester) async {
-            // The borrowed node survives theme specimens. Stage a new focus
-            // transition so each fresh interaction paints its keyboard ring.
-            FocusManager.instance.rootScope.requestFocus();
-            await tester.pump();
-            readOnlyFocus.requestFocus();
+            final Finder box = find.descendant(
+              of: find.byWidgetPredicate(
+                (Widget widget) =>
+                    widget is CarbonCheckbox &&
+                    widget.label == 'Read only true',
+              ),
+              matching: find.byType(CustomPaint),
+            );
+            final FocusNode focus = Focus.of(tester.element(box));
+            focus.requestFocus();
             await tester.pumpAndSettle();
             expect(tester.takeException(), isNull);
+            expect(focus.hasPrimaryFocus, isTrue);
+            expect(
+              tester.widget<CustomPaint>(box).foregroundPainter,
+              isNotNull,
+            );
           },
           builder: (BuildContext context) => Padding(
             padding: const EdgeInsets.all(16),
@@ -427,9 +436,6 @@ void main() {
                                   onChanged: (_) {},
                                   readOnly: mode == 'Read only',
                                   disabled: mode == 'Disabled',
-                                  focusNode: mode == 'Read only' && value
-                                      ? readOnlyFocus
-                                      : null,
                                 ),
                                 _Kind.radio => CarbonRadioButton(
                                   label: '$mode $value',
@@ -473,7 +479,6 @@ void main() {
       } finally {
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pumpAndSettle();
-        readOnlyFocus.dispose();
         FocusManager.instance.highlightStrategy = old;
       }
     },
