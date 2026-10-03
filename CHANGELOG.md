@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Continue nested ordered-list markers after `z` as `aa`, `ab`, … using
+  CSS lower-latin numbering. Keep wide markers on one line in the gutter,
+  preserving content alignment in expressive/scaled text and RTL (#304).
+
 - Add stable data-table row IDs, accessible record labels, ID-based selection
   (`selectedRowIds` / `onSelectedRowIdsChanged`) and expansion (`expandedRowIds`
   / `onExpansionChanged`). Counts ignore absent IDs; retained IDs restore when

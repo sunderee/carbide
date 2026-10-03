@@ -7,12 +7,14 @@
 //   styles/scss/components/list/_list.scss
 //   react/src/components/{OrderedList,UnorderedList,ListItem}
 
+import 'package:flutter/rendering.dart' show OverflowBoxFit;
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/list_markers.dart';
 
 /// Whether a list numbers its items or bullets them.
 enum _ListKind { ordered, unordered }
@@ -57,7 +59,7 @@ class CarbonListItem extends StatelessWidget {
 /// An ordered (numbered) Carbon list.
 ///
 /// Top-level items are numbered `1.`, `2.`, …; nested ordered lists use
-/// lower-latin markers (`a.`, `b.`, …), per `_list.scss`.
+/// lower-latin markers (`a.` … `z.`, `aa.`, `ab.`, …), per `_list.scss`.
 class CarbonOrderedList extends StatelessWidget {
   /// Creates an ordered list.
   const CarbonOrderedList({
@@ -131,8 +133,7 @@ class _CarbonList extends StatelessWidget {
     switch (kind) {
       case _ListKind.ordered:
         if (nested) {
-          // lower-latin: 1 -> a, 2 -> b, …
-          return '${String.fromCharCode(0x60 + index + 1)}.';
+          return '${lowerLatin(index)}.';
         }
         return '${index + 1}.';
       case _ListKind.unordered:
@@ -174,7 +175,25 @@ class _CarbonList extends StatelessWidget {
             children: <Widget>[
               SizedBox(
                 width: gutter,
-                child: Text(_marker(i, nested), style: style),
+                // Native CSS markers hang into the margin when wider than the
+                // gutter. Keep the content edge fixed and the marker on one
+                // line, including expressive/scaled multi-letter markers.
+                child: OverflowBox(
+                  fit: OverflowBoxFit.deferToChild,
+                  alignment: AlignmentDirectional.topEnd,
+                  minWidth: gutter,
+                  maxWidth: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      end: CarbonSpacing.spacing02,
+                    ),
+                    child: Text(
+                      _marker(i, nested),
+                      style: style,
+                      softWrap: false,
+                    ),
+                  ),
+                ),
               ),
               Expanded(
                 child: DefaultTextStyle(style: style, child: children[i]),

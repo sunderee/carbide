@@ -59,6 +59,146 @@ void main() {
       expect(find.text('b.'), findsOneWidget);
     });
 
+    for (final parentOrdered in <bool>[true, false]) {
+      testWidgets(
+        '53 nested ordered markers continue through z and az, ordered parent=$parentOrdered',
+        (tester) async {
+          final items = <CarbonListItem>[
+            CarbonListItem(
+              child: CarbonOrderedList(
+                children: <CarbonListItem>[
+                  for (int i = 0; i < 53; i++)
+                    CarbonListItem(child: Text('Item ${i + 1}')),
+                ],
+              ),
+            ),
+          ];
+          await tester.pumpWidget(
+            _host(
+              SingleChildScrollView(
+                child: parentOrdered
+                    ? CarbonOrderedList(children: items)
+                    : CarbonUnorderedList(children: items),
+              ),
+            ),
+          );
+          for (final marker in <String>[
+            'y.',
+            'z.',
+            'aa.',
+            'ab.',
+            'az.',
+            'ba.',
+          ]) {
+            expect(find.text(marker), findsOneWidget);
+            expect(_markerGutter(tester, marker), 24);
+          }
+          expect(
+            find.byWidgetPredicate(
+              (w) => w is Text && RegExp(r'^[{}|~]\.$').hasMatch(w.data ?? ''),
+            ),
+            findsNothing,
+          );
+          expect(find.text(parentOrdered ? '1.' : '–'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+    testWidgets(
+      'empty nested list creates no marker and neighboring lists restart at a',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            const CarbonOrderedList(
+              children: <CarbonListItem>[
+                CarbonListItem(
+                  child: CarbonOrderedList(children: <CarbonListItem>[]),
+                ),
+                CarbonListItem(
+                  child: CarbonOrderedList(
+                    children: <CarbonListItem>[
+                      CarbonListItem(child: Text('First')),
+                    ],
+                  ),
+                ),
+                CarbonListItem(
+                  child: CarbonOrderedList(
+                    children: <CarbonListItem>[
+                      CarbonListItem(child: Text('Second')),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        expect(find.text('a.'), findsNWidgets(2));
+        expect(find.text('b.'), findsNothing);
+        expect(find.text('1.'), findsOneWidget);
+        expect(find.text('2.'), findsOneWidget);
+        expect(find.text('3.'), findsOneWidget);
+      },
+    );
+    for (final direction in TextDirection.values) {
+      testWidgets(
+        'wide expressive markers stay on one line outside the content edge: $direction',
+        (tester) async {
+          await tester.pumpWidget(
+            _host(
+              Directionality(
+                textDirection: direction,
+                child: MediaQuery(
+                  data: const MediaQueryData(
+                    textScaler: TextScaler.linear(1.3),
+                  ),
+                  child: SingleChildScrollView(
+                    child: CarbonOrderedList(
+                      expressive: true,
+                      children: <CarbonListItem>[
+                        CarbonListItem(
+                          child: CarbonOrderedList(
+                            children: <CarbonListItem>[
+                              CarbonListItem(
+                                child: CarbonOrderedList(
+                                  children: <CarbonListItem>[
+                                    for (int i = 0; i < 703; i++)
+                                      CarbonListItem(
+                                        child: Text('Item ${i + 1}'),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          for (final entry in <String, int>{
+            'zw.': 699,
+            'zz.': 702,
+            'aaa.': 703,
+          }.entries) {
+            final marker = tester.getRect(find.text(entry.key));
+            final item = tester.getRect(find.text('Item ${entry.value}'));
+            expect(marker.height, item.height);
+            expect(
+              direction == TextDirection.ltr ? marker.right : marker.left,
+              closeTo(
+                direction == TextDirection.ltr ? item.left - 4 : item.right + 4,
+                0.01,
+              ),
+            );
+            expect(_markerGutter(tester, entry.key), 24);
+          }
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
     testWidgets('unordered top-level is en-dash; nested is a square', (
       WidgetTester tester,
     ) async {
@@ -178,6 +318,79 @@ void main() {
     });
   });
 
+  testWidgets('nested lower-latin boundaries across themes and directions', (
+    tester,
+  ) async {
+    await expectThemeGoldens(
+      tester,
+      name: 'list_lower_latin_boundary',
+      containsText: true,
+      size: const Size(360, 260),
+      directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
+      builder: (_) => Center(
+        child: SizedBox(
+          width: 320,
+          height: 220,
+          child: SingleChildScrollView(
+            child: CarbonOrderedList(
+              children: <CarbonListItem>[
+                CarbonListItem(
+                  child: CarbonOrderedList(
+                    children: <CarbonListItem>[
+                      for (int i = 0; i < 30; i++)
+                        CarbonListItem(child: Text('Item ${i + 1}')),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      afterPump: (tester) async {
+        // Show the transition x, y, z, aa … with the real list numbering.
+        await tester.ensureVisible(find.text('Item 30'));
+        await tester.pumpAndSettle();
+      },
+    );
+  });
+  testWidgets(
+    'wide lower-latin markers hang in the gutter across themes and directions',
+    (tester) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'list_lower_latin_wide',
+        containsText: true,
+        size: const Size(360, 260),
+        directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
+        builder: (_) => Center(
+          child: SizedBox(
+            width: 320,
+            height: 220,
+            child: SingleChildScrollView(
+              child: CarbonOrderedList(
+                expressive: true,
+                children: <CarbonListItem>[
+                  CarbonListItem(
+                    child: CarbonOrderedList(
+                      children: <CarbonListItem>[
+                        for (int i = 0; i < 703; i++)
+                          CarbonListItem(child: Text('Item ${i + 1}')),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        afterPump: (tester) async {
+          await tester.ensureVisible(find.text('Item 703'));
+          await tester.pumpAndSettle();
+        },
+      );
+    },
+  );
   testWidgets('list variants across themes', (WidgetTester tester) async {
     await expectThemeGoldens(
       tester,
