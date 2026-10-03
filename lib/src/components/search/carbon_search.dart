@@ -20,6 +20,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon search field.
@@ -53,7 +54,10 @@ class CarbonSearch extends StatefulWidget {
   /// The accessible label (visually hidden).
   final String labelText;
 
-  /// An external controller.
+  /// A caller-owned controller, rebound when this property changes.
+  ///
+  /// Removing it creates an internal controller seeded with its text, selection,
+  /// and composing range. Caller-owned controllers are never disposed here.
   final TextEditingController? controller;
 
   /// The initial query.
@@ -80,7 +84,11 @@ class CarbonSearch extends StatefulWidget {
   /// Uses the fluid treatment.
   final bool fluid;
 
-  /// An optional focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.
@@ -95,29 +103,37 @@ class _CarbonSearchState extends State<CarbonSearch> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
-  TextEditingController? _internalController;
-  FocusNode? _internalFocus;
+  late final OwnedTextEditingController _controllerOwner;
+  late final OwnedFocusNode _focusOwner;
 
-  TextEditingController get _controller =>
-      widget.controller ?? (_internalController ??= TextEditingController());
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  TextEditingController get _controller => _controllerOwner.value;
+  FocusNode get _focus => _focusOwner.value;
 
   @override
   void initState() {
     super.initState();
-    if (widget.controller == null) {
-      _internalController = TextEditingController(text: widget.initialValue);
-    }
-    _controller.addListener(_rebuild);
-    _focus.addListener(_rebuild);
+    _controllerOwner = OwnedTextEditingController(
+      external: widget.controller,
+      initialText: widget.initialValue,
+      onChanged: _rebuild,
+    );
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _rebuild,
+    );
+  }
+
+  @override
+  void didUpdateWidget(CarbonSearch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _controllerOwner.update(widget.controller);
+    _focusOwner.update(widget.focusNode);
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_rebuild);
-    _focus.removeListener(_rebuild);
-    _internalController?.dispose();
-    _internalFocus?.dispose();
+    _controllerOwner.dispose();
+    _focusOwner.dispose();
     super.dispose();
   }
 
@@ -159,6 +175,7 @@ class _CarbonSearchState extends State<CarbonSearch> {
       child: _CarbonSearchField(
         controller: _controller,
         focusNode: _focus,
+        selectAllOnFocus: _focusOwner.selectAllOnFocus,
         placeholder: widget.placeholder,
         labelText: widget.labelText,
         size: widget.size,
@@ -178,6 +195,7 @@ class _CarbonSearchField extends StatelessWidget {
   const _CarbonSearchField({
     required this.controller,
     required this.focusNode,
+    required this.selectAllOnFocus,
     required this.placeholder,
     required this.labelText,
     required this.size,
@@ -191,6 +209,7 @@ class _CarbonSearchField extends StatelessWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool? selectAllOnFocus;
   final String placeholder;
   final String labelText;
   final CarbonFieldSize size;
@@ -223,6 +242,7 @@ class _CarbonSearchField extends StatelessWidget {
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: labelText,
+        enabled: !disabled,
         textField: true,
         child: Stack(
           alignment: AlignmentDirectional.centerStart,
@@ -243,6 +263,7 @@ class _CarbonSearchField extends StatelessWidget {
             EditableText(
               controller: controller,
               focusNode: focusNode,
+              selectAllOnFocus: selectAllOnFocus,
               readOnly: disabled,
               autofocus: autofocus,
               onChanged: onChanged,
@@ -343,10 +364,10 @@ class _CarbonSearchField extends StatelessWidget {
             )
           : SizedBox(height: h, child: searchRow),
     );
-    if (focusNode.hasFocus) {
-      box = CarbonFocusRing(visible: true, child: box);
-    }
-    return Semantics(container: true, child: box);
+    box = CarbonFocusRing(visible: focusNode.hasFocus, child: box);
+    // Keep the editable's semantics parent stable when the clear button fades
+    // out. Reparenting its native web input would otherwise drop browser focus.
+    return Semantics(container: true, explicitChildNodes: true, child: box);
   }
 }
 
@@ -370,7 +391,10 @@ class CarbonExpandableSearch extends StatefulWidget {
   /// The accessible label.
   final String labelText;
 
-  /// An external controller.
+  /// A caller-owned controller, rebound when this property changes.
+  ///
+  /// Removing it creates an internal controller seeded with its text, selection,
+  /// and composing range. Caller-owned controllers are never disposed here.
   final TextEditingController? controller;
 
   /// Called when the query changes.
@@ -399,8 +423,8 @@ class CarbonExpandableSearch extends StatefulWidget {
 }
 
 class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
-  late final TextEditingController _controller =
-      widget.controller ?? TextEditingController();
+  late final OwnedTextEditingController _controllerOwner;
+  TextEditingController get _controller => _controllerOwner.value;
   final FocusNode _focus = FocusNode();
   final FocusNode _buttonFocus = FocusNode(
     debugLabel: 'CarbonExpandableSearch.button',
@@ -410,15 +434,20 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
   @override
   void initState() {
     super.initState();
+    _controllerOwner = OwnedTextEditingController(external: widget.controller);
     _focus.addListener(_onFocusChange);
+  }
+
+  @override
+  void didUpdateWidget(CarbonExpandableSearch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _controllerOwner.update(widget.controller);
   }
 
   @override
   void dispose() {
     _focus.removeListener(_onFocusChange);
-    if (widget.controller == null) {
-      _controller.dispose();
-    }
+    _controllerOwner.dispose();
     _focus.dispose();
     _buttonFocus.dispose();
     super.dispose();
@@ -447,7 +476,7 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
       setState(() => _expanded = false);
       // The button mounts on the next frame, replacing the field.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _buttonFocus.requestFocus();
+        if (mounted && !_expanded) _buttonFocus.requestFocus();
       });
       return KeyEventResult.handled;
     }

@@ -431,12 +431,13 @@ class CarbonField extends StatelessWidget {
     // Focus wins over the invalid outline; otherwise invalid shows its own
     // 2px error ring. The CarbonFocusRing paints the 2px inset `focus`
     // outline; the error ring is the same geometry in `support-error`.
-    if (focused) {
-      field = CarbonFocusRing(visible: true, child: field);
-    } else if (invalid) {
-      field = _ErrorRing(color: theme.supportError, child: field);
-    }
-    return field;
+    return CarbonFocusRing(
+      visible: focused,
+      child: _ErrorRing(
+        color: invalid && !focused ? theme.supportError : null,
+        child: field,
+      ),
+    );
   }
 }
 
@@ -445,13 +446,15 @@ class CarbonField extends StatelessWidget {
 class _ErrorRing extends StatelessWidget {
   const _ErrorRing({required this.color, required this.child});
 
-  final Color color;
+  final Color? color;
   final Widget child;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
     position: DecorationPosition.foreground,
-    decoration: BoxDecoration(border: Border.all(color: color, width: 2)),
+    decoration: BoxDecoration(
+      border: color == null ? null : Border.all(color: color!, width: 2),
+    ),
     child: child,
   );
 }

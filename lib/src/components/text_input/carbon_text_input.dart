@@ -21,6 +21,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon text input.
@@ -70,7 +71,10 @@ class CarbonTextInput extends StatefulWidget {
   /// The field label.
   final String labelText;
 
-  /// An external controller; one is created if omitted.
+  /// A caller-owned controller, rebound when this property changes.
+  ///
+  /// Removing it creates an internal controller seeded with its text, selection,
+  /// and composing range. Caller-owned controllers are never disposed here.
   final TextEditingController? controller;
 
   /// The initial text when no [controller] is given.
@@ -131,7 +135,11 @@ class CarbonTextInput extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional external focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.
@@ -149,29 +157,37 @@ class _CarbonTextInputState extends State<CarbonTextInput> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
-  TextEditingController? _internalController;
-  FocusNode? _internalFocus;
+  late final OwnedTextEditingController _controllerOwner;
+  late final OwnedFocusNode _focusOwner;
 
-  TextEditingController get _controller =>
-      widget.controller ?? (_internalController ??= TextEditingController());
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  TextEditingController get _controller => _controllerOwner.value;
+  FocusNode get _focus => _focusOwner.value;
 
   @override
   void initState() {
     super.initState();
-    if (widget.controller == null) {
-      _internalController = TextEditingController(text: widget.initialValue);
-    }
-    _controller.addListener(_onChange);
-    _focus.addListener(_onChange);
+    _controllerOwner = OwnedTextEditingController(
+      external: widget.controller,
+      initialText: widget.initialValue,
+      onChanged: _onChange,
+    );
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _onChange,
+    );
+  }
+
+  @override
+  void didUpdateWidget(CarbonTextInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _controllerOwner.update(widget.controller);
+    _focusOwner.update(widget.focusNode);
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onChange);
-    _focus.removeListener(_onChange);
-    _internalController?.dispose();
-    _internalFocus?.dispose();
+    _controllerOwner.dispose();
+    _focusOwner.dispose();
     super.dispose();
   }
 
@@ -198,9 +214,11 @@ class _CarbonTextInputState extends State<CarbonTextInput> {
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: widget.labelText,
+        enabled: !widget.disabled,
         child: _Editable(
           controller: _controller,
           focusNode: _focus,
+          selectAllOnFocus: _focusOwner.selectAllOnFocus,
           placeholder: widget.placeholder,
           enabled: enabled,
           readOnly: widget.readOnly,
@@ -300,6 +318,7 @@ class _Editable extends StatelessWidget {
   const _Editable({
     required this.controller,
     required this.focusNode,
+    required this.selectAllOnFocus,
     required this.placeholder,
     required this.enabled,
     required this.readOnly,
@@ -315,6 +334,7 @@ class _Editable extends StatelessWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool? selectAllOnFocus;
   final String? placeholder;
   final bool enabled;
   final bool readOnly;
@@ -349,6 +369,7 @@ class _Editable extends StatelessWidget {
         EditableText(
           controller: controller,
           focusNode: focusNode,
+          selectAllOnFocus: selectAllOnFocus,
           readOnly: readOnly || !enabled,
           obscureText: obscureText,
           autofocus: autofocus,
@@ -446,17 +467,20 @@ class _FluidField extends StatelessWidget {
       ),
     );
 
-    if (focused) {
-      box = CarbonFocusRing(visible: true, child: box);
-    } else if (invalid) {
-      box = DecoratedBox(
+    // Keep the editor's ancestors stable when focus or validation changes;
+    // replacing this wrapper would remount EditableText and close its input.
+    box = CarbonFocusRing(
+      visible: focused,
+      child: DecoratedBox(
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
-          border: Border.all(color: theme.supportError, width: 2),
+          border: invalid && !focused
+              ? Border.all(color: theme.supportError, width: 2)
+              : null,
         ),
         child: box,
-      );
-    }
+      ),
+    );
     return box;
   }
 }
@@ -491,7 +515,10 @@ class CarbonPasswordInput extends StatefulWidget {
   /// The field label.
   final String labelText;
 
-  /// An external controller.
+  /// A caller-owned controller, rebound when this property changes.
+  ///
+  /// Removing it creates an internal controller seeded with its text, selection,
+  /// and composing range. Caller-owned controllers are never disposed here.
   final TextEditingController? controller;
 
   /// The initial text.
@@ -540,7 +567,11 @@ class CarbonPasswordInput extends StatefulWidget {
   /// Suppresses the aura while the AI label shows its revert control.
   final bool aiRevert;
 
-  /// An optional focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.

@@ -21,6 +21,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
+import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon number input: a numeric field with increment/decrement steppers.
@@ -127,7 +128,11 @@ class CarbonNumberInput extends StatefulWidget {
   /// The decrement stepper's accessible label.
   final String decrementLabel;
 
-  /// An optional focus node.
+  /// A caller-owned focus node, rebound when this property changes.
+  ///
+  /// Current focus transfers to the replacement when it can request focus.
+  /// Removing it creates an internal node. Caller-owned nodes are never disposed
+  /// here.
   final FocusNode? focusNode;
 
   /// Whether to request focus when first built.
@@ -142,22 +147,28 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
-  late final TextEditingController _controller = TextEditingController(
-    text: widget.value?.toString() ?? '',
-  );
-  FocusNode? _internalFocus;
-  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+  late final OwnedTextEditingController _controllerOwner;
+  TextEditingController get _controller => _controllerOwner.value;
+  late final OwnedFocusNode _focusOwner;
+  FocusNode get _focus => _focusOwner.value;
 
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_rebuild);
-    _controller.addListener(_rebuild);
+    _controllerOwner = OwnedTextEditingController(
+      initialText: widget.value?.toString(),
+      onChanged: _rebuild,
+    );
+    _focusOwner = OwnedFocusNode(
+      external: widget.focusNode,
+      onChanged: _rebuild,
+    );
   }
 
   @override
   void didUpdateWidget(CarbonNumberInput oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _focusOwner.update(widget.focusNode);
     if (widget.value != oldWidget.value &&
         widget.value?.toString() != _controller.text) {
       _controller.text = widget.value?.toString() ?? '';
@@ -166,10 +177,8 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
 
   @override
   void dispose() {
-    _focus.removeListener(_rebuild);
-    _controller.removeListener(_rebuild);
-    _internalFocus?.dispose();
-    _controller.dispose();
+    _focusOwner.dispose();
+    _controllerOwner.dispose();
     super.dispose();
   }
 
@@ -262,12 +271,14 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: widget.labelText,
+        enabled: !widget.disabled,
         value: _controller.text,
         child: Focus(
           onKeyEvent: _onKey,
           child: EditableText(
             controller: _controller,
             focusNode: _focus,
+            selectAllOnFocus: _focusOwner.selectAllOnFocus,
             readOnly: !enabled,
             autofocus: widget.autofocus,
             onChanged: _onTextChanged,
@@ -460,17 +471,20 @@ class _NumberField extends StatelessWidget {
         ),
       ),
     );
-    if (focused) {
-      box = CarbonFocusRing(visible: true, child: box);
-    } else if (invalid) {
-      box = DecoratedBox(
+    // Keep the editor's ancestors stable when focus or validation changes;
+    // replacing this wrapper would remount EditableText and close its input.
+    box = CarbonFocusRing(
+      visible: focused,
+      child: DecoratedBox(
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
-          border: Border.all(color: theme.supportError, width: 2),
+          border: invalid && !focused
+              ? Border.all(color: theme.supportError, width: 2)
+              : null,
         ),
         child: box,
-      );
-    }
+      ),
+    );
     return box;
   }
 }
