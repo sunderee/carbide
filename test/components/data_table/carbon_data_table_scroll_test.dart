@@ -9,14 +9,18 @@
 // overlays the pinned header after scrolling.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// Web unit tests use wide placeholder glyphs; native browser tests load Plex.
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
   child: CarbonTheme(
     data: CarbonThemeData.white,
-    child: Center(child: SizedBox(width: 480, child: child)),
+    child: Center(
+      child: SizedBox(width: kIsWeb ? 720 : 480, child: child),
+    ),
   ),
 );
 

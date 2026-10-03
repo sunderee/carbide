@@ -87,6 +87,7 @@ jobs:
           test/components/slider
           test/components/date_picker
           test/components/tree_view
+          test/components/data_table
 
   gallery-web-integration:
     name: Gallery integration test — web
@@ -172,4 +173,12 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/tree_view_state_test.dart
+          -d web-server
+
+      - name: Drive data-table native identity and focus test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/data_table_identity_test.dart
           -d web-server

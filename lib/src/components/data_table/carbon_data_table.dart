@@ -12,6 +12,8 @@
 // / expansion / toolbar features build on. No Material DataTable — equal-flex
 // columns shared between the header and body rows.
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -25,6 +27,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/native_control_focus.dart';
 import '../button/carbon_button.dart';
 import '../checkbox/carbon_checkbox.dart';
 import '../radio_button/carbon_radio_button.dart';
@@ -91,7 +94,23 @@ class CarbonTableColumn {
 /// A row of cells for a [CarbonDataTable].
 class CarbonTableRow {
   /// Creates a table row.
-  const CarbonTableRow({required this.cells, this.expandedContent});
+  const CarbonTableRow({
+    required this.cells,
+    this.id,
+    this.label,
+    this.expandedContent,
+  });
+
+  /// Stable record identity, required by the ID-based selection/expansion APIs.
+  ///
+  /// IDs must be unique within the current data. Legacy index-based tables
+  /// may omit them; those rows use positional widget keys.
+  final Object? id;
+
+  /// A human-readable record name for selection and expansion controls.
+  ///
+  /// Defaults to [id], or the one-based position for legacy rows without IDs.
+  final String? label;
 
   /// The cell contents, one per column.
   final List<Widget> cells;
@@ -127,6 +146,18 @@ class CarbonTableBatchAction {
 
 /// A Carbon data table.
 ///
+/// Use stable [CarbonTableRow.id] values with [selectedRowIds] and
+/// [onSelectedRowIdsChanged], or [expandedRowIds] and [onExpansionChanged].
+/// Selection, expansion and row widget state then follow records through
+/// sorting, filtering and paging. Absent IDs are retained and ignored while
+/// absent; counts include only the current data.
+///
+/// The deprecated index APIs remain functional for at least one minor release.
+/// To migrate, add an ID to every row and replace `selectedRows` /
+/// `onSelectionChanged` with `selectedRowIds` / `onSelectedRowIdsChanged`, and
+/// `expandedRows` / `onExpandedChanged` with `expandedRowIds` /
+/// `onExpansionChanged`. Selection and expansion can migrate independently.
+///
 /// When the platform requests reduced motion, the row hover fill, row
 /// expansion, and batch-actions bar transitions complete instantly.
 ///
@@ -138,8 +169,11 @@ class CarbonTableBatchAction {
 ///     CarbonTableColumn(title: 'Status'),
 ///   ],
 ///   rows: const <CarbonTableRow>[
-///     CarbonTableRow(cells: <Widget>[Text('Load'), Text('Running')]),
+///     CarbonTableRow(id: 'load', label: 'Load', cells: <Widget>[Text('Load'), Text('Running')]),
 ///   ],
+///   selection: CarbonTableSelection.multi,
+///   selectedRowIds: _selectedIds,
+///   onSelectedRowIdsChanged: (Set<Object> ids) => setState(() => _selectedIds = ids),
 /// )
 /// ```
 class CarbonDataTable extends StatelessWidget {
@@ -159,14 +193,29 @@ class CarbonDataTable extends StatelessWidget {
     this.sortDirection = CarbonSortDirection.none,
     this.onSort,
     this.selection = CarbonTableSelection.none,
-    this.selectedRows = const <int>{},
+    Set<int>? selectedRows,
+    this.selectedRowIds,
+    this.onSelectedRowIdsChanged,
     this.onSelectionChanged,
     this.batchActions,
     this.batchCancelLabel = 'Cancel',
     this.expandable = false,
-    this.expandedRows = const <int>{},
+    Set<int>? expandedRows,
+    this.expandedRowIds,
+    this.onExpansionChanged,
     this.onExpandedChanged,
-  });
+  }) : selectedRows = selectedRows ?? const <int>{},
+       expandedRows = expandedRows ?? const <int>{},
+       assert(
+         (selectedRowIds == null && onSelectedRowIdsChanged == null) ||
+             (selectedRows == null && onSelectionChanged == null),
+         'Use selectedRowIds/onSelectedRowIdsChanged or selectedRows/onSelectionChanged, not both.',
+       ),
+       assert(
+         (expandedRowIds == null && onExpansionChanged == null) ||
+             (expandedRows == null && onExpandedChanged == null),
+         'Use expandedRowIds/onExpansionChanged or expandedRows/onExpandedChanged, not both.',
+       );
 
   /// The columns.
   final List<CarbonTableColumn> columns;
@@ -209,10 +258,29 @@ class CarbonDataTable extends StatelessWidget {
   /// How rows may be selected.
   final CarbonTableSelection selection;
 
-  /// The currently selected row indices.
+  /// The currently selected row indices (legacy positional selection).
+  ///
+  /// Out-of-range indices are ignored for rendering and counts. This API stays
+  /// functional during migration; sorting or paging changes their meaning.
+  @Deprecated('Use selectedRowIds with stable CarbonTableRow.id values.')
   final Set<int> selectedRows;
 
+  /// Controlled selected record IDs.
+  ///
+  /// Absent IDs are ignored for rendering, header state and batch counts, but
+  /// retained in multi-selection proposals so paging back restores selection.
+  /// Select-all adds/removes only current rows; Cancel clears the full set.
+  /// Single selection replaces the full set with the chosen ID.
+  final Set<Object>? selectedRowIds;
+
+  /// Called with a copied ID selection after a user action.
+  ///
+  /// Programmatic data/selection changes do not notify or mutate caller sets.
+  /// Do not supply the legacy selection API at the same time.
+  final ValueChanged<Set<Object>>? onSelectedRowIdsChanged;
+
   /// Called with the new selection when a row (or select-all) toggles.
+  @Deprecated('Use onSelectedRowIdsChanged with selectedRowIds.')
   final ValueChanged<Set<int>>? onSelectionChanged;
 
   /// Actions shown in the batch-actions bar (multi-select).
@@ -224,37 +292,209 @@ class CarbonDataTable extends StatelessWidget {
   /// Whether rows can expand to reveal [CarbonTableRow.expandedContent].
   final bool expandable;
 
-  /// The currently expanded row indices.
+  /// The currently expanded row indices (legacy positional expansion).
+  @Deprecated('Use expandedRowIds with stable CarbonTableRow.id values.')
   final Set<int> expandedRows;
 
+  /// Controlled expanded record IDs.
+  ///
+  /// Absent IDs remain in the caller's set and are ignored until their rows
+  /// return. Expansion therefore follows records through sorting and paging.
+  final Set<Object>? expandedRowIds;
+
+  /// Called with a copied ID expansion set after a user toggle.
+  ///
+  /// Programmatic data/expansion changes do not notify. Do not supply the
+  /// legacy expansion API at the same time.
+  final ValueChanged<Set<Object>>? onExpansionChanged;
+
   /// Called with the new set when a row expands or collapses.
+  @Deprecated('Use onExpansionChanged with expandedRowIds.')
   final ValueChanged<Set<int>>? onExpandedChanged;
 
-  bool get _selectable => selection != CarbonTableSelection.none;
-
-  void _toggleExpanded(int index) {
-    final Set<int> next = Set<int>.of(expandedRows);
-    next.contains(index) ? next.remove(index) : next.add(index);
-    onExpandedChanged?.call(next);
+  @override
+  StatelessElement createElement() {
+    _validateTable(this);
+    return super.createElement();
   }
 
-  void _toggleRow(int index) {
-    final Set<int> next = Set<int>.of(selectedRows);
-    if (selection == CarbonTableSelection.single) {
-      next
-        ..clear()
-        ..add(index);
-    } else {
-      next.contains(index) ? next.remove(index) : next.add(index);
+  @override
+  Widget build(BuildContext context) {
+    _validateTable(this);
+    return _TableBody(table: this);
+  }
+}
+
+void _validateTable(CarbonDataTable table) {
+  final bool requiresIds =
+      table.selectedRowIds != null ||
+      table.onSelectedRowIdsChanged != null ||
+      table.expandedRowIds != null ||
+      table.onExpansionChanged != null;
+  final Set<Object> ids = <Object>{};
+  for (final CarbonTableRow row in table.rows) {
+    assert(
+      !requiresIds || row.id != null,
+      'Every row needs an id when using ID-based selection or expansion.',
+    );
+    assert(
+      row.id == null || ids.add(row.id!),
+      'Table row ids must be unique: ${row.id}',
+    );
+  }
+}
+
+class _TableBody extends StatefulWidget {
+  const _TableBody({required this.table});
+  final CarbonDataTable table;
+  @override
+  State<_TableBody> createState() => _TableBodyState();
+}
+
+class _TableBodyState extends State<_TableBody> {
+  List<CarbonTableColumn> get columns => widget.table.columns;
+  List<CarbonTableRow> get rows => widget.table.rows;
+  CarbonTableSize get size => widget.table.size;
+  bool get zebra => widget.table.zebra;
+  bool get stickyHeader => widget.table.stickyHeader;
+  double get stickyHeaderHeight => widget.table.stickyHeaderHeight;
+  String? get title => widget.table.title;
+  String? get description => widget.table.description;
+  Widget? get aiLabel => widget.table.aiLabel;
+  int? get sortColumnIndex => widget.table.sortColumnIndex;
+  CarbonSortDirection get sortDirection => widget.table.sortDirection;
+  ValueChanged<int>? get onSort => widget.table.onSort;
+  CarbonTableSelection get selection => widget.table.selection;
+  Set<int> get selectedRows => widget.table.selectedRows;
+  ValueChanged<Set<int>>? get onSelectionChanged =>
+      widget.table.onSelectionChanged;
+  List<CarbonTableBatchAction>? get batchActions => widget.table.batchActions;
+  String get batchCancelLabel => widget.table.batchCancelLabel;
+  bool get expandable => widget.table.expandable;
+  Set<int> get expandedRows => widget.table.expandedRows;
+  ValueChanged<Set<int>>? get onExpandedChanged =>
+      widget.table.onExpandedChanged;
+
+  bool get _selectable => selection != CarbonTableSelection.none;
+  bool get _idSelection =>
+      widget.table.selectedRowIds != null ||
+      widget.table.onSelectedRowIdsChanged != null;
+  bool get _idExpansion =>
+      widget.table.expandedRowIds != null ||
+      widget.table.onExpansionChanged != null;
+  bool get _selectionEnabled => _idSelection
+      ? widget.table.onSelectedRowIdsChanged != null
+      : onSelectionChanged != null;
+  bool get _allSelectionEnabled => _selectionEnabled && rows.isNotEmpty;
+  bool get _expansionEnabled => _idExpansion
+      ? widget.table.onExpansionChanged != null
+      : onExpandedChanged != null;
+  Set<Object> get _selectedIds =>
+      widget.table.selectedRowIds ?? const <Object>{};
+  Set<Object> get _expandedIds =>
+      widget.table.expandedRowIds ?? const <Object>{};
+  Set<Object> get _presentIds => <Object>{
+    for (final CarbonTableRow row in rows)
+      if (row.id != null) row.id!,
+  };
+  Set<int> get _presentIndices => <int>{
+    for (int i = 0; i < rows.length; i++) i,
+  };
+  int get _selectedCount => _idSelection
+      ? _selectedIds.intersection(_presentIds).length
+      : selectedRows.intersection(_presentIndices).length;
+  bool _selected(int index) => _idSelection
+      ? _selectedIds.contains(rows[index].id)
+      : selectedRows.contains(index);
+  bool _expanded(int index) => _idExpansion
+      ? _expandedIds.contains(rows[index].id)
+      : expandedRows.contains(index);
+  String _rowName(int index) =>
+      rows[index].label ?? rows[index].id?.toString() ?? '${index + 1}';
+  Key _rowKey(String part, int index) => ValueKey<(String, bool, Object)>((
+    part,
+    rows[index].id != null,
+    rows[index].id ?? index,
+  ));
+
+  int _currentIndex(CarbonTableRow row, int index) {
+    if (!mounted) return -1;
+    if (row.id != null) {
+      return rows.indexWhere((current) => current.id == row.id);
     }
-    onSelectionChanged?.call(next);
+    return index < rows.length && identical(rows[index], row) ? index : -1;
+  }
+
+  void _toggleExpanded(CarbonTableRow row, int index) {
+    index = _currentIndex(row, index);
+    if (index < 0 ||
+        !expandable ||
+        !_expansionEnabled ||
+        rows[index].expandedContent == null) {
+      return;
+    }
+    if (_idExpansion) {
+      final Set<Object> next = <Object>{..._expandedIds};
+      final Object id = rows[index].id!;
+      if (!next.add(id)) next.remove(id);
+      widget.table.onExpansionChanged!(next);
+    } else {
+      final Set<int> next = <int>{...expandedRows};
+      if (!next.add(index)) next.remove(index);
+      onExpandedChanged!(next);
+    }
+  }
+
+  void _toggleRow(CarbonTableRow row, int index) {
+    index = _currentIndex(row, index);
+    if (index < 0 || !_selectable || !_selectionEnabled) return;
+    if (_idSelection) {
+      final Set<Object> next = selection == CarbonTableSelection.single
+          ? <Object>{}
+          : <Object>{..._selectedIds};
+      final Object id = rows[index].id!;
+      if (!next.add(id)) next.remove(id);
+      widget.table.onSelectedRowIdsChanged!(next);
+    } else {
+      final Set<int> next = selection == CarbonTableSelection.single
+          ? <int>{}
+          : <int>{...selectedRows};
+      if (!next.add(index)) next.remove(index);
+      onSelectionChanged!(next);
+    }
   }
 
   void _toggleAll() {
-    final bool all = selectedRows.length == rows.length && rows.isNotEmpty;
-    onSelectionChanged?.call(
-      all ? <int>{} : <int>{for (int i = 0; i < rows.length; i++) i},
-    );
+    if (!mounted ||
+        selection != CarbonTableSelection.multi ||
+        !_selectionEnabled ||
+        rows.isEmpty) {
+      return;
+    }
+    final bool all = _selectedCount == rows.length;
+    if (_idSelection) {
+      final Set<Object> next = <Object>{..._selectedIds};
+      all ? next.removeAll(_presentIds) : next.addAll(_presentIds);
+      widget.table.onSelectedRowIdsChanged!(next);
+    } else {
+      final Set<int> next = <int>{...selectedRows};
+      all ? next.removeAll(_presentIndices) : next.addAll(_presentIndices);
+      onSelectionChanged!(next);
+    }
+  }
+
+  void _cancelSelection() {
+    if (!mounted ||
+        selection != CarbonTableSelection.multi ||
+        !_selectionEnabled ||
+        _selectedCount == 0) {
+      return;
+    }
+    if (_idSelection) {
+      widget.table.onSelectedRowIdsChanged!(<Object>{});
+    } else {
+      onSelectionChanged!(<int>{});
+    }
   }
 
   @override
@@ -264,9 +504,8 @@ class CarbonDataTable extends StatelessWidget {
 
     // The leading select-all cell (multi only): checked when all rows are
     // selected, indeterminate on a partial selection.
-    final bool allSelected =
-        rows.isNotEmpty && selectedRows.length == rows.length;
-    final bool partlySelected = selectedRows.isNotEmpty && !allSelected;
+    final bool allSelected = rows.isNotEmpty && _selectedCount == rows.length;
+    final bool partlySelected = _selectedCount > 0 && !allSelected;
     final Widget? selectAll = selection == CarbonTableSelection.multi
         ? MergeSemantics(
             child: Semantics(
@@ -277,11 +516,11 @@ class CarbonDataTable extends StatelessWidget {
               // false. Keep the native flag and announce the state in the same
               // node's value until the engine preserves mixed in the DOM.
               value: kIsWeb && partlySelected ? 'Partially selected' : null,
-              enabled: onSelectionChanged != null,
-              onTap: onSelectionChanged != null ? _toggleAll : null,
+              enabled: _allSelectionEnabled,
+              onTap: _allSelectionEnabled ? _toggleAll : null,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: onSelectionChanged != null ? _toggleAll : null,
+                onTap: _allSelectionEnabled ? _toggleAll : null,
                 child: SizedBox(
                   width: CarbonSpacing.spacing09,
                   height: size.height,
@@ -290,7 +529,7 @@ class CarbonDataTable extends StatelessWidget {
                       label: '',
                       value: allSelected,
                       indeterminate: partlySelected,
-                      onChanged: onSelectionChanged != null
+                      onChanged: _allSelectionEnabled
                           ? (_) => _toggleAll()
                           : null,
                     ),
@@ -305,6 +544,7 @@ class CarbonDataTable extends StatelessWidget {
     // selector. Header and body share the same column layout.
     Widget? leadingRow({required int? rowIndex}) {
       if (!expandable && !_selectable) return null;
+      final CarbonTableRow? row = rowIndex == null ? null : rows[rowIndex];
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -312,10 +552,10 @@ class CarbonDataTable extends StatelessWidget {
             _LeadingCell(
               child: rowIndex != null && rows[rowIndex].expandedContent != null
                   ? _ExpandChevron(
-                      expanded: expandedRows.contains(rowIndex),
-                      label: 'Expand row ${rowIndex + 1}',
-                      onTap: onExpandedChanged != null
-                          ? () => _toggleExpanded(rowIndex)
+                      expanded: _expanded(rowIndex),
+                      label: 'Expand row ${_rowName(rowIndex)}',
+                      onTap: _expansionEnabled
+                          ? () => _toggleExpanded(row!, rowIndex)
                           : null,
                     )
                   : const SizedBox.shrink(),
@@ -327,10 +567,10 @@ class CarbonDataTable extends StatelessWidget {
                   : _RowSelector(
                       height: size.height,
                       multi: selection == CarbonTableSelection.multi,
-                      selected: selectedRows.contains(rowIndex),
-                      label: 'Select row ${rowIndex + 1}',
-                      onChanged: onSelectionChanged != null
-                          ? () => _toggleRow(rowIndex)
+                      selected: _selected(rowIndex),
+                      label: 'Select row ${_rowName(rowIndex)}',
+                      onChanged: _selectionEnabled
+                          ? () => _toggleRow(row!, rowIndex)
                           : null,
                     ),
             ),
@@ -350,20 +590,22 @@ class CarbonDataTable extends StatelessWidget {
     final List<Widget> bodyRows = <Widget>[
       for (int i = 0; i < rows.length; i++) ...<Widget>[
         _BodyRow(
+          key: _rowKey('body', i),
           row: rows[i],
           columns: columns,
           size: size,
           // Zebra tints even rows (`tr:nth-child(even)`); rows are 1-based in
           // CSS, so the 0-based odd index is the even child.
           tinted: zebra && i.isOdd,
-          isLast: i == rows.length - 1 && !expandedRows.contains(i),
-          selected: selectedRows.contains(i),
-          expanded: expandedRows.contains(i),
+          isLast: i == rows.length - 1 && !_expanded(i),
+          selected: _selected(i),
+          expanded: _expanded(i),
           leading: leadingRow(rowIndex: i),
         ),
         if (expandable && rows[i].expandedContent != null)
           _ExpandedDetail(
-            expanded: expandedRows.contains(i),
+            key: _rowKey('detail', i),
+            expanded: _expanded(i),
             isLast: i == rows.length - 1,
             child: rows[i].expandedContent!,
           ),
@@ -374,10 +616,10 @@ class CarbonDataTable extends StatelessWidget {
         ? _BatchHeader(
             size: size,
             header: header,
-            selectedCount: selectedRows.length,
+            selectedCount: _selectedCount,
             actions: batchActions ?? const <CarbonTableBatchAction>[],
             cancelLabel: batchCancelLabel,
-            onCancel: () => onSelectionChanged?.call(<int>{}),
+            onCancel: _selectionEnabled ? _cancelSelection : null,
           )
         : header;
 
@@ -452,8 +694,15 @@ class CarbonDataTable extends StatelessWidget {
                   ],
                 ),
               ),
-            headerArea,
-            body,
+            // Separate the changing batch header from the stable row controls.
+            // Otherwise RTL reading-order updates can reparent the focused
+            // native checkbox when the batch bar appears.
+            Semantics(
+              container: true,
+              explicitChildNodes: true,
+              child: headerArea,
+            ),
+            Semantics(container: true, explicitChildNodes: true, child: body),
           ],
         ),
       ),
@@ -638,6 +887,7 @@ class _HeaderCellState extends State<_HeaderCell> {
 /// A body row with hover, optional zebra tint and a bottom divider.
 class _BodyRow extends StatefulWidget {
   const _BodyRow({
+    super.key,
     required this.row,
     required this.columns,
     required this.size,
@@ -680,7 +930,7 @@ class _BodyRowState extends State<_BodyRow> {
         ? theme.textPrimary
         : theme.textSecondary;
 
-    Widget content = MouseRegion(
+    final Widget content = MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       // Row fill per `_data-table.scss` `tbody tr`: background-color
@@ -731,18 +981,21 @@ class _BodyRowState extends State<_BodyRow> {
       ),
     );
 
-    // Selected rows carry a 3px border-interactive marker on the start edge.
-    if (widget.selected) {
-      content = DecoratedBox(
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            start: BorderSide(color: theme.borderInteractive, width: 3),
+    // Keep the wrapper in place when selection changes, preserving cell and
+    // selector state/focus. Selected rows paint the 3px interactive marker.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: BorderDirectional(
+          start: BorderSide(
+            color: widget.selected
+                ? theme.borderInteractive
+                : const Color(0x00000000),
+            width: 3,
           ),
         ),
-        child: content,
-      );
-    }
-    return content;
+      ),
+      child: content,
+    );
   }
 }
 
@@ -758,6 +1011,8 @@ class _LeadingCell extends StatelessWidget {
     child: Align(child: child),
   );
 }
+
+int _nextTableControlId = 0;
 
 /// The per-row expand toggle — a chevron that rotates a quarter turn when open.
 class _ExpandChevron extends StatefulWidget {
@@ -777,6 +1032,21 @@ class _ExpandChevron extends StatefulWidget {
 
 class _ExpandChevronState extends State<_ExpandChevron> {
   bool _focused = false;
+  final FocusNode _focusNode = FocusNode(debugLabel: 'table-expand');
+  Timer? _nativeFocusTimer;
+  late final String _semanticsIdentifier =
+      'carbon-table-control-${_nextTableControlId++}';
+
+  @override
+  void dispose() {
+    _nativeFocusTimer?.cancel();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _requestFocus() {
+    if (mounted && widget.onTap != null) _focusNode.requestFocus();
+  }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (widget.onTap != null &&
@@ -791,21 +1061,57 @@ class _ExpandChevronState extends State<_ExpandChevron> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb && _focusNode.hasPrimaryFocus && widget.onTap != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _nativeFocusTimer?.cancel();
+        // The engine may blur a moved semantics element after the frame. Let
+        // that focus update finish before reconciling the two focus trees.
+        _nativeFocusTimer = Timer(Duration.zero, () {
+          if (!mounted || widget.onTap == null) return;
+          final FocusNode? current = FocusManager.instance.primaryFocus;
+          if (current != _focusNode &&
+              current != FocusManager.instance.rootScope) {
+            return;
+          }
+          if (restoreNativeControlFocus(_semanticsIdentifier)) {
+            _focusNode.requestFocus();
+          }
+        });
+      });
+    }
     final CarbonThemeData theme = CarbonTheme.of(context);
     return Semantics(
+      identifier: _semanticsIdentifier,
       button: true,
+      enabled: widget.onTap != null,
+      focusable: widget.onTap != null,
+      focused: widget.onTap != null && _focused,
+      onFocus: widget.onTap != null ? _requestFocus : null,
       expanded: widget.expanded,
       label: widget.label,
       onTap: widget.onTap,
       child: ExcludeSemantics(
         child: MouseRegion(
-          cursor: SystemMouseCursors.click,
+          cursor: widget.onTap != null
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
             child: Focus(
+              focusNode: _focusNode,
+              includeSemantics: false,
+              canRequestFocus: widget.onTap != null,
               onKeyEvent: _onKey,
-              onFocusChange: (bool f) => setState(() => _focused = f),
+              onFocusChange: (bool f) {
+                if (!f &&
+                    FocusManager.instance.primaryFocus !=
+                        FocusManager.instance.rootScope) {
+                  _nativeFocusTimer?.cancel();
+                }
+                setState(() => _focused = f);
+              },
               child: CarbonFocusRing(
                 visible: _focused,
                 inset: true,
@@ -839,6 +1145,7 @@ class _ExpandChevronState extends State<_ExpandChevron> {
 /// The full-width detail row revealed below an expanded row.
 class _ExpandedDetail extends StatelessWidget {
   const _ExpandedDetail({
+    super.key,
     required this.expanded,
     required this.isLast,
     required this.child,
@@ -891,7 +1198,7 @@ class _ExpandedDetail extends StatelessWidget {
 }
 
 /// The leading per-row selector — a checkbox (multi) or radio (single).
-class _RowSelector extends StatelessWidget {
+class _RowSelector extends StatefulWidget {
   const _RowSelector({
     required this.height,
     required this.multi,
@@ -907,34 +1214,101 @@ class _RowSelector extends StatelessWidget {
   final VoidCallback? onChanged;
 
   @override
+  State<_RowSelector> createState() => _RowSelectorState();
+}
+
+class _RowSelectorState extends State<_RowSelector> {
+  final FocusNode _focusNode = FocusNode(debugLabel: 'table-select');
+  Timer? _nativeFocusTimer;
+  late final String _semanticsIdentifier =
+      'carbon-table-control-${_nextTableControlId++}';
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_focusChanged);
+  }
+
+  void _focusChanged() {
+    if (!_focusNode.hasPrimaryFocus &&
+        FocusManager.instance.primaryFocus != FocusManager.instance.rootScope) {
+      _nativeFocusTimer?.cancel();
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _requestFocus() {
+    if (mounted && widget.onChanged != null) _focusNode.requestFocus();
+  }
+
+  void _activate() {
+    if (!mounted || widget.onChanged == null) return;
+    _focusNode.requestFocus();
+    widget.onChanged!();
+  }
+
+  @override
+  void dispose() {
+    _nativeFocusTimer?.cancel();
+    _focusNode.removeListener(_focusChanged);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (kIsWeb && _focusNode.hasPrimaryFocus && widget.onChanged != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _nativeFocusTimer?.cancel();
+        // The engine may blur a moved semantics element after the frame. Let
+        // that focus update finish before reconciling the two focus trees.
+        _nativeFocusTimer = Timer(Duration.zero, () {
+          if (!mounted || widget.onChanged == null) return;
+          final FocusNode? current = FocusManager.instance.primaryFocus;
+          if (current != _focusNode &&
+              current != FocusManager.instance.rootScope) {
+            return;
+          }
+          if (restoreNativeControlFocus(_semanticsIdentifier)) {
+            _focusNode.requestFocus();
+          }
+        });
+      });
+    }
+    final bool enabled = widget.onChanged != null;
     return MergeSemantics(
-      // Web checkable roles retain their initial checkbox/radio kind. Replace
-      // the node when selection mode changes so the role follows the control.
-      key: ValueKey<bool>(multi),
+      // Replace the engine's checkable role when the selection mode changes.
+      key: ValueKey<bool>(widget.multi),
       child: Semantics(
-        label: label,
-        checked: selected,
-        inMutuallyExclusiveGroup: !multi,
-        enabled: onChanged != null,
-        onTap: onChanged,
+        identifier: _semanticsIdentifier,
+        label: widget.label,
+        checked: widget.selected,
+        inMutuallyExclusiveGroup: !widget.multi,
+        enabled: enabled,
+        focusable: enabled,
+        focused: enabled && _focusNode.hasPrimaryFocus,
+        onFocus: enabled ? _requestFocus : null,
+        onTap: enabled ? _activate : null,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: onChanged,
+          onTap: enabled ? _activate : null,
           child: SizedBox(
             width: CarbonSpacing.spacing09,
-            height: height,
+            height: widget.height,
             child: Center(
-              child: multi
+              child: widget.multi
                   ? CarbonCheckbox(
                       label: '',
-                      value: selected,
-                      onChanged: onChanged != null ? (_) => onChanged!() : null,
+                      focusNode: _focusNode,
+                      value: widget.selected,
+                      onChanged: enabled ? (_) => _activate() : null,
                     )
                   : CarbonRadioButton(
                       label: '',
-                      selected: selected,
-                      onSelected: onChanged,
+                      focusNode: _focusNode,
+                      selected: widget.selected,
+                      onSelected: enabled ? _activate : null,
                     ),
             ),
           ),
@@ -961,7 +1335,7 @@ class _BatchHeader extends StatelessWidget {
   final int selectedCount;
   final List<CarbonTableBatchAction> actions;
   final String cancelLabel;
-  final VoidCallback onCancel;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {

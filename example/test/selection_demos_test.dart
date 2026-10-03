@@ -78,7 +78,7 @@ void main() {
     try {
       await tester.pumpWidget(_host('data-table'));
       final SemanticsNode row = tester.getSemantics(
-        find.bySemanticsLabel('Select row 2'),
+        find.bySemanticsLabel('Select row Load balancer 2'),
       );
       tester.binding.platformDispatcher.onSemanticsActionEvent!(
         SemanticsActionEvent(
@@ -91,8 +91,8 @@ void main() {
       expect(
         tester
             .widget<CarbonDataTable>(find.byType(CarbonDataTable))
-            .selectedRows,
-        <int>{1},
+            .selectedRowIds,
+        <Object>{'Load balancer 2'},
       );
       expect(
         tester.getSemantics(find.bySemanticsLabel('Select all rows')),
@@ -100,6 +100,33 @@ void main() {
       );
     } finally {
       handle.dispose();
+    }
+  });
+  testWidgets('table demo sorting preserves selected and expanded record IDs', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_host('data-table'));
+    await tester.ensureVisible(_toggle('Expandable'));
+    await tester.tap(_toggle('Expandable'));
+    await tester.pumpAndSettle();
+    final table = tester.widget<CarbonDataTable>(find.byType(CarbonDataTable));
+    table.onSelectedRowIdsChanged!(<Object>{'Load balancer 2'});
+    table.onExpansionChanged!(<Object>{'Load balancer 2'});
+    await tester.pumpAndSettle();
+    for (int i = 0; i < 3; i++) {
+      tester.widget<CarbonDataTable>(find.byType(CarbonDataTable)).onSort!(0);
+      await tester.pumpAndSettle();
+      final current = tester.widget<CarbonDataTable>(
+        find.byType(CarbonDataTable),
+      );
+      expect(current.selectedRowIds, <Object>{'Load balancer 2'});
+      expect(current.expandedRowIds, <Object>{'Load balancer 2'});
+      expect(
+        current.rows.map((row) => row.id),
+        i == 1
+            ? <Object>['Load balancer 3', 'Load balancer 2', 'Load balancer 1']
+            : <Object>['Load balancer 1', 'Load balancer 2', 'Load balancer 3'],
+      );
     }
   });
 }
