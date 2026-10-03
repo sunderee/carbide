@@ -103,10 +103,12 @@ void main() {
               await _settle(tester);
               state.focus.requestFocus();
               await tester.pump();
-              _button('After').focus();
+              // Choose a different native element so this is a new focus
+              // event, rather than refocusing the already active element.
+              _button('Before').focus();
               await _settle(tester);
               expect(state.focus.hasPrimaryFocus, isFalse);
-              expect(_document.activeElement == _button('After'), isTrue);
+              expect(_document.activeElement == _button('Before'), isTrue);
               expect(state.changes, count);
             }
             expect(tester.takeException(), isNull);

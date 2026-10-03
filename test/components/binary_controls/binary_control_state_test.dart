@@ -398,7 +398,12 @@ void main() {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(kind.name),
+                        Text(
+                          kind.name,
+                          style: CarbonTypeStyles.headingCompact01.copyWith(
+                            color: CarbonTheme.of(context).textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         for (final String mode in <String>[
                           'Enabled',
