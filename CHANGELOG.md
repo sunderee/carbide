@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Reconcile tree focus resources with dynamic data and recover focus from
+  removed, hidden or disabled rows. Add controlled expansion while preserving
+  local expansion, surviving node identity, selection and scroll position.
+  Expose native row focus and skip disabled rows during keyboard navigation
+  (#300).
+
 - Reconcile calendar selection and bounds without interrupting unchanged
   keyboard navigation. Clamp civil-day/month movement, disable chevrons at
   bounds, and expose focused-day semantics separately from selection (#299).

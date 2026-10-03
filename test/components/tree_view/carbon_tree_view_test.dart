@@ -657,6 +657,8 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('src')),
         isSemantics(
           label: 'src',
+          isFocusable: true,
+          hasFocusAction: true,
           isSelected: true,
           hasExpandedState: true,
           isExpanded: true,
@@ -716,6 +718,49 @@ void main() {
         },
       );
     });
+
+    testWidgets(
+      'controlled expansion with keyboard focus across themes and RTL',
+      (tester) async {
+        await expectThemeGoldens(
+          tester,
+          name: 'tree_view_controlled_focus',
+          containsText: true,
+          size: const Size(280, 220),
+          directions: const <TextDirection>{
+            TextDirection.ltr,
+            TextDirection.rtl,
+          },
+          builder: (_) => Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 260,
+              child: CarbonTreeView(
+                label: 'Files',
+                nodes: _nodes(),
+                expandedIds: const <Object>{'src', 'utils'},
+                selectedId: 'readme',
+                onSelect: (_) {},
+              ),
+            ),
+          ),
+          afterPump: (tester) async {
+            final focus = tester
+                .widget<Focus>(
+                  find
+                      .ancestor(
+                        of: find.text('math.dart'),
+                        matching: find.byType(Focus),
+                      )
+                      .first,
+                )
+                .focusNode!;
+            focus.requestFocus();
+            await tester.pumpAndSettle();
+          },
+        );
+      },
+    );
 
     testWidgets('tree across themes', (WidgetTester tester) async {
       await expectThemeGoldens(

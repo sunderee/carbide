@@ -21,6 +21,7 @@
 // `--tree-node--active` drives the 4px marker, `--tree-node--selected`
 // the layer-selected background).
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -115,6 +116,25 @@ class CarbonTreeNode {
 ///   nodes: const <CarbonTreeNode>[/* … */],
 /// )
 /// ```
+///
+/// [expandedIds] controls expansion; leave it null to use local expansion
+/// seeded once by [initiallyExpandedIds]. For example:
+///
+/// ```dart
+/// CarbonTreeView(
+///   label: 'Files',
+///   nodes: _nodes,
+///   expandedIds: _expanded,
+///   onExpansionChanged: (Set<Object> ids) => setState(() => _expanded = ids),
+/// )
+/// ```
+///
+/// Surviving ids keep their focus nodes
+/// across data refreshes. If a focused row is removed, hidden or disabled,
+/// focus moves to its nearest enabled visible ancestor, then its nearest
+/// surviving enabled sibling (the following sibling wins a distance tie),
+/// then the first enabled visible row. With no available row, focus returns
+/// to the enclosing scope. Refreshing an unfocused tree does not take focus.
 class CarbonTreeView extends StatefulWidget {
   /// Creates a tree view.
   const CarbonTreeView({
@@ -129,8 +149,15 @@ class CarbonTreeView extends StatefulWidget {
     this.onSelectionChanged,
     this.activeId,
     this.onActivate,
-    this.initiallyExpandedIds = const <Object>{},
-  }) : assert(
+    Set<Object>? initiallyExpandedIds,
+    this.expandedIds,
+    this.onExpansionChanged,
+  }) : initiallyExpandedIds = initiallyExpandedIds ?? const <Object>{},
+       assert(
+         expandedIds == null || initiallyExpandedIds == null,
+         'Provide initiallyExpandedIds or expandedIds, not both.',
+       ),
+       assert(
          selectedId == null || selectedIds == null,
          'Provide selectedId (the single-select shorthand) or selectedIds, '
          'not both.',
@@ -194,8 +221,29 @@ class CarbonTreeView extends StatefulWidget {
   /// Called with the node id when a plain activation makes it active.
   final ValueChanged<Object>? onActivate;
 
-  /// Ids of parents that start expanded.
+  /// Ids of parents that start expanded in uncontrolled mode.
+  ///
+  /// This seed is read once. Do not supply it together with [expandedIds].
   final Set<Object> initiallyExpandedIds;
+
+  /// Expanded parent ids (controlled); null uses local expansion state.
+  ///
+  /// User toggles propose a new set through [onExpansionChanged]. Rendering
+  /// follows this value, so a caller can accept or reject the proposal.
+  /// Removing this property preserves its outgoing set as local state.
+  final Set<Object>? expandedIds;
+
+  /// Called with a copied expansion set after a user toggle.
+  ///
+  /// This also observes toggles in uncontrolled mode. Programmatic changes
+  /// and data reconciliation do not invoke it or mutate caller-owned sets.
+  final ValueChanged<Set<Object>>? onExpansionChanged;
+
+  @override
+  StatefulElement createElement() {
+    _TreeData(nodes);
+    return super.createElement();
+  }
 
   @override
   State<CarbonTreeView> createState() => _CarbonTreeViewState();
@@ -208,10 +256,143 @@ class _Flat {
   final int depth;
 }
 
+class _TreeData {
+  _TreeData(List<CarbonTreeNode> roots) {
+    void visit(List<CarbonTreeNode> nodes, Object? parent) {
+      siblings[parent] = <Object>[
+        for (final CarbonTreeNode node in nodes) node.id,
+      ];
+      for (final CarbonTreeNode node in nodes) {
+        assert(
+          !byId.containsKey(node.id),
+          'Tree node ids must be unique: ${node.id}',
+        );
+        byId[node.id] = node;
+        parents[node.id] = parent;
+        visit(node.children, node.id);
+      }
+    }
+
+    visit(roots, null);
+  }
+  final Map<Object, CarbonTreeNode> byId = <Object, CarbonTreeNode>{};
+  final Map<Object, Object?> parents = <Object, Object?>{};
+  final Map<Object?, List<Object>> siblings = <Object?, List<Object>>{};
+}
+
 class _CarbonTreeViewState extends State<CarbonTreeView> {
-  late final Set<Object> _expanded = <Object>{...widget.initiallyExpandedIds};
+  late Set<Object> _localExpanded;
+  Set<Object> get _expanded => widget.expandedIds ?? _localExpanded;
+  late _TreeData _data;
   final Map<Object, FocusNode> _focusNodes = <Object, FocusNode>{};
   List<_Flat> _visible = <_Flat>[];
+  int _focusGeneration = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _localExpanded = <Object>{...widget.initiallyExpandedIds};
+    _data = _TreeData(widget.nodes);
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('retainedFocusNodeCount', _focusNodes.length));
+  }
+
+  @override
+  void didUpdateWidget(CarbonTreeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.expandedIds == null && oldWidget.expandedIds != null) {
+      _localExpanded = <Object>{...oldWidget.expandedIds!};
+    }
+    final _TreeData oldData = _data;
+    final Object? focusedId = _focusedId;
+    final FocusNode? previous = focusedId == null
+        ? null
+        : _focusNodes[focusedId];
+    _data = _TreeData(widget.nodes);
+    _localExpanded.removeWhere((Object id) => !_data.byId.containsKey(id));
+    _refreshVisible();
+    _recoverFocus(focusedId, previous, oldData);
+    for (final Object id in _focusNodes.keys.toList()) {
+      if (!_data.byId.containsKey(id)) _focusNodes.remove(id)!.dispose();
+    }
+  }
+
+  Object? get _focusedId {
+    for (final MapEntry<Object, FocusNode> entry in _focusNodes.entries) {
+      if (entry.value.hasPrimaryFocus) return entry.key;
+    }
+    return null;
+  }
+
+  void _refreshVisible() {
+    _visible = <_Flat>[];
+    _flatten(widget.nodes, 0, _visible);
+  }
+
+  bool _available(Object id) => _indexOf(id) >= 0 && !_data.byId[id]!.disabled;
+
+  Object? _fallback(Object id, _TreeData oldData) {
+    Object? ancestor = oldData.parents[id];
+    while (ancestor != null) {
+      if (_available(ancestor)) return ancestor;
+      ancestor = oldData.parents[ancestor];
+    }
+    final List<Object> siblings =
+        oldData.siblings[oldData.parents[id]] ?? <Object>[];
+    final int position = siblings.indexOf(id);
+    for (int distance = 1; distance < siblings.length; distance++) {
+      for (final int candidate in <int>[
+        position + distance,
+        position - distance,
+      ]) {
+        if (candidate >= 0 &&
+            candidate < siblings.length &&
+            _available(siblings[candidate])) {
+          return siblings[candidate];
+        }
+      }
+    }
+    for (final _Flat flat in _visible) {
+      if (!flat.node.disabled) return flat.node.id;
+    }
+    return null;
+  }
+
+  void _recoverFocus(Object? id, FocusNode? previous, _TreeData oldData) {
+    if (id == null || _available(id)) return;
+    final Object? target = _fallback(id, oldData);
+    if (target == null) {
+      _focusGeneration++;
+      previous?.unfocus(disposition: UnfocusDisposition.scope);
+      return;
+    }
+    final int generation = ++_focusGeneration;
+    // Let old Focus attachments detach and disabled-policy updates complete
+    // before requesting their replacement. Both can otherwise override it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || generation != _focusGeneration) return;
+      final FocusNode? current = FocusManager.instance.primaryFocus;
+      if (current != null &&
+          current is! FocusScopeNode &&
+          !identical(current, previous) &&
+          !_focusNodes.containsValue(current)) {
+        return;
+      }
+      final Object? liveTarget = _available(target)
+          ? target
+          : _fallback(id, oldData);
+      if (liveTarget != null) _focusFor(liveTarget).requestFocus();
+    });
+  }
+
+  CarbonTreeNode? _liveNode(CarbonTreeNode node) {
+    if (!mounted || !_available(node.id)) return null;
+    return _data.byId[node.id];
+  }
 
   @override
   void dispose() {
@@ -234,11 +415,22 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
   }
 
   void _toggle(CarbonTreeNode node) {
-    setState(() {
-      if (!_expanded.add(node.id)) {
-        _expanded.remove(node.id);
-      }
-    });
+    final CarbonTreeNode? live = _liveNode(node);
+    if (live == null || !live.isParent) return;
+    final Set<Object> next = <Object>{..._expanded};
+    if (!next.add(live.id)) next.remove(live.id);
+    if (widget.expandedIds == null) {
+      final Object? focusedId = _focusedId;
+      final FocusNode? previous = focusedId == null
+          ? null
+          : _focusNodes[focusedId];
+      setState(() {
+        _localExpanded = <Object>{...next};
+        _refreshVisible();
+        _recoverFocus(focusedId, previous, _data);
+      });
+    }
+    widget.onExpansionChanged?.call(next);
   }
 
   /// The controlled selection, whichever API carries it.
@@ -258,21 +450,33 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
   /// selection collapses to the node and it becomes active — upstream's
   /// `handleTreeSelect` else-branch.
   void _select(CarbonTreeNode node) {
-    if (node.disabled) {
+    final CarbonTreeNode? live = _liveNode(node);
+    if (live == null) {
       return;
     }
+
+    _focusGeneration++;
     _focusFor(node.id).requestFocus();
     widget.onSelect?.call(node.id);
     widget.onSelectionChanged?.call(<Object>{node.id});
     widget.onActivate?.call(node.id);
   }
 
+  void _requestNodeFocus(CarbonTreeNode node) {
+    if (_liveNode(node) == null) return;
+
+    _focusGeneration++;
+    _focusFor(node.id).requestFocus();
+  }
+
   /// Ctrl/Cmd-activation in multiselect: toggles the node's membership
   /// and leaves the active node untouched.
   void _toggleSelection(CarbonTreeNode node) {
-    if (node.disabled) {
+    if (_liveNode(node) == null) {
       return;
     }
+
+    _focusGeneration++;
     _focusFor(node.id).requestFocus();
     final Set<Object> next = <Object>{..._selectedIds};
     if (!next.add(node.id)) {
@@ -317,9 +521,16 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
 
   int _indexOf(Object id) => _visible.indexWhere((_Flat f) => f.node.id == id);
 
-  void _focusIndex(int index) {
-    if (index >= 0 && index < _visible.length) {
+  void _focusIndex(int index, {int step = 1}) {
+    while (index >= 0 && index < _visible.length) {
+      if (_visible[index].node.disabled) {
+        index += step;
+        continue;
+      }
+
+      _focusGeneration++;
       _focusFor(_visible[index].node.id).requestFocus();
+      return;
     }
   }
 
@@ -343,7 +554,8 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
-    final CarbonTreeNode node = flat.node;
+    final CarbonTreeNode? node = _liveNode(flat.node);
+    if (node == null) return KeyEventResult.ignored;
     final int i = _indexOf(node.id);
     final LogicalKeyboardKey key = event.logicalKey;
     final HardwareKeyboard keyboard = HardwareKeyboard.instance;
@@ -356,7 +568,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.arrowUp) {
-      _focusIndex(i - 1);
+      _focusIndex(i - 1, step: -1);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.home) {
@@ -373,7 +585,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       if (widget.multiselect && ctrlLike && keyboard.isShiftPressed) {
         _extendSelection(i, _visible.length - 1);
       }
-      _focusIndex(_visible.length - 1);
+      _focusIndex(_visible.length - 1, step: -1);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.keyA && widget.multiselect && ctrlLike) {
@@ -388,7 +600,13 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       if (node.isParent && !_expanded.contains(node.id)) {
         _toggle(node);
       } else if (node.isParent) {
-        _focusIndex(i + 1);
+        for (int child = i + 1; child < _visible.length; child++) {
+          if (_visible[child].depth <= _visible[i].depth) break;
+          if (!_visible[child].node.disabled) {
+            _focusIndex(child);
+            break;
+          }
+        }
       }
       return KeyEventResult.handled;
     }
@@ -396,9 +614,13 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       if (node.isParent && _expanded.contains(node.id)) {
         _toggle(node);
       } else {
-        final Object? parent = _parentOf(node.id);
-        if (parent != null) {
-          _focusIndex(_indexOf(parent));
+        Object? parent = _parentOf(node.id);
+        while (parent != null) {
+          if (_available(parent)) {
+            _focusIndex(_indexOf(parent));
+            break;
+          }
+          parent = _parentOf(parent);
         }
       }
       return KeyEventResult.handled;
@@ -409,8 +631,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
   @override
   Widget build(BuildContext context) {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    _visible = <_Flat>[];
-    _flatten(widget.nodes, 0, _visible);
+    _refreshVisible();
 
     return Semantics(
       container: true,
@@ -433,6 +654,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
                 focusNode: _focusFor(flat.node.id),
                 onToggle: () => _toggle(flat.node),
                 onSelect: () => _activate(flat.node),
+                onFocus: () => _requestNodeFocus(flat.node),
                 onKey: (KeyEvent e) => _onKey(flat, e),
               ),
           ],
@@ -454,6 +676,7 @@ class _TreeRow extends StatefulWidget {
     required this.focusNode,
     required this.onToggle,
     required this.onSelect,
+    required this.onFocus,
     required this.onKey,
     super.key,
   });
@@ -466,6 +689,7 @@ class _TreeRow extends StatefulWidget {
   final FocusNode focusNode;
   final VoidCallback onToggle;
   final VoidCallback onSelect;
+  final VoidCallback onFocus;
   final KeyEventResult Function(KeyEvent) onKey;
 
   @override
@@ -585,6 +809,9 @@ class _TreeRowState extends State<_TreeRow> {
     return Semantics(
       selected: widget.selected,
       enabled: !disabled,
+      focusable: !disabled,
+      focused: !disabled && _focused,
+      onFocus: disabled ? null : widget.onFocus,
       label: node.label,
       expanded: node.isParent ? widget.expanded : null,
       onTap: disabled ? null : widget.onSelect,
@@ -600,6 +827,7 @@ class _TreeRowState extends State<_TreeRow> {
             onTap: disabled ? null : widget.onSelect,
             child: Focus(
               focusNode: widget.focusNode,
+              includeSemantics: false,
               canRequestFocus: !disabled,
               onKeyEvent: (FocusNode _, KeyEvent e) => widget.onKey(e),
               onFocusChange: (bool f) => setState(() => _focused = f),

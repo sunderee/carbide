@@ -86,6 +86,7 @@ jobs:
           test/lifecycle test/components/number_input test/components/text_area
           test/components/slider
           test/components/date_picker
+          test/components/tree_view
 
   gallery-web-integration:
     name: Gallery integration test — web
@@ -163,4 +164,12 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/date_picker_state_test.dart
+          -d web-server
+
+      - name: Drive tree-view native reconciliation and expansion test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/tree_view_state_test.dart
           -d web-server
