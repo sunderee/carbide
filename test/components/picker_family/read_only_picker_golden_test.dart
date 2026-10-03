@@ -27,7 +27,21 @@ void main() {
           );
           state.focus.requestFocus();
           await tester.pump();
+          await tester.pump();
           expect(state.focus.hasPrimaryFocus, isTrue);
+          expect(
+            tester
+                .widget<CarbonFocusRing>(
+                  find
+                      .descendant(
+                        of: find.byType(PickerFixture).first,
+                        matching: find.byType(CarbonFocusRing),
+                      )
+                      .first,
+                )
+                .visible,
+            isTrue,
+          );
         },
         builder: (context) => DefaultTextStyle(
           style: CarbonTypeStyles.bodyCompact01.copyWith(
