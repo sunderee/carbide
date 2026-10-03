@@ -15,6 +15,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
+import '../../utils/control_state.dart';
 import '../form/carbon_form.dart';
 
 /// Whether a radio's label sits before or after the circle.
@@ -32,6 +33,10 @@ enum CarbonRadioLabelPosition {
 /// when [selected]; label `body-compact-01`. Usually built by
 /// [CarbonRadioButtonGroup], which manages single-selection and arrow-key
 /// roving; use this directly only for a standalone radio.
+///
+/// A null callback or [disabled] disables focus and editing. [readOnly]
+/// retains focus and the announced value while preventing activation. Its
+/// [readOnlyHint] announces non-editability and can be localized.
 class CarbonRadioButton extends StatelessWidget {
   /// Creates a radio button.
   const CarbonRadioButton({
@@ -41,7 +46,9 @@ class CarbonRadioButton extends StatelessWidget {
     this.onSelected,
     this.labelPosition = CarbonRadioLabelPosition.right,
     this.invalid = false,
+    this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.focusNode,
     this.autofocus = false,
   });
@@ -64,6 +71,12 @@ class CarbonRadioButton extends StatelessWidget {
   /// Renders read-only.
   final bool readOnly;
 
+  /// Disables focus and editing, independently of callback availability.
+  final bool disabled;
+
+  /// Localizable read-only announcement; ignored when disabled.
+  final String readOnlyHint;
+
   /// An optional focus node.
   final FocusNode? focusNode;
 
@@ -82,27 +95,40 @@ class CarbonRadioButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool enabled = onSelected != null && !readOnly;
+    final CarbonControlState state = CarbonControlState.resolve(
+      hasCallback: onSelected != null,
+      disabled: disabled,
+      readOnly: readOnly,
+    );
+    final bool enabled = state.canActivate;
 
     return Semantics(
       inMutuallyExclusiveGroup: true,
       checked: selected,
-      enabled: onSelected != null,
+      enabled: state.canActivate,
+      hint: state.semanticsHint(readOnlyHint),
       label: label,
       child: CarbonInteraction(
-        enabled: enabled,
+        enabled: state.canFocus,
+        readOnly: state.isReadOnly,
         onPressed: enabled ? onSelected : null,
         focusNode: focusNode,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final bool focused = states.contains(WidgetState.focused);
-          final bool disabled = onSelected == null;
+          final bool disabled = state.isDisabled;
           final Color ringColor = disabled
+              ? theme.iconDisabled
+              : state.isReadOnly
               ? theme.iconDisabled
               : invalid
               ? theme.supportError
               : theme.iconPrimary;
-          final Color dotColor = disabled ? theme.textDisabled : ringColor;
+          final Color dotColor = disabled
+              ? theme.textDisabled
+              : state.isReadOnly
+              ? theme.iconPrimary
+              : ringColor;
 
           final Widget circle = _RadioCircle(
             selected: selected,
@@ -240,7 +266,8 @@ class _RadioFocusRing extends CustomPainter {
 ///
 /// Selection is driven by [value] / [onChanged]. Lays out [orientation]
 /// horizontal (a row) or vertical (a column with `spacing-03` gaps); arrow
-/// keys move and select among the enabled options (roving focus).
+/// keys move and select among the enabled options (roving focus). Read-only
+/// groups permit arrow-key inspection without changing the selection.
 class CarbonRadioButtonGroup<T> extends StatefulWidget {
   /// Creates a radio group.
   const CarbonRadioButtonGroup({
@@ -252,7 +279,9 @@ class CarbonRadioButtonGroup<T> extends StatefulWidget {
     this.onChanged,
     this.orientation = Axis.horizontal,
     this.labelPosition = CarbonRadioLabelPosition.right,
+    this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -285,6 +314,12 @@ class CarbonRadioButtonGroup<T> extends StatefulWidget {
   /// Renders the group read-only.
   final bool readOnly;
 
+  /// Disables focus and editing, independently of callback availability.
+  final bool disabled;
+
+  /// Localizable read-only announcement; ignored when disabled.
+  final String readOnlyHint;
+
   /// Whether the group is invalid.
   final bool invalid;
 
@@ -307,6 +342,12 @@ class CarbonRadioButtonGroup<T> extends StatefulWidget {
 
 class _CarbonRadioButtonGroupState<T> extends State<CarbonRadioButtonGroup<T>> {
   late List<FocusNode> _nodes;
+
+  CarbonControlState get _state => CarbonControlState.resolve(
+    hasCallback: widget.onChanged != null,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
 
   @override
   void initState() {
@@ -340,16 +381,17 @@ class _CarbonRadioButtonGroupState<T> extends State<CarbonRadioButtonGroup<T>> {
   }
 
   void _move(int from, int delta) {
+    if (!_state.canFocus) return;
     // The group enables uniformly, so just wrap to the adjacent option,
-    // select it, and move focus there (roving selection).
+    // move focus there, and select it only while editable.
     final int count = widget.options.length;
     final int next = (from + delta + count) % count;
-    widget.onChanged?.call(widget.options[next].$1);
+    if (_state.canActivate) widget.onChanged?.call(widget.options[next].$1);
     _nodes[next].requestFocus();
   }
 
   KeyEventResult _onKey(int index, KeyEvent event) {
-    if (event is! KeyDownEvent || widget.onChanged == null) {
+    if (event is! KeyDownEvent || !_state.canFocus) {
       return KeyEventResult.ignored;
     }
     // Horizontal arrows follow the visual direction (mirrored under RTL,
@@ -380,19 +422,22 @@ class _CarbonRadioButtonGroupState<T> extends State<CarbonRadioButtonGroup<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final bool enabled = widget.onChanged != null && !widget.readOnly;
     final List<Widget> radios = <Widget>[
       for (int i = 0; i < widget.options.length; i++)
         Focus(
           onKeyEvent: (FocusNode _, KeyEvent event) => _onKey(i, event),
+          canRequestFocus: false,
+          includeSemantics: false,
           child: CarbonRadioButton(
             label: widget.options[i].$2,
             selected: widget.value == widget.options[i].$1,
             labelPosition: widget.labelPosition,
             invalid: widget.invalid,
             readOnly: widget.readOnly,
+            disabled: widget.disabled,
+            readOnlyHint: widget.readOnlyHint,
             focusNode: _nodes[i],
-            onSelected: enabled
+            onSelected: widget.onChanged != null
                 ? () => widget.onChanged!(widget.options[i].$1)
                 : null,
           ),

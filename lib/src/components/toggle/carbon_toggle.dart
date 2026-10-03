@@ -22,6 +22,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
+import '../../utils/control_state.dart';
 import '../form/carbon_form.dart';
 
 /// The Carbon toggle sizes and their geometry.
@@ -67,6 +68,10 @@ enum CarbonToggleSize {
 /// labels ([labelA] off / [labelB] on); [hideLabel] replaces the side labels
 /// with the top label inline. Slides at `fast-01`, instant under reduced
 /// motion. Exposed as a switch to assistive technology.
+///
+/// A null callback or [disabled] disables focus and editing. [readOnly]
+/// retains focus and the announced value while preventing activation. Its
+/// [readOnlyHint] announces non-editability and can be localized.
 class CarbonToggle extends StatelessWidget {
   /// Creates a toggle.
   const CarbonToggle({
@@ -78,7 +83,9 @@ class CarbonToggle extends StatelessWidget {
     this.labelA = 'Off',
     this.labelB = 'On',
     this.hideLabel = false,
+    this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.focusNode,
     this.autofocus = false,
   });
@@ -107,6 +114,12 @@ class CarbonToggle extends StatelessWidget {
   /// Renders read-only.
   final bool readOnly;
 
+  /// Disables focus and editing, independently of callback availability.
+  final bool disabled;
+
+  /// Localizable read-only announcement; ignored when disabled.
+  final String readOnlyHint;
+
   /// An optional focus node.
   final FocusNode? focusNode;
 
@@ -116,8 +129,13 @@ class CarbonToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool enabled = onToggled != null && !readOnly;
-    final bool disabled = onToggled == null;
+    final CarbonControlState state = CarbonControlState.resolve(
+      hasCallback: onToggled != null,
+      disabled: this.disabled,
+      readOnly: readOnly,
+    );
+    final bool enabled = state.canActivate;
+    final bool disabled = state.isDisabled;
     final bool reduceMotion =
         MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final Duration duration = reduceMotion
@@ -128,21 +146,27 @@ class CarbonToggle extends StatelessWidget {
 
     final Widget switchControl = Semantics(
       toggled: toggled,
-      enabled: !disabled,
+      enabled: state.canActivate,
+      hint: state.semanticsHint(readOnlyHint),
       label: labelText,
       child: CarbonInteraction(
-        enabled: enabled,
+        enabled: state.canFocus,
+        readOnly: state.isReadOnly,
         onPressed: enabled ? () => onToggled!(!toggled) : null,
         focusNode: focusNode,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final Color track = disabled
               ? theme.buttonDisabled
+              : state.isReadOnly
+              ? const Color(0x00000000)
               : toggled
               ? theme.supportSuccess
               : theme.toggleOff;
           final Color handleColor = disabled
               ? theme.iconOnColorDisabled
+              : state.isReadOnly
+              ? theme.iconPrimary
               : theme.iconOnColor;
           return _ToggleFocusRing(
             color: theme.focus,
@@ -155,13 +179,18 @@ class CarbonToggle extends StatelessWidget {
               decoration: BoxDecoration(
                 color: track,
                 borderRadius: BorderRadius.circular(size.radius),
+                border: state.isReadOnly
+                    ? Border.all(color: theme.iconDisabled)
+                    : null,
               ),
               child: Stack(
                 children: <Widget>[
                   AnimatedPositionedDirectional(
                     duration: duration,
-                    top: size.margin,
-                    start: toggled ? size.margin + size.travel : size.margin,
+                    top: state.isReadOnly ? 2 : size.margin,
+                    start:
+                        (state.isReadOnly ? 2 : size.margin) +
+                        (toggled ? size.travel : 0),
                     child: Container(
                       width: size.handle,
                       height: size.handle,
@@ -174,7 +203,11 @@ class CarbonToggle extends StatelessWidget {
                               child: CarbonIcon(
                                 CarbonIcons.checkmark,
                                 size: 6,
-                                color: theme.supportSuccess,
+                                color: state.isReadOnly
+                                    ? theme.background
+                                    : disabled
+                                    ? theme.buttonDisabled
+                                    : theme.supportSuccess,
                               ),
                             )
                           : null,

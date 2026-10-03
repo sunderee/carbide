@@ -17,7 +17,7 @@ typedef CarbonInteractionBuilder = Widget Function(
 /// Tracks hover, focus, pressed, and disabled as [WidgetState]s and exposes
 /// them to [builder], so a component only has to map states to styling — for
 /// example with [WidgetStateProperty]. Handles pointer and keyboard activation
-/// (Space/Enter), focus, hover, and the disabled state.
+/// (Space/Enter), focus, hover, disabled and read-only states.
 ///
 /// Following Carbon, the focus state reflects the *focus highlight* — it is set
 /// for keyboard focus, not for a tap that merely moves focus — so components can
@@ -27,6 +27,7 @@ class CarbonInteraction extends StatefulWidget {
   const CarbonInteraction({
     super.key,
     this.enabled = true,
+    this.readOnly = false,
     this.onPressed,
     this.focusNode,
     this.autofocus = false,
@@ -39,7 +40,12 @@ class CarbonInteraction extends StatefulWidget {
   /// set and pointer/keyboard input is ignored.
   final bool enabled;
 
-  /// Called on tap or keyboard activation while [enabled].
+  /// Keeps focus available while preventing activation and hover feedback.
+  ///
+  /// Unlike a disabled region, a read-only region can show its focus ring.
+  final bool readOnly;
+
+  /// Called on tap or keyboard activation while enabled and not read-only.
   final VoidCallback? onPressed;
 
   /// An optional focus node to control focus externally.
@@ -85,9 +91,10 @@ class _CarbonInteractionState extends State<CarbonInteraction> {
       }
       _states.update(WidgetState.disabled, !widget.enabled);
     }
-    if (widget.enabled != oldWidget.enabled) {
+    if (widget.enabled != oldWidget.enabled ||
+        widget.readOnly != oldWidget.readOnly) {
       _states.update(WidgetState.disabled, !widget.enabled);
-      if (!widget.enabled) {
+      if (!_operable) {
         _states
           ..update(WidgetState.pressed, false)
           ..update(WidgetState.hovered, false);
@@ -101,8 +108,10 @@ class _CarbonInteractionState extends State<CarbonInteraction> {
     super.dispose();
   }
 
+  bool get _operable => widget.enabled && !widget.readOnly;
+
   void _activate() {
-    if (widget.enabled) {
+    if (_operable) {
       widget.onPressed?.call();
     }
   }
@@ -110,39 +119,44 @@ class _CarbonInteractionState extends State<CarbonInteraction> {
   @override
   Widget build(BuildContext context) {
     final bool enabled = widget.enabled;
+    final bool operable = _operable;
     return FocusableActionDetector(
       enabled: enabled,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       mouseCursor:
           widget.mouseCursor ??
-          (enabled ? SystemMouseCursors.click : SystemMouseCursors.basic),
+          (operable ? SystemMouseCursors.click : SystemMouseCursors.basic),
       onShowHoverHighlight: (bool value) =>
-          _states.update(WidgetState.hovered, value),
+          _states.update(WidgetState.hovered, operable && value),
       onShowFocusHighlight: (bool value) =>
           _states.update(WidgetState.focused, value),
-      shortcuts: const <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-      },
-      actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (ActivateIntent intent) {
-            _activate();
-            return null;
-          },
-        ),
-      },
+      shortcuts: operable
+          ? const <ShortcutActivator, Intent>{
+              SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+              SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+            }
+          : const <ShortcutActivator, Intent>{},
+      actions: operable
+          ? <Type, Action<Intent>>{
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (ActivateIntent intent) {
+                  _activate();
+                  return null;
+                },
+              ),
+            }
+          : <Type, Action<Intent>>{},
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: enabled ? _activate : null,
-        onTapDown: enabled
+        onTap: operable ? _activate : null,
+        onTapDown: operable
             ? (TapDownDetails _) => _states.update(WidgetState.pressed, true)
             : null,
-        onTapUp: enabled
+        onTapUp: operable
             ? (TapUpDetails _) => _states.update(WidgetState.pressed, false)
             : null,
-        onTapCancel: enabled
+        onTapCancel: operable
             ? () => _states.update(WidgetState.pressed, false)
             : null,
         child: ListenableBuilder(
