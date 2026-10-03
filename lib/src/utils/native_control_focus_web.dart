@@ -33,6 +33,32 @@ bool restoreNativeControlFocus(String identifier) {
   return element.getRootNode().activeElement == element;
 }
 
+/// Captures the current native control for guarded repair after a DOM move.
+///
+/// The returned callback must be released on close or disposal. It respects a
+/// different active control, an inactive document and a detached captured node.
+bool Function()? captureNativeControlFocus() {
+  if (!_document.hasFocus()) return null;
+  final _Element? element = _document.activeElement;
+  if (element == null ||
+      element.tagName == 'BODY' ||
+      element.tagName == 'FLUTTER-VIEW') {
+    return null;
+  }
+  return () {
+    if (!_document.hasFocus() || !element.isConnected) return false;
+    final _Element? active = element.getRootNode().activeElement;
+    if (active == element) return true;
+    if (active != null &&
+        active.tagName != 'BODY' &&
+        active.tagName != 'FLUTTER-VIEW') {
+      return false;
+    }
+    element.focus(_FocusOptions(preventScroll: true));
+    return element.getRootNode().activeElement == element;
+  };
+}
+
 @JS('document')
 external _Document get _document;
 
@@ -44,6 +70,7 @@ extension type _Document(JSObject _) implements JSObject {
 
 extension type _Element(JSObject _) implements JSObject {
   external String get tagName;
+  external bool get isConnected;
   external _Document getRootNode();
   external void focus(_FocusOptions options);
 }

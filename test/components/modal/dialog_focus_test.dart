@@ -235,6 +235,25 @@ void main() {
           expect(state.after.hasPrimaryFocus, isTrue);
         });
       }
+      if (kind != DialogKind.modal) {
+        _test('changing modal mode reconciles live focus (#306)', (
+          WidgetTester tester,
+        ) async {
+          final DialogFixtureState state = await _mount(tester, kind);
+          final bool nextModal = kind == DialogKind.nonModalDialog;
+          (nextModal ? state.after : state.first).requestFocus();
+          await tester.pump();
+          state.setModal(nextModal);
+          await tester.pumpAndSettle();
+          if (nextModal) {
+            expect(_buttonFocus(tester, 'Close').hasPrimaryFocus, isTrue);
+            expect(state.after.hasFocus, isFalse);
+          } else {
+            expect(state.first.hasPrimaryFocus, isTrue);
+            expect(state.before.hasFocus, isFalse);
+          }
+        });
+      }
     });
   }
 

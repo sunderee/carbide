@@ -72,12 +72,15 @@ class DialogFixtureState extends State<DialogFixture> {
   final FocusNode first = FocusNode(debugLabel: 'First inside');
   final FocusNode second = FocusNode(debugLabel: 'Second inside');
   bool open = false;
+  bool? modalOverride;
   bool showLauncher = true;
   bool _launcherDisposed = false;
   int closes = 0;
   int outsidePresses = 0;
   int primaryPresses = 0;
   int insidePresses = 0;
+
+  void setModal(bool modal) => setState(() => modalOverride = modal);
 
   void show() => setState(() => open = true);
   void hide() => setState(() => open = false);
@@ -167,7 +170,7 @@ class DialogFixtureState extends State<DialogFixture> {
         else
           CarbonDialog(
             open: open,
-            modal: widget.kind == DialogKind.dialog,
+            modal: modalOverride ?? widget.kind == DialogKind.dialog,
             onRequestClose: close,
             children: <Widget>[
               CarbonDialogHeader(

@@ -216,7 +216,9 @@ class _CarbonModalState extends State<CarbonModal> {
         _entered = false;
         final FocusNode? launcher = _restoreFocus;
         _restoreFocus = null;
-        if (launcher?.context != null && launcher!.canRequestFocus) {
+        if (launcher?.context != null &&
+            launcher!.parent != null &&
+            launcher.canRequestFocus) {
           launcher.requestFocus();
         }
       }

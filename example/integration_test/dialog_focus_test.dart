@@ -6,6 +6,7 @@
 import 'dart:js_interop';
 import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
+import 'package:carbide/carbide.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,7 +92,18 @@ void main() {
         await _settle(tester);
         switch (path) {
           case 'button':
-            await tester.tap(find.bySemanticsLabel('Close'));
+            // Semantics finders inspect debug-only render metadata. Use
+            // the actual widget for pointer testing in release builds.
+            await tester.tap(
+              kind == DialogKind.modal
+                  ? find.byWidgetPredicate(
+                      (Widget widget) =>
+                          widget is CarbonButton &&
+                          widget.iconOnly &&
+                          widget.label == 'Close',
+                    )
+                  : find.byType(CarbonDialogCloseButton),
+            );
           case 'escape':
             await _key(tester, LogicalKeyboardKey.escape);
           case 'semantics':
@@ -138,6 +150,20 @@ void main() {
       await _settle(tester);
       expect(_activeName, 'After');
     });
+
+    if (kind != DialogKind.modal) {
+      _test('native ${kind.name}: changing modal mode reconciles live focus', (
+        WidgetTester tester,
+      ) async {
+        final DialogFixtureState state = await _mount(tester, kind);
+        final bool nextModal = kind == DialogKind.nonModalDialog;
+        _button(nextModal ? 'After' : 'First inside').focus();
+        await _settle(tester);
+        state.setModal(nextModal);
+        await _settle(tester);
+        expect(_activeName, nextModal ? 'Close' : 'First inside');
+      });
+    }
   }
 
   _test('native non-modal close preserves a new page focus target', (
