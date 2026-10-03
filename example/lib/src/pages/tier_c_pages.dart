@@ -420,7 +420,7 @@ class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
       description: 'A segmented control for named text and icon-only views.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
-        width: 360,
+        width: _iconOnly ? null : 360,
         child: CarbonContentSwitcher(
           selectedIndex: _index,
           onChanged: (int i) => setState(() => _index = i),

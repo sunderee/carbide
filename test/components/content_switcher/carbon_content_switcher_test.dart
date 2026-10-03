@@ -480,8 +480,15 @@ void main() {
         name: 'content_switcher',
         containsText: true,
         size: const Size(360, 80),
-        builder: (BuildContext context) =>
-            const Center(child: CarbonContentSwitcher(switches: _switches)),
+        // The web widget harness uses wider placeholder glyphs (#271). Keep
+        // this fixed-size golden surface valid there while preserving the
+        // natural Carbon size with Plex on the authoritative Linux renderer.
+        builder: (BuildContext context) => const Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: CarbonContentSwitcher(switches: _switches),
+          ),
+        ),
       );
     });
   });
