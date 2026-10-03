@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add a consistent `readOnly` and localizable `readOnlyHint` contract to the
+  picker and search family. Keep names, selected values and keyboard focus
+  available while preventing popup opening, editing and clearing; close open
+  popups and discard date-range drafts when the policy changes. Distinguish
+  read-only and disabled styling and announce multi-select item values (#312).
+
 - Add `CarbonSwitch.semanticLabel` for icon-only segments and accessible names
   that differ from visible text. **Breaking assertion:** icon-only segments
   must now supply a semantic label in debug mode. Icons remain decorative

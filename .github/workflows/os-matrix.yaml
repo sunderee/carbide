@@ -86,6 +86,9 @@ jobs:
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
           test/components/content_switcher
+          test/components/picker_family test/components/dropdown
+          test/components/select test/components/combo_box
+          test/components/multi_select test/components/search
           test/components/slider
           test/components/date_picker
           test/components/tree_view
@@ -229,6 +232,14 @@ jobs:
           flutter drive --release
           --driver=test_driver/integration_test.dart
           --target=integration_test/password_visibility_test.dart
+          -d web-server
+
+      - name: Drive read-only picker native focus contracts in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/read_only_picker_test.dart
           -d web-server
 
       - name: Drive content-switcher native name contracts in release mode

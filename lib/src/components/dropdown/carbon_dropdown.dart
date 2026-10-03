@@ -21,6 +21,8 @@ import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 import '../list_box/carbon_list_box.dart';
@@ -71,6 +73,9 @@ class CarbonDropdownItem<T> {
 ///   onChanged: (String v) => setState(() => _value = v),
 /// )
 /// ```
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonDropdown<T> extends StatefulWidget {
   /// Creates a dropdown.
   const CarbonDropdown({
@@ -85,6 +90,7 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.direction = CarbonDropdownDirection.bottom,
     this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -128,6 +134,9 @@ class CarbonDropdown<T> extends StatefulWidget {
 
   /// Whether the value is read-only (shown, not editable).
   final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
 
   /// Whether the dropdown is invalid.
   final bool invalid;
@@ -181,6 +190,12 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: widget.onChanged != null,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final OwnedFocusNode _focusOwner;
@@ -188,7 +203,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   int _highlighted = -1;
   double _triggerWidth = 0;
 
-  bool get _enabled => !widget.disabled && !widget.readOnly;
+  bool get _enabled => _controlState.canActivate;
 
   CarbonDropdownItem<T>? get _selected {
     for (final CarbonDropdownItem<T> item in widget.items) {
@@ -214,6 +229,15 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   void didUpdateWidget(CarbonDropdown<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
+    if (!_controlState.canActivate && _overlay.isShowing) {
+      // OverlayPortal cannot hide during the parent's build. Events already
+      // use the current policy while the popup is removed after this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_controlState.canActivate && _overlay.isShowing) {
+          _close();
+        }
+      });
+    }
   }
 
   @override
@@ -223,12 +247,13 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   void _toggle() {
+    if (!mounted || !_controlState.canActivate) return;
     _focus.requestFocus();
     _overlay.isShowing ? _close() : _open();
   }
 
   void _open() {
-    if (widget.onChanged == null || !_enabled) return;
+    if (!mounted || !_controlState.canActivate) return;
     _highlighted = widget.items.indexWhere(
       (CarbonDropdownItem<T> i) => !i.disabled,
     );
@@ -242,12 +267,13 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   void _close() {
+    if (!mounted) return;
     _overlay.hide();
     setState(() {});
   }
 
   void _select(CarbonDropdownItem<T> item) {
-    if (item.disabled) return;
+    if (!mounted || !_controlState.canActivate || item.disabled) return;
     widget.onChanged?.call(item.value);
     _close();
     _focus.requestFocus();
@@ -266,7 +292,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || widget.onChanged == null || !_enabled) {
+    if (event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
@@ -317,16 +343,18 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonDropdownItem<T>? selected = _selected;
     final String display = selected?.label ?? widget.label ?? '';
-    final Color textColor = widget.disabled
+    final Color textColor = _controlState.isDisabled
         ? theme.textDisabled
         : selected == null
         ? theme.textPlaceholder
         : theme.textPrimary;
 
     final Widget field = CarbonListBox(
+      includeSemantics: false,
       size: widget.size,
       expanded: _overlay.isShowing,
-      disabled: widget.disabled,
+      disabled: _controlState.isDisabled,
+      readOnly: _controlState.isReadOnly,
       invalid: widget.invalid,
       warn: widget.warn,
       focused: _focus.hasFocus,
@@ -345,13 +373,18 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       ),
     );
 
-    final Widget trigger = Semantics(
+    final Widget trigger = CarbonControlSemantics(
+      state: _controlState,
+      readOnlyHint: widget.readOnlyHint,
+      focusNode: _focus,
+      onActivate: _toggle,
       button: true,
-      enabled: _enabled,
       label: widget.titleText,
       value: selected?.label,
-      child: Focus(
-        focusNode: _focus,
+      builder: (FocusNode focusNode) => Focus(
+        focusNode: focusNode,
+        includeSemantics: false,
+        canRequestFocus: _controlState.canFocus,
         onKeyEvent: _onKey,
         autofocus: widget.autofocus,
         child: CompositedTransformTarget(
@@ -378,13 +411,19 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
             status: CarbonFieldStatus.warning,
           )
         : widget.helperText != null
-        ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
+        ? CarbonHelperText(
+            widget.helperText!,
+            disabled: _controlState.isDisabled,
+          )
         : null;
 
     final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
-            child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
+            child: CarbonFormLabel(
+              widget.titleText,
+              disabled: _controlState.isDisabled,
+            ),
           );
 
     if (widget.inline) {

@@ -21,8 +21,10 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/owned_listenable.dart';
+import '../../utils/text_control_semantics.dart';
 import '../form/carbon_form.dart';
 import '../list_box/carbon_list_box.dart';
 
@@ -51,6 +53,9 @@ class CarbonComboBoxItem<T> {
 /// Typing filters the menu (case-insensitive substring); arrows move the
 /// highlight; Enter selects; Escape clears or closes; the clear (X) control
 /// resets the value.
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonComboBox<T> extends StatefulWidget {
   /// Creates a combo box.
   const CarbonComboBox({
@@ -64,6 +69,8 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.helperText,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -102,6 +109,12 @@ class CarbonComboBox<T> extends StatefulWidget {
 
   /// Whether the combo box is disabled.
   final bool disabled;
+
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
 
   /// Whether the combo box is invalid.
   final bool invalid;
@@ -149,6 +162,13 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    // The combo box owns its text and supports an unobserved query.
+    hasCallback: true,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final TextEditingController _controller;
@@ -188,6 +208,15 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   void didUpdateWidget(CarbonComboBox<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
+    if (!_controlState.canActivate && _overlay.isShowing) {
+      // OverlayPortal cannot hide during the parent's build. Events already
+      // use the current policy while the popup is removed after this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_controlState.canActivate && _overlay.isShowing) {
+          _close();
+        }
+      });
+    }
     if (widget.selectedItem != oldWidget.selectedItem) {
       final String text = _selected?.label ?? '';
       if (text != _controller.text) _controller.text = text;
@@ -202,13 +231,15 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   void _onFocusChange() {
-    if (_focus.hasFocus && !_overlay.isShowing && !widget.disabled) {
+    if (!mounted) return;
+    if (_focus.hasFocus && !_overlay.isShowing && _controlState.canActivate) {
       _open();
     }
     setState(() {});
   }
 
   void _onText(String value) {
+    if (!mounted || !_controlState.canActivate) return;
     widget.onInputChange?.call(value);
     if (!_overlay.isShowing) _overlay.show();
     final List<CarbonComboBoxItem<T>> items = _filtered;
@@ -217,7 +248,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   void _open() {
-    if (widget.disabled) return;
+    if (!mounted || !_controlState.canActivate) return;
     final List<CarbonComboBoxItem<T>> items = _filtered;
     _highlighted = items.indexWhere((CarbonComboBoxItem<T> i) => !i.disabled);
     final CarbonComboBoxItem<T>? selected = _selected;
@@ -229,12 +260,13 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   void _close() {
+    if (!mounted) return;
     _overlay.hide();
     setState(() {});
   }
 
   void _select(CarbonComboBoxItem<T> item) {
-    if (item.disabled) return;
+    if (!mounted || !_controlState.canActivate || item.disabled) return;
     _controller.value = TextEditingValue(
       text: item.label,
       selection: TextSelection.collapsed(offset: item.label.length),
@@ -245,10 +277,17 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   void _clear() {
+    if (!mounted || !_controlState.canActivate) return;
     _controller.clear();
     widget.onChanged?.call(null);
     _focus.requestFocus();
     _open();
+  }
+
+  void _toggle() {
+    if (!mounted || !_controlState.canActivate) return;
+    _focus.requestFocus();
+    _overlay.isShowing ? _close() : _open();
   }
 
   void _moveHighlight(int delta) {
@@ -265,7 +304,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || widget.disabled) {
+    if (event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     switch (event.logicalKey) {
@@ -337,17 +376,20 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   Widget _buildField(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    final bool enabled = !widget.disabled;
+    final bool enabled = !_controlState.isDisabled;
     final bool focused = _focus.hasFocus;
 
-    final Color background = enabled && _hovered
+    final Color background = _controlState.isReadOnly
+        ? const Color(0x00000000)
+        : _controlState.canActivate && _hovered
         ? layer.fieldHover
         : layer.field;
     // The AI treatment: aura gradient + ai-border-strong bottom border.
-    final bool ai = widget.aiLabel != null && !widget.aiRevert;
+    final bool ai =
+        widget.aiLabel != null && !widget.aiRevert && !_controlState.isReadOnly;
     final Color borderColor = widget.disabled
         ? const Color(0x00000000)
-        : _overlay.isShowing
+        : _controlState.isReadOnly || _overlay.isShowing
         ? layer.borderSubtle
         : ai
         ? theme.aiBorderStrong
@@ -356,24 +398,24 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         ? Border.all(color: theme.supportError, width: 2)
         : Border(bottom: BorderSide(color: borderColor));
 
-    final Widget editable = MergeSemantics(
-      child: Semantics(
-        textField: true,
-        label: widget.titleText,
-        enabled: enabled,
-        child: _ComboInput(
-          controller: _controller,
-          focusNode: _focus,
-          selectAllOnFocus: _focusOwner.selectAllOnFocus,
-          enabled: enabled,
-          placeholder: widget.placeholder,
-          style: CarbonTypeStyles.bodyCompact01.copyWith(
-            color: widget.disabled ? theme.textDisabled : theme.textPrimary,
-          ),
-          placeholderColor: theme.textPlaceholder,
-          cursorColor: theme.focus,
-          onChanged: _onText,
+    final Widget editable = CarbonTextControlSemantics(
+      state: _controlState,
+      label: widget.titleText,
+      value: _controller.text,
+      readOnlyHint: widget.readOnlyHint,
+      focusNode: _focus,
+      child: _ComboInput(
+        controller: _controller,
+        focusNode: _focus,
+        selectAllOnFocus: _focusOwner.selectAllOnFocus,
+        enabled: _controlState.canActivate,
+        placeholder: widget.placeholder,
+        style: CarbonTypeStyles.bodyCompact01.copyWith(
+          color: widget.disabled ? theme.textDisabled : theme.textPrimary,
         ),
+        placeholderColor: theme.textPlaceholder,
+        cursorColor: theme.focus,
+        onChanged: _onText,
       ),
     );
 
@@ -433,7 +475,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                           )
                         : editable,
                   ),
-                  if (_controller.text.isNotEmpty && enabled) ...<Widget>[
+                  if (_controller.text.isNotEmpty &&
+                      _controlState.canActivate) ...<Widget>[
                     const SizedBox(width: CarbonSpacing.spacing03),
                     CarbonListBoxSelection(onClear: _clear),
                   ],
@@ -444,22 +487,20 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     widget.aiLabel!,
                   ],
                   const SizedBox(width: CarbonSpacing.spacing03),
-                  Semantics(
-                    button: true,
-                    enabled: enabled,
-                    expanded: _overlay.isShowing,
-                    label: widget.titleText,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: enabled
-                          ? () {
-                              _focus.requestFocus();
-                              _overlay.isShowing ? _close() : _open();
-                            }
-                          : null,
-                      child: CarbonListBoxMenuIcon(
-                        open: _overlay.isShowing,
-                        disabled: widget.disabled,
+                  ExcludeSemantics(
+                    excluding: !_controlState.canActivate,
+                    child: Semantics(
+                      button: true,
+                      enabled: _controlState.canActivate,
+                      expanded: _overlay.isShowing,
+                      label: widget.titleText,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _controlState.canActivate ? _toggle : null,
+                        child: CarbonListBoxMenuIcon(
+                          open: _overlay.isShowing,
+                          disabled: !_controlState.canActivate,
+                        ),
                       ),
                     ),
                   ),

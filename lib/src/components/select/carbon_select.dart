@@ -21,6 +21,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
 import '../../utils/owned_listenable.dart';
@@ -69,6 +71,9 @@ class CarbonSelectItemGroup<T> extends CarbonSelectEntry<T> {
 /// support: Down/Enter/Space opens; arrows move the highlight; Enter selects;
 /// Escape closes; typing jumps to the next matching label. Reuses the
 /// [CarbonField] chrome with [inline] and [fluid] layouts.
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonSelect<T> extends StatefulWidget {
   /// Creates a select.
   const CarbonSelect({
@@ -81,6 +86,8 @@ class CarbonSelect<T> extends StatefulWidget {
     this.helperText,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -117,6 +124,12 @@ class CarbonSelect<T> extends StatefulWidget {
 
   /// Whether disabled.
   final bool disabled;
+
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
 
   /// Whether invalid.
   final bool invalid;
@@ -165,6 +178,12 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: widget.onChanged != null,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final OwnedFocusNode _focusOwner;
@@ -208,6 +227,15 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   void didUpdateWidget(CarbonSelect<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
+    if (!_controlState.canActivate && _overlay.isShowing) {
+      // OverlayPortal cannot hide during the parent's build. Events already
+      // use the current policy while the popup is removed after this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_controlState.canActivate && _overlay.isShowing) {
+          _close();
+        }
+      });
+    }
   }
 
   @override
@@ -217,9 +245,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   }
 
   void _open() {
-    if (widget.onChanged == null) {
-      return;
-    }
+    if (!mounted || !_controlState.canActivate) return;
     final List<CarbonSelectItem<T>> items = _flatItems;
     _highlighted = items.indexWhere((CarbonSelectItem<T> i) => !i.disabled);
     final CarbonSelectItem<T>? selected = _selectedItem;
@@ -237,15 +263,20 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     });
   }
 
+  void _toggle() {
+    if (!mounted || !_controlState.canActivate) return;
+    _focus.requestFocus();
+    _overlay.isShowing ? _close() : _open();
+  }
+
   void _close() {
+    if (!mounted) return;
     _overlay.hide();
     setState(() {});
   }
 
   void _select(CarbonSelectItem<T> item) {
-    if (item.disabled) {
-      return;
-    }
+    if (!mounted || !_controlState.canActivate || item.disabled) return;
     widget.onChanged?.call(item.value);
     _close();
     _focus.requestFocus();
@@ -267,7 +298,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   /// so the trigger keeps focus while open): Down/Enter/Space open; arrows
   /// navigate; Enter/Space select; Escape closes; characters type-ahead.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || widget.onChanged == null) {
+    if (event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
@@ -327,10 +358,9 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool enabled = !widget.disabled;
     final CarbonSelectItem<T>? selected = _selectedItem;
     final String display = selected?.label ?? widget.placeholder ?? '';
-    final Color textColor = widget.disabled
+    final Color textColor = _controlState.isDisabled
         ? theme.textDisabled
         : selected == null
         ? theme.textPlaceholder
@@ -353,7 +383,9 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       child: CarbonIcon(
         CarbonIcons.chevronDown,
         size: 16,
-        color: widget.disabled ? theme.iconDisabled : theme.iconPrimary,
+        color: !_controlState.canActivate
+            ? theme.iconDisabled
+            : theme.iconPrimary,
       ),
     );
 
@@ -365,7 +397,8 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         ? _FluidSelectField(
             label: widget.labelText,
             status: _status,
-            disabled: widget.disabled,
+            disabled: _controlState.isDisabled,
+            readOnly: _controlState.isReadOnly,
             focused: focused,
             value: valueText,
             chevron: chevron,
@@ -373,7 +406,8 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         : CarbonField(
             size: widget.size,
             status: _status,
-            disabled: widget.disabled,
+            disabled: _controlState.isDisabled,
+            readOnly: _controlState.isReadOnly,
             aiLabel: widget.aiLabel,
             aiRevert: widget.aiRevert,
             focused: focused,
@@ -381,23 +415,24 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
             child: ExcludeSemantics(child: valueText),
           );
 
-    final Widget trigger = Semantics(
+    final Widget trigger = CarbonControlSemantics(
+      state: _controlState,
+      readOnlyHint: widget.readOnlyHint,
+      focusNode: _focus,
+      onActivate: _toggle,
       button: true,
-      enabled: enabled,
       label: widget.labelText,
       value: selected?.label,
-      child: Focus(
-        focusNode: _focus,
+      builder: (FocusNode focusNode) => Focus(
+        focusNode: focusNode,
+        includeSemantics: false,
+        canRequestFocus: _controlState.canFocus,
         onKeyEvent: _onKey,
         autofocus: widget.autofocus,
         child: GestureDetector(
+          excludeFromSemantics: true,
           behavior: HitTestBehavior.opaque,
-          onTap: enabled
-              ? () {
-                  _focus.requestFocus();
-                  _overlay.isShowing ? _close() : _open();
-                }
-              : null,
+          onTap: _controlState.canActivate ? _toggle : null,
           child: fieldChrome,
         ),
       ),
@@ -425,13 +460,19 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
             status: CarbonFieldStatus.warning,
           )
         : widget.helperText != null
-        ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
+        ? CarbonHelperText(
+            widget.helperText!,
+            disabled: _controlState.isDisabled,
+          )
         : null;
 
     final Widget? label = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
-            child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
+            child: CarbonFormLabel(
+              widget.labelText,
+              disabled: _controlState.isDisabled,
+            ),
           );
 
     if (widget.inline) {
@@ -588,6 +629,7 @@ class _FluidSelectField extends StatelessWidget {
     required this.label,
     required this.status,
     required this.disabled,
+    required this.readOnly,
     required this.focused,
     required this.value,
     required this.chevron,
@@ -596,6 +638,7 @@ class _FluidSelectField extends StatelessWidget {
   final String label;
   final CarbonFieldStatus status;
   final bool disabled;
+  final bool readOnly;
   final bool focused;
   final Widget value;
   final Widget chevron;
@@ -607,11 +650,13 @@ class _FluidSelectField extends StatelessWidget {
     final bool invalid = status == CarbonFieldStatus.invalid;
     final Color border = disabled
         ? const Color(0x00000000)
+        : readOnly
+        ? layer.borderSubtle
         : theme.borderStrong01;
 
     Widget box = DecoratedBox(
       decoration: BoxDecoration(
-        color: layer.field,
+        color: readOnly ? const Color(0x00000000) : layer.field,
         border: Border(bottom: BorderSide(color: border)),
       ),
       // Fluid field height is a minimum (docs/text-scaling.md).

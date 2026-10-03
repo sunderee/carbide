@@ -198,6 +198,8 @@ class _SelectPage extends StatefulWidget {
 }
 
 class _SelectPageState extends State<_SelectPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
   String _value = 'md';
 
   @override
@@ -209,6 +211,8 @@ class _SelectPageState extends State<_SelectPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonSelect<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           labelText: 'Size',
           value: _value,
           onChanged: (String v) => setState(() => _value = v),
@@ -219,26 +223,82 @@ class _SelectPageState extends State<_SelectPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
       code: "CarbonSelect<String>(labelText: 'Size', items: <…>[…]);",
     );
   }
 }
 
-class _SearchPage extends StatelessWidget {
+class _SearchPage extends StatefulWidget {
   const _SearchPage();
   @override
-  Widget build(BuildContext context) {
-    return const DemoScaffold(
-      title: 'Search',
-      description: 'A search field with a clear affordance.',
-      previewAlignment: Alignment.topCenter,
-      preview: SizedBox(
-        width: 360,
-        child: CarbonSearch(placeholder: 'Search components'),
-      ),
-      code: 'CarbonSearch(placeholder: \'Search components\');',
-    );
+  State<_SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<_SearchPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
+  bool _expandable = false;
+  final TextEditingController _query = TextEditingController(
+    text: 'Carbon components',
+  );
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => DemoScaffold(
+    title: 'Search',
+    description: 'A search field with a clear affordance.',
+    previewAlignment: Alignment.topCenter,
+    preview: SizedBox(
+      width: 360,
+      child: _expandable
+          ? CarbonExpandableSearch(
+              controller: _query,
+              readOnly: _readOnly,
+              disabled: _disabled,
+            )
+          : CarbonSearch(
+              controller: _query,
+              readOnly: _readOnly,
+              disabled: _disabled,
+              placeholder: 'Search components',
+            ),
+    ),
+    controls: <Widget>[
+      boolKnob(
+        label: 'Read only',
+        value: _readOnly,
+        onChanged: (bool value) => setState(() => _readOnly = value),
+      ),
+      boolKnob(
+        label: 'Disabled',
+        value: _disabled,
+        onChanged: (bool value) => setState(() => _disabled = value),
+      ),
+
+      boolKnob(
+        label: 'Expandable',
+        value: _expandable,
+        onChanged: (bool value) => setState(() => _expandable = value),
+      ),
+    ],
+    code: 'CarbonSearch(readOnly: …, disabled: …);',
+  );
 }
 
 class _CheckboxPage extends StatefulWidget {

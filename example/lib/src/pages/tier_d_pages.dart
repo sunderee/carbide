@@ -167,6 +167,8 @@ class _DatePickerPage extends StatefulWidget {
 }
 
 class _DatePickerPageState extends State<_DatePickerPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
   DateTime? _value = DateTime(2026, 6, 16);
   CarbonDateRange? _range = CarbonDateRange(
     DateTime(2026, 6, 10),
@@ -183,18 +185,33 @@ class _DatePickerPageState extends State<_DatePickerPage> {
       previewAlignment: Alignment.topCenter,
       preview: _rangeMode
           ? CarbonDateRangePicker(
+              readOnly: _readOnly,
+              disabled: _disabled,
               value: _range,
               onChanged: (CarbonDateRange r) => setState(() => _range = r),
             )
           : SizedBox(
               width: 288,
               child: CarbonDatePicker(
+                readOnly: _readOnly,
+                disabled: _disabled,
                 labelText: 'Appointment date',
                 value: _value,
                 onChanged: (DateTime d) => setState(() => _value = d),
               ),
             ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+
         boolKnob(
           label: 'Range',
           value: _rangeMode,

@@ -126,6 +126,8 @@ class _DropdownPage extends StatefulWidget {
 }
 
 class _DropdownPageState extends State<_DropdownPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
   String _value = 'cyan';
   bool _ai = false;
   bool _fluid = false;
@@ -138,6 +140,8 @@ class _DropdownPageState extends State<_DropdownPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonDropdown<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Favourite colour',
           selectedItem: _value,
           onChanged: (String v) => setState(() => _value = v),
@@ -153,6 +157,17 @@ class _DropdownPageState extends State<_DropdownPage> {
         ),
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+
         boolKnob(
           label: 'AI label',
           value: _ai,
@@ -176,7 +191,9 @@ class _ComboBoxPage extends StatefulWidget {
 }
 
 class _ComboBoxPageState extends State<_ComboBoxPage> {
-  String? _value;
+  bool _readOnly = false;
+  bool _disabled = false;
+  String? _value = 'ee';
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -186,6 +203,8 @@ class _ComboBoxPageState extends State<_ComboBoxPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonComboBox<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Country',
           selectedItem: _value,
           onChanged: (String? v) => setState(() => _value = v),
@@ -197,6 +216,18 @@ class _ComboBoxPageState extends State<_ComboBoxPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
       code: 'CarbonComboBox<String>(titleText: \'Country\', items: <…>[…]);',
     );
   }
@@ -209,6 +240,9 @@ class _MultiSelectPage extends StatefulWidget {
 }
 
 class _MultiSelectPageState extends State<_MultiSelectPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
+  bool _filterable = false;
   Set<String> _selected = <String>{'read'};
   @override
   Widget build(BuildContext context) {
@@ -219,7 +253,10 @@ class _MultiSelectPageState extends State<_MultiSelectPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonMultiSelect<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Permissions',
+          filterable: _filterable,
           label: 'Choose permissions',
           selectedValues: _selected,
           onChanged: (Set<String> v) => setState(() => _selected = v),
@@ -230,6 +267,24 @@ class _MultiSelectPageState extends State<_MultiSelectPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+
+        boolKnob(
+          label: 'Filterable',
+          value: _filterable,
+          onChanged: (bool value) => setState(() => _filterable = value),
+        ),
+      ],
       code: 'CarbonMultiSelect<String>(titleText: \'…\', items: <…>[…]);',
     );
   }

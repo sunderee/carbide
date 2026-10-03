@@ -13,7 +13,7 @@ import 'overlay_focus_repair.dart';
 /// Builds a value control with the resolved owned or borrowed focus node.
 typedef CarbonControlBuilder = Widget Function(FocusNode focusNode);
 
-/// Shared value semantics and guarded native focus for binary controls.
+/// Shared value semantics and guarded native focus for non-text controls.
 ///
 /// Flutter's web focus manager suppresses focus for `enabled: false`, including
 /// read-only controls. Repair only while this focusable read-only control owns
@@ -27,6 +27,8 @@ class CarbonControlSemantics extends StatefulWidget {
     required this.builder,
     this.focusNode,
     this.onActivate,
+    this.button = false,
+    this.value,
     this.checked,
     this.mixed = false,
     this.toggled,
@@ -51,6 +53,12 @@ class CarbonControlSemantics extends StatefulWidget {
 
   /// The edit action, exposed only while the resolved state permits editing.
   final VoidCallback? onActivate;
+
+  /// Whether this control is a button that opens a value picker.
+  final bool button;
+
+  /// The selected value announced by a picker trigger.
+  final String? value;
 
   /// The checkbox or radio value; omitted for a switch.
   final bool? checked;
@@ -131,6 +139,8 @@ class _CarbonControlSemanticsState extends State<CarbonControlSemantics> {
   Widget build(BuildContext context) => Semantics(
     identifier: _identifier,
     label: widget.label,
+    button: widget.button,
+    value: widget.value,
     checked: widget.checked,
     mixed: widget.mixed,
     toggled: widget.toggled,
@@ -142,7 +152,7 @@ class _CarbonControlSemanticsState extends State<CarbonControlSemantics> {
     onFocus: widget.state.canFocus ? _focus.requestFocus : null,
     onTap: widget.state.canActivate
         ? () {
-            if (widget.state.canActivate) widget.onActivate?.call();
+            if (mounted && widget.state.canActivate) widget.onActivate?.call();
           }
         : null,
     child: widget.builder(_focus),

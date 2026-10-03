@@ -219,7 +219,7 @@ void main() {
       await tester.pumpWidget(stateful(initial: <String>{'a'}));
       expect(
         tester.getSemantics(find.bySemanticsLabel('Fruit')),
-        isSemantics(label: 'Fruit', isButton: true, value: '1 selected'),
+        isSemantics(label: 'Fruit', isButton: true, value: 'Apple'),
       );
       handle.dispose();
     });

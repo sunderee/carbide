@@ -38,6 +38,33 @@ suffix in the label. On long, expert-configuration forms the reverse is
 common — mark required fields instead. Pick one convention per product and
 keep it; never mix both on one form.
 
+## Disabled and read-only controls
+
+Use `readOnly: true` when a value is available for review but cannot be changed.
+Read-only controls remain in keyboard traversal, retain value contrast and
+announce their non-editability. Text-based controls allow selection and copying;
+picker triggers keep their selected value available without opening a popup.
+Pointer activation, editing keys, typeahead and accessibility edit actions cannot
+change the value. Clear and selection-dismiss controls are hidden or inert.
+
+Use `disabled: true` when the control is unavailable. Disabled controls skip
+keyboard traversal and use the disabled text and icon tokens. Disabled takes
+precedence when both flags are set. On callback-driven selectors (`CarbonSelect`,
+`CarbonDropdown` and `CarbonMultiSelect`), an absent `onChanged` also disables the
+control. Search and combo-box query editing retain their existing uncontrolled
+behavior when a callback is omitted.
+
+The picker and search family accepts a localizable `readOnlyHint` (default
+`'Read only'`). Read-only text fields expose the native read-only state; button
+triggers announce the hint while keeping their name and value. Switching an open
+picker to read-only closes its popup and discards any uncommitted date-range
+draft without notifying `onChanged`. Application updates to a controlled value
+or text controller still appear normally.
+
+Carbon's read-only field treatment uses a transparent background, subtle border,
+full-contrast value and inert chevron/calendar icon. Focus remains visible.
+See [read-only states](read-only-states.md) for review-screen composition.
+
 ## Validation
 
 - Validate per field as soon as it loses focus (client-side), not only on

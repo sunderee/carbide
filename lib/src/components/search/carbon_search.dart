@@ -18,9 +18,11 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
 import '../../utils/owned_listenable.dart';
+import '../../utils/text_control_semantics.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon search field.
@@ -30,6 +32,9 @@ import '../form/carbon_form.dart';
 /// height-square; the field reads `field` with a `border-strong` bottom
 /// border, per `_search.scss`. See [CarbonExpandableSearch] for the
 /// collapse-to-an-icon variant.
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonSearch extends StatefulWidget {
   /// Creates a search field.
   const CarbonSearch({
@@ -42,6 +47,8 @@ class CarbonSearch extends StatefulWidget {
     this.placeholder = 'Search',
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.closeButtonLabel = 'Clear search input',
     this.fluid = false,
     this.focusNode,
@@ -78,6 +85,12 @@ class CarbonSearch extends StatefulWidget {
   /// Whether disabled.
   final bool disabled;
 
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
+
   /// The clear button's accessible label.
   final String closeButtonLabel;
 
@@ -102,6 +115,13 @@ class _CarbonSearchState extends State<CarbonSearch> {
   /// The effective fluid flag: the widget's own, or an enclosing
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    // Search owns its query and can edit without an external change callback.
+    hasCallback: true,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
 
   late final OwnedTextEditingController _controllerOwner;
   late final OwnedFocusNode _focusOwner;
@@ -144,17 +164,23 @@ class _CarbonSearchState extends State<CarbonSearch> {
   }
 
   void _clear() {
+    if (!mounted || !_controlState.canActivate) return;
     _controller.clear();
     widget.onChanged?.call('');
     widget.onClear?.call();
     _focus.requestFocus();
   }
 
+  void _onChanged(String value) {
+    if (mounted && _controlState.canActivate) widget.onChanged?.call(value);
+  }
+
   /// Escape clears a non-empty query (`search/accessibility.mdx`: users
   /// "press Esc to clear it"). An empty query ignores the key so it can
   /// bubble — [CarbonExpandableSearch] collapses on it, like upstream.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
+    if (_controlState.canActivate &&
+        event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.escape &&
         _controller.text.isNotEmpty) {
       _clear();
@@ -179,10 +205,11 @@ class _CarbonSearchState extends State<CarbonSearch> {
         placeholder: widget.placeholder,
         labelText: widget.labelText,
         size: widget.size,
-        disabled: widget.disabled,
+        state: _controlState,
+        readOnlyHint: widget.readOnlyHint,
         fluid: _fluid,
         autofocus: widget.autofocus,
-        onChanged: widget.onChanged,
+        onChanged: _onChanged,
         onClear: _clear,
         closeButtonLabel: widget.closeButtonLabel,
       ),
@@ -199,7 +226,8 @@ class _CarbonSearchField extends StatelessWidget {
     required this.placeholder,
     required this.labelText,
     required this.size,
-    required this.disabled,
+    required this.state,
+    required this.readOnlyHint,
     required this.fluid,
     required this.autofocus,
     required this.onChanged,
@@ -213,7 +241,8 @@ class _CarbonSearchField extends StatelessWidget {
   final String placeholder;
   final String labelText;
   final CarbonFieldSize size;
-  final bool disabled;
+  final CarbonControlState state;
+  final String readOnlyHint;
   final bool fluid;
   final bool autofocus;
   final ValueChanged<String>? onChanged;
@@ -224,6 +253,7 @@ class _CarbonSearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final bool disabled = state.isDisabled;
     final double h = size.height;
     final bool hasContent = controller.text.isNotEmpty;
 
@@ -239,58 +269,58 @@ class _CarbonSearchField extends StatelessWidget {
       ),
     );
 
-    final Widget editable = MergeSemantics(
-      child: Semantics(
-        label: labelText,
-        enabled: !disabled,
-        textField: true,
-        child: Stack(
-          alignment: AlignmentDirectional.centerStart,
-          children: <Widget>[
-            if (!hasContent)
-              ExcludeSemantics(
-                child: IgnorePointer(
-                  child: Text(
-                    placeholder,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: CarbonTypeStyles.bodyCompact01.copyWith(
-                      color: theme.textPlaceholder,
-                    ),
+    final Widget editable = CarbonTextControlSemantics(
+      state: state,
+      label: labelText,
+      value: controller.text,
+      readOnlyHint: readOnlyHint,
+      focusNode: focusNode,
+      child: Stack(
+        alignment: AlignmentDirectional.centerStart,
+        children: <Widget>[
+          if (!hasContent)
+            ExcludeSemantics(
+              child: IgnorePointer(
+                child: Text(
+                  placeholder,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(
+                    color: theme.textPlaceholder,
                   ),
                 ),
               ),
-            EditableText(
-              controller: controller,
-              focusNode: focusNode,
-              selectAllOnFocus: selectAllOnFocus,
-              readOnly: disabled,
-              autofocus: autofocus,
-              onChanged: onChanged,
-              style: CarbonTypeStyles.bodyCompact01.copyWith(
-                color: disabled ? theme.textDisabled : theme.textPrimary,
-              ),
-              cursorColor: theme.focus,
-              backgroundCursorColor: theme.textPlaceholder,
-              selectionColor: theme.focus.withValues(alpha: 0.2),
-              cursorWidth: 1,
-              maxLines: 1,
             ),
-          ],
-        ),
+          EditableText(
+            controller: controller,
+            focusNode: focusNode,
+            selectAllOnFocus: selectAllOnFocus,
+            readOnly: !state.canActivate,
+            autofocus: autofocus,
+            onChanged: onChanged,
+            style: CarbonTypeStyles.bodyCompact01.copyWith(
+              color: disabled ? theme.textDisabled : theme.textPrimary,
+            ),
+            cursorColor: theme.focus,
+            backgroundCursorColor: theme.textPlaceholder,
+            selectionColor: theme.focus.withValues(alpha: 0.2),
+            cursorWidth: 1,
+            maxLines: 1,
+          ),
+        ],
       ),
     );
 
     final Widget clear = AnimatedOpacity(
       duration: CarbonDuration.fast01,
-      opacity: hasContent ? 1 : 0,
+      opacity: hasContent && !state.isReadOnly ? 1 : 0,
       child: IgnorePointer(
-        ignoring: !hasContent,
+        ignoring: !hasContent || !state.canActivate,
         child: Semantics(
           button: true,
           label: closeButtonLabel,
           child: CarbonInteraction(
-            enabled: hasContent && !disabled,
+            enabled: hasContent && state.canActivate,
             onPressed: onClear,
             builder: (BuildContext context, Set<WidgetState> states) {
               final bool hovered = states.contains(WidgetState.hovered);
@@ -324,10 +354,14 @@ class _CarbonSearchField extends StatelessWidget {
 
     Widget box = DecoratedBox(
       decoration: BoxDecoration(
-        color: layer.field,
+        color: state.isReadOnly ? const Color(0x00000000) : layer.field,
         border: Border(
           bottom: BorderSide(
-            color: disabled ? const Color(0x00000000) : theme.borderStrong01,
+            color: disabled
+                ? const Color(0x00000000)
+                : state.isReadOnly
+                ? layer.borderSubtle
+                : theme.borderStrong01,
           ),
         ),
       ),
@@ -373,6 +407,9 @@ class _CarbonSearchField extends StatelessWidget {
 
 /// A search that collapses to a single magnifier button and expands to the
 /// full field on tap/focus, collapsing again on blur when empty.
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonExpandableSearch extends StatefulWidget {
   /// Creates an expandable search.
   const CarbonExpandableSearch({
@@ -384,6 +421,8 @@ class CarbonExpandableSearch extends StatefulWidget {
     this.placeholder = 'Search',
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.expandLabel = 'Expand search',
     this.closeButtonLabel = 'Clear search input',
   });
@@ -412,6 +451,12 @@ class CarbonExpandableSearch extends StatefulWidget {
   /// Whether disabled.
   final bool disabled;
 
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
+
   /// The collapsed magnifier button's accessible label.
   final String expandLabel;
 
@@ -423,6 +468,11 @@ class CarbonExpandableSearch extends StatefulWidget {
 }
 
 class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: true,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
   late final OwnedTextEditingController _controllerOwner;
   TextEditingController get _controller => _controllerOwner.value;
   final FocusNode _focus = FocusNode();
@@ -442,6 +492,15 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
   void didUpdateWidget(CarbonExpandableSearch oldWidget) {
     super.didUpdateWidget(oldWidget);
     _controllerOwner.update(widget.controller);
+    if (widget.readOnly && !oldWidget.readOnly && _buttonFocus.hasFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _controlState.canFocus && widget.readOnly) {
+          _focus.requestFocus();
+        }
+      });
+    } else if (oldWidget.readOnly && !widget.readOnly && _focus.hasFocus) {
+      _expanded = true;
+    }
   }
 
   @override
@@ -455,12 +514,15 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
 
   void _onFocusChange() {
     // Collapse when focus leaves and the field is empty.
-    if (!_focus.hasFocus && _controller.text.isEmpty) {
+    if (_controlState.canActivate &&
+        !_focus.hasFocus &&
+        _controller.text.isEmpty) {
       setState(() => _expanded = false);
     }
   }
 
   void _expand() {
+    if (!mounted || !_controlState.canActivate) return;
     setState(() => _expanded = true);
     _focus.requestFocus();
   }
@@ -470,7 +532,8 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
   /// `Search.tsx` focuses the expand button). A non-empty query never
   /// reaches this handler — the inner [CarbonSearch] clears it instead.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
+    if (_controlState.canActivate &&
+        event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.escape &&
         _controller.text.isEmpty) {
       setState(() => _expanded = false);
@@ -489,12 +552,13 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final double h = widget.size.height;
 
-    if (!_expanded) {
+    if (!_expanded && !widget.readOnly) {
       return Semantics(
         button: true,
+        enabled: _controlState.canActivate,
         label: widget.expandLabel,
         child: CarbonInteraction(
-          enabled: !widget.disabled,
+          enabled: _controlState.canActivate,
           focusNode: _buttonFocus,
           onPressed: _expand,
           builder: (BuildContext context, Set<WidgetState> states) {
@@ -534,7 +598,9 @@ class _CarbonExpandableSearchState extends State<CarbonExpandableSearch> {
         placeholder: widget.placeholder,
         size: widget.size,
         disabled: widget.disabled,
-        autofocus: true,
+        readOnly: widget.readOnly,
+        readOnlyHint: widget.readOnlyHint,
+        autofocus: _expanded,
         onChanged: widget.onChanged,
         onClear: widget.onClear,
         closeButtonLabel: widget.closeButtonLabel,
