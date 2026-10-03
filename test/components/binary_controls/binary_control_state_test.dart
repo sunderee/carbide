@@ -387,6 +387,10 @@ void main() {
           size: const Size(800, 540),
           containsText: true,
           afterPump: (WidgetTester tester) async {
+            // The borrowed node survives theme specimens. Stage a new focus
+            // transition so each fresh interaction paints its keyboard ring.
+            FocusManager.instance.rootScope.requestFocus();
+            await tester.pump();
             readOnlyFocus.requestFocus();
             await tester.pumpAndSettle();
             expect(tester.takeException(), isNull);
