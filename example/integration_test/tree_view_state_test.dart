@@ -166,7 +166,7 @@ void main() {
     tester,
   ) async {
     final state = await _mount(tester);
-    _document.querySelectorAll('flt-semantics input').item(0)!.focus();
+    await tester.tap(find.byType(EditableText));
     await _settle(tester);
     expect(state.outside.hasPrimaryFocus, isTrue);
     expect(_activeName, 'Outside');
