@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make password visibility keyboard-focusable after the input, with Enter,
+  Space, pointer and accessibility activation, a keyboard focus ring, and
+  density-sized targets matching Carbon. Disable visibility activation and
+  traversal with the field, including pending events (#308).
+
 - Give opened date pickers a separate focus scope so pointer activation moves
   focus into the calendar even when another control is focused. Keep the native
   opener focused after Escape or completion in the gallery, and keep popup
