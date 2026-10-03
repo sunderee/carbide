@@ -4,6 +4,7 @@
 // Apache License, Version 2.0. See the LICENSE file in the project root.
 
 import 'dart:js_interop';
+import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +32,15 @@ void main() {
                   child: _Fixture(key: key, iconOnly: iconOnly),
                 ),
               ),
+            ),
+          );
+          await _settle(tester);
+          _document.querySelectorAll('flutter-view').item(0)!.focus();
+          tester.binding.handleViewFocusChanged(
+            ViewFocusEvent(
+              viewId: tester.view.viewId,
+              state: ViewFocusState.focused,
+              direction: ViewFocusDirection.undefined,
             ),
           );
           await _settle(tester);
@@ -65,6 +75,11 @@ void main() {
             direction == TextDirection.ltr
                 ? LogicalKeyboardKey.arrowRight
                 : LogicalKeyboardKey.arrowLeft,
+            // Flutter infers physical keys from debug names, which are absent
+            // in release mode. Supply the real key in both configurations.
+            physicalKey: direction == TextDirection.ltr
+                ? PhysicalKeyboardKey.arrowRight
+                : PhysicalKeyboardKey.arrowLeft,
           );
           await _settle(tester);
           expect(state.selected, 0);
@@ -171,4 +186,5 @@ extension type _Element(JSObject _) implements JSObject {
   external String? getAttribute(String name);
   external _NodeList querySelectorAll(String selector);
   external void click();
+  external void focus();
 }
