@@ -16,6 +16,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
 import '../../utils/control_state.dart';
+import '../../utils/control_semantics.dart';
 import '../form/carbon_form.dart';
 
 /// Whether a radio's label sits before or after the circle.
@@ -102,17 +103,20 @@ class CarbonRadioButton extends StatelessWidget {
     );
     final bool enabled = state.canActivate;
 
-    return Semantics(
+    return CarbonControlSemantics(
       inMutuallyExclusiveGroup: true,
       checked: selected,
-      enabled: state.canActivate,
-      hint: state.semanticsHint(readOnlyHint),
+      state: state,
+      readOnlyHint: readOnlyHint,
+      focusNode: focusNode,
+      onActivate: enabled ? onSelected : null,
       label: label,
-      child: CarbonInteraction(
+      builder: (FocusNode focus) => CarbonInteraction(
         enabled: state.canFocus,
+        includeSemantics: false,
         readOnly: state.isReadOnly,
         onPressed: enabled ? onSelected : null,
-        focusNode: focusNode,
+        focusNode: focus,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final bool focused = states.contains(WidgetState.focused);

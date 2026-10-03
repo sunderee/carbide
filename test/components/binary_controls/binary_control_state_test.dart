@@ -20,7 +20,7 @@ Widget _control(
   required bool callback,
   bool disabled = false,
   String readOnlyHint = 'Read only',
-  required FocusNode focus,
+  required FocusNode? focus,
   required VoidCallback change,
 }) => switch (kind) {
   _Kind.checkbox => CarbonCheckbox(
@@ -249,6 +249,60 @@ void main() {
         },
       );
     }
+  }
+
+  for (final _Kind kind in _Kind.values) {
+    testWidgets(
+      '${kind.name} disposes owned focus and keeps borrowed nodes reusable (#310)',
+      (WidgetTester tester) async {
+        final FocusNode before = FocusNode();
+        final FocusNode after = FocusNode();
+        final FocusNode a = FocusNode();
+        final FocusNode b = FocusNode();
+        void listener() {}
+        Widget build(FocusNode? node) => _host(
+          _control(
+            kind,
+            value: true,
+            readOnly: true,
+            callback: true,
+            focus: node,
+            change: () {},
+          ),
+          before,
+          after,
+        );
+        try {
+          await tester.pumpWidget(build(null));
+          await tester.pumpAndSettle();
+          final FocusNode owned = tester
+              .widget<CarbonInteraction>(find.byType(CarbonInteraction))
+              .focusNode!;
+          before.requestFocus();
+          await tester.pump();
+          for (final FocusNode? node in <FocusNode?>[a, b, null]) {
+            await tester.pumpWidget(build(node));
+            await tester.pumpAndSettle();
+            expect(before.hasPrimaryFocus, isTrue);
+          }
+          expect(() => owned.addListener(listener), throwsFlutterError);
+          expect(a.parent, isNull);
+          expect(b.parent, isNull);
+          for (final FocusNode node in <FocusNode>[a, b]) {
+            node.addListener(listener);
+            node.removeListener(listener);
+          }
+          expect(tester.takeException(), isNull);
+        } finally {
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pumpAndSettle();
+          before.dispose();
+          after.dispose();
+          a.dispose();
+          b.dispose();
+        }
+      },
+    );
   }
 
   testWidgets(

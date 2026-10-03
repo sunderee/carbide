@@ -15,6 +15,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
 import '../../utils/control_state.dart';
+import '../../utils/control_semantics.dart';
 import '../form/carbon_form.dart';
 
 /// A Carbon checkbox.
@@ -98,17 +99,20 @@ class CarbonCheckbox extends StatelessWidget {
     );
     final bool enabled = state.canActivate;
 
-    return Semantics(
+    return CarbonControlSemantics(
       checked: indeterminate ? null : value,
       mixed: indeterminate,
-      enabled: state.canActivate,
-      hint: state.semanticsHint(readOnlyHint),
+      state: state,
+      readOnlyHint: readOnlyHint,
+      focusNode: focusNode,
+      onActivate: enabled ? () => onChanged!(!value) : null,
       label: label,
-      child: CarbonInteraction(
+      builder: (FocusNode focus) => CarbonInteraction(
         enabled: state.canFocus,
+        includeSemantics: false,
         readOnly: state.isReadOnly,
         onPressed: enabled ? () => onChanged!(!value) : null,
-        focusNode: focusNode,
+        focusNode: focus,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final bool focused = states.contains(WidgetState.focused);

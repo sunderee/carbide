@@ -28,6 +28,7 @@ class CarbonInteraction extends StatefulWidget {
     super.key,
     this.enabled = true,
     this.readOnly = false,
+    this.includeSemantics = true,
     this.onPressed,
     this.focusNode,
     this.autofocus = false,
@@ -44,6 +45,11 @@ class CarbonInteraction extends StatefulWidget {
   ///
   /// Unlike a disabled region, a read-only region can show its focus ring.
   final bool readOnly;
+
+  /// Whether to add focus and gesture semantics.
+  ///
+  /// Disable when a parent supplies the complete control semantics.
+  final bool includeSemantics;
 
   /// Called on tap or keyboard activation while enabled and not read-only.
   final VoidCallback? onPressed;
@@ -122,6 +128,7 @@ class _CarbonInteractionState extends State<CarbonInteraction> {
     final bool operable = _operable;
     return FocusableActionDetector(
       enabled: enabled,
+      includeFocusSemantics: widget.includeSemantics,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       mouseCursor:
@@ -148,6 +155,7 @@ class _CarbonInteractionState extends State<CarbonInteraction> {
             }
           : <Type, Action<Intent>>{},
       child: GestureDetector(
+        excludeFromSemantics: !widget.includeSemantics,
         behavior: HitTestBehavior.opaque,
         onTap: operable ? _activate : null,
         onTapDown: operable

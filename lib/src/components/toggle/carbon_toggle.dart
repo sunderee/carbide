@@ -23,6 +23,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
 import '../../utils/control_state.dart';
+import '../../utils/control_semantics.dart';
 import '../form/carbon_form.dart';
 
 /// The Carbon toggle sizes and their geometry.
@@ -144,16 +145,19 @@ class CarbonToggle extends StatelessWidget {
 
     final String sideText = hideLabel ? labelText : (toggled ? labelB : labelA);
 
-    final Widget switchControl = Semantics(
+    final Widget switchControl = CarbonControlSemantics(
       toggled: toggled,
-      enabled: state.canActivate,
-      hint: state.semanticsHint(readOnlyHint),
+      state: state,
+      readOnlyHint: readOnlyHint,
+      focusNode: focusNode,
+      onActivate: enabled ? () => onToggled!(!toggled) : null,
       label: labelText,
-      child: CarbonInteraction(
+      builder: (FocusNode focus) => CarbonInteraction(
         enabled: state.canFocus,
+        includeSemantics: false,
         readOnly: state.isReadOnly,
         onPressed: enabled ? () => onToggled!(!toggled) : null,
-        focusNode: focusNode,
+        focusNode: focus,
         autofocus: autofocus,
         builder: (BuildContext context, Set<WidgetState> states) {
           final Color track = disabled

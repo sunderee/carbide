@@ -67,6 +67,10 @@ void main() {
               control.getAttribute('aria-disabled'),
               operable ? anyOf(isNull, 'false') : 'true',
             );
+            expect(
+              control.getAttribute('aria-description'),
+              focusable && readOnly ? 'Read only' : anyOf(isNull, ''),
+            );
             _button('Before').focus();
             await _settle(tester);
             await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
@@ -94,6 +98,17 @@ void main() {
             await _settle(tester);
             expect(state.changes - count, operable ? 3 : 0);
             expect(_control().getAttribute('aria-checked'), initial.toString());
+            if (focusable && readOnly) {
+              _button('After').focus();
+              await _settle(tester);
+              state.focus.requestFocus();
+              await tester.pump();
+              _button('After').focus();
+              await _settle(tester);
+              expect(state.focus.hasPrimaryFocus, isFalse);
+              expect(_document.activeElement == _button('After'), isTrue);
+              expect(state.changes, count);
+            }
             expect(tester.takeException(), isNull);
           }
         } finally {
