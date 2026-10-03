@@ -146,6 +146,19 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
       CarbonSwitch(text: 'Week'),
     ],
   ),
+  'content switcher (icon-only)': (_) => CarbonContentSwitcher(
+    selectedIndex: 1,
+    onChanged: (int _) {},
+    switches: const <CarbonSwitch>[
+      CarbonSwitch(icon: CarbonIcons.list, semanticLabel: 'List view'),
+      CarbonSwitch(icon: CarbonIcons.grid, semanticLabel: 'Grid view'),
+      CarbonSwitch(
+        icon: CarbonIcons.archive,
+        semanticLabel: 'Archived view',
+        disabled: true,
+      ),
+    ],
+  ),
   'notification': (_) => SizedBox(
     width: 360,
     child: CarbonInlineNotification(

@@ -5,6 +5,7 @@
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -129,10 +130,23 @@ void main() {
       expect(segmentColor(tester, 'All'), theme.layerSelectedInverse);
     });
 
-    testWidgets('a switch requires text or an icon', (
+    testWidgets('a switch requires content and an accessible name (#309)', (
       WidgetTester tester,
     ) async {
       expect(() => CarbonSwitch(), throwsAssertionError);
+      expect(() => CarbonSwitch(icon: CarbonIcons.add), throwsAssertionError);
+      expect(
+        () => CarbonSwitch(semanticLabel: 'Missing content'),
+        throwsAssertionError,
+      );
+      expect(const CarbonSwitch(text: 'Text').text, 'Text');
+      expect(
+        const CarbonSwitch(
+          icon: CarbonIcons.add,
+          semanticLabel: 'Add',
+        ).semanticLabel,
+        'Add',
+      );
     });
 
     testWidgets('hover fills layerHover and darkens the label', (
@@ -188,7 +202,7 @@ void main() {
         _host(
           const CarbonContentSwitcher(
             switches: <CarbonSwitch>[
-              CarbonSwitch(icon: CarbonIcons.add),
+              CarbonSwitch(icon: CarbonIcons.add, semanticLabel: 'Add'),
               CarbonSwitch(text: 'Both', icon: CarbonIcons.add),
             ],
           ),
@@ -279,6 +293,112 @@ void main() {
   });
 
   group('semantics', () {
+    testWidgets('icon-only segments meet the label guideline (#309)', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _host(
+            const CarbonContentSwitcher(
+              size: CarbonFieldSize.lg,
+              switches: <CarbonSwitch>[
+                CarbonSwitch(
+                  icon: CarbonIcons.list,
+                  semanticLabel: 'List view',
+                ),
+                CarbonSwitch(
+                  icon: CarbonIcons.grid,
+                  semanticLabel: 'Grid view',
+                ),
+              ],
+            ),
+          ),
+        );
+        await expectA11y(tester);
+      } finally {
+        handle.dispose();
+      }
+    });
+
+    for (final bool iconOnly in <bool>[false, true]) {
+      for (final bool selected in <bool>[false, true]) {
+        for (final bool disabled in <bool>[false, true]) {
+          testWidgets(
+            'one name, iconOnly=$iconOnly, selected=$selected, disabled=$disabled (#309)',
+            (WidgetTester tester) async {
+              final SemanticsHandle handle = tester.ensureSemantics();
+              int changes = 0;
+              try {
+                await tester.pumpWidget(
+                  _host(
+                    CarbonContentSwitcher(
+                      size: CarbonFieldSize.lg,
+                      selectedIndex: selected ? 0 : 1,
+                      onChanged: (_) => changes++,
+                      switches: <CarbonSwitch>[
+                        CarbonSwitch(
+                          text: iconOnly ? null : 'Visible list',
+                          icon: CarbonIcons.list,
+                          semanticLabel: 'Liste anzeigen',
+                          disabled: disabled,
+                        ),
+                        const CarbonSwitch(text: 'Other'),
+                      ],
+                    ),
+                  ),
+                );
+                final Finder segment = find.bySemanticsLabel('Liste anzeigen');
+                expect(segment, findsOneWidget);
+                final node = tester.getSemantics(segment);
+                expect(
+                  node,
+                  isSemantics(
+                    label: 'Liste anzeigen',
+                    isButton: true,
+                    hasEnabledState: true,
+                    isEnabled: !disabled,
+                    hasSelectedState: true,
+                    isSelected: selected,
+                    isInMutuallyExclusiveGroup: true,
+                    hasTapAction: !disabled,
+                  ),
+                );
+                expect(
+                  node.debugListChildrenInOrder(
+                    DebugSemanticsDumpOrder.traversalOrder,
+                  ),
+                  isEmpty,
+                );
+                expect(find.bySemanticsLabel('Visible list'), findsNothing);
+                expect(
+                  tester
+                      .widget<CarbonIcon>(find.byType(CarbonIcon))
+                      .semanticLabel,
+                  isNull,
+                );
+                await expectA11y(tester);
+                await tester.tap(segment);
+                await tester.pumpAndSettle();
+                expect(changes, disabled ? 0 : 1);
+                if (!disabled) {
+                  tester
+                      .renderObject(segment)
+                      .owner!
+                      .semanticsOwner!
+                      .performAction(node.id, SemanticsAction.tap);
+                  await tester.pumpAndSettle();
+                  expect(changes, 2);
+                }
+              } finally {
+                handle.dispose();
+              }
+            },
+          );
+        }
+      }
+    }
+
     testWidgets('segments are exclusive-group buttons with selected state', (
       WidgetTester tester,
     ) async {
@@ -319,6 +439,41 @@ void main() {
   });
 
   group('goldens', () {
+    testWidgets('icon-only state matrix across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'content_switcher_icon_states',
+        size: const Size(360, 240),
+        builder: (BuildContext context) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              for (final int selected in <int>[0, 1])
+                for (final bool disabled in <bool>[false, true])
+                  Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: CarbonContentSwitcher(
+                      selectedIndex: selected,
+                      switches: <CarbonSwitch>[
+                        CarbonSwitch(
+                          icon: CarbonIcons.list,
+                          semanticLabel: 'List view',
+                          disabled: disabled,
+                        ),
+                        const CarbonSwitch(
+                          icon: CarbonIcons.grid,
+                          semanticLabel: 'Grid view',
+                        ),
+                      ],
+                    ),
+                  ),
+            ],
+          ),
+        ),
+      );
+    });
     testWidgets('content switcher across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
         tester,

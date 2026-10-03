@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add `CarbonSwitch.semanticLabel` for icon-only segments and accessible names
+  that differ from visible text. **Breaking assertion:** icon-only segments
+  must now supply a semantic label in debug mode. Icons remain decorative
+  inside their named buttons (#309).
+
 - Make password visibility keyboard-focusable after the input, with Enter,
   Space, pointer and accessibility activation, a keyboard focus ring, and
   density-sized targets matching Carbon. Disable visibility activation and

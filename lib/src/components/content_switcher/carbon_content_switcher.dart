@@ -27,14 +27,28 @@ import '../form/carbon_form.dart' show CarbonFieldSize;
 /// A single segment of a [CarbonContentSwitcher].
 class CarbonSwitch {
   /// Creates a content-switcher segment.
-  const CarbonSwitch({this.text, this.icon, this.disabled = false})
-    : assert(text != null || icon != null, 'a switch needs text or an icon');
+  const CarbonSwitch({
+    this.text,
+    this.icon,
+    this.semanticLabel,
+    this.disabled = false,
+  }) : assert(text != null || icon != null, 'a switch needs text or an icon'),
+       assert(
+         text != null || semanticLabel != null,
+         'an icon-only switch needs a semanticLabel',
+       );
 
   /// The segment label.
   final String? text;
 
   /// An optional icon (icon-only when [text] is null).
   final CarbonIconData? icon;
+
+  /// The accessible name, overriding [text] when supplied.
+  ///
+  /// Required for icon-only segments. The icon remains decorative inside the
+  /// named segment, so assistive technology announces the name once.
+  final String? semanticLabel;
 
   /// Whether the segment is disabled.
   final bool disabled;
@@ -254,11 +268,7 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
         : const Color(0x00000000);
 
     final Widget label = widget.data.icon != null && widget.data.text == null
-        ? CarbonIcon(
-            widget.data.icon!,
-            color: foreground,
-            semanticLabel: widget.data.text,
-          )
+        ? CarbonIcon(widget.data.icon!, color: foreground)
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -282,7 +292,7 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
       inMutuallyExclusiveGroup: true,
       selected: widget.selected,
       enabled: enabled,
-      label: widget.data.text,
+      label: widget.data.semanticLabel ?? widget.data.text,
       onTap: enabled ? widget.onTap : null,
       child: ExcludeSemantics(
         child: MouseRegion(

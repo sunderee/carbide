@@ -85,6 +85,7 @@ jobs:
           test/theme test/utils test/foundations
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
+          test/components/content_switcher
           test/components/slider
           test/components/date_picker
           test/components/tree_view
@@ -228,4 +229,12 @@ jobs:
           flutter drive --release
           --driver=test_driver/integration_test.dart
           --target=integration_test/password_visibility_test.dart
+          -d web-server
+
+      - name: Drive content-switcher native name contracts in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/content_switcher_names_test.dart
           -d web-server

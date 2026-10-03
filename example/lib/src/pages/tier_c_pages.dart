@@ -411,25 +411,57 @@ class _ContentSwitcherPage extends StatefulWidget {
 
 class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
   int _index = 0;
+  bool _iconOnly = false;
+  bool _disabled = false;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Content switcher',
-      description: 'A segmented control for mutually exclusive views.',
+      description: 'A segmented control for named text and icon-only views.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
         width: 360,
         child: CarbonContentSwitcher(
           selectedIndex: _index,
           onChanged: (int i) => setState(() => _index = i),
-          switches: const <CarbonSwitch>[
-            CarbonSwitch(text: 'Day'),
-            CarbonSwitch(text: 'Week'),
-            CarbonSwitch(text: 'Month'),
-          ],
+          switches: _iconOnly
+              ? <CarbonSwitch>[
+                  const CarbonSwitch(
+                    icon: CarbonIcons.list,
+                    semanticLabel: 'List view',
+                  ),
+                  const CarbonSwitch(
+                    icon: CarbonIcons.grid,
+                    semanticLabel: 'Grid view',
+                  ),
+                  CarbonSwitch(
+                    icon: CarbonIcons.archive,
+                    semanticLabel: 'Archived view',
+                    disabled: _disabled,
+                  ),
+                ]
+              : <CarbonSwitch>[
+                  const CarbonSwitch(text: 'Day'),
+                  const CarbonSwitch(text: 'Week'),
+                  CarbonSwitch(text: 'Month', disabled: _disabled),
+                ],
         ),
       ),
-      code: 'CarbonContentSwitcher(switches: <CarbonSwitch>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Icon only',
+          value: _iconOnly,
+          onChanged: (bool value) => setState(() => _iconOnly = value),
+        ),
+        boolKnob(
+          label: 'Disable last segment',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
+      code: _iconOnly
+          ? "CarbonContentSwitcher(switches: <CarbonSwitch>[\n  CarbonSwitch(icon: CarbonIcons.list, semanticLabel: 'List view'),\n  CarbonSwitch(icon: CarbonIcons.grid, semanticLabel: 'Grid view'),\n]);"
+          : 'CarbonContentSwitcher(switches: <CarbonSwitch>[…]);',
     );
   }
 }
