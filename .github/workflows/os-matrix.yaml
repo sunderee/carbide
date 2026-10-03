@@ -84,6 +84,7 @@ jobs:
           --dart-define=CARBIDE_SKIP_GOLDENS=true
           test/theme test/utils test/foundations
           test/lifecycle test/components/number_input test/components/text_area
+          test/components/slider
 
   gallery-web-integration:
     name: Gallery integration test — web
@@ -145,4 +146,12 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/number_input_commit_test.dart
+          -d web-server
+
+      - name: Drive slider native policy and semantics test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/slider_state_test.dart
           -d web-server
