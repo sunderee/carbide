@@ -3,6 +3,8 @@
 // This file is part of Carbide and is licensed under the Apache License,
 // Version 2.0. See the LICENSE file in the project root.
 
+import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
+
 import 'package:carbide/carbide.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +48,20 @@ Widget _host(
 
 EditableText _editor(WidgetTester tester) =>
     tester.widget<EditableText>(find.byType(EditableText));
+
+void _focusInput(WidgetTester tester, FocusNode input) {
+  // A newly opened browser test view has not received a platform focus event.
+  // Model entering the view before exercising traversal, as the native fixture
+  // and real gallery pointer/keyboard interaction do.
+  tester.binding.handleViewFocusChanged(
+    ViewFocusEvent(
+      viewId: tester.view.viewId,
+      state: ViewFocusState.focused,
+      direction: ViewFocusDirection.undefined,
+    ),
+  );
+  input.requestFocus();
+}
 
 void _semanticsTap(WidgetTester tester, String label) {
   final Finder button = find.bySemanticsLabel(label);
@@ -93,7 +109,7 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          input.requestFocus();
+          _focusInput(tester, input);
           await tester.pumpAndSettle();
           final TextEditingValue original = controller.value;
           if (path == 'Enter' || path == 'Space') {
@@ -151,7 +167,7 @@ void main() {
             after: after,
           ),
         );
-        input.requestFocus();
+        _focusInput(tester, input);
         await tester.pumpAndSettle();
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pumpAndSettle();
@@ -258,7 +274,7 @@ void main() {
         );
         before.requestFocus();
         await tester.pumpAndSettle();
-        input.requestFocus();
+        _focusInput(tester, input);
         await tester.pumpAndSettle();
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pumpAndSettle();
