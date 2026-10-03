@@ -118,14 +118,17 @@ void main() {
         await tester.pumpWidget(_host(_table(selection, <int>{0}, null)));
         final List<SemanticsNode> selectors = tester.semantics
             .simulatedAccessibilityTraversal()
-            .where((SemanticsNode node) => node.label.startsWith('Select '))
+            .where(
+              (SemanticsNode node) =>
+                  node.getSemanticsData().label.startsWith('Select '),
+            )
             .toList();
         expect(
           selectors,
           hasLength(selection == CarbonTableSelection.multi ? 3 : 2),
         );
         for (final SemanticsNode node in selectors) {
-          if (node.label.startsWith('Select ')) {
+          if (node.getSemanticsData().label.startsWith('Select ')) {
             expect(node, isSemantics(isEnabled: false));
             expect(
               node.getSemanticsData().hasAction(SemanticsAction.tap),

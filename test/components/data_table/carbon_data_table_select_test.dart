@@ -4,16 +4,20 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/golden.dart';
 
+// Web unit tests use wide placeholder glyphs; native browser tests load Plex.
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
   child: CarbonTheme(
     data: CarbonThemeData.white,
-    child: Center(child: SizedBox(width: 520, child: child)),
+    child: Center(
+      child: SizedBox(width: kIsWeb ? 720 : 520, child: child),
+    ),
   ),
 );
 
@@ -262,10 +266,10 @@ void main() {
         tester,
         name: 'data_table_unselected',
         containsText: true,
-        size: const Size(560, 320),
+        size: const Size(kIsWeb ? 760 : 560, 320),
         builder: (BuildContext context) => Center(
           child: SizedBox(
-            width: 520,
+            width: kIsWeb ? 720 : 520,
             child: CarbonDataTable(
               title: 'Load balancers',
               description: 'Available services',
@@ -286,10 +290,10 @@ void main() {
         tester,
         name: 'data_table_batch',
         containsText: true,
-        size: const Size(560, 240),
+        size: const Size(kIsWeb ? 760 : 560, 240),
         builder: (BuildContext context) => Center(
           child: SizedBox(
-            width: 520,
+            width: kIsWeb ? 720 : 520,
             child: CarbonDataTable(
               columns: _columns,
               rows: _rows(),

@@ -57,7 +57,9 @@ class _DataTablePage extends StatefulWidget {
 class _DataTablePageState extends State<_DataTablePage> {
   int? _sortColumn;
   CarbonSortDirection _sortDir = CarbonSortDirection.none;
-  Set<int> _selected = <int>{};
+  Set<Object> _selected = <Object>{};
+  Set<Object> _expanded = <Object>{};
+  bool _expandable = false;
   bool _multi = true;
   bool _selectionEnabled = true;
 
@@ -74,9 +76,19 @@ class _DataTablePageState extends State<_DataTablePage> {
       s,
       style: CarbonTypeStyles.bodyCompact01.copyWith(color: t.textPrimary),
     );
+    final List<List<String>> displayed = <List<String>>[..._data];
+    if (_sortColumn != null && _sortDir != CarbonSortDirection.none) {
+      displayed.sort((a, b) {
+        final int comparison = a[_sortColumn!].compareTo(b[_sortColumn!]);
+        return _sortDir == CarbonSortDirection.ascending
+            ? comparison
+            : -comparison;
+      });
+    }
     return DemoScaffold(
       title: 'Data table',
-      description: 'Sortable, selectable rows with a zebra option.',
+      description:
+          'Selection and expansion follow records when rows are sorted.',
       previewAlignment: Alignment.topLeft,
       preview: CarbonDataTable(
         title: 'Load balancers',
@@ -85,9 +97,13 @@ class _DataTablePageState extends State<_DataTablePage> {
         selection: _multi
             ? CarbonTableSelection.multi
             : CarbonTableSelection.single,
-        selectedRows: _selected,
-        onSelectionChanged: _selectionEnabled
-            ? (Set<int> s) => setState(() => _selected = s)
+        selectedRowIds: _selected,
+        expandable: _expandable,
+        expandedRowIds: _expanded,
+        onExpansionChanged: (Set<Object> ids) =>
+            setState(() => _expanded = ids),
+        onSelectedRowIdsChanged: _selectionEnabled
+            ? (Set<Object> s) => setState(() => _selected = s)
             : null,
         sortColumnIndex: _sortColumn,
         sortDirection: _sortDir,
@@ -109,8 +125,11 @@ class _DataTablePageState extends State<_DataTablePage> {
           CarbonTableColumn(title: 'Status'),
         ],
         rows: <CarbonTableRow>[
-          for (final List<String> row in _data)
+          for (final List<String> row in displayed)
             CarbonTableRow(
+              id: row[0],
+              label: row[0],
+              expandedContent: Text('Details for ${row[0]}'),
               cells: <Widget>[cell(row[0]), cell(row[1]), cell(row[2])],
             ),
         ],
@@ -121,8 +140,13 @@ class _DataTablePageState extends State<_DataTablePage> {
           value: _multi,
           onChanged: (bool value) => setState(() {
             _multi = value;
-            _selected = <int>{};
+            _selected = <Object>{};
           }),
+        ),
+        boolKnob(
+          label: 'Expandable',
+          value: _expandable,
+          onChanged: (bool value) => setState(() => _expandable = value),
         ),
         boolKnob(
           label: 'Selection enabled',
@@ -131,7 +155,7 @@ class _DataTablePageState extends State<_DataTablePage> {
         ),
       ],
       code:
-          'CarbonDataTable(columns: <…>[…], rows: <…>[…], selection: CarbonTableSelection.${_multi ? 'multi' : 'single'}, onSelectionChanged: ${_selectionEnabled ? '(rows) { … }' : 'null'});',
+          'CarbonDataTable(columns: <…>[…], rows: <…>[…], selection: CarbonTableSelection.${_multi ? 'multi' : 'single'}, selectedRowIds: {…}, onSelectedRowIdsChanged: ${_selectionEnabled ? '(rows) { … }' : 'null'});',
     );
   }
 }

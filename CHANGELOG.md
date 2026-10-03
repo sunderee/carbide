@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add stable data-table row IDs, accessible record labels, ID-based selection
+  (`selectedRowIds` / `onSelectedRowIdsChanged`) and expansion (`expandedRowIds`
+  / `onExpansionChanged`). Counts ignore absent IDs; retained IDs restore when
+  records return, and row state follows sorting and reordering. Add IDs to rows
+  and migrate the deprecated index properties/callbacks; they remain functional
+  for at least one minor release (#301).
+
 - Reconcile tree focus resources with dynamic data and recover focus from
   removed, hidden or disabled rows. Add controlled expansion while preserving
   local expansion, surviving node identity, selection and scroll position.
