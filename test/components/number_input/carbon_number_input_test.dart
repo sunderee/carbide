@@ -134,10 +134,15 @@ void main() {
       expect(reported, 5);
     });
 
-    testWidgets('typing a number reports it', (WidgetTester tester) async {
+    testWidgets('typing a number reports it at commit', (
+      WidgetTester tester,
+    ) async {
       num? reported;
       await tester.pumpWidget(controlled(1, (num? v) => reported = v));
       await tester.enterText(find.byType(EditableText), '42');
+      await tester.pump();
+      expect(reported, isNull);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
       expect(reported, 42);
     });
@@ -149,6 +154,9 @@ void main() {
       );
       await tester.enterText(find.byType(EditableText), '');
       await tester.pump();
+      expect(reported, 5);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
       expect(reported, isNull);
     });
 
@@ -159,7 +167,14 @@ void main() {
       await tester.pumpWidget(controlled(5, (num? v) => reported = v, min: 2));
       await tester.enterText(find.byType(EditableText), '');
       await tester.pump();
+      expect(reported, isNull);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
       expect(reported, 2);
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+        '2',
+      );
     });
   });
 
@@ -236,6 +251,57 @@ void main() {
   });
 
   group('goldens', () {
+    testWidgets('warning precedence and hidden fluid label across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'number_input_status',
+        containsText: true,
+        size: const Size(340, 380),
+        builder: (BuildContext context) => const Center(
+          child: SizedBox(
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CarbonNumberInput(
+                  labelText: 'Warning',
+                  value: 5,
+                  warn: true,
+                  warnText: 'Check quantity',
+                ),
+                SizedBox(height: 12),
+                CarbonNumberInput(
+                  labelText: 'Invalid before warning',
+                  value: 99,
+                  invalid: true,
+                  invalidText: 'Out of range',
+                  warn: true,
+                  warnText: 'Check quantity',
+                ),
+                SizedBox(height: 12),
+                CarbonNumberInput(
+                  labelText: 'Fluid warning',
+                  value: 8,
+                  fluid: true,
+                  warn: true,
+                  warnText: 'Check quantity',
+                ),
+                SizedBox(height: 12),
+                CarbonNumberInput(
+                  labelText: 'Hidden fluid label',
+                  value: 8,
+                  fluid: true,
+                  hideLabel: true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+
     testWidgets('states + fluid across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
         tester,

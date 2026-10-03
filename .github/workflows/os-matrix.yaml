@@ -75,15 +75,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # The icon fidelity sweep and pictogram suite read reference files via
-      # dart:io and cannot compile for the web. Scope stays the dart:io-free
-      # foundations for now; widening to the component suites (which run
-      # with placeholder glyphs on the web) is a separate decision.
+      # The icon fidelity sweep and pictogram suite need dart:io reference
+      # files. Run foundations and the M13 form lifecycle/commit regressions
+      # here; component goldens use the web pass-through comparator.
       - name: Run web-compilable suites
         run: >
           flutter test --platform chrome
           --dart-define=CARBIDE_SKIP_GOLDENS=true
           test/theme test/utils test/foundations
+          test/lifecycle test/components/number_input test/components/text_area
 
   gallery-web-integration:
     name: Gallery integration test — web
@@ -137,4 +137,12 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/text_area_limit_test.dart
+          -d web-server
+
+      - name: Drive number-input native draft and commit test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/number_input_commit_test.dart
           -d web-server

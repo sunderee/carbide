@@ -8,10 +8,12 @@
 //   styles/scss/components/fluid-number-input/_fluid-number-input.scss
 //   react/src/components/NumberInput/NumberInput.tsx
 
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icon_data.dart';
@@ -21,6 +23,8 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
+import '../../utils/native_text_composition.dart';
+import '../../utils/native_text_value.dart';
 import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
@@ -30,6 +34,16 @@ import '../form/carbon_form.dart';
 /// `Subtract` steppers disable at the bounds, and Up/Down arrows step too.
 /// When [allowEmpty] is false an empty field coerces to [min] (or 0). Reuses
 /// the field chrome from [CarbonField] with a [fluid] variant.
+///
+/// Typing changes a draft without calling [onChanged]. Enter, the keyboard's
+/// Done action, leaving the input/stepper focus group, and step actions commit
+/// the draft. Commit parses finite numbers, clamps them, and normalizes the
+/// displayed text before notifying the caller. Invalid or incomplete drafts
+/// (`-`, `.`, `1e`) restore the last committed value. Step actions commit and
+/// then step the clamped draft, reporting only the final value. Repeated commits
+/// without another edit or value change do not repeat the callback.
+/// Active IME composition stays a draft; candidate-selection keys do not step
+/// or commit it.
 class CarbonNumberInput extends StatefulWidget {
   /// Creates a number input.
   const CarbonNumberInput({
@@ -58,27 +72,57 @@ class CarbonNumberInput extends StatefulWidget {
     this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
-  });
+  }) : assert(
+         step > 0 && step < double.infinity,
+         'step must be finite and positive',
+       ),
+       assert(
+         min == null ||
+             (min > double.negativeInfinity && min < double.infinity),
+         'min must be finite',
+       ),
+       assert(
+         max == null ||
+             (max > double.negativeInfinity && max < double.infinity),
+         'max must be finite',
+       ),
+       assert(
+         min == null || max == null || min <= max,
+         'min must not exceed max',
+       ),
+       assert(
+         value == null ||
+             (value > double.negativeInfinity && value < double.infinity),
+         'value must be finite',
+       );
 
   /// The field label.
   final String labelText;
 
-  /// The current value; null is an empty field.
+  /// The committed value; null initially displays an empty field.
+  ///
+  /// Changing this property replaces a pending draft. Rebuilding with the same
+  /// value preserves it. Must be finite when non-null. Bounds apply at commit.
   final num? value;
 
-  /// Called with the new value (null when cleared and [allowEmpty]).
+  /// Called once per committed edit, after the displayed text is normalized.
+  ///
+  /// Typing alone does not call this. A committed empty draft reports null when
+  /// [allowEmpty] is true. Invalid drafts report the restored committed value.
   final ValueChanged<num?>? onChanged;
 
-  /// The minimum allowed value.
+  /// The finite minimum allowed value; must not exceed [max].
   final num? min;
 
-  /// The maximum allowed value.
+  /// The finite maximum allowed value; must not be below [min].
   final num? max;
 
-  /// The step applied by the steppers and arrow keys.
+  /// The finite positive step applied by the steppers and arrow keys.
   final num step;
 
-  /// Whether an empty value is allowed.
+  /// Whether a committed empty or whitespace-only draft is allowed.
+  ///
+  /// Otherwise commit displays and reports [min], or zero clamped to [max].
   final bool allowEmpty;
 
   /// Helper text (hidden when invalid/warn).
@@ -143,6 +187,9 @@ class CarbonNumberInput extends StatefulWidget {
 }
 
 class _CarbonNumberInputState extends State<CarbonNumberInput> {
+  static int _nextSemanticId = 0;
+  final String _semanticId = 'carbide-number-${_nextSemanticId++}';
+
   /// The effective fluid flag: the widget's own, or an enclosing
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
@@ -151,10 +198,16 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
   TextEditingController get _controller => _controllerOwner.value;
   late final OwnedFocusNode _focusOwner;
   FocusNode get _focus => _focusOwner.value;
+  late final NativeTextComposition _nativeComposition;
+  late final TextInputFormatter _compositionFormatter;
+  num? _committed;
+  bool _dirty = false;
+  bool _componentFocused = false;
 
   @override
   void initState() {
     super.initState();
+    _committed = widget.value;
     _controllerOwner = OwnedTextEditingController(
       initialText: widget.value?.toString(),
       onChanged: _rebuild,
@@ -163,20 +216,49 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       external: widget.focusNode,
       onChanged: _rebuild,
     );
+    _nativeComposition = NativeTextComposition(
+      isFocused: () => _focus.hasFocus,
+      onCommit: (String text) {
+        if (mounted && _controller.text == text) {
+          _controller.value = _controller.value.copyWith(
+            composing: TextRange.empty,
+          );
+        }
+      },
+    );
+    _compositionFormatter = TextInputFormatter.withFunction(
+      (TextEditingValue oldValue, TextEditingValue newValue) =>
+          _nativeComposition.resolve(newValue),
+    );
+    if (kIsWeb) {
+      WidgetsBinding.instance.addSemanticsEnabledListener(_rebuild);
+    }
   }
 
   @override
   void didUpdateWidget(CarbonNumberInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
-    if (widget.value != oldWidget.value &&
-        widget.value?.toString() != _controller.text) {
-      _controller.text = widget.value?.toString() ?? '';
+    if (widget.value != oldWidget.value) {
+      _committed = widget.value;
+      _dirty = false;
+      if (widget.value?.toString() != _controller.text) {
+        _controller.value = TextEditingValue(
+          text: widget.value?.toString() ?? '',
+          selection: TextSelection.collapsed(
+            offset: widget.value?.toString().length ?? 0,
+          ),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
+    if (kIsWeb) {
+      WidgetsBinding.instance.removeSemanticsEnabledListener(_rebuild);
+    }
+    _nativeComposition.dispose();
     _focusOwner.dispose();
     _controllerOwner.dispose();
     super.dispose();
@@ -188,7 +270,20 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
     }
   }
 
-  num? get _current => num.tryParse(_controller.text);
+  num? get _draftValue {
+    if (_controller.text.trim().isEmpty) {
+      return widget.allowEmpty ? null : _clamp(widget.min ?? 0);
+    }
+    final num? parsed = num.tryParse(_controller.text);
+    final num? value = parsed != null && parsed.isFinite ? parsed : _committed;
+    return value != null
+        ? _clamp(value)
+        : widget.allowEmpty
+        ? null
+        : _clamp(widget.min ?? 0);
+  }
+
+  num get _stepBase => _draftValue ?? _clamp(widget.min ?? 0);
 
   num _clamp(num v) {
     num result = v;
@@ -204,42 +299,62 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
   }
 
   void _commit(num? v) {
-    _controller.text = v?.toString() ?? '';
-    _controller.selection = TextSelection.collapsed(
-      offset: _controller.text.length,
+    final bool notify = _dirty || v != _committed;
+    _dirty = false;
+    _committed = v;
+    final String text = v?.toString() ?? '';
+    _controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
     );
-    widget.onChanged?.call(v);
+    if (notify) {
+      widget.onChanged?.call(v);
+    }
   }
 
   void _step(int direction) {
-    final num base = _current ?? widget.min ?? 0;
-    _commit(_clamp(base + widget.step * direction));
-  }
-
-  void _onTextChanged(String text) {
-    if (text.isEmpty) {
-      widget.onChanged?.call(widget.allowEmpty ? null : (widget.min ?? 0));
-      return;
-    }
-    final num? parsed = num.tryParse(text);
-    if (parsed != null) {
-      widget.onChanged?.call(parsed);
+    if (!widget.disabled && !widget.readOnly) {
+      _commit(_nextStep(direction));
     }
   }
 
-  bool get _canIncrement {
-    if (widget.max == null) {
-      return true;
+  num _nextStep(int direction) {
+    final num base = _stepBase;
+    final num next = _clamp(base + widget.step * direction);
+    // Floating-point overflow or integer wrap must not reverse a step or
+    // expose a non-finite value. Unrepresentable steps stay at the base.
+    if (!next.isFinite ||
+        (direction > 0 && next < base) ||
+        (direction < 0 && next > base)) {
+      return base;
     }
-    return (_current ?? widget.min ?? 0) < widget.max!;
+    return next;
   }
 
-  bool get _canDecrement {
-    if (widget.min == null) {
-      return true;
+  void _commitDraft() {
+    if (!widget.disabled &&
+        !widget.readOnly &&
+        !(_focus.hasFocus &&
+            _controller.value.composing.isValid &&
+            !_controller.value.composing.isCollapsed)) {
+      _commit(_draftValue);
     }
-    return (_current ?? widget.min ?? 0) > widget.min!;
   }
+
+  void _onTextChanged(String _) {
+    _dirty = true;
+  }
+
+  void _onComponentFocusChange(bool focused) {
+    if (_componentFocused && !focused && mounted) {
+      _commitDraft();
+    }
+    _componentFocused = focused;
+  }
+
+  bool get _canIncrement => _dirty || _nextStep(1) > _stepBase;
+
+  bool get _canDecrement => _dirty || _nextStep(-1) < _stepBase;
 
   CarbonFieldStatus get _status => widget.invalid
       ? CarbonFieldStatus.invalid
@@ -250,6 +365,15 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent || widget.disabled || widget.readOnly) {
       return KeyEventResult.ignored;
+    }
+    if (_controller.value.composing.isValid &&
+        !_controller.value.composing.isCollapsed) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _commitDraft();
+      return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowUp && _canIncrement) {
       _step(1);
@@ -264,6 +388,17 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          syncNativeTextValue(
+            _semanticId,
+            _controller.text,
+            readOnly: widget.readOnly || widget.disabled,
+          );
+        }
+      });
+    }
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = !widget.disabled && !widget.readOnly;
@@ -271,17 +406,23 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: widget.labelText,
+        identifier: _semanticId,
         enabled: !widget.disabled,
-        value: _controller.text,
         child: Focus(
+          canRequestFocus: false,
+          includeSemantics: false,
           onKeyEvent: _onKey,
           child: EditableText(
+            groupId: this,
             controller: _controller,
             focusNode: _focus,
             selectAllOnFocus: _focusOwner.selectAllOnFocus,
             readOnly: !enabled,
             autofocus: widget.autofocus,
             onChanged: _onTextChanged,
+            onEditingComplete: _commitDraft,
+            inputFormatters: <TextInputFormatter>[_compositionFormatter],
+            textInputAction: TextInputAction.done,
             keyboardType: const TextInputType.numberWithOptions(
               decimal: true,
               signed: true,
@@ -303,6 +444,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
         ? null
         : Row(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _Divider(color: layer.borderSubtle),
               _Stepper(
@@ -332,6 +474,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       aiLabel: widget.aiLabel,
       aiRevert: widget.aiRevert,
       fluidLabel: _fluid && !widget.hideLabel ? widget.labelText : null,
+      fluid: _fluid,
     );
 
     final Widget? message = widget.invalid && widget.invalidText != null
@@ -345,17 +488,25 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        if (!_fluid && !widget.hideLabel)
-          ExcludeSemantics(
-            child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
-          ),
-        field,
-        ?message,
-      ],
+    return Focus(
+      canRequestFocus: false,
+      includeSemantics: false,
+      onFocusChange: _onComponentFocusChange,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (!_fluid && !widget.hideLabel)
+            ExcludeSemantics(
+              child: CarbonFormLabel(
+                widget.labelText,
+                disabled: widget.disabled,
+              ),
+            ),
+          TextFieldTapRegion(groupId: this, child: field),
+          ?message,
+        ],
+      ),
     );
   }
 }
@@ -374,6 +525,7 @@ class _NumberField extends StatelessWidget {
     required this.aiLabel,
     required this.aiRevert,
     required this.fluidLabel,
+    required this.fluid,
   });
 
   final CarbonFieldSize size;
@@ -386,6 +538,7 @@ class _NumberField extends StatelessWidget {
   final Widget? aiLabel;
   final bool aiRevert;
   final String? fluidLabel;
+  final bool fluid;
 
   /// The fluid field height (`4rem`).
   static const double fluidHeight = 64;
@@ -393,26 +546,33 @@ class _NumberField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final CarbonLayerTokens layer = CarbonLayer.of(context);
-    final bool invalid = status == CarbonFieldStatus.invalid;
-    final bool fluid = fluidLabel != null;
-    // The AI treatment: aura gradient + ai-border-strong bottom border.
-    final bool ai = aiLabel != null && !aiRevert && !readOnly;
-    final Color border = disabled
-        ? const Color(0x00000000)
-        : readOnly
-        ? layer.borderSubtle
-        : ai
-        ? theme.aiBorderStrong
-        : theme.borderStrong01;
-
-    final Widget content = Padding(
-      padding: const EdgeInsetsDirectional.only(
-        start: CarbonField.paddingInline,
-      ),
-      child: fluid
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    final TextScaler scaler =
+        MediaQuery.maybeTextScalerOf(context) ?? TextScaler.noScaling;
+    double lineHeight(TextStyle style) =>
+        scaler.scale(style.fontSize!) * style.height!;
+    final double contentHeight =
+        lineHeight(CarbonTypeStyles.bodyCompact01) +
+        (fluidLabel == null ? 0 : lineHeight(CarbonTypeStyles.label01) + 2);
+    final double height = math.max(
+      fluid ? fluidHeight : size.height,
+      contentHeight,
+    );
+    return CarbonField(
+      size: size,
+      status: status,
+      disabled: disabled,
+      readOnly: readOnly,
+      focused: focused,
+      fluid: fluid,
+      aiLabel: aiLabel,
+      aiRevert: aiRevert,
+      trailing: steppers == null
+          ? null
+          : SizedBox(height: height, child: steppers),
+      child: fluidLabel == null
+          ? editable
+          : Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 ExcludeSemantics(
@@ -428,64 +588,8 @@ class _NumberField extends StatelessWidget {
                 const SizedBox(height: 2),
                 editable,
               ],
-            )
-          : Align(alignment: AlignmentDirectional.centerStart, child: editable),
+            ),
     );
-
-    Widget box = DecoratedBox(
-      decoration: BoxDecoration(
-        color: readOnly ? const Color(0x00000000) : layer.field,
-        gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
-        border: Border(bottom: BorderSide(color: border)),
-      ),
-      child: SizedBox(
-        height: fluid ? fluidHeight : size.height,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(child: content),
-            if (invalid)
-              Align(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: CarbonIcon(
-                    CarbonIcons.errorFilled,
-                    size: 16,
-                    color: theme.supportError,
-                  ),
-                ),
-              ),
-            // The AI label sits before the steppers (inset-inline-end
-            // $spacing-12 upstream, clearing the two stepper buttons).
-            if (aiLabel != null)
-              Align(
-                child: Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                    end: CarbonSpacing.spacing03,
-                  ),
-                  child: aiLabel,
-                ),
-              ),
-            ?steppers,
-          ],
-        ),
-      ),
-    );
-    // Keep the editor's ancestors stable when focus or validation changes;
-    // replacing this wrapper would remount EditableText and close its input.
-    box = CarbonFocusRing(
-      visible: focused,
-      child: DecoratedBox(
-        position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          border: invalid && !focused
-              ? Border.all(color: theme.supportError, width: 2)
-              : null,
-        ),
-        child: box,
-      ),
-    );
-    return box;
   }
 }
 

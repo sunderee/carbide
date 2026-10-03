@@ -151,7 +151,9 @@ class _NumberInputPageState extends State<_NumberInputPage> {
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Number input',
-      description: 'Steppers with min/max bounds.',
+      description:
+          'Type a draft, then press Enter or leave the field to commit. '
+          'Steppers and arrow keys commit within the min/max bounds.',
       previewAlignment: Alignment.topCenter,
       preview: SizedBox(
         width: 240,

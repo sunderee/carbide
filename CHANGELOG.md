@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Treat number-input typing as a draft. Enter, Done, blur, and step actions
+  commit a finite, clamped value and normalize the displayed text before
+  notifying the caller. Share field chrome for warning/invalid precedence,
+  preserve fluid sizing, and require a finite positive step (#303).
 - Enforce text-area `maxCount` on committed input and paste, using grapheme or
   word counts. Preserve active IME composition until commit and announce the
   limit through field semantics, including when the counter is hidden (#302).
