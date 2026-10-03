@@ -250,6 +250,7 @@ class _TreeViewPage extends StatefulWidget {
 
 class _TreeViewPageState extends State<_TreeViewPage> {
   Object? _selected = 'main';
+  Set<Object> _expanded = <Object>{'src'};
   Set<Object> _multiSelected = <Object>{'main', 'app'};
   Object? _active = 'app';
 
@@ -283,7 +284,9 @@ class _TreeViewPageState extends State<_TreeViewPage> {
             child: CarbonTreeView(
               label: 'Files',
               selectedId: _selected,
-              initiallyExpandedIds: const <Object>{'src'},
+              expandedIds: _expanded,
+              onExpansionChanged: (Set<Object> ids) =>
+                  setState(() => _expanded = ids),
               onSelect: (Object id) => setState(() => _selected = id),
               nodes: _nodes,
             ),
