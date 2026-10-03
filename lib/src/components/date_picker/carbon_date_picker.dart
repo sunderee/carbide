@@ -828,9 +828,10 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
           autofocus: true,
           onEscape: _closeAndRefocus,
           onChanged: (DateTime d) {
-            if (!_open || widget.disabled) return;
-            widget.onChanged(d);
+            if (!mounted || !_open || widget.disabled) return;
+            // End the session before notifying, matching range commits.
             _closeAndRefocus();
+            widget.onChanged(d);
           },
         ),
       ),

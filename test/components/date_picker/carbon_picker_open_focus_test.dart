@@ -102,4 +102,69 @@ void main() {
       );
     }
   }
+
+  testWidgets('single commit closes before a reentrant notification', (
+    WidgetTester tester,
+  ) async {
+    int changes = 0;
+    late CarbonCalendar calendar;
+    calendar = await _openSingle(tester, (DateTime day) {
+      changes++;
+      if (changes == 1) calendar.onChanged!(day);
+    });
+    calendar.onChanged!(DateTime(2026, 6, 20));
+    await tester.pumpAndSettle();
+    expect(changes, 1);
+    expect(find.byType(CarbonCalendar), findsNothing);
+  });
+
+  testWidgets('unmounting an open single picker gates retained callbacks', (
+    WidgetTester tester,
+  ) async {
+    int changes = 0;
+    final CarbonCalendar calendar = await _openSingle(tester, (_) => changes++);
+    await tester.pumpWidget(const SizedBox.shrink());
+    calendar.onChanged!(DateTime(2026, 6, 20));
+    calendar.onEscape!();
+    await tester.pumpAndSettle();
+    expect(changes, 0);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+Future<CarbonCalendar> _openSingle(
+  WidgetTester tester,
+  ValueChanged<DateTime> onChanged,
+) async {
+  addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: CarbonTheme(
+        data: CarbonThemeData.white,
+        child: TapRegionSurface(
+          child: Overlay(
+            initialEntries: <OverlayEntry>[
+              managedOverlayEntry(
+                builder: (_) => Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: 320,
+                    child: CarbonDatePicker(
+                      labelText: 'Date',
+                      value: DateTime(2026, 6, 15),
+                      onChanged: onChanged,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.tap(find.text('06/15/2026'));
+  await tester.pumpAndSettle();
+  return tester.widget<CarbonCalendar>(find.byType(CarbonCalendar));
 }
