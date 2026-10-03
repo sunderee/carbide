@@ -85,6 +85,7 @@ jobs:
           test/theme test/utils test/foundations
           test/lifecycle test/components/number_input test/components/text_area
           test/components/slider
+          test/components/date_picker
 
   gallery-web-integration:
     name: Gallery integration test — web
@@ -154,4 +155,12 @@ jobs:
           flutter drive
           --driver=test_driver/integration_test.dart
           --target=integration_test/slider_state_test.dart
+          -d web-server
+
+      - name: Drive date-picker native state and range session test
+        working-directory: example
+        run: >
+          flutter drive
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/date_picker_state_test.dart
           -d web-server

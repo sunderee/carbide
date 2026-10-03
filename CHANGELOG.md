@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Reconcile calendar selection and bounds without interrupting unchanged
+  keyboard navigation. Clamp civil-day/month movement, disable chevrons at
+  bounds, and expose focused-day semantics separately from selection (#299).
+- Keep range-picker edits local until a complete range is committed once.
+  Escape, outside dismissal, trigger toggles and disabling discard drafts,
+  including sessions that began empty. New external values rebase an open
+  session. Outside dismissal restores focus when needed and preserves a newly
+  focused control, including for the single picker (#298).
 - Gate every slider interaction on its current disabled/read-only policy,
   including both handles, the value input, pending events and accessibility
   actions. Disabled sliders cannot receive focus; read-only sliders remain
