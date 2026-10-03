@@ -6,6 +6,7 @@
 import 'dart:js_interop';
 
 import 'package:carbide/carbide.dart';
+import 'package:carbide_gallery/src/gallery_app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +14,120 @@ import 'package:integration_test/integration_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  for (final String opener in <String>['Date', 'Start date', 'End date']) {
+    for (final bool focusTrigger in <bool>[false, true]) {
+      testWidgets(
+        'native $opener opening replaces ${focusTrigger ? "trigger" : "outside"} focus and Escape restores it',
+        (WidgetTester tester) async {
+          final SemanticsHandle handle = tester.ensureSemantics();
+          try {
+            final _FixtureState state = await _mount(
+              tester,
+              mode: opener == 'Date' ? 2 : 1,
+              range: CarbonDateRange(
+                DateTime(2026, 6, 10),
+                DateTime(2026, 6, 12),
+              ),
+            );
+            _button(focusTrigger ? opener : 'Outside').focus();
+            await _settle(tester);
+            final CarbonDateRange? snapshot = state.range;
+            for (int i = 0; i < 2; i++) {
+              await tester.tap(
+                find.text(
+                  opener == 'Date'
+                      ? '06/15/2026'
+                      : opener == 'Start date'
+                      ? '06/10/2026'
+                      : '06/12/2026',
+                ),
+              );
+              await _settle(tester);
+              expect(_activeName, opener == 'Date' ? '15' : '12');
+              await _key(tester, LogicalKeyboardKey.escape);
+              await _settle(tester);
+              expect(find.byType(CarbonCalendar), findsNothing);
+              expect(_activeName, startsWith(opener));
+              expect(state.range, snapshot);
+              expect(state.ranges, isEmpty);
+              expect(state.dates, isEmpty);
+            }
+          } finally {
+            await tester.pumpWidget(const SizedBox.shrink());
+            handle.dispose();
+          }
+        },
+      );
+    }
+  }
+
+  testWidgets('gallery popup keeps native opening and dismissal focus', (
+    WidgetTester tester,
+  ) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(const GalleryApp());
+      await _settle(tester);
+      await tester.tap(find.text('Complex & data'));
+      await _settle(tester);
+      await tester.tap(find.text('Date picker'));
+      await _settle(tester);
+      _button('Appointment date').focus();
+      await _settle(tester);
+      final DateTime? snapshot = tester
+          .widget<CarbonDatePicker>(find.byType(CarbonDatePicker))
+          .value;
+      await tester.tap(find.text('06/16/2026'));
+      await _settle(tester);
+      expect(_activeName, '16');
+      // The popup is a sibling of the trigger in accessibility navigation.
+      expect(_button('Appointment date').textContent, isNot(contains('June')));
+      await _key(tester, LogicalKeyboardKey.escape);
+      await _settle(tester);
+      expect(find.byType(CarbonCalendar), findsNothing);
+      expect(_activeName, startsWith('Appointment date'));
+      expect(
+        tester.widget<CarbonDatePicker>(find.byType(CarbonDatePicker)).value,
+        snapshot,
+      );
+      await _key(tester, LogicalKeyboardKey.enter);
+      await _settle(tester);
+      expect(_activeName, '16');
+      await _key(tester, LogicalKeyboardKey.escape);
+      await _settle(tester);
+      expect(_activeName, startsWith('Appointment date'));
+    } finally {
+      await tester.pumpWidget(const SizedBox.shrink());
+      handle.dispose();
+    }
+  });
+
+  for (final bool single in <bool>[false, true]) {
+    testWidgets('new native focus wins during popup removal, single=$single', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      try {
+        await _mount(tester, mode: single ? 2 : 1);
+        await tester.tap(find.text(single ? '06/15/2026' : 'Start date'));
+        await _settle(tester);
+        await _key(tester, LogicalKeyboardKey.escape);
+        // The opener's return is queued while OverlayPortal is still hiding.
+        await tester.pump();
+        _button('Outside').focus();
+        await _settle(tester);
+        expect(find.byType(CarbonCalendar), findsNothing);
+        expect(_activeName, 'Outside');
+        await tester.pumpWidget(const SizedBox.shrink());
+        await _settle(tester);
+        expect(tester.takeException(), isNull);
+      } finally {
+        await tester.pumpWidget(const SizedBox.shrink());
+        handle.dispose();
+      }
+    });
+  }
 
   testWidgets(
     'native focus follows calendar navigation and controlled bounds',
@@ -22,7 +137,7 @@ void main() {
         final _FixtureState state = await _mount(tester);
         _button('15').focus();
         await _settle(tester);
-        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+        await _key(tester, LogicalKeyboardKey.arrowRight);
         await _settle(tester);
         expect(_activeName, '16');
         expect(_button('15').getAttribute('aria-current'), 'true');
@@ -46,11 +161,11 @@ void main() {
           LogicalKeyboardKey.arrowDown,
           LogicalKeyboardKey.pageDown,
         ]) {
-          await tester.sendKeyEvent(key);
+          await _key(tester, key);
         }
         await _settle(tester);
         expect(_activeName, '25');
-        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await _key(tester, LogicalKeyboardKey.arrowUp);
         await _settle(tester);
         expect(_activeName, '20');
         for (final LogicalKeyboardKey key in <LogicalKeyboardKey>[
@@ -58,11 +173,11 @@ void main() {
           LogicalKeyboardKey.arrowUp,
           LogicalKeyboardKey.pageUp,
         ]) {
-          await tester.sendKeyEvent(key);
+          await _key(tester, key);
         }
         await _settle(tester);
         expect(_activeName, '20');
-        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await _key(tester, LogicalKeyboardKey.enter);
         await _settle(tester);
         expect(state.dates, <DateTime>[DateTime(2026, 7, 20)]);
       } finally {
@@ -99,7 +214,7 @@ void main() {
           );
           switch (path) {
             case 'Escape':
-              await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+              await _key(tester, LogicalKeyboardKey.escape);
             case 'outside':
               await tester.tapAt(const Offset(900, 650));
             case 'toggle':
@@ -297,11 +412,32 @@ void main() {
   }
 }
 
+// Flutter's key simulator infers physical keys from debug names, which are
+// stripped in release mode. Supply the physical key explicitly in both modes.
+Future<void> _key(WidgetTester tester, LogicalKeyboardKey key) async {
+  await tester.sendKeyEvent(
+    key,
+    physicalKey: switch (key) {
+      LogicalKeyboardKey.escape => PhysicalKeyboardKey.escape,
+      LogicalKeyboardKey.enter => PhysicalKeyboardKey.enter,
+      LogicalKeyboardKey.arrowLeft => PhysicalKeyboardKey.arrowLeft,
+      LogicalKeyboardKey.arrowRight => PhysicalKeyboardKey.arrowRight,
+      LogicalKeyboardKey.arrowUp => PhysicalKeyboardKey.arrowUp,
+      LogicalKeyboardKey.arrowDown => PhysicalKeyboardKey.arrowDown,
+      LogicalKeyboardKey.pageUp => PhysicalKeyboardKey.pageUp,
+      LogicalKeyboardKey.pageDown => PhysicalKeyboardKey.pageDown,
+      _ => throw ArgumentError.value(key, 'key'),
+    },
+  );
+}
+
 Future<void> _settle(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await tester.runAsync(
     () => Future<void>.delayed(const Duration(milliseconds: 50)),
   );
+  // Native focus events can request a frame after the semantics DOM update.
+  await tester.pumpAndSettle();
 }
 
 Future<_FixtureState> _mount(

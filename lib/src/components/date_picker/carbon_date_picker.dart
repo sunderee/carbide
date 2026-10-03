@@ -17,6 +17,9 @@
 // committed ends on button-primary, in-range days on the highlight token,
 // and the preview end as a layer-01 cell with the 2px focus outline.
 
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -28,6 +31,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/native_control_focus.dart';
 import '../form/carbon_form.dart';
 import '../popover/carbon_popover.dart';
 
@@ -778,16 +782,14 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
   /// Enter/Space open the calendar from the focused trigger (WAI-ARIA
   /// date-picker dialog pattern via `date-picker/accessibility.mdx`).
   ///
-  /// The trigger is unfocused first: the calendar grid's `autofocus` is
-  /// only honored while its focus scope has no focused child, and the
-  /// dialog pattern moves focus into the opened calendar.
+  /// The popup owns a separate focus scope, so the grid takes focus even
+  /// when the trigger or another control already holds it.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (widget.disabled || _open || event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space) {
-      node.unfocus();
       setState(() => _open = true);
       return KeyEventResult.handled;
     }
@@ -809,33 +811,41 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget trigger = Semantics(
-      button: true,
-      enabled: !widget.disabled,
-      label: widget.labelText,
-      value: widget.value != null ? _format(widget.value!) : null,
-      child: CarbonPopover(
-        open: _open,
-        align: CarbonPopoverAlignment.bottomStart,
-        caret: false,
-        tapRegionGroupId: _group,
-        onRequestClose: () => _closeAndRefocus(deferred: true),
-        content: CarbonCalendar(
+    final Widget trigger = CarbonPopover(
+      open: _open,
+      align: CarbonPopoverAlignment.bottomStart,
+      caret: false,
+      tapRegionGroupId: _group,
+      onRequestClose: () => _closeAndRefocus(deferred: true),
+      content: FocusScope(
+        debugLabel: 'CarbonDatePicker.calendar',
+        autofocus: true,
+        includeSemantics: false,
+        child: CarbonCalendar(
           value: widget.value,
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
           autofocus: true,
           onEscape: _closeAndRefocus,
           onChanged: (DateTime d) {
-            if (!_open || widget.disabled) return;
-            widget.onChanged(d);
+            if (!mounted || !_open || widget.disabled) return;
+            // End the session before notifying, matching range commits.
             _closeAndRefocus();
+            widget.onChanged(d);
           },
         ),
-        child: TapRegion(
-          groupId: _group,
+      ),
+      child: TapRegion(
+        groupId: _group,
+        child: _PickerTriggerSemantics(
+          focusNode: _focus,
+          enabled: !widget.disabled,
+          recoverFocus: !_open,
+          label: widget.labelText,
+          value: widget.value != null ? _format(widget.value!) : null,
           child: Focus(
             focusNode: _focus,
+            includeSemantics: false,
             canRequestFocus: !widget.disabled,
             onKeyEvent: _onKey,
             child: GestureDetector(
@@ -1100,16 +1110,14 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
     }
   }
 
-  /// Enter/Space open the shared calendar from either focused field. The
-  /// field is unfocused first so the calendar grid's `autofocus` is
-  /// honored (see [CarbonDatePicker]).
+  /// Enter/Space open the shared calendar from either focused field.
+  /// Its separate focus scope lets the grid take focus on every opening.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (widget.disabled || _open || event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space) {
-      node.unfocus();
       _toggle(node);
       return KeyEventResult.handled;
     }
@@ -1133,13 +1141,15 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
                 child: CarbonFormLabel(label, disabled: widget.disabled),
               ),
             ),
-          Semantics(
-            button: true,
+          _PickerTriggerSemantics(
+            focusNode: focus,
             enabled: !widget.disabled,
+            recoverFocus: !_open,
             label: label,
             value: date == null ? null : _format(date),
             child: Focus(
               focusNode: focus,
+              includeSemantics: false,
               canRequestFocus: !widget.disabled,
               onKeyEvent: _onKey,
               child: GestureDetector(
@@ -1187,13 +1197,19 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
       caret: false,
       tapRegionGroupId: _group,
       onRequestClose: () => _cancel(session, deferred: true),
-      content: CarbonCalendar(
-        range: displayed,
-        firstDate: widget.firstDate,
-        lastDate: widget.lastDate,
+      content: FocusScope(
+        debugLabel: 'CarbonDateRangePicker.calendar',
         autofocus: true,
-        onEscape: () => _cancel(session),
-        onRangeChanged: (CarbonDateRange range) => _changeDraft(session, range),
+        includeSemantics: false,
+        child: CarbonCalendar(
+          range: displayed,
+          firstDate: widget.firstDate,
+          lastDate: widget.lastDate,
+          autofocus: true,
+          onEscape: () => _cancel(session),
+          onRangeChanged: (CarbonDateRange range) =>
+              _changeDraft(session, range),
+        ),
       ),
       child: TapRegion(groupId: _group, child: fields),
     );
@@ -1208,6 +1224,93 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[trigger, ?message],
+    );
+  }
+}
+
+int _nextPickerControlId = 0;
+
+/// Keeps the opener's native focus when the popup changes DOM reading order.
+class _PickerTriggerSemantics extends StatefulWidget {
+  const _PickerTriggerSemantics({
+    required this.focusNode,
+    required this.enabled,
+    required this.recoverFocus,
+    required this.label,
+    required this.value,
+    required this.child,
+  });
+
+  final FocusNode focusNode;
+  final bool enabled;
+  final bool recoverFocus;
+  final String label;
+  final String? value;
+  final Widget child;
+
+  @override
+  State<_PickerTriggerSemantics> createState() =>
+      _PickerTriggerSemanticsState();
+}
+
+class _PickerTriggerSemanticsState extends State<_PickerTriggerSemantics> {
+  Timer? _nativeFocusTimer;
+  late final String _identifier =
+      'carbon-date-picker-control-${_nextPickerControlId++}';
+
+  @override
+  void dispose() {
+    _nativeFocusTimer?.cancel();
+    super.dispose();
+  }
+
+  void _requestFocus() {
+    if (mounted && widget.enabled) widget.focusNode.requestFocus();
+  }
+
+  void _scheduleNativeFocusRestore() {
+    if (!mounted) return;
+    _nativeFocusTimer?.cancel();
+    // Let the engine finish any view-focus update caused by a DOM move.
+    _nativeFocusTimer = Timer(Duration.zero, () {
+      if (!mounted || !widget.enabled || !widget.recoverFocus) return;
+      final FocusNode? current = FocusManager.instance.primaryFocus;
+      if (current != widget.focusNode &&
+          current != FocusManager.instance.rootScope) {
+        return;
+      }
+      if (restoreNativeControlFocus(_identifier)) _requestFocus();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (kIsWeb &&
+        widget.enabled &&
+        widget.recoverFocus &&
+        widget.focusNode.hasPrimaryFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _scheduleNativeFocusRestore();
+        // Popover hides its OverlayPortal after the triggering frame. Its DOM
+        // reading order changes in the next frame without rebuilding this
+        // trigger. Reconcile there too; both checks respect another control.
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _scheduleNativeFocusRestore(),
+        );
+      });
+    }
+    return Semantics(
+      container: true,
+      identifier: _identifier,
+      button: true,
+      enabled: widget.enabled,
+      focusable: widget.enabled,
+      focused: widget.focusNode.hasFocus,
+      onFocus: widget.enabled ? _requestFocus : null,
+      label: widget.label,
+      value: widget.value,
+      child: widget.child,
     );
   }
 }

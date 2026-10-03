@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Give opened date pickers a separate focus scope so pointer activation moves
+  focus into the calendar even when another control is focused. Keep the native
+  opener focused after Escape or completion in the gallery, and keep popup
+  content separate from the single-picker trigger in accessibility navigation
+  (#298, #299).
+
 - Continue nested ordered-list markers after `z` as `aa`, `ab`, … using
   CSS lower-latin numbering. Keep wide markers on one line in the gutter,
   preserving content alignment in expressive/scaled text and RTL (#304).
