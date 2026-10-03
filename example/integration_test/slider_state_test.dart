@@ -27,6 +27,7 @@ void main() {
               (false, true, true),
               (true, true, true),
               (false, false, false),
+              (false, true, false),
               (false, false, true),
             ]) {
           state.configure(
@@ -40,6 +41,12 @@ void main() {
             final _Element slider = _slider(range: range, upper: upper);
             expect(slider.getAttribute('aria-disabled'), (!enabled).toString());
             expect(slider.getAttribute('aria-readonly'), readOnly.toString());
+            expect(
+              slider.getAttribute('aria-description'),
+              !disabled && callback && readOnly
+                  ? 'Read only'
+                  : anyOf(isNull, ''),
+            );
             expect(slider.getAttribute('aria-valuenow'), upper ? '70' : '40');
             expect(slider.getAttribute('aria-valuetext'), upper ? '70' : '40');
             expect(slider.getAttribute('aria-valuemin'), upper ? '40' : '0');

@@ -382,11 +382,14 @@ void main() {
         await expectThemeGoldens(
           tester,
           name: 'binary_control_states',
-          size: const Size(600, 540),
+          // Browser tests use wider placeholder glyphs; keep the specimen
+          // columns wide enough to exercise the same layout without overflow.
+          size: const Size(800, 540),
           containsText: true,
           afterPump: (WidgetTester tester) async {
             readOnlyFocus.requestFocus();
             await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
           },
           builder: (BuildContext context) => Padding(
             padding: const EdgeInsets.all(16),
