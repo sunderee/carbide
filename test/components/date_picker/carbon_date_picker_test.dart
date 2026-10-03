@@ -602,6 +602,33 @@ void main() {
   });
 
   group('goldens', () {
+    testWidgets('bounded focus remains separate from selection across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'date_picker_bounded_focus',
+        containsText: true,
+        size: const Size(360, 400),
+        builder: (_) => Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: 320,
+            child: CarbonCalendar(
+              value: DateTime(2026, 7, 15),
+              firstDate: DateTime(2026, 7, 10),
+              lastDate: DateTime(2026, 7, 20),
+              autofocus: true,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+        afterPump: (WidgetTester tester) async {
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+          await tester.pumpAndSettle();
+        },
+      );
+    });
     testWidgets('calendar across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
         tester,
@@ -855,11 +882,18 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('June 2026'), findsOneWidget);
 
-      // Restarting keeps the calendar open with a start-only value.
+      // Restarting keeps a local draft; the parent's committed value stays put.
       await tester.tap(find.text('5'));
       await tester.pumpAndSettle();
       expect(find.text('June 2026'), findsOneWidget);
-      expect(value, CarbonDateRange(DateTime(2026, 6, 5)));
+      expect(
+        value,
+        CarbonDateRange(DateTime(2026, 6, 10), DateTime(2026, 6, 12)),
+      );
+      expect(
+        tester.widget<CarbonCalendar>(find.byType(CarbonCalendar)).range,
+        CarbonDateRange(DateTime(2026, 6, 5)),
+      );
 
       // Completing the range closes the calendar.
       await tester.tap(find.text('20'));
@@ -893,7 +927,14 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('5'));
       await tester.pumpAndSettle();
-      expect(value, CarbonDateRange(DateTime(2026, 6, 5)));
+      expect(
+        value,
+        CarbonDateRange(DateTime(2026, 6, 10), DateTime(2026, 6, 12)),
+      );
+      expect(
+        tester.widget<CarbonCalendar>(find.byType(CarbonCalendar)).range,
+        CarbonDateRange(DateTime(2026, 6, 5)),
+      );
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
@@ -958,6 +999,33 @@ void main() {
   });
 
   group('range goldens', () {
+    testWidgets('local draft fields and preview across themes', (
+      WidgetTester tester,
+    ) async {
+      await expectThemeGoldens(
+        tester,
+        name: 'date_picker_range_draft',
+        containsText: true,
+        size: const Size(360, 500),
+        builder: (_) => _overlay(
+          CarbonDateRangePicker(
+            value: CarbonDateRange(
+              DateTime(2026, 6, 10),
+              DateTime(2026, 6, 12),
+            ),
+            onChanged: (_) {},
+          ),
+        ),
+        afterPump: (WidgetTester tester) async {
+          await tester.tap(find.text('Start date'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('5'));
+          await tester.pumpAndSettle();
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+          await tester.pumpAndSettle();
+        },
+      );
+    });
     testWidgets('committed range across themes', (WidgetTester tester) async {
       await expectThemeGoldens(
         tester,

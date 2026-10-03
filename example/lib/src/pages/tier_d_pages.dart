@@ -153,7 +153,9 @@ class _DatePickerPageState extends State<_DatePickerPage> {
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Date picker',
-      description: 'A self-contained calendar in single and range modes.',
+      description:
+          'A calendar in single and range modes. A range is committed after '
+          'both dates are picked; dismissing the calendar discards the draft.',
       previewAlignment: Alignment.topCenter,
       preview: _rangeMode
           ? CarbonDateRangePicker(
