@@ -84,6 +84,7 @@ jobs:
           --dart-define=CARBIDE_SKIP_GOLDENS=true
           test/theme test/utils test/foundations
           test/lifecycle test/components/number_input test/components/text_area
+          test/components/text_input
           test/components/slider
           test/components/date_picker
           test/components/tree_view
@@ -219,4 +220,12 @@ jobs:
           flutter drive --release
           --driver=test_driver/integration_test.dart
           --target=integration_test/binary_control_state_test.dart
+          -d web-server
+
+      - name: Drive password native visibility contracts in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/password_visibility_test.dart
           -d web-server

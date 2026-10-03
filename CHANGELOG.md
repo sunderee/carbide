@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make password visibility keyboard-focusable after the input, with Enter,
+  Space, pointer and accessibility activation, a keyboard focus ring, and
+  density-sized targets matching Carbon. Disable visibility activation and
+  traversal with the field, including pending events (#308).
+
 - Make checkbox, radio, toggle and slider use a shared interaction policy.
   Read-only binary controls remain focusable, expose their value, announce a
   localizable read-only hint and use Carbon's outlined styling. Add explicit

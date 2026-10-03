@@ -72,26 +72,40 @@ class _TextInputPage extends StatefulWidget {
 class _TextInputPageState extends State<_TextInputPage> {
   bool _invalid = false;
   bool _disabled = false;
+  bool _readOnly = false;
   bool _ai = false;
 
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Text input',
-      description: 'A single-line field with helper, invalid and warn states.',
+      description: 'Single-line text and password fields with validation and visibility controls.',
       previewAlignment: Alignment.topCenter,
       preview: SizedBox(
         width: 320,
-        child: CarbonTextInput(
-          labelText: 'Email address',
-          placeholder: 'you@example.com',
-          helperText: 'We never share your email.',
-          invalid: _invalid,
-          invalidText: 'Enter a valid email.',
-          disabled: _disabled,
-          aiLabel: _ai
-              ? const CarbonAILabel(size: CarbonAILabelSize.mini)
-              : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CarbonTextInput(
+              labelText: 'Email address',
+              placeholder: 'you@example.com',
+              helperText: 'We never share your email.',
+              invalid: _invalid,
+              invalidText: 'Enter a valid email.',
+              disabled: _disabled,
+              readOnly: _readOnly,
+              aiLabel: _ai
+                  ? const CarbonAILabel(size: CarbonAILabelSize.mini)
+                  : null,
+            ),
+            const SizedBox(height: CarbonSpacing.spacing05),
+            CarbonPasswordInput(
+              labelText: 'Password',
+              initialValue: 'demo-password',
+              disabled: _disabled,
+              readOnly: _readOnly,
+            ),
+          ],
         ),
       ),
       controls: <Widget>[
@@ -110,8 +124,15 @@ class _TextInputPageState extends State<_TextInputPage> {
           value: _disabled,
           onChanged: (bool v) => setState(() => _disabled = v),
         ),
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
       ],
-      code: "CarbonTextInput(labelText: 'Email address', placeholder: '…');",
+      code:
+          "CarbonTextInput(labelText: 'Email address', placeholder: '…');\n"
+          "CarbonPasswordInput(labelText: 'Password');",
     );
   }
 }
