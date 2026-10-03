@@ -4,7 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
-import 'package:flutter/semantics.dart' show SemanticsNode;
+import 'package:flutter/semantics.dart' show SemanticsAction, SemanticsNode;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +24,17 @@ Widget _host(Widget child) => Directionality(
     ),
   ),
 );
+
+void _a11yTest(String name, WidgetTesterCallback body) =>
+    testWidgets(name, (WidgetTester tester) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      try {
+        await body(tester);
+      } finally {
+        await tester.pumpWidget(const SizedBox.shrink());
+        handle.dispose();
+      }
+    });
 
 void main() {
   setUp(() {
@@ -216,30 +227,61 @@ void main() {
   });
 
   group('accessibility guidelines (#226)', () {
-    testWidgets('meets tap-target and label guidelines', (
+    _a11yTest('meets tap-target and label guidelines', (
       WidgetTester tester,
     ) async {
-      final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
         modal(
           onClose: () {},
-          // The scrim's click-outside catcher is an unlabelled full-screen
-          // tap node; suppressing it here keeps the label gate meaningful
-          // for the modal's own controls — TODO(#226): the scrim should
-          // either carry a dismiss label or be excluded from semantics.
-          preventCloseOnClickOutside: true,
           primaryButton: CarbonModalAction(label: 'Delete', onPressed: () {}),
           secondaryButton: CarbonModalAction(label: 'Cancel', onPressed: () {}),
         ),
       );
       await tester.pumpAndSettle();
-      // Tap targets are gated off — TODO(#226): the close button renders
-      // as CarbonButton.iconOnly at `md` (40×40), but upstream
-      // `_modal.scss` `.cds--modal-close` is 3rem (48px); the 64px footer
-      // buttons already pass.
-      await expectA11y(tester, tapTargets: false);
-      handle.dispose();
+      await expectA11y(tester);
     });
+
+    _a11yTest('default passive modal passes both guidelines (#305)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(modal(onClose: () {}, passiveModal: true));
+      await tester.pumpAndSettle();
+      await expectA11y(tester);
+      expect(
+        tester.getSize(find.bySemanticsLabel('Close')),
+        const Size(48, 48),
+      );
+      final CarbonIcon icon = tester.widget<CarbonIcon>(
+        find.descendant(
+          of: find.bySemanticsLabel('Close'),
+          matching: find.byType(CarbonIcon),
+        ),
+      );
+      expect(icon.icon, CarbonIcons.close);
+      expect(icon.size, 16);
+    });
+
+    _a11yTest(
+      'only named controls expose tap actions, never the scrim (#305)',
+      (WidgetTester tester) async {
+        int closes = 0;
+        await tester.pumpWidget(modal(onClose: () => closes++));
+        await tester.pumpAndSettle();
+        final List<SemanticsNode> nodes = tester.semantics
+            .simulatedAccessibilityTraversal()
+            .where(
+              (SemanticsNode node) =>
+                  node.getSemanticsData().hasAction(SemanticsAction.tap),
+            )
+            .toList();
+        expect(nodes.map((SemanticsNode node) => node.label), <String>[
+          'Close',
+        ]);
+        await tester.tapAt(const Offset(5, 5));
+        await tester.pump();
+        expect(closes, 1);
+      },
+    );
   });
 
   group('motion (#235)', () {
