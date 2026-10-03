@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Exclude modal scrims from accessibility traversal and give the modal close
+  button a 48×48 target while preserving its icon. Verify modal/dialog focus
+  containment and restoration, choose safe initial focus, ignore disposed
+  openers, and support Escape from inside a non-modal dialog (#305, #306).
+
 - Give opened date pickers a separate focus scope so pointer activation moves
   focus into the calendar even when another control is focused. Keep the native
   opener focused after Escape or completion in the gallery, and keep popup
