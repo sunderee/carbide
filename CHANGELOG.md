@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Enforce text-area `maxCount` on committed input and paste, using grapheme or
+  word counts. Preserve active IME composition until commit and announce the
+  limit through field semantics, including when the counter is hidden (#302).
 - Rebind form controllers and focus nodes after widget updates, preserving text,
   selection, composing state and focus where applicable. Dispose only internally
   owned resources, including expandable search (#295, #296).
