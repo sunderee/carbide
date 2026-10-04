@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
@@ -463,7 +464,7 @@ class _CarbonSliderState extends State<CarbonSlider> {
               hint: _state.semanticsHint(widget.readOnlyHint),
               child: AnimatedScale(
                 scale: focused ? 1.4286 : 1,
-                duration: const Duration(milliseconds: 70),
+                duration: carbonDuration(context, CarbonDuration.fast01),
                 child: Container(
                   width: CarbonSlider.thumbSize,
                   height: CarbonSlider.thumbSize,

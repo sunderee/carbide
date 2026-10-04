@@ -100,7 +100,7 @@ class _CarbonSideNavState extends State<CarbonSideNav> {
   bool get _want => _pointerInside || _focusWithin;
 
   bool get _reducedMotion =>
-      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+      carbonDuration(context, _expansion) == Duration.zero;
 
   void _pointer(bool inside) {
     _pointerInside = inside;
@@ -189,7 +189,7 @@ class _CarbonSideNavState extends State<CarbonSideNav> {
             onFocusChange: _focus,
             onKeyEvent: _onEscape,
             child: AnimatedContainer(
-              duration: _reducedMotion ? Duration.zero : _expansion,
+              duration: carbonDuration(context, _expansion),
               curve: _expansionCurve,
               onEnd: () {
                 if (!_overlayExpanded && !_want) {
@@ -229,7 +229,7 @@ class _CarbonSideNavState extends State<CarbonSideNav> {
         // cubic-bezier(0.2, 0, 1, 0.9) (`_side-nav.scss`, hardcoded — not a
         // motion token).
         child: AnimatedContainer(
-          duration: _reducedMotion ? Duration.zero : _expansion,
+          duration: carbonDuration(context, _expansion),
           curve: _expansionCurve,
           width: widget.expanded ? 256 : 48,
           color: theme.background,
@@ -520,11 +520,7 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration fast02 = reducedMotion
-        ? Duration.zero
-        : CarbonDuration.fast02;
+    final Duration fast02 = carbonDuration(context, CarbonDuration.fast02);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,

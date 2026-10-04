@@ -170,11 +170,7 @@ class _CarbonAccordionItemState extends State<CarbonAccordionItem> {
         (scope?.align ?? CarbonAccordionAlign.end) ==
         CarbonAccordionAlign.start;
     final bool enabled = !widget.disabled;
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration fast02 = reducedMotion
-        ? Duration.zero
-        : CarbonDuration.fast02;
+    final Duration fast02 = carbonDuration(context, CarbonDuration.fast02);
 
     final Color titleColor = widget.disabled
         ? theme.textDisabled

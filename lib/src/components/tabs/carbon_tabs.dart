@@ -426,11 +426,23 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
         topInViewport - h / 2 < 0 ||
         topInViewport + h + h / 2 > position.viewportDimension;
     if (outside) {
-      _scroll.animateTo(
-        ((index - 1) * h).clamp(0, position.maxScrollExtent),
-        duration: CarbonDuration.moderate01,
-        curve: CarbonEasing.standardProductive,
+      final double target = ((index - 1) * h).clamp(
+        0,
+        position.maxScrollExtent,
       );
+      final Duration duration = carbonDuration(
+        context,
+        CarbonDuration.moderate01,
+      );
+      if (duration == Duration.zero) {
+        _scroll.jumpTo(target);
+      } else {
+        _scroll.animateTo(
+          target,
+          duration: duration,
+          curve: CarbonEasing.standardProductive,
+        );
+      }
     }
   }
 
@@ -917,10 +929,7 @@ class _TabButtonState extends State<_TabButton> {
               // border-bottom-color / outline $duration-fast-01
               // motion(standard, productive).
               child: AnimatedContainer(
-                duration:
-                    (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                    ? Duration.zero
-                    : CarbonDuration.fast01,
+                duration: carbonDuration(context, CarbonDuration.fast01),
                 curve: CarbonEasing.standardProductive,
                 height: widget.size.height,
                 padding: const EdgeInsets.symmetric(

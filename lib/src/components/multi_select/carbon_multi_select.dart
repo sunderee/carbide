@@ -548,7 +548,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
             visible: _focus.hasFocus,
             inset: true,
             child: AnimatedContainer(
-              duration: CarbonDuration.fast01,
+              duration: carbonDuration(context, CarbonDuration.fast01),
               curve: CarbonEasing.standardProductive,
               height: widget.size.height,
               decoration: BoxDecoration(color: background, border: border),

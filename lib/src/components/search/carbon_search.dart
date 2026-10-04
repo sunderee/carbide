@@ -312,7 +312,7 @@ class _CarbonSearchField extends StatelessWidget {
     );
 
     final Widget clear = AnimatedOpacity(
-      duration: CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       opacity: hasContent && !state.isReadOnly ? 1 : 0,
       child: IgnorePointer(
         ignoring: !hasContent || !state.canActivate,

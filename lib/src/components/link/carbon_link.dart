@@ -134,7 +134,7 @@ class CarbonLink extends StatelessWidget {
 
           final CarbonIconData? trailing = icon;
           Widget content = AnimatedDefaultTextStyle(
-            duration: CarbonDuration.fast01,
+            duration: carbonDuration(context, CarbonDuration.fast01),
             curve: CarbonEasing.standardProductive,
             style: style,
             child: trailing == null

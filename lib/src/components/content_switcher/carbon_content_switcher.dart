@@ -326,10 +326,7 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
                   // fast-01 × standard-productive is Carbide's choice for
                   // this micro-interaction.
                   child: AnimatedDefaultTextStyle(
-                    duration:
-                        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                        ? Duration.zero
-                        : CarbonDuration.fast01,
+                    duration: carbonDuration(context, CarbonDuration.fast01),
                     curve: CarbonEasing.standardProductive,
                     style: CarbonTypeStyles.bodyCompact01.copyWith(
                       color: foreground,

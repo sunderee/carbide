@@ -263,11 +263,10 @@ class _CarbonDialogState extends State<CarbonDialog> {
   Widget _buildOverlay(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration duration = reducedMotion
-        ? Duration.zero
-        : CarbonDuration.moderate02;
+    final Duration duration = carbonDuration(
+      context,
+      CarbonDuration.moderate02,
+    );
 
     final Widget surface = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -362,9 +361,10 @@ class _CarbonDialogState extends State<CarbonDialog> {
               Positioned.fill(
                 child: ExcludeSemantics(
                   child: AnimatedOpacity(
-                    duration: reducedMotion
-                        ? Duration.zero
-                        : CarbonDuration.moderate02,
+                    duration: carbonDuration(
+                      context,
+                      CarbonDuration.moderate02,
+                    ),
                     opacity: _entered ? 1 : 0,
                     child: ColoredBox(color: theme.overlay),
                   ),
@@ -464,8 +464,6 @@ class CarbonDialogCloseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     return Semantics(
       button: true,
       label: label,
@@ -478,7 +476,7 @@ class CarbonDialogCloseButton extends StatelessWidget {
           // `_dialog.scss`: background-color $duration-fast-02
           // motion(standard, productive); instant under reduced motion.
           return AnimatedContainer(
-            duration: reducedMotion ? Duration.zero : CarbonDuration.fast02,
+            duration: carbonDuration(context, CarbonDuration.fast02),
             curve: CarbonEasing.standardProductive,
             width: 48,
             height: 48,

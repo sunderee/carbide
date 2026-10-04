@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Resolve decorative animation durations through `carbonDuration`, including
+  picker decoration, search clearing, link/list hover, slider focus and tree
+  expansion. Vertical tabs reveal selection instantly under reduced motion.
+  Guard the shared policy in CI; retain loading and indeterminate progress as
+  explicit essential-motion exceptions (#316).
+
 - Open context menus with Shift+F10 or the Context Menu key inside a focused
   target region. Anchor to that focused child's logical start edge, enter the
   first enabled item and restore the opener on dismissal. Tab continues normal

@@ -1094,9 +1094,7 @@ class _BodyRowState extends State<_BodyRow> {
       // Row fill per `_data-table.scss` `tbody tr`: background-color
       // $duration-fast-01 motion(entrance, productive).
       child: AnimatedContainer(
-        duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-            ? Duration.zero
-            : CarbonDuration.fast01,
+        duration: carbonDuration(context, CarbonDuration.fast01),
         curve: CarbonEasing.entranceProductive,
         decoration: BoxDecoration(
           color: background,
@@ -1304,10 +1302,10 @@ class _ExpandChevronState extends State<_ExpandChevron> {
                   // motion(standard, productive).
                   child: AnimatedRotation(
                     turns: widget.expanded ? 0.25 : 0,
-                    duration:
-                        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                        ? Duration.zero
-                        : CarbonDuration.moderate01,
+                    duration: carbonDuration(
+                      context,
+                      CarbonDuration.moderate01,
+                    ),
                     curve: CarbonEasing.standardProductive,
                     child: CarbonIcon(
                       CarbonIcons.chevronRight,
@@ -1360,9 +1358,7 @@ class _ExpandedDetail extends StatelessWidget {
             role: SemanticsRole.cell,
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
-              duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                  ? Duration.zero
-                  : CarbonDuration.moderate01,
+              duration: carbonDuration(context, CarbonDuration.moderate01),
               curve: CarbonEasing.standardProductive,
               builder: (BuildContext context, double t, Widget? child) =>
                   ClipRect(
@@ -1592,9 +1588,7 @@ class _BatchHeader extends StatelessWidget {
           // $duration-fast-02 motion(standard, productive)).
           AnimatedSlide(
             offset: active ? Offset.zero : const Offset(0, -1),
-            duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                ? Duration.zero
-                : CarbonDuration.fast02,
+            duration: carbonDuration(context, CarbonDuration.fast02),
             curve: CarbonEasing.standardProductive,
             child: ExcludeSemantics(
               excluding: !active,

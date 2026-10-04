@@ -137,11 +137,7 @@ class CarbonToggle extends StatelessWidget {
     );
     final bool enabled = state.canActivate;
     final bool disabled = state.isDisabled;
-    final bool reduceMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration duration = reduceMotion
-        ? Duration.zero
-        : CarbonDuration.fast01;
+    final Duration duration = carbonDuration(context, CarbonDuration.fast01);
 
     final String sideText = hideLabel ? labelText : (toggled ? labelB : labelA);
 

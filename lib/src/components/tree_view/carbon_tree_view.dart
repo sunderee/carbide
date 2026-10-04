@@ -874,7 +874,7 @@ class _Toggle extends StatelessWidget {
             child: AnimatedRotation(
               // Collapsed chevron points right (`rotate(-90deg)`).
               turns: expanded ? 0 : -0.25,
-              duration: CarbonDuration.fast02,
+              duration: carbonDuration(context, CarbonDuration.fast02),
               curve: CarbonEasing.standardProductive,
               child: CarbonIcon(
                 CarbonIcons.chevronDown,

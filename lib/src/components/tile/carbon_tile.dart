@@ -131,8 +131,6 @@ class CarbonClickableTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onPressed != null;
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     return Semantics(
       button: true,
@@ -153,9 +151,7 @@ class CarbonClickableTile extends StatelessWidget {
             // Background per `_tile.scss` `--tile--clickable`:
             // $duration-moderate-01 motion(standard, productive).
             child: AnimatedContainer(
-              duration: reducedMotion
-                  ? Duration.zero
-                  : CarbonDuration.moderate01,
+              duration: carbonDuration(context, CarbonDuration.moderate01),
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,
@@ -256,8 +252,6 @@ class CarbonSelectableTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onChanged != null;
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     return Semantics(
       checked: selected,
@@ -287,9 +281,7 @@ class CarbonSelectableTile extends StatelessWidget {
             // Background/border per `_tile.scss`: $duration-moderate-01
             // motion(standard, productive).
             child: AnimatedContainer(
-              duration: reducedMotion
-                  ? Duration.zero
-                  : CarbonDuration.moderate01,
+              duration: carbonDuration(context, CarbonDuration.moderate01),
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,
@@ -324,9 +316,7 @@ class CarbonSelectableTile extends StatelessWidget {
                     // opacity $duration-fast-02
                     // motion(standard, productive).
                     child: AnimatedOpacity(
-                      duration: reducedMotion
-                          ? Duration.zero
-                          : CarbonDuration.fast02,
+                      duration: carbonDuration(context, CarbonDuration.fast02),
                       curve: CarbonEasing.standardProductive,
                       opacity: checkmarkVisible ? 1 : 0,
                       child: CarbonIcon(

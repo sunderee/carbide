@@ -493,7 +493,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
             visible: focused,
             inset: true,
             child: AnimatedContainer(
-              duration: CarbonDuration.fast01,
+              duration: carbonDuration(context, CarbonDuration.fast01),
               curve: CarbonEasing.standardProductive,
               height: _fluid ? 64 : widget.size.height,
               decoration: BoxDecoration(

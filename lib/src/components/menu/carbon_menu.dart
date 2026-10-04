@@ -565,12 +565,10 @@ class _MenuItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     // `_menu.scss`: background-color $duration-fast-01
     // motion(standard, productive); instant under reduced motion.
     return AnimatedContainer(
-      duration: reducedMotion ? Duration.zero : CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.standardProductive,
       height: size.height,
       decoration: BoxDecoration(color: background),

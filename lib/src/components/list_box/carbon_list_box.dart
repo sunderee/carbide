@@ -194,7 +194,7 @@ class _CarbonListBoxState extends State<CarbonListBox> {
           visible: widget.focused,
           inset: true,
           child: AnimatedContainer(
-            duration: CarbonDuration.fast01,
+            duration: carbonDuration(context, CarbonDuration.fast01),
             curve: CarbonEasing.standardProductive,
             height: widget.fluid ? 64 : widget.size.height,
             decoration: BoxDecoration(
@@ -283,7 +283,7 @@ class CarbonListBoxMenuIcon extends StatelessWidget {
       child: Center(
         child: AnimatedRotation(
           turns: open ? 0.5 : 0,
-          duration: CarbonDuration.fast01,
+          duration: carbonDuration(context, CarbonDuration.fast01),
           curve: CarbonEasing.standardProductive,
           child: CarbonIcon(
             CarbonIcons.chevronDown,

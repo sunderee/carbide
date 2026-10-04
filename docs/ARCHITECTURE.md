@@ -72,6 +72,12 @@ them as plain, immutable Dart, derived from the upstream `@carbon/*` packages in
 - **Motion** — durations (`fast-01`..`slow-02`) as `Duration`, and the
   standard/entrance/exit × productive/expressive easing curves as `Curve`
   (cubic-bézier → `Cubic`) (`@carbon/motion`).
+  Components resolve decorative durations at the animation site with
+  `carbonDuration(context, CarbonDuration.fast01)`, which depends on the nearest
+  `MediaQuery.disableAnimations`. This also accepts custom durations. Scrolling
+  APIs that reject zero use their instant alternative. The CI source guard
+  requires this resolver in animated sources and for every Carbon duration
+  token; loading spinners and indeterminate progress are documented exceptions.
 
 Token values are copied faithfully from the Apache-2.0 source; files that are
 direct translations carry an attribution header pointing to `NOTICE`.

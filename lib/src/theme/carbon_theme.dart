@@ -5,6 +5,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../foundations/motion.dart';
 import 'carbon_theme_data.dart';
 
 /// Provides a [CarbonThemeData] to its descendants.
@@ -83,10 +84,8 @@ class _AnimatedCarbonThemeState
   void _syncDuration() {
     // The theme crossfade is decorative, so it collapses to zero when the
     // platform requests reduced motion.
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    controller.duration = reducedMotion ? Duration.zero : widget.duration;
-    if (reducedMotion && controller.isAnimating) {
+    controller.duration = carbonDuration(context, widget.duration);
+    if (controller.duration == Duration.zero && controller.isAnimating) {
       // A crossfade already in flight was started with the pre-clamp
       // duration; jump it to its end state.
       controller.value = controller.upperBound;

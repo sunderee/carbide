@@ -337,8 +337,6 @@ class _Track extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 48),
       child: SizedBox(
@@ -366,9 +364,7 @@ class _Track extends StatelessWidget {
               // under reduced motion.
               : TweenAnimationBuilder<double>(
                   tween: Tween<double>(end: fraction),
-                  duration: reducedMotion
-                      ? Duration.zero
-                      : CarbonDuration.fast02,
+                  duration: carbonDuration(context, CarbonDuration.fast02),
                   curve: CarbonEasing.standardProductive,
                   builder:
                       (BuildContext context, double width, Widget? child) =>

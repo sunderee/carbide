@@ -295,9 +295,6 @@ class _AILabelButtonState extends State<_AILabelButton> {
         color: color,
       );
 
-  bool _reducedMotion(BuildContext context) =>
-      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-
   Widget _buildDefault(CarbonThemeData theme) {
     final CarbonAILabelSize size = widget.size;
     final bool filled = _hovered || _pressed;
@@ -305,7 +302,7 @@ class _AILabelButtonState extends State<_AILabelButton> {
     // `_slug.scss`: color/border/background $duration-fast-01
     // motion(entrance, productive); instant under reduced motion.
     final Widget box = AnimatedContainer(
-      duration: _reducedMotion(context) ? Duration.zero : CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.entranceProductive,
       width: size.dimension,
       height: size.dimension,
@@ -348,7 +345,7 @@ class _AILabelButtonState extends State<_AILabelButton> {
     // `_slug.scss` inline affordance: background/box-shadow $duration-fast-01
     // motion(entrance, productive); instant under reduced motion.
     return AnimatedContainer(
-      duration: _reducedMotion(context) ? Duration.zero : CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.entranceProductive,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(

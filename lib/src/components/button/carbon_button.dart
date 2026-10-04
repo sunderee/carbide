@@ -384,9 +384,7 @@ class _ButtonSurface extends StatelessWidget {
     // Fill per `button/_mixins.scss`: background / box-shadow /
     // border-color / outline $duration-fast-01 motion(entrance, productive).
     return AnimatedContainer(
-      duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-          ? Duration.zero
-          : CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.entranceProductive,
       // The spec height is a minimum, not a ceiling: under text scaling
       // the label's line box may exceed the fixed chrome, and the button

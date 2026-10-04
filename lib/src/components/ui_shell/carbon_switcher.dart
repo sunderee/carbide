@@ -54,9 +54,7 @@ class CarbonHeaderPanel extends StatelessWidget {
       // Slide per `_header-panel.scss`: width $duration-fast-02
       // motion(exit, productive).
       child: AnimatedContainer(
-        duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-            ? Duration.zero
-            : CarbonDuration.fast02,
+        duration: carbonDuration(context, CarbonDuration.fast02),
         curve: CarbonEasing.exitProductive,
         width: open ? 256 : 0,
         decoration: BoxDecoration(
