@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Open context menus with Shift+F10 or the Context Menu key inside a focused
+  target region. Anchor to that focused child's logical start edge, enter the
+  first enabled item and restore the opener on dismissal. Tab continues normal
+  traversal, while consumer focus requests take precedence (#315).
+
 - Give data tables an accessible name and ordered table, row, header and cell
   roles. Sortable headers expose a named button with a localizable sort-state
   value and an activation target that fills the cell. Preserve keyed row focus,

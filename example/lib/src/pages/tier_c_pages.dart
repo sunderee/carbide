@@ -1032,14 +1032,23 @@ class _ContainedListPageState extends State<_ContainedListPage> {
   }
 }
 
-class _ContextMenuPage extends StatelessWidget {
+class _ContextMenuPage extends StatefulWidget {
   const _ContextMenuPage();
+
+  @override
+  State<_ContextMenuPage> createState() => _ContextMenuPageState();
+}
+
+class _ContextMenuPageState extends State<_ContextMenuPage> {
+  bool _focusVisible = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
     return DemoScaffold(
       title: 'Context menu',
-      description: 'Right-click (or long-press) the area to open a menu.',
+      description:
+          'Focus the target and press Shift+F10 or the Context Menu '
+          'key. Secondary click and long press also open the menu.',
       preview: CarbonContextMenu(
         items: <Widget>[
           CarbonMenuItem(label: 'Cut', icon: CarbonIcons.cut, onPressed: () {}),
@@ -1054,21 +1063,36 @@ class _ContextMenuPage extends StatelessWidget {
             onPressed: () {},
           ),
         ],
-        child: Container(
-          width: 280,
-          height: 120,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: t.layer01,
-            border: Border.all(color: t.borderSubtle00),
-          ),
-          child: Text(
-            'Right-click here',
-            style: CarbonTypeStyles.body01.copyWith(color: t.textSecondary),
+        child: FocusableActionDetector(
+          onShowFocusHighlight: (bool visible) =>
+              setState(() => _focusVisible = visible),
+          child: Semantics(
+            hint: 'Press Shift+F10 or the Context Menu key for actions',
+            child: CarbonFocusRing(
+              visible: _focusVisible,
+              inset: true,
+              child: Container(
+                width: 280,
+                height: 120,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: t.layer01,
+                  border: Border.all(color: t.borderSubtle00),
+                ),
+                child: Text(
+                  'Context menu target',
+                  style: CarbonTypeStyles.body01.copyWith(
+                    color: t.textSecondary,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
-      code: 'CarbonContextMenu(items: <…>[…], child: …);',
+      code:
+          'CarbonContextMenu(items: <…>[…], '
+          'child: Focus(child: …));',
     );
   }
 }
