@@ -29,6 +29,7 @@ import '../checkbox/carbon_checkbox.dart';
 import '../../utils/owned_listenable.dart';
 import '../../utils/text_control_semantics.dart';
 import '../form/carbon_form.dart';
+import '../list_box/list_box_semantics.dart';
 import '../list_box/carbon_list_box.dart';
 
 /// A single option in a [CarbonMultiSelect].
@@ -75,6 +76,7 @@ class CarbonMultiSelect<T> extends StatefulWidget {
     this.disabled = false,
     this.readOnly = false,
     this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
+    this.activeOptionFormatter = carbonListBoxActiveOptionLabel,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -120,6 +122,14 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 
   /// The localizable announcement for read-only mode.
   final String readOnlyHint;
+
+  /// Formats the highlighted option and its one-based position for assistive
+  /// technology. Defaults to [carbonListBoxActiveOptionLabel].
+  ///
+  /// Keyboard focus stays on the trigger, including editable filters. The
+  /// shared list-box policy updates a hint and polite live region while the
+  /// value remains the current text or committed selection.
+  final CarbonListBoxActiveOptionFormatter activeOptionFormatter;
 
   /// Whether the multi-select is invalid.
   final bool invalid;
@@ -380,7 +390,18 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => CarbonListBoxSemantics(
+    expanded: _controlState.canActivate && _overlay.isShowing,
+    activeIndex: _highlighted,
+    focusNode: _focus,
+    optionLabels: <String?>[
+      for (final item in _filtered) item.disabled ? null : item.label,
+    ],
+    formatActiveOption: widget.activeOptionFormatter,
+    builder: _build,
+  );
+
+  Widget _build(BuildContext context) {
     final Widget field = CompositedTransformTarget(
       link: _link,
       child: LayoutBuilder(
@@ -461,6 +482,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     return CarbonControlSemantics(
       state: _controlState,
       readOnlyHint: widget.readOnlyHint,
+      expanded: _controlState.canActivate && _overlay.isShowing,
+      activeOptionHint: CarbonListBoxSemantics.activeHintOf(context),
       focusNode: _focus,
       onActivate: _toggleOpen,
       button: true,
@@ -553,6 +576,10 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                       label: widget.titleText,
                       value: controller.text,
                       readOnlyHint: widget.readOnlyHint,
+                      expanded: _controlState.canActivate && _overlay.isShowing,
+                      activeOptionHint: CarbonListBoxSemantics.activeHintOf(
+                        context,
+                      ),
                       focusNode: _focus,
                       child: _FilterInput(
                         controller: controller,
@@ -571,12 +598,22 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                     ),
                   ),
                   const SizedBox(width: CarbonSpacing.spacing03),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _controlState.canActivate ? _toggleOpen : null,
-                    child: CarbonListBoxMenuIcon(
-                      open: _overlay.isShowing,
-                      disabled: !_controlState.canActivate,
+                  ExcludeSemantics(
+                    excluding: !_controlState.canActivate,
+                    child: Semantics(
+                      button: true,
+                      label: widget.titleText,
+                      expanded: _overlay.isShowing,
+                      onTap: _controlState.canActivate ? _toggleOpen : null,
+                      child: GestureDetector(
+                        excludeFromSemantics: true,
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _controlState.canActivate ? _toggleOpen : null,
+                        child: CarbonListBoxMenuIcon(
+                          open: _overlay.isShowing,
+                          disabled: !_controlState.canActivate,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -618,9 +655,12 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
 
   Widget _menuRow(CarbonMultiSelectItem<T> item, int index) {
     final bool selected = widget.selectedValues.contains(item.value);
-    return Semantics(
-      checked: selected,
-      enabled: !item.disabled,
+    return CarbonListBoxOptionSemantics(
+      multiple: true,
+      selected: selected,
+      disabled: item.disabled,
+      active: index == _highlighted,
+      onActivate: () => _toggle(item),
       label: item.label,
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(
@@ -629,8 +669,11 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           isFirst: index == 0,
           isHighlighted: index == _highlighted,
           disabled: item.disabled,
+          onTap: () => _toggle(item),
           child: IgnorePointer(
-            ignoring: item.disabled,
+            // The whole option row owns pointer activation, including taps
+            // over the checkbox. Its checkbox paints the committed state.
+            ignoring: true,
             child: CarbonCheckbox(
               label: item.label,
               value: selected,
@@ -682,6 +725,7 @@ class _FilterInput extends StatelessWidget {
             ),
           ),
         EditableText(
+          groupId: focusNode,
           controller: controller,
           focusNode: focusNode,
           readOnly: !enabled,

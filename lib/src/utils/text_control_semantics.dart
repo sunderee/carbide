@@ -25,6 +25,8 @@ class CarbonTextControlSemantics extends StatefulWidget {
     required this.readOnlyHint,
     required this.focusNode,
     required this.child,
+    this.expanded,
+    this.activeOptionHint,
     super.key,
   });
 
@@ -45,6 +47,12 @@ class CarbonTextControlSemantics extends StatefulWidget {
 
   /// The editor and any decorative placeholder.
   final Widget child;
+
+  /// Whether an attached picker popup is open; omitted for plain editors.
+  final bool? expanded;
+
+  /// The keyboard-highlight announcement without replacing the editor value.
+  final String? activeOptionHint;
 
   @override
   State<CarbonTextControlSemantics> createState() =>
@@ -254,7 +262,10 @@ class _CarbonTextControlSemanticsState
           label: widget.label,
           enabled: !widget.state.isDisabled,
           readOnly: !widget.state.canActivate,
-          hint: widget.state.semanticsHint(widget.readOnlyHint),
+          expanded: widget.expanded,
+          hint: widget.state.isReadOnly
+              ? widget.readOnlyHint
+              : widget.activeOptionHint,
           focusable: widget.state.canFocus,
           focused: widget.state.canFocus ? widget.focusNode.hasFocus : null,
           value: widget.state.isDisabled ? widget.value : null,

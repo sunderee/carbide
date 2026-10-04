@@ -100,10 +100,9 @@ jobs:
 
   gallery-web-integration:
     name: Gallery integration test — web
-    # The expanded fixture suite reached the 20-minute limit during its final
-    # content-switcher run after adding the picker matrix. Keep a bounded
-    # 25-minute budget for the complete gallery browser suite.
-    timeout-minutes: 25
+    # The full native matrix took 23 minutes before the active-option fixture;
+    # leave room for its extra browser compilation and interaction cases.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -257,6 +256,14 @@ jobs:
           flutter drive --release
           --driver=test_driver/integration_test.dart
           --target=integration_test/picker_keyboard_without_semantics_test.dart
+          -d web-server
+
+      - name: Drive picker native active-option semantics in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/picker_option_semantics_test.dart
           -d web-server
 
       - name: Drive content-switcher native name contracts in release mode

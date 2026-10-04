@@ -27,6 +27,7 @@ import '../../utils/focus_ring.dart';
 import '../../utils/owned_listenable.dart';
 import '../../utils/text_control_semantics.dart';
 import '../form/carbon_form.dart';
+import '../list_box/list_box_semantics.dart';
 import '../list_box/carbon_list_box.dart';
 
 /// A single option in a [CarbonComboBox].
@@ -74,6 +75,7 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.disabled = false,
     this.readOnly = false,
     this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
+    this.activeOptionFormatter = carbonListBoxActiveOptionLabel,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -118,6 +120,14 @@ class CarbonComboBox<T> extends StatefulWidget {
 
   /// The localizable announcement for read-only mode.
   final String readOnlyHint;
+
+  /// Formats the highlighted option and its one-based position for assistive
+  /// technology. Defaults to [carbonListBoxActiveOptionLabel].
+  ///
+  /// Keyboard focus stays on the trigger, including editable filters. The
+  /// shared list-box policy updates a hint and polite live region while the
+  /// value remains the current text or committed selection.
+  final CarbonListBoxActiveOptionFormatter activeOptionFormatter;
 
   /// Whether the combo box is invalid.
   final bool invalid;
@@ -367,7 +377,18 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => CarbonListBoxSemantics(
+    expanded: _controlState.canActivate && _overlay.isShowing,
+    activeIndex: _highlighted,
+    focusNode: _focus,
+    optionLabels: <String?>[
+      for (final item in _filtered) item.disabled ? null : item.label,
+    ],
+    formatActiveOption: widget.activeOptionFormatter,
+    builder: _build,
+  );
+
+  Widget _build(BuildContext context) {
     final Widget field = CompositedTransformTarget(
       link: _link,
       child: LayoutBuilder(
@@ -436,6 +457,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       label: widget.titleText,
       value: _controller.text,
       readOnlyHint: widget.readOnlyHint,
+      expanded: _controlState.canActivate && _overlay.isShowing,
+      activeOptionHint: CarbonListBoxSemantics.activeHintOf(context),
       focusNode: _focus,
       child: _ComboInput(
         controller: _controller,
@@ -577,15 +600,22 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   Widget _menuRow(CarbonComboBoxItem<T> item, int index) {
     final bool selected = item.value == widget.selectedItem;
-    return CarbonListBoxMenuItem(
-      size: widget.size,
-      fluid: _fluid && !widget.condensed,
-      isFirst: index == 0,
-      isActive: selected,
-      isHighlighted: index == _highlighted,
+    return CarbonListBoxOptionSemantics(
+      label: item.label,
+      selected: selected,
+      active: index == _highlighted,
       disabled: item.disabled,
-      onTap: () => _select(item),
-      child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      onActivate: () => _select(item),
+      child: CarbonListBoxMenuItem(
+        size: widget.size,
+        fluid: _fluid && !widget.condensed,
+        isFirst: index == 0,
+        isActive: selected,
+        isHighlighted: index == _highlighted,
+        disabled: item.disabled,
+        onTap: () => _select(item),
+        child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      ),
     );
   }
 }
@@ -632,6 +662,7 @@ class _ComboInput extends StatelessWidget {
             ),
           ),
         EditableText(
+          groupId: focusNode,
           controller: controller,
           focusNode: focusNode,
           selectAllOnFocus: selectAllOnFocus,

@@ -59,6 +59,24 @@ bool Function()? captureNativeControlFocus() {
   };
 }
 
+/// Captures browser focus ownership while an ordinary editor is reattached.
+///
+/// The caller checks framework ownership and requests the current editor through
+/// public Flutter APIs. A newer native control or an inactive document wins;
+/// the captured editor need not remain connected after a native blur.
+bool Function()? captureNativeFocusOwnership() {
+  if (!_document.hasFocus()) return null;
+  final _Element? previous = _document.activeElement;
+  return () {
+    if (!_document.hasFocus()) return false;
+    final _Element? active = _document.activeElement;
+    return active == previous ||
+        active == null ||
+        active.tagName == 'BODY' ||
+        active.tagName == 'FLUTTER-VIEW';
+  };
+}
+
 /// Captures a guarded native request for a newly focused read-only control.
 ///
 /// The caller confirms framework ownership before invoking the callback after
@@ -98,15 +116,7 @@ bool Function()? _captureControlFocus(
     // The ordinary web editing host is created by EditableText's public
     // requestKeyboard API. Guard that attachment after editor replacement;
     // there is no named semantics input to focus directly in this mode.
-    final _Element? previous = _document.activeElement;
-    return () {
-      if (!_document.hasFocus()) return false;
-      final _Element? active = _document.activeElement;
-      return active == previous ||
-          active == null ||
-          active.tagName == 'BODY' ||
-          active.tagName == 'FLUTTER-VIEW';
-    };
+    return captureNativeFocusOwnership();
   }
   final _Element? previous = _document.activeElement;
   return () {

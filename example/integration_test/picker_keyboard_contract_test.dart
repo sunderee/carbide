@@ -278,6 +278,261 @@ void main() {
   }
 }
 
+// Uses the same native field/key/settling helpers as the keyboard contracts.
+// A separate entrypoint keeps the original keyboard matrix independently runnable.
+void testNativePickerOptionSemantics() {
+  for (final TextDirection direction in TextDirection.values) {
+    for (final KeyboardPickerKind kind in KeyboardPickerKind.values) {
+      for (final bool dialog in <bool>[false, true]) {
+        testWidgets(
+          'native active option ${kind.name}, $direction dialog=$dialog (#311)',
+          (tester) async {
+            final SemanticsHandle semantics = tester.ensureSemantics();
+            final key = GlobalKey<PickerKeyboardFixtureState>();
+            _MutationObserver? observer;
+            final List<String> announcements = <String>[];
+            try {
+              final Widget fixture = PickerKeyboardFixture(
+                key: key,
+                kind: kind,
+                provideAncestorShortcuts: !dialog,
+              );
+              await tester.pumpWidget(
+                _host(
+                  dialog
+                      ? CarbonDialog(
+                          open: true,
+                          onRequestClose: () {},
+                          children: <Widget>[CarbonDialogBody(child: fixture)],
+                        )
+                      : fixture,
+                  direction,
+                ),
+              );
+              await _settle(tester);
+              final state = key.currentState!;
+              state.configure(
+                choices: const <KeyboardChoice>[
+                  KeyboardChoice('a', 'Alpha'),
+                  KeyboardChoice('b', 'Beta', disabled: true),
+                  KeyboardChoice('c', 'Charlie'),
+                ],
+              );
+              await _settle(tester);
+              await _focusClosed(tester, state);
+              expect(_expanded(), 'false');
+              observer = _MutationObserver(
+                ((JSObject records, JSObject observer) {
+                  final String? message = _liveAnnouncement();
+                  if (message != null && message.isNotEmpty) {
+                    announcements.add(message);
+                  }
+                }).toJS,
+              );
+              observer.observe(
+                _document.querySelectorAll('[aria-live="polite"]').item(0)!,
+                _ObserverOptions(
+                  childList: true,
+                  subtree: true,
+                  characterData: true,
+                ),
+              );
+              final native = _field();
+              final parents = _nativeParents(native);
+              await _key(tester, 'ArrowDown');
+              expect(_expanded(), 'true');
+              _expectNativeActive(announcements, state, 'Alpha', 1, 3);
+              await _key(tester, 'ArrowDown');
+              _expectNativeActive(announcements, state, 'Charlie', 3, 3);
+              expect(_field(), same(native));
+              if (kind == KeyboardPickerKind.combo ||
+                  kind == KeyboardPickerKind.filteredMulti) {
+                expect(_nativeParents(native), parents);
+              }
+              for (final String label in <String>['Alpha', 'Beta', 'Charlie']) {
+                expect(
+                  _nativeOptions(label),
+                  hasLength(1),
+                  reason: 'one native option: $label',
+                );
+              }
+              final multiple =
+                  kind == KeyboardPickerKind.multi ||
+                  kind == KeyboardPickerKind.filteredMulti;
+              expect(
+                _nativeOptions('Beta').single.getAttribute('aria-disabled'),
+                'true',
+              );
+              expect(
+                _nativeOptions('Beta').single
+                    .getAttribute(multiple ? 'aria-checked' : 'aria-current'),
+                'true',
+              );
+              expect(
+                _nativeOptions('Charlie').single
+                    .getAttribute(multiple ? 'aria-checked' : 'aria-current'),
+                'false',
+              );
+              expect(state.value, 'b');
+              expect(state.selected, <String>{'b'});
+              expect(state.changes, 0);
+              state.configure(
+                activeOptionFormatter: (label, position, count) =>
+                    'Option active : $label ($position/$count)',
+              );
+              await _settle(tester);
+              const localized = 'Option active : Charlie (3/3)';
+              expect(_field().getAttribute('aria-description'), localized);
+              expect(
+                _nativeOptions('Charlie').single
+                    .getAttribute('aria-description'),
+                localized,
+              );
+              expect(announcements, contains(localized));
+              expect(_document.activeElement == _field(), isTrue);
+              // Model the native blur caused by a real pointer on a disabled
+              // row, then exercise the complete Flutter row hit target.
+              _document.querySelectorAll('flutter-view').item(0)!.focus();
+              await tester.tapAt(
+                tester.getCenter(
+                  find.descendant(
+                    of: find.byType(CompositedTransformFollower),
+                    matching: find.text('Beta'),
+                  ),
+                ),
+              );
+              await _settle(tester);
+              expect(_document.activeElement == _field(), isTrue);
+              expect(state.focus.hasPrimaryFocus, isTrue);
+              expect(state.changes, 0);
+              _nativeOptions('Beta').single.click();
+              await _settle(tester);
+              expect(state.changes, 0);
+              state.configure(
+                activeOptionFormatter: carbonListBoxActiveOptionLabel,
+              );
+              await _settle(tester);
+              if (kind == KeyboardPickerKind.combo ||
+                  kind == KeyboardPickerKind.filteredMulti) {
+                _field().value = 'Ch';
+                _field().dispatchEvent(
+                  _InputEvent('input', _InputEventInit(bubbles: true)),
+                );
+                await _settle(tester);
+                expect(
+                  tester
+                      .widget<EditableText>(find.byType(EditableText))
+                      .controller
+                      .text,
+                  'Ch',
+                );
+                _expectNativeActive(announcements, state, 'Charlie', 1, 1);
+                expect(_field().value, 'Ch');
+                expect(_nativeOptions('Alpha'), isEmpty);
+                expect(_nativeOptions('Beta'), isEmpty);
+                _field().value = 'Missing';
+                _field().dispatchEvent(
+                  _InputEvent('input', _InputEventInit(bubbles: true)),
+                );
+                await _settle(tester);
+                expect(_field().getAttribute('aria-description'), isNull);
+                expect(
+                  tester
+                      .widget<EditableText>(find.byType(EditableText))
+                      .controller
+                      .text,
+                  'Missing',
+                );
+                _field().value = '';
+                _field().dispatchEvent(
+                  _InputEvent('input', _InputEventInit(bubbles: true)),
+                );
+                await _settle(tester);
+                _expectNativeActive(announcements, state, 'Alpha', 1, 3);
+              }
+              _nativeOptions('Charlie').single.click();
+              await _settle(tester);
+              expect(state.changes, 1);
+              if (multiple) {
+                expect(state.selected, <String>{'b', 'c'});
+                expect(
+                  _nativeOptions('Charlie').single.getAttribute('aria-checked'),
+                  'true',
+                );
+                await _key(tester, 'Escape');
+              } else {
+                expect(state.value, 'c');
+              }
+              expect(_expanded(), 'false');
+              expect(_field().getAttribute('aria-description'), isNull);
+              expect(_document.activeElement == _field(), isTrue);
+              await _key(tester, 'ArrowDown');
+              state.configure(readOnly: true);
+              await _settle(tester);
+              expect(_open, isFalse);
+              expect(_field().getAttribute('aria-description'), 'Read only');
+              expect(state.changes, 1);
+              expect(_document.activeElement == _field(), isTrue);
+            } finally {
+              observer?.disconnect();
+              await tester.pumpWidget(const SizedBox.shrink());
+              await _settle(tester);
+              semantics.dispose();
+            }
+          },
+        );
+      }
+    }
+  }
+}
+
+String? _expanded() {
+  final field = _field();
+  if (field.tagName != 'INPUT' && field.tagName != 'TEXTAREA') {
+    return field.getAttribute('aria-expanded');
+  }
+  // Flutter's SemanticTextField uses SemanticRole.blank and does not translate
+  // expanded. The adjacent named popup button supplies native web expansion;
+  // the input itself still carries expanded in Flutter's semantics tree.
+  return _nativeOptions('Field').single.getAttribute('aria-expanded');
+}
+
+List<_Element> _nativeOptions(String label) {
+  final elements = _document.querySelectorAll(
+    'flt-semantics[role="button"],flt-semantics[role="checkbox"]',
+  );
+  return <_Element>[
+    for (int i = 0; i < elements.length; i++)
+      if ((elements.item(i)!.getAttribute('aria-label') ??
+                  elements.item(i)!.textContent ??
+                  '')
+              .trim() ==
+          label)
+        elements.item(i)!,
+  ];
+}
+
+String? _liveAnnouncement() => _document
+    .querySelectorAll('[aria-live="polite"]')
+    .item(0)
+    ?.textContent
+    ?.trim();
+
+void _expectNativeActive(
+  List<String> announcements,
+  PickerKeyboardFixtureState state,
+  String label,
+  int position,
+  int count,
+) {
+  final hint = 'Active option: $label, $position of $count';
+  expect(_field().getAttribute('aria-description'), hint);
+  expect(_nativeOptions(label).single.getAttribute('aria-description'), hint);
+  expect(announcements, contains(hint));
+  expect(state.focus.hasPrimaryFocus, isTrue);
+  expect(_document.activeElement == _field(), isTrue, reason: _describe(state));
+}
+
 // Flutter web chooses its native editing strategy on first use. Register these
 // cases from a separate browser entrypoint so they exercise the shared editing
 // host from startup, rather than disabling a previously active semantics role.
@@ -317,6 +572,48 @@ void testSharedEditingHostPickerPolicy() {
               anyOf('INPUT', 'TEXTAREA'),
               reason: 'the ordinary native editor is connected before policy changes',
             );
+            state.configure(
+              choices: const <KeyboardChoice>[
+                KeyboardChoice('a', 'Alpha'),
+                KeyboardChoice('b', 'Beta', disabled: true),
+                KeyboardChoice('c', 'Charlie'),
+              ],
+            );
+            await _settle(tester);
+            await _key(tester, 'ArrowDown');
+            // The browser's default canvas pointer action blurs its ordinary
+            // editing host before the framework delivers the option gesture.
+            _document.querySelectorAll('flutter-view').item(0)!.focus();
+            await tester.tapAt(
+              tester.getCenter(
+                find.descendant(
+                  of: find.byType(CompositedTransformFollower),
+                  matching: find.text('Beta'),
+                ),
+              ),
+            );
+            await _settle(tester);
+            expect(state.changes, 0);
+            expect(
+              state.focus.hasPrimaryFocus,
+              isTrue,
+              reason: 'a disabled row preserves the ordinary editor focus',
+            );
+            final _Element retained = _document.activeElement!;
+            expect(<String>['INPUT', 'TEXTAREA'], contains(retained.tagName));
+            retained.value = 'Charlie';
+            retained.dispatchEvent(
+              _InputEvent('input', _InputEventInit(bubbles: true)),
+            );
+            await _settle(tester);
+            expect(
+              tester
+                  .widget<EditableText>(find.byType(EditableText))
+                  .controller
+                  .text,
+              'Charlie',
+            );
+            expect(state.changes, 0);
             state.configure(readOnly: true);
             await _settle(tester);
             expect(state.focus.hasPrimaryFocus, isTrue);
@@ -489,6 +786,7 @@ extension type _Element(JSObject _) implements JSObject {
   external bool get readOnly;
   external String? getAttribute(String name);
   external void focus();
+  external void click();
 }
 
 @JS('KeyboardEvent')
@@ -513,4 +811,19 @@ extension type _InputEvent._(JSObject _) implements JSObject {
 
 extension type _InputEventInit._(JSObject _) implements JSObject {
   external factory _InputEventInit({bool bubbles});
+}
+
+@JS('MutationObserver')
+extension type _MutationObserver._(JSObject _) implements JSObject {
+  external factory _MutationObserver(JSFunction callback);
+  external void observe(JSObject target, _ObserverOptions options);
+  external void disconnect();
+}
+
+extension type _ObserverOptions._(JSObject _) implements JSObject {
+  external factory _ObserverOptions({
+    bool childList,
+    bool subtree,
+    bool characterData,
+  });
 }

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Share active-option semantics across dropdown, select, combo-box and
+  multi-select. Announce keyboard navigation without changing the committed
+  value or editor query, expose expanded state, and allow localization through
+  `activeOptionFormatter`. Each option has one accessible activation target;
+  multi-select rows toggle once across their full width (#311).
+
 - Align Select and Dropdown opening keys: Up starts at the last enabled
   option, Down at the first, and Enter/Space at an enabled current selection.
   Let picker keys reach ancestor form/dialog handlers when they perform no

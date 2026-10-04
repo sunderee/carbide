@@ -62,6 +62,8 @@ export 'src/components/tree_view/carbon_tree_view.dart';
 export 'src/components/dropdown/carbon_dropdown.dart';
 export 'src/components/list/carbon_list.dart';
 export 'src/components/list_box/carbon_list_box.dart';
+export 'src/components/list_box/list_box_semantics.dart'
+    show CarbonListBoxActiveOptionFormatter, carbonListBoxActiveOptionLabel;
 export 'src/components/loading/carbon_inline_loading.dart';
 export 'src/components/loading/carbon_loading.dart';
 export 'src/components/menu/carbon_menu.dart';

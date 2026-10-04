@@ -55,6 +55,8 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
   bool readOnly = false;
   bool disabled = false;
   int changes = 0;
+  CarbonListBoxActiveOptionFormatter activeOptionFormatter =
+      carbonListBoxActiveOptionLabel;
 
   int calls(LogicalKeyboardKey key) => ancestorCalls[key] ?? 0;
 
@@ -64,11 +66,15 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
     bool clearValue = false,
     bool? readOnly,
     bool? disabled,
+    CarbonListBoxActiveOptionFormatter? activeOptionFormatter,
   }) => setState(() {
     if (choices != null) this.choices = choices;
     if (clearValue || value != null) this.value = value;
     if (readOnly != null) this.readOnly = readOnly;
     if (disabled != null) this.disabled = disabled;
+    if (activeOptionFormatter != null) {
+      this.activeOptionFormatter = activeOptionFormatter;
+    }
   });
 
   void _single(String? next) => setState(() {
@@ -112,6 +118,7 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
         selectedItem: value,
         focusNode: focus,
         readOnly: readOnly,
+        activeOptionFormatter: activeOptionFormatter,
         disabled: disabled,
         onChanged: _single,
       ),
@@ -125,6 +132,7 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
         value: value,
         focusNode: focus,
         readOnly: readOnly,
+        activeOptionFormatter: activeOptionFormatter,
         disabled: disabled,
         onChanged: _single,
       ),
@@ -141,6 +149,7 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
         selectedItem: value,
         focusNode: focus,
         readOnly: readOnly,
+        activeOptionFormatter: activeOptionFormatter,
         disabled: disabled,
         onChanged: _single,
       ),
@@ -160,6 +169,7 @@ class PickerKeyboardFixtureState extends State<PickerKeyboardFixture> {
         selectedValues: selected,
         focusNode: focus,
         readOnly: readOnly,
+        activeOptionFormatter: activeOptionFormatter,
         disabled: disabled,
         onChanged: _multiple,
       ),

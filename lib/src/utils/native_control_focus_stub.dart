@@ -18,3 +18,6 @@ bool Function()? captureTextControlFocus(
   required bool readOnly,
   bool allowSharedEditor = false,
 }) => null;
+
+/// Browser focus ownership is managed by Flutter outside the browser.
+bool Function()? captureNativeFocusOwnership() => null;
