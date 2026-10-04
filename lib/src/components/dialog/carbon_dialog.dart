@@ -19,6 +19,8 @@
 // CarbonModal there is no outside-tap dismissal — the native dialog element
 // does not close on backdrop clicks.
 
+import 'dart:async';
+
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -32,8 +34,22 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/interaction.dart';
+import '../../utils/native_control_focus.dart';
+import '../../utils/overlay_focus_repair.dart';
 
 /// A composable Carbon dialog.
+///
+/// Modal dialogs contain keyboard traversal and restore focus to the opener
+/// on close if it is still attached and focusable. Initial focus follows a
+/// descendant's `autofocus` request, otherwise the first available control
+/// (normally Close). For a destructive dialog, set `autofocus: true` on the
+/// non-destructive action, such as Cancel. Passive and confirmation dialogs
+/// normally start at Close. A non-modal dialog leaves existing focus unchanged
+/// on opening and closing, and permits traversal to the page behind it.
+///
+/// The modal backdrop is excluded from semantics and does not dismiss on tap.
+/// The named close control and Escape provide keyboard-accessible dismissal;
+/// Escape only requests close while focus is inside the dialog.
 ///
 /// Opening plays the upstream entrance transition — opacity +
 /// translateY(−24px) at `moderate-02` × `entrance, expressive`. Under
@@ -98,7 +114,10 @@ class CarbonDialog extends StatefulWidget {
 class _CarbonDialogState extends State<CarbonDialog> {
   final OverlayPortalController _overlay = OverlayPortalController();
   final FocusScopeNode _scope = FocusScopeNode(debugLabel: 'CarbonDialog');
+  final FocusNode _region = FocusNode(debugLabel: 'CarbonDialog region');
   FocusNode? _restoreFocus;
+  bool Function()? _restoreNativeFocus;
+  final OverlayFocusRepair _focusRepair = OverlayFocusRepair();
   bool _entered = false;
 
   @override
@@ -106,19 +125,33 @@ class _CarbonDialogState extends State<CarbonDialog> {
     super.initState();
     if (widget.open) {
       _restoreFocus = FocusManager.instance.primaryFocus;
+      _restoreNativeFocus = widget.modal ? null : captureNativeControlFocus();
       _overlay.show();
       _entered = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusOnOpen());
     }
   }
 
   @override
   void didUpdateWidget(CarbonDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.open != oldWidget.open) _sync();
+    if (widget.open != oldWidget.open) {
+      _sync();
+    } else if (widget.open && widget.modal != oldWidget.modal) {
+      _focusRepair.cancel();
+      if (widget.modal) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && widget.open && widget.modal) _focusOnOpen();
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
+    _restoreNativeFocus = null;
+    _focusRepair.dispose();
+    _region.dispose();
     _scope.dispose();
     super.dispose();
   }
@@ -127,17 +160,44 @@ class _CarbonDialogState extends State<CarbonDialog> {
     void apply() {
       if (!mounted) return;
       if (widget.open && !_overlay.isShowing) {
+        _focusRepair.cancel();
         _restoreFocus = FocusManager.instance.primaryFocus;
+        _restoreNativeFocus = widget.modal ? null : captureNativeControlFocus();
         _overlay.show();
         // Mount hidden first so the entrance transition plays.
         setState(() => _entered = false);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && widget.open) setState(() => _entered = true);
+          if (mounted && widget.open) {
+            setState(() => _entered = true);
+            _focusOnOpen();
+          }
         });
       } else if (!widget.open && _overlay.isShowing) {
+        final FocusNode? pageFocus = FocusManager.instance.primaryFocus;
+        final bool preservePage =
+            !widget.modal &&
+            pageFocus != null &&
+            !pageFocus.ancestors.contains(_region);
+        final bool Function()? pageNativeFocus = preservePage
+            ? captureNativeControlFocus()
+            : null;
         _overlay.hide();
         _entered = false;
-        if (widget.modal) _restoreFocus?.requestFocus();
+        final FocusNode? launcher = _restoreFocus;
+        _restoreFocus = null;
+        _restoreNativeFocus = null;
+        if (widget.modal &&
+            launcher?.context != null &&
+            launcher!.parent != null &&
+            launcher.canRequestFocus) {
+          launcher.requestFocus();
+        } else if (preservePage) {
+          _focusRepair.schedule(
+            pageFocus,
+            pageNativeFocus,
+            isCurrent: () => mounted && !widget.open && !widget.modal,
+          );
+        }
       }
     }
 
@@ -149,8 +209,36 @@ class _CarbonDialogState extends State<CarbonDialog> {
     }
   }
 
+  void _focusOnOpen() {
+    if (!widget.modal) {
+      _focusRepair.schedule(
+        _restoreFocus,
+        _restoreNativeFocus,
+        isCurrent: () => mounted && widget.open && !widget.modal,
+      );
+      return;
+    }
+    // Honor a caller's autofocus choice before selecting the first control.
+    scheduleMicrotask(() {
+      if (!mounted ||
+          !widget.open ||
+          !widget.modal ||
+          _scope.context == null ||
+          (_scope.hasFocus && _scope.focusedChild != null)) {
+        return;
+      }
+      if (_scope.focusedChild != null) {
+        _scope.requestFocus();
+      } else if (!_scope.nextFocus()) {
+        _scope.requestFocus();
+      }
+    });
+  }
+
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
+    if (widget.open &&
+        widget.onRequestClose != null &&
+        event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.escape) {
       widget.onRequestClose?.call();
       return KeyEventResult.handled;
@@ -235,8 +323,11 @@ class _CarbonDialogState extends State<CarbonDialog> {
 
     if (!widget.modal) {
       return Positioned.fill(
-        child: IgnorePointer(
-          ignoring: false,
+        child: Focus(
+          focusNode: _region,
+          onKeyEvent: _onKey,
+          canRequestFocus: false,
+          includeSemantics: false,
           child: Stack(
             children: <Widget>[
               // Non-modal: the page stays interactive; only the dialog
@@ -257,6 +348,7 @@ class _CarbonDialogState extends State<CarbonDialog> {
       // Escape cancels a modal dialog (the native cancel event); the key
       // handler must sit ABOVE the focus scope to see bubbled keys.
       child: Focus(
+        focusNode: _region,
         onKeyEvent: _onKey,
         canRequestFocus: false,
         child: FocusScope(
@@ -268,12 +360,14 @@ class _CarbonDialogState extends State<CarbonDialog> {
               // (the native dialog element does not close on backdrop
               // clicks).
               Positioned.fill(
-                child: AnimatedOpacity(
-                  duration: reducedMotion
-                      ? Duration.zero
-                      : CarbonDuration.moderate02,
-                  opacity: _entered ? 1 : 0,
-                  child: ColoredBox(color: theme.overlay),
+                child: ExcludeSemantics(
+                  child: AnimatedOpacity(
+                    duration: reducedMotion
+                        ? Duration.zero
+                        : CarbonDuration.moderate02,
+                    opacity: _entered ? 1 : 0,
+                    child: ColoredBox(color: theme.overlay),
+                  ),
                 ),
               ),
               surface,

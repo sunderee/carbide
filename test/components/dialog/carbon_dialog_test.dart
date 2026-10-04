@@ -4,6 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/semantics.dart' show SemanticsAction, SemanticsNode;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -359,6 +360,41 @@ void main() {
   });
 
   group('accessibility guidelines (#226)', () {
+    testWidgets('inert backdrop exposes no control, only named Close (#305)', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      try {
+        int closes = 0;
+        await tester.pumpWidget(
+          _host(
+            CarbonDialog(
+              open: true,
+              onRequestClose: () => closes++,
+              children: _slots(onClose: () => closes++),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final Iterable<SemanticsNode> controls = tester.semantics
+            .simulatedAccessibilityTraversal()
+            .where(
+              (SemanticsNode node) =>
+                  node.getSemanticsData().hasAction(SemanticsAction.tap),
+            );
+        expect(controls.map((SemanticsNode node) => node.label), <String>[
+          'Close',
+        ]);
+        await tester.tapAt(const Offset(5, 5));
+        await tester.pump();
+        expect(closes, 0);
+        await expectA11y(tester);
+      } finally {
+        await tester.pumpWidget(const SizedBox.shrink());
+        handle.dispose();
+      }
+    });
+
     testWidgets('meets tap-target and label guidelines', (
       WidgetTester tester,
     ) async {

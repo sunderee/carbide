@@ -5,3 +5,6 @@
 
 /// Native semantics focus is managed by Flutter on non-web platforms.
 bool restoreNativeControlFocus(String identifier) => false;
+
+/// No native DOM exists outside the browser.
+bool Function()? captureNativeControlFocus() => null;
