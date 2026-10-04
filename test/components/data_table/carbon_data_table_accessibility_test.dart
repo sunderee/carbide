@@ -18,6 +18,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/a11y.dart';
+import '../../support/golden.dart';
 import '../../support/overlay_entries.dart';
 
 const _columns = <CarbonTableColumn>[
@@ -698,6 +699,34 @@ void main() {
       },
     );
   }
+
+  testWidgets('full-cell focused sort in all themes and directions (#307)', (
+    tester,
+  ) async {
+    await expectThemeGoldens(
+      tester,
+      name: 'data_table_sort_focus',
+      containsText: true,
+      size: const Size(520, 180),
+      directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
+      builder: (_) => Center(
+        child: SizedBox(
+          width: 480,
+          child: CarbonDataTable(
+            columns: _columns,
+            rows: _rows,
+            sortColumnIndex: 0,
+            sortDirection: CarbonSortDirection.ascending,
+            onSort: (_) {},
+          ),
+        ),
+      ),
+      afterPump: (tester) async {
+        Focus.of(tester.element(find.text('Name'))).requestFocus();
+        await tester.pumpAndSettle();
+      },
+    );
+  });
 }
 
 void _nothing() {}
