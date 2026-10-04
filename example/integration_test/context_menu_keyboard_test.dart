@@ -5,6 +5,7 @@
 
 import 'dart:js_interop';
 
+import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -106,6 +107,17 @@ void main() {
             );
             await _key(tester, 'F10', shift: true);
             expect(_document.activeElement, same(_named('button', 'Cut')));
+            final menuBounds = tester.getRect(find.byType(CarbonMenu));
+            final originBounds = state.target.rect;
+            expect(menuBounds.top, originBounds.bottom);
+            expect(
+              direction == TextDirection.ltr
+                  ? menuBounds.left
+                  : menuBounds.right,
+              direction == TextDirection.ltr
+                  ? originBounds.left
+                  : originBounds.right,
+            );
             expect(
               _named('button', 'Unavailable').getAttribute('aria-disabled'),
               'true',
@@ -132,8 +144,13 @@ void main() {
               _document.activeElement,
               same(_named('button', 'Second target')),
             );
-            target.focus();
-            await _settle(tester);
+            await _key(tester, 'Tab', shift: true);
+            expect(
+              state.target.hasPrimaryFocus,
+              isTrue,
+              reason: 'backward traversal returns to opener',
+            );
+            expect(_document.activeElement, same(target));
             await _key(tester, 'ContextMenu');
             await tester.tapAt(const Offset(2, 2));
             await _settle(tester);
