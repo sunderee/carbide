@@ -18,6 +18,11 @@ on:
     # Mondays 05:30 UTC.
     - cron: "30 5 * * 1"
   workflow_dispatch:
+    inputs:
+      picker-options-only:
+        description: Run only the picker active-option native contract
+        type: boolean
+        default: false
   # Self-validating: editing this workflow runs it once on the PR.
   pull_request:
     paths:
@@ -27,7 +32,34 @@ permissions:
   contents: read
 
 jobs:
+  picker-options:
+    if: ${{ inputs.picker-options-only }}
+    name: Picker active options — native web
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        working-directory: example
+        run: flutter pub get
+      - name: Start chromedriver
+        run: chromedriver --port=4444 &
+      - name: Drive picker native active-option semantics in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/picker_option_semantics_test.dart
+          -d web-server
+
   desktop:
+    if: ${{ !inputs.picker-options-only }}
     name: Package tests — ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
@@ -52,6 +84,7 @@ jobs:
         run: flutter test
 
   web-smoke:
+    if: ${{ !inputs.picker-options-only }}
     name: Package tests — web (chrome)
     # The #271 "loading"-phase hang is fixed: it was the Plex font load in
     # `flutter_test_config.dart` — on the web test platform the
@@ -99,6 +132,7 @@ jobs:
           test/components/radio_button test/components/toggle
 
   gallery-web-integration:
+    if: ${{ !inputs.picker-options-only }}
     name: Gallery integration test — web
     # The full native matrix took 23 minutes before the active-option fixture;
     # leave room for its extra browser compilation and interaction cases.
