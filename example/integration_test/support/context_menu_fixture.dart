@@ -43,7 +43,12 @@ Widget contextMenuHost(
         data: theme ?? CarbonThemeData.white,
         child: ColoredBox(
           color: (theme ?? CarbonThemeData.white).background,
-          child: Center(child: child),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(
+              color: (theme ?? CarbonThemeData.white).textPrimary,
+            ),
+            child: Center(child: child),
+          ),
         ),
       ),
     ),
