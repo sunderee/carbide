@@ -24,6 +24,8 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 
 /// The drop shadow under a menu (`box-shadow()`: `0 2px 6px $shadow`).
 const BoxShadow _menuShadow = BoxShadow(
@@ -55,15 +57,24 @@ enum CarbonMenuSize {
 /// Registers the focusable rows of a [CarbonMenu] in visual order so the menu
 /// can rove focus across them with the arrow keys, Home/End and type-ahead.
 class _MenuRegistry {
-  final List<({FocusNode node, String label})> entries =
+  final List<({FocusNode node, String label})> _entries =
       <({FocusNode node, String label})>[];
 
-  void register(FocusNode node, String label) =>
-      entries.add((node: node, label: label));
+  List<({FocusNode node, String label})> get entries => _entries
+      .where((entry) => entry.node.canRequestFocus && !entry.node.skipTraversal)
+      .toList(growable: false);
 
-  void unregister(FocusNode node) => entries.removeWhere(
+  void register(FocusNode node, String label) =>
+      _entries.add((node: node, label: label));
+
+  void unregister(FocusNode node) => _entries.removeWhere(
     (({FocusNode node, String label}) e) => e.node == node,
   );
+
+  void updateLabel(FocusNode node, String label) {
+    final int index = _entries.indexWhere((entry) => entry.node == node);
+    if (index >= 0) _entries[index] = (node: node, label: label);
+  }
 }
 
 /// Inherited menu context shared with descendant items.
@@ -341,7 +352,15 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
     if (registry != _registry) {
       _registry?.unregister(_node);
       _registry = registry;
-      if (!widget.disabled) registry.register(_node, widget.label);
+      registry.register(_node, widget.label);
+    }
+  }
+
+  @override
+  void didUpdateWidget(CarbonMenuItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.label != oldWidget.label) {
+      _registry?.updateLabel(_node, widget.label);
     }
   }
 
@@ -353,13 +372,15 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
   }
 
   void _activate() {
-    if (widget.disabled) return;
+    if (!mounted || widget.disabled) return;
     if (_hasSubmenu) {
       _submenu.show();
       return;
     }
-    widget.onPressed?.call();
     _MenuScope.of(context).onClose?.call();
+    // Restore the menu origin before invoking the consumer so its focus or
+    // navigation request takes precedence over dismissal.
+    widget.onPressed?.call();
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
@@ -436,7 +457,7 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
       background: background,
     );
 
-    Widget item = MouseRegion(
+    final Widget interaction = MouseRegion(
       cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
@@ -453,12 +474,16 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
       ),
     );
 
-    item = Semantics(
+    final Widget item = CarbonControlSemantics(
+      focusNode: _node,
+      state: enabled
+          ? CarbonControlState.interactive
+          : CarbonControlState.disabled,
       button: true,
-      enabled: enabled,
       label: widget.label,
-      onTap: enabled ? _activate : null,
-      child: ExcludeSemantics(child: item),
+      readOnlyHint: '',
+      onActivate: _activate,
+      builder: (_) => ExcludeSemantics(child: interaction),
     );
 
     if (!_hasSubmenu) return item;
@@ -540,12 +565,10 @@ class _MenuItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     // `_menu.scss`: background-color $duration-fast-01
     // motion(standard, productive); instant under reduced motion.
     return AnimatedContainer(
-      duration: reducedMotion ? Duration.zero : CarbonDuration.fast01,
+      duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.standardProductive,
       height: size.height,
       decoration: BoxDecoration(color: background),
@@ -660,7 +683,15 @@ class _CarbonMenuItemSelectableState extends State<CarbonMenuItemSelectable> {
     if (registry != _registry) {
       _registry?.unregister(_node);
       _registry = registry;
-      if (!widget.disabled) registry.register(_node, widget.label);
+      registry.register(_node, widget.label);
+    }
+  }
+
+  @override
+  void didUpdateWidget(CarbonMenuItemSelectable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.label != oldWidget.label) {
+      _registry?.updateLabel(_node, widget.label);
     }
   }
 
@@ -672,7 +703,7 @@ class _CarbonMenuItemSelectableState extends State<CarbonMenuItemSelectable> {
   }
 
   void _toggle() {
-    if (widget.disabled) return;
+    if (!mounted || widget.disabled) return;
     widget.onChanged?.call(!widget.selected);
   }
 
@@ -711,13 +742,17 @@ class _CarbonMenuItemSelectableState extends State<CarbonMenuItemSelectable> {
       background: active ? layer.layerHover : const Color(0x00000000),
     );
 
-    return Semantics(
+    return CarbonControlSemantics(
+      focusNode: _node,
+      state: enabled
+          ? CarbonControlState.interactive
+          : CarbonControlState.disabled,
       inMutuallyExclusiveGroup: false,
       checked: widget.selected,
-      enabled: enabled,
       label: widget.label,
-      onTap: enabled ? _toggle : null,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: _toggle,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           cursor: enabled
               ? SystemMouseCursors.click
@@ -822,6 +857,14 @@ class _RadioItemState<T> extends State<_RadioItem<T>> {
   }
 
   @override
+  void didUpdateWidget(_RadioItem<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.label != oldWidget.label) {
+      _registry?.updateLabel(_node, widget.label);
+    }
+  }
+
+  @override
   void dispose() {
     _registry?.unregister(_node);
     _node.dispose();
@@ -832,10 +875,14 @@ class _RadioItemState<T> extends State<_RadioItem<T>> {
     if (event is KeyDownEvent &&
         (event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.space)) {
-      widget.onSelected();
+      _select();
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+
+  void _select() {
+    if (mounted) widget.onSelected();
   }
 
   @override
@@ -858,19 +905,22 @@ class _RadioItemState<T> extends State<_RadioItem<T>> {
       background: active ? layer.layerHover : const Color(0x00000000),
     );
 
-    return Semantics(
+    return CarbonControlSemantics(
+      focusNode: _node,
+      state: CarbonControlState.interactive,
       inMutuallyExclusiveGroup: true,
       checked: widget.selected,
       label: widget.label,
-      onTap: widget.onSelected,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: _select,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           onEnter: (_) => setState(() => _hovered = true),
           onExit: (_) => setState(() => _hovered = false),
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: widget.onSelected,
+            onTap: _select,
             child: Focus(
               focusNode: _node,
               onKeyEvent: _onKey,

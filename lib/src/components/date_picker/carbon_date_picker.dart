@@ -31,6 +31,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_state.dart';
 import '../../utils/native_control_focus.dart';
 import '../form/carbon_form.dart';
 import '../popover/carbon_popover.dart';
@@ -644,6 +645,9 @@ class _DayCellState extends State<_DayCell> {
 ///   onChanged: (DateTime d) => setState(() => _date = d),
 /// )
 /// ```
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonDatePicker extends StatefulWidget {
   /// Creates a date picker.
   const CarbonDatePicker({
@@ -656,6 +660,8 @@ class CarbonDatePicker extends StatefulWidget {
     this.placeholder = 'mm/dd/yyyy',
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.helperText,
@@ -698,6 +704,12 @@ class CarbonDatePicker extends StatefulWidget {
 
   /// Whether disabled.
   final bool disabled;
+
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
 
   /// Whether invalid.
   final bool invalid;
@@ -750,6 +762,12 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: true,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
+
   bool _open = false;
   final Object _group = UniqueKey();
   final FocusNode _focus = FocusNode(debugLabel: 'CarbonDatePicker');
@@ -763,7 +781,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
   @override
   void didUpdateWidget(CarbonDatePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.disabled && _open) _closeAndRefocus();
+    if (!_controlState.canActivate && _open) _closeAndRefocus();
   }
 
   void _rebuild() {
@@ -785,7 +803,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
   /// The popup owns a separate focus scope, so the grid takes focus even
   /// when the trigger or another control already holds it.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (widget.disabled || _open || event is! KeyDownEvent) {
+    if (!_controlState.canActivate || _open || event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -794,6 +812,15 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+
+  void _toggle() {
+    if (!mounted || !_controlState.canActivate) return;
+    if (_open) {
+      _closeAndRefocus();
+    } else {
+      setState(() => _open = true);
+    }
   }
 
   /// Closes the calendar and returns keyboard focus to the trigger, per
@@ -805,7 +832,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
     _returnPickerFocus(
       _focus,
       deferred: deferred,
-      allowed: () => mounted && !widget.disabled && !_open,
+      allowed: () => mounted && _controlState.canFocus && !_open,
     );
   }
 
@@ -828,7 +855,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
           autofocus: true,
           onEscape: _closeAndRefocus,
           onChanged: (DateTime d) {
-            if (!mounted || !_open || widget.disabled) return;
+            if (!mounted || !_open || !_controlState.canActivate) return;
             // End the session before notifying, matching range commits.
             _closeAndRefocus();
             widget.onChanged(d);
@@ -839,23 +866,23 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
         groupId: _group,
         child: _PickerTriggerSemantics(
           focusNode: _focus,
-          enabled: !widget.disabled,
+          state: _controlState,
+          readOnlyHint: widget.readOnlyHint,
           recoverFocus: !_open,
           label: widget.labelText,
           value: widget.value != null ? _format(widget.value!) : null,
           child: Focus(
             focusNode: _focus,
             includeSemantics: false,
-            canRequestFocus: !widget.disabled,
+            canRequestFocus: _controlState.canFocus,
             onKeyEvent: _onKey,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: widget.disabled
-                  ? null
-                  : () => setState(() => _open = !_open),
+              onTap: _controlState.canActivate ? _toggle : null,
               child: _DateField(
                 size: widget.size,
-                disabled: widget.disabled,
+                disabled: _controlState.isDisabled,
+                readOnly: _controlState.isReadOnly,
                 invalid: widget.invalid,
                 focused: _focus.hasFocus,
                 text: widget.value == null ? null : _format(widget.value!),
@@ -911,6 +938,9 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
 ///   onChanged: (CarbonDateRange r) => setState(() => _range = r),
 /// )
 /// ```
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonDateRangePicker extends StatefulWidget {
   /// Creates a date range picker.
   const CarbonDateRangePicker({
@@ -924,6 +954,8 @@ class CarbonDateRangePicker extends StatefulWidget {
     this.placeholder = 'mm/dd/yyyy',
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
     this.invalid = false,
     this.invalidText,
     this.helperText,
@@ -973,6 +1005,12 @@ class CarbonDateRangePicker extends StatefulWidget {
   /// Whether disabled.
   final bool disabled;
 
+  /// Keeps the value focusable while preventing editing and popup activation.
+  final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
+
   /// Whether invalid.
   final bool invalid;
 
@@ -996,6 +1034,12 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
   /// The effective fluid flag: the widget's own, or an enclosing
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
+
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: true,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
 
   _RangeSession? _session;
   bool get _open => _session != null;
@@ -1024,7 +1068,7 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
   @override
   void didUpdateWidget(CarbonDateRangePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.disabled && _open) {
+    if (!_controlState.canActivate && _open) {
       _cancel(_session);
     } else if (_open && widget.value != oldWidget.value) {
       _session = _sessionFor(widget.value);
@@ -1067,7 +1111,7 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
   }
 
   void _toggle(FocusNode opener) {
-    if (!mounted || widget.disabled) {
+    if (!mounted || !_controlState.canActivate) {
       return;
     }
     if (_open) {
@@ -1087,13 +1131,13 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
     _returnPickerFocus(
       _opener,
       deferred: deferred,
-      allowed: () => mounted && !widget.disabled && !_open,
+      allowed: () => mounted && _controlState.canFocus && !_open,
     );
   }
 
   void _changeDraft(_RangeSession? session, CarbonDateRange range) {
     if (!mounted ||
-        widget.disabled ||
+        !_controlState.canActivate ||
         session == null ||
         !identical(session, _session) ||
         !_validDraft(range)) {
@@ -1113,7 +1157,7 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
   /// Enter/Space open the shared calendar from either focused field.
   /// Its separate focus scope lets the grid take focus on every opening.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (widget.disabled || _open || event is! KeyDownEvent) {
+    if (!_controlState.canActivate || _open || event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -1136,30 +1180,32 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               excludeFromSemantics: true,
-              onTap: widget.disabled ? null : () => _toggle(focus),
+              onTap: _controlState.canActivate ? () => _toggle(focus) : null,
               child: ExcludeSemantics(
                 child: CarbonFormLabel(label, disabled: widget.disabled),
               ),
             ),
           _PickerTriggerSemantics(
             focusNode: focus,
-            enabled: !widget.disabled,
+            state: _controlState,
+            readOnlyHint: widget.readOnlyHint,
             recoverFocus: !_open,
             label: label,
             value: date == null ? null : _format(date),
             child: Focus(
               focusNode: focus,
               includeSemantics: false,
-              canRequestFocus: !widget.disabled,
+              canRequestFocus: _controlState.canFocus,
               onKeyEvent: _onKey,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: widget.disabled ? null : () => _toggle(focus),
+                onTap: _controlState.canActivate ? () => _toggle(focus) : null,
                 child: SizedBox(
                   width: _inputWidth,
                   child: _DateField(
                     size: widget.size,
-                    disabled: widget.disabled,
+                    disabled: _controlState.isDisabled,
+                    readOnly: _controlState.isReadOnly,
                     invalid: widget.invalid,
                     focused: focus.hasFocus,
                     text: date == null ? null : _format(date),
@@ -1234,7 +1280,8 @@ int _nextPickerControlId = 0;
 class _PickerTriggerSemantics extends StatefulWidget {
   const _PickerTriggerSemantics({
     required this.focusNode,
-    required this.enabled,
+    required this.state,
+    required this.readOnlyHint,
     required this.recoverFocus,
     required this.label,
     required this.value,
@@ -1242,7 +1289,8 @@ class _PickerTriggerSemantics extends StatefulWidget {
   });
 
   final FocusNode focusNode;
-  final bool enabled;
+  final CarbonControlState state;
+  final String readOnlyHint;
   final bool recoverFocus;
   final String label;
   final String? value;
@@ -1265,38 +1313,43 @@ class _PickerTriggerSemanticsState extends State<_PickerTriggerSemantics> {
   }
 
   void _requestFocus() {
-    if (mounted && widget.enabled) widget.focusNode.requestFocus();
+    if (mounted && widget.state.canFocus) widget.focusNode.requestFocus();
   }
 
-  void _scheduleNativeFocusRestore() {
+  void _scheduleNativeFocusRestore(bool Function()? nativeRestore) {
     if (!mounted) return;
     _nativeFocusTimer?.cancel();
     // Let the engine finish any view-focus update caused by a DOM move.
     _nativeFocusTimer = Timer(Duration.zero, () {
-      if (!mounted || !widget.enabled || !widget.recoverFocus) return;
+      if (!mounted || !widget.state.canFocus || !widget.recoverFocus) return;
       final FocusNode? current = FocusManager.instance.primaryFocus;
       if (current != widget.focusNode &&
           current != FocusManager.instance.rootScope) {
         return;
       }
-      if (restoreNativeControlFocus(_identifier)) _requestFocus();
+      if (nativeRestore?.call() ?? restoreNativeControlFocus(_identifier)) {
+        _requestFocus();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     if (kIsWeb &&
-        widget.enabled &&
+        widget.state.canFocus &&
         widget.recoverFocus &&
         widget.focusNode.hasPrimaryFocus) {
+      final bool Function()? nativeRestore = widget.state.isReadOnly
+          ? captureReadOnlyControlFocus(_identifier)
+          : null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        _scheduleNativeFocusRestore();
+        _scheduleNativeFocusRestore(nativeRestore);
         // Popover hides its OverlayPortal after the triggering frame. Its DOM
         // reading order changes in the next frame without rebuilding this
         // trigger. Reconcile there too; both checks respect another control.
         WidgetsBinding.instance.addPostFrameCallback(
-          (_) => _scheduleNativeFocusRestore(),
+          (_) => _scheduleNativeFocusRestore(nativeRestore),
         );
       });
     }
@@ -1304,10 +1357,11 @@ class _PickerTriggerSemanticsState extends State<_PickerTriggerSemantics> {
       container: true,
       identifier: _identifier,
       button: true,
-      enabled: widget.enabled,
-      focusable: widget.enabled,
-      focused: widget.focusNode.hasFocus,
-      onFocus: widget.enabled ? _requestFocus : null,
+      enabled: widget.state.canActivate,
+      hint: widget.state.semanticsHint(widget.readOnlyHint),
+      focusable: widget.state.canFocus,
+      focused: widget.state.canFocus ? widget.focusNode.hasFocus : null,
+      onFocus: widget.state.canFocus ? _requestFocus : null,
       label: widget.label,
       value: widget.value,
       child: widget.child,
@@ -1320,6 +1374,7 @@ class _DateField extends StatelessWidget {
   const _DateField({
     required this.size,
     required this.disabled,
+    this.readOnly = false,
     required this.invalid,
     required this.text,
     required this.placeholder,
@@ -1331,6 +1386,7 @@ class _DateField extends StatelessWidget {
 
   final CarbonFieldSize size;
   final bool disabled;
+  final bool readOnly;
   final bool invalid;
   final bool focused;
   final String? text;
@@ -1353,6 +1409,7 @@ class _DateField extends StatelessWidget {
     return CarbonField(
       size: size,
       disabled: disabled,
+      readOnly: readOnly,
       status: invalid ? CarbonFieldStatus.invalid : CarbonFieldStatus.none,
       focused: focused,
       aiLabel: aiLabel,
@@ -1362,7 +1419,7 @@ class _DateField extends StatelessWidget {
         padding: const EdgeInsetsDirectional.only(end: CarbonSpacing.spacing05),
         child: CarbonIcon(
           CarbonIcons.calendar,
-          color: disabled ? theme.iconDisabled : theme.iconPrimary,
+          color: disabled || readOnly ? theme.iconDisabled : theme.iconPrimary,
         ),
       ),
       child: ExcludeSemantics(

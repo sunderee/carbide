@@ -50,11 +50,13 @@ class CarbonListBox extends StatefulWidget {
     this.size = CarbonFieldSize.md,
     this.expanded = false,
     this.disabled = false,
+    this.readOnly = false,
     this.invalid = false,
     this.warn = false,
     this.focused = false,
     this.selection,
     this.onTap,
+    this.includeSemantics = true,
     this.aiLabel,
     this.aiRevert = false,
     this.fluid = false,
@@ -93,6 +95,9 @@ class CarbonListBox extends StatefulWidget {
   /// Whether the control is disabled.
   final bool disabled;
 
+  /// Paints a transparent, non-editable field without hover or tap feedback.
+  final bool readOnly;
+
   /// Whether the control is in an error state.
   final bool invalid;
 
@@ -108,6 +113,11 @@ class CarbonListBox extends StatefulWidget {
   /// Called when the field is tapped.
   final VoidCallback? onTap;
 
+  /// Whether the field gesture contributes a tap semantics action.
+  ///
+  /// Consumers that own named trigger semantics set this to false.
+  final bool includeSemantics;
+
   @override
   State<CarbonListBox> createState() => _CarbonListBoxState();
 }
@@ -119,11 +129,13 @@ class _CarbonListBoxState extends State<CarbonListBox> {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    final bool enabled = !widget.disabled;
+    final bool enabled = !widget.disabled && !widget.readOnly;
 
     // _list-box.scss: background $field, hover $field-hover; disabled keeps
     // $field (no hover).
-    final Color background = enabled && _hovered
+    final Color background = widget.readOnly && !widget.disabled
+        ? const Color(0x00000000)
+        : enabled && _hovered
         ? layer.fieldHover
         : layer.field;
     final Color textColor = widget.disabled
@@ -131,13 +143,14 @@ class _CarbonListBoxState extends State<CarbonListBox> {
         : theme.textPrimary;
 
     // The AI treatment: aura gradient + ai-border-strong bottom border.
-    final bool ai = widget.aiLabel != null && !widget.aiRevert;
+    final bool ai =
+        widget.aiLabel != null && !widget.aiRevert && !widget.readOnly;
 
     // bottom border: 1px $border-strong, $border-subtle when expanded,
     // transparent when disabled (_list-box.scss).
     final Color borderColor = widget.disabled
         ? const Color(0x00000000)
-        : widget.expanded
+        : widget.readOnly || widget.expanded
         ? layer.borderSubtle
         : ai
         ? theme.aiBorderStrong
@@ -160,7 +173,7 @@ class _CarbonListBoxState extends State<CarbonListBox> {
       ?widget.aiLabel,
       CarbonListBoxMenuIcon(
         open: widget.expanded,
-        disabled: widget.disabled,
+        disabled: widget.disabled || widget.readOnly,
         small: widget.fluid,
       ),
     ];
@@ -168,17 +181,20 @@ class _CarbonListBoxState extends State<CarbonListBox> {
     return MouseRegion(
       cursor: widget.disabled
           ? SystemMouseCursors.forbidden
+          : widget.readOnly
+          ? SystemMouseCursors.basic
           : SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.disabled ? null : widget.onTap,
+        excludeFromSemantics: !widget.includeSemantics,
+        onTap: enabled ? widget.onTap : null,
         child: CarbonFocusRing(
           visible: widget.focused,
           inset: true,
           child: AnimatedContainer(
-            duration: CarbonDuration.fast01,
+            duration: carbonDuration(context, CarbonDuration.fast01),
             curve: CarbonEasing.standardProductive,
             height: widget.fluid ? 64 : widget.size.height,
             decoration: BoxDecoration(
@@ -267,7 +283,7 @@ class CarbonListBoxMenuIcon extends StatelessWidget {
       child: Center(
         child: AnimatedRotation(
           turns: open ? 0.5 : 0,
-          duration: CarbonDuration.fast01,
+          duration: carbonDuration(context, CarbonDuration.fast01),
           curve: CarbonEasing.standardProductive,
           child: CarbonIcon(
             CarbonIcons.chevronDown,
@@ -504,6 +520,7 @@ class CarbonListBoxSelectionCount extends StatelessWidget {
     required this.count,
     required this.onClear,
     this.disabled = false,
+    this.readOnly = false,
     super.key,
   });
 
@@ -515,6 +532,9 @@ class CarbonListBoxSelectionCount extends StatelessWidget {
 
   /// Whether the host control is disabled.
   final bool disabled;
+
+  /// Keeps the count visible while hiding its editing affordance.
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -534,7 +554,7 @@ class CarbonListBoxSelectionCount extends StatelessWidget {
     // and a centered row that lets the content use the full height.
     return Container(
       height: 24,
-      padding: const EdgeInsetsDirectional.only(start: 8, end: 2),
+      padding: EdgeInsetsDirectional.only(start: 8, end: readOnly ? 8 : 2),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(12),
@@ -546,22 +566,24 @@ class CarbonListBoxSelectionCount extends StatelessWidget {
             '$count',
             style: CarbonTypeStyles.label01.copyWith(color: foreground),
           ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: disabled ? null : onClear,
-            // `> svg { padding: 2px; block-size: 20px }` — a 16px glyph in a
-            // 20px box.
-            child: Padding(
-              padding: const EdgeInsets.all(2),
-              child: CarbonIcon(
-                CarbonIcons.close,
-                size: 16,
-                color: iconColor,
-                semanticLabel: 'Clear all selected items',
+          if (!readOnly) ...<Widget>[
+            const SizedBox(width: 4),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: disabled ? null : onClear,
+              // `> svg { padding: 2px; block-size: 20px }` — a 16px glyph in a
+              // 20px box.
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: CarbonIcon(
+                  CarbonIcons.close,
+                  size: 16,
+                  color: iconColor,
+                  semanticLabel: 'Clear all selected items',
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

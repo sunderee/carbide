@@ -14,6 +14,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/motion.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 
@@ -109,10 +110,11 @@ class _AISkeletonBox extends StatefulWidget {
 
 class _AISkeletonBoxState extends State<_AISkeletonBox>
     with SingleTickerProviderStateMixin {
+  static const Duration _cycle = Duration(milliseconds: 1250);
   late final AnimationController _controller = AnimationController(
     // 1250ms ease-in-out, infinite (_ai-skeleton-styles.scss keyframes).
     vsync: this,
-    duration: const Duration(milliseconds: 1250),
+    duration: _cycle,
   );
 
   @override
@@ -124,8 +126,7 @@ class _AISkeletonBoxState extends State<_AISkeletonBox>
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final bool reducedMotion = carbonDuration(context, _cycle) == Duration.zero;
     if (reducedMotion) {
       _controller.stop();
     } else if (!_controller.isAnimating) {

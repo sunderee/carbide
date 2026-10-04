@@ -9,6 +9,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../../foundations/motion.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 
@@ -136,7 +137,7 @@ class _CarbonSkeletonState extends State<CarbonSkeleton>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    _reduced = carbonDuration(context, CarbonSkeleton.cycle) == Duration.zero;
     if (_reduced) {
       _controller.stop();
     } else if (!_controller.isAnimating) {

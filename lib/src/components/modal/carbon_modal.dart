@@ -286,11 +286,10 @@ class _CarbonModalState extends State<CarbonModal> {
     // wrapper fades and the container slides from translate3d(0, -24px, 0),
     // both $duration-moderate-02 × motion(entrance, expressive); under
     // `prefers-reduced-motion` the transition is dropped entirely.
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration duration = reducedMotion
-        ? Duration.zero
-        : CarbonDuration.moderate02;
+    final Duration duration = carbonDuration(
+      context,
+      CarbonDuration.moderate02,
+    );
 
     return Positioned.fill(
       child: Focus(

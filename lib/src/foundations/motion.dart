@@ -7,6 +7,22 @@
 // (@carbon/motion). See the NOTICE file for attribution.
 
 import 'package:flutter/animation.dart' show Cubic;
+import 'package:flutter/widgets.dart' show BuildContext, MediaQuery;
+
+/// Resolves a decorative motion [duration] against the platform preference.
+///
+/// Returns [Duration.zero] when the nearest [MediaQuery] disables animations;
+/// otherwise preserves [duration], including when no media query is present.
+/// The caller depends on the preference and rebuilds when it changes.
+///
+/// Use this at the animation site, including for custom durations. APIs that
+/// reject zero durations, such as scrolling animations, must use their instant
+/// alternative instead. Loading spinners and indeterminate progress retain
+/// their essential activity signal and deliberately bypass this resolver.
+Duration carbonDuration(BuildContext context, Duration duration) =>
+    (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+    ? Duration.zero
+    : duration;
 
 /// Carbon motion durations.
 abstract final class CarbonDuration {

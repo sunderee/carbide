@@ -282,7 +282,7 @@ class _ClickableRow extends StatelessWidget {
           return CarbonFocusRing(
             visible: states.contains(WidgetState.focused),
             child: AnimatedContainer(
-              duration: CarbonDuration.moderate01,
+              duration: carbonDuration(context, CarbonDuration.moderate01),
               curve: CarbonEasing.standardProductive,
               decoration: BoxDecoration(color: color),
               child: child,

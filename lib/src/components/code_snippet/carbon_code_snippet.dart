@@ -49,6 +49,11 @@ enum CarbonCodeSnippetType {
 /// collapses behind a show-more/less toggle; [wrapText] wraps long lines
 /// instead of scrolling them.
 ///
+/// Code remains accessible text, with separate copy and expand actions. A
+/// copyable inline snippet exposes the code in its button label. Applications
+/// can wrap important standalone blocks in a named [Semantics] region with
+/// `explicitChildNodes: true` to preserve the content and controls.
+///
 /// ```dart
 /// CarbonCodeSnippet(code: 'flutter pub add carbide')
 /// ```

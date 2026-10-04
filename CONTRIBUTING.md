@@ -66,6 +66,10 @@ Every PR runs on the **latest Flutter stable** (`channel: stable` in
   lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
   golden comparison is strict and authoritative.
 - **Gallery — analyze & test** — the example app's suite + contact sheet.
+- **Motion policy source guard** — `python3 tool/test_motion_policy.py` and
+  `python3 tool/check_motion_policy.py` enforce duration resolution and the
+  documented loading/indeterminate-progress exceptions. See
+  [loading accessibility](docs/patterns/loading.md#accessibility).
 - **Publish rehearsal** (`publish-rehearsal.yaml`) — on PRs touching
   packaging inputs (`pubspec.yaml`, README, LICENSE, NOTICE, …): a strict
   `dart pub publish --dry-run` that tolerates exactly the known

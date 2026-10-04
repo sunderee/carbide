@@ -77,11 +77,7 @@ class CarbonRadioTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onSelected != null;
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final Duration fast02 = reducedMotion
-        ? Duration.zero
-        : CarbonDuration.fast02;
+    final Duration fast02 = carbonDuration(context, CarbonDuration.fast02);
 
     return Semantics(
       inMutuallyExclusiveGroup: true,
@@ -109,9 +105,7 @@ class CarbonRadioTile extends StatelessWidget {
             // Background/border per `_tile.scss`: $duration-moderate-01
             // motion(standard, productive).
             child: AnimatedContainer(
-              duration: reducedMotion
-                  ? Duration.zero
-                  : CarbonDuration.moderate01,
+              duration: carbonDuration(context, CarbonDuration.moderate01),
               curve: CarbonEasing.standardProductive,
               constraints: const BoxConstraints(
                 minHeight: CarbonTileSpec.minHeight,

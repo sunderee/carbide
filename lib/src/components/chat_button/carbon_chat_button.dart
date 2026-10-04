@@ -145,9 +145,7 @@ class CarbonChatButton extends StatelessWidget {
           // reset): background / border-color $duration-fast-01
           // motion(entrance, productive).
           return AnimatedContainer(
-            duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-                ? Duration.zero
-                : CarbonDuration.fast01,
+            duration: carbonDuration(context, CarbonDuration.fast01),
             curve: CarbonEasing.entranceProductive,
             height: size.height,
             constraints: const BoxConstraints(maxWidth: 320),

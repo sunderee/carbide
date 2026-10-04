@@ -192,7 +192,9 @@ void main() {
       expect(chosen, 'b');
     });
 
-    testWidgets('Escape closes, then clears', (WidgetTester tester) async {
+    testWidgets('Escape closes, then preserves the committed value', (
+      WidgetTester tester,
+    ) async {
       String? chosen = 'a';
       final FocusNode node = FocusNode();
       addTearDown(node.dispose);
@@ -209,10 +211,15 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
       expect(find.byType(CarbonListBoxMenu), findsNothing);
-      // Second Escape clears the field.
+      // A closed popup leaves Escape for an ancestor and preserves the value.
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
-      expect(chosen, isNull);
+      expect(chosen, 'a');
+      expect(find.byType(CarbonListBoxMenu), findsNothing);
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+        'Apple',
+      );
     });
   });
 

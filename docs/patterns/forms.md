@@ -38,6 +38,67 @@ suffix in the label. On long, expert-configuration forms the reverse is
 common — mark required fields instead. Pick one convention per product and
 keep it; never mix both on one form.
 
+## Disabled and read-only controls
+
+Use `readOnly: true` when a value is available for review but cannot be changed.
+Read-only controls remain in keyboard traversal, retain value contrast and
+announce their non-editability. Text-based controls allow selection and copying;
+picker triggers keep their selected value available without opening a popup.
+Pointer activation, editing keys, typeahead and accessibility edit actions cannot
+change the value. Clear and selection-dismiss controls are hidden or inert.
+
+Use `disabled: true` when the control is unavailable. Disabled controls skip
+keyboard traversal and use the disabled text and icon tokens. Disabled takes
+precedence when both flags are set. On callback-driven selectors (`CarbonSelect`,
+`CarbonDropdown` and `CarbonMultiSelect`), an absent `onChanged` also disables the
+control. Search and combo-box query editing retain their existing uncontrolled
+behavior when a callback is omitted.
+
+The picker and search family accepts a localizable `readOnlyHint` (default
+`'Read only'`). Read-only text fields expose the native read-only state; button
+triggers announce the hint while keeping their name and value. Switching an open
+picker to read-only closes its popup and discards any uncommitted date-range
+draft without notifying `onChanged`. Application updates to a controlled value
+or text controller still appear normally.
+
+Carbon's read-only field treatment uses a transparent background, subtle border,
+full-contrast value and inert chevron/calendar icon. Focus remains visible.
+See [read-only states](read-only-states.md) for review-screen composition.
+
+## Navigating picker options
+
+Dropdown, Select, ComboBox and both MultiSelect variants share one announcement
+policy. Arrow keys move an active option without committing it. The trigger
+keeps keyboard focus, exposes its expanded state and describes the active
+option in a hint, for example, "Active option: Email, 2 of 3". A polite live
+region also announces changes because platforms do not reliably re-read a
+changed hint. The trigger's value remains the selection or current editor text;
+navigation does not replace a query, selection range or composing range.
+
+Flutter has no active-descendant relationship corresponding to the
+[ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
+Keeping focus on every trigger avoids a different navigation policy for
+editable fields and protects text entry. Options each expose one named node
+with selected and enabled states, an active-option hint when highlighted, and
+one activation action when available. MultiSelect also exposes checked state;
+its entire option row toggles once, including taps over the painted checkbox.
+
+On Flutter 3.47.6 web, the native text-input role does not translate the input's
+expanded semantics flag. Editable pickers therefore also expose expanded state
+on their adjacent named popup button. The input still exposes expanded in
+Flutter's semantics tree and receives the active-option hint natively. Live
+announcements use Flutter's supported
+[live-region semantics](https://api.flutter.dev/flutter/semantics/SemanticsProperties/liveRegion.html).
+
+Use the same `activeOptionFormatter` for each picker in an application to
+localize the complete announcement. Positions are one-based among currently
+visible options, including disabled rows:
+
+```dart
+activeOptionFormatter: (label, position, count) =>
+    'Option active : $label ($position/$count)',
+```
+
 ## Validation
 
 - Validate per field as soon as it loses focus (client-side), not only on

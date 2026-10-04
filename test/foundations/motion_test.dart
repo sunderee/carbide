@@ -4,10 +4,94 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
-import 'package:flutter/animation.dart' show Cubic;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  for (final bool? reduced in <bool?>[null, false, true]) {
+    testWidgets('duration resolver: disableAnimations=$reduced', (
+      tester,
+    ) async {
+      final List<Duration> resolved = <Duration>[];
+      Widget child = Builder(
+        builder: (BuildContext context) {
+          for (final Duration duration in <Duration>[
+            CarbonDuration.fast01,
+            CarbonDuration.fast02,
+            CarbonDuration.moderate01,
+            CarbonDuration.moderate02,
+            CarbonDuration.slow01,
+            CarbonDuration.slow02,
+            const Duration(milliseconds: 1234),
+            Duration.zero,
+          ]) {
+            resolved.add(carbonDuration(context, duration));
+          }
+          return const SizedBox();
+        },
+      );
+      if (reduced != null) {
+        child = MediaQuery(
+          data: MediaQueryData(disableAnimations: reduced),
+          child: child,
+        );
+      }
+      await tester.pumpWidget(child);
+      expect(
+        resolved,
+        reduced == true
+            ? List<Duration>.filled(8, Duration.zero)
+            : <Duration>[
+                CarbonDuration.fast01,
+                CarbonDuration.fast02,
+                CarbonDuration.moderate01,
+                CarbonDuration.moderate02,
+                CarbonDuration.slow01,
+                CarbonDuration.slow02,
+                const Duration(milliseconds: 1234),
+                Duration.zero,
+              ],
+      );
+    });
+  }
+
+  testWidgets('duration resolver follows the nearest live preference', (
+    tester,
+  ) async {
+    final ValueNotifier<bool> reduced = ValueNotifier<bool>(false);
+    addTearDown(reduced.dispose);
+    Duration? duration;
+    int builds = 0;
+    final Widget reader = Builder(
+      builder: (context) {
+        builds++;
+        duration = carbonDuration(context, CarbonDuration.slow02);
+        return const SizedBox();
+      },
+    );
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: reduced,
+          child: reader,
+          builder: (_, value, child) => MediaQuery(
+            data: MediaQueryData(disableAnimations: value),
+            child: child!,
+          ),
+        ),
+      ),
+    );
+    expect(duration, CarbonDuration.slow02);
+    reduced.value = true;
+    await tester.pump();
+    expect(duration, Duration.zero);
+    reduced.value = false;
+    await tester.pump();
+    expect(duration, CarbonDuration.slow02);
+    expect(builds, 3);
+  });
+
   test('durations match the Carbon source (ms)', () {
     expect(CarbonDuration.fast01.inMilliseconds, 70);
     expect(CarbonDuration.fast02.inMilliseconds, 110);

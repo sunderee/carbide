@@ -13,9 +13,10 @@ accessibility losses of a disabled state.
 |---|---|
 | Text entry | `readOnly: true` on `CarbonTextInput`, `CarbonTextArea` |
 | Bound entry | `readOnly: true` on `CarbonNumberInput`, `CarbonSlider`, `CarbonTimePicker` |
-| Selection | `readOnly: true` on `CarbonCheckbox`, `CarbonRadioButton` / `CarbonRadioButtonGroup`, `CarbonToggle`, `CarbonDropdown` |
+| Selection | `readOnly: true` on `CarbonCheckbox`, `CarbonRadioButton` / `CarbonRadioButtonGroup`, `CarbonToggle`, `CarbonDropdown`, `CarbonComboBox`, `CarbonMultiSelect`, `CarbonSelect` |
 | Field chrome | `CarbonField(readOnly: true)` for custom field content |
-| Not yet available | no `readOnly` on `CarbonComboBox`, `CarbonMultiSelect`, `CarbonSelect`, `CarbonDatePicker` — see gaps below |
+| Search | `readOnly: true` on `CarbonSearch`, `CarbonExpandableSearch` |
+| Dates | `readOnly: true` on `CarbonDatePicker`, `CarbonDateRangePicker` |
 
 ## When to use
 
@@ -46,7 +47,7 @@ Carbide applies Carbon's read-only recipe through theme tokens when you
 set `readOnly: true` — you do not restyle anything:
 
 - **Field background** goes transparent so the value sits on the page
-  (fluid fields keep their contained background).
+  (picker and search fields use this treatment in fluid mode too).
 - **Borders** drop to subtle to remove the "click me" affordance.
 - **Text keeps full contrast** — unlike disabled, the value is meant to
   be read, and still passes 4.5:1.
@@ -73,26 +74,13 @@ CarbonToggle(
 
 ## Interaction and accessibility
 
-The distinction from disabled is navigable vs. operable:
-
-- Read-only components stay **navigable**: they keep keyboard focus and
-  are announced by screen readers, so users can review the value.
-- They are not **operable**: taps, key presses, and drags change
-  nothing, and the cursor stays a plain arrow rather than an I-beam or
-  hand.
+The [forms pattern](forms.md#disabled-and-read-only-controls) defines the shared
+focus, editing, callback and announcement contract. Read-only text fields allow
+selection and copying; picker popups and clear actions remain inert.
 
 If the enabled state shows instructive placeholder content ("Choose an
 option"), swap it for informative content in read-only mode — an unset
-read-only dropdown should say something like "None selected", not issue
-an instruction the user cannot follow.
-
-## Carbide gaps
-
-`CarbonComboBox`, `CarbonMultiSelect`, `CarbonSelect`, `CarbonSearch`,
-and `CarbonDatePicker` do not expose a public `readOnly` parameter yet.
-Until they do, render the committed value with a read-only
-`CarbonTextInput` (or plain text) in review contexts rather than
-disabling the richer control.
+read-only dropdown should say something like "None selected".
 
 ## Related
 

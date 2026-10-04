@@ -168,6 +168,9 @@ class CarbonPopover extends StatefulWidget {
   final bool border;
 
   /// Whether to use the inverse high-contrast palette.
+  ///
+  /// This Carbon surface variant is independent of the operating system's
+  /// increased-contrast preference. [CarbonTheme] adapts its tokens separately.
   final bool highContrast;
 
   /// Whether to flip to the opposite side when the preferred side would

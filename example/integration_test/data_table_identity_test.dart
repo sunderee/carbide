@@ -12,13 +12,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'support/failure_diagnostics.dart';
+
 const _columns = <CarbonTableColumn>[
   CarbonTableColumn(title: 'Name', sortable: true),
   CarbonTableColumn(title: 'Value'),
 ];
 const _names = <Object, String>{'a': 'Alpha', 'b': 'Beta', 'g': 'Gamma'};
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  retainIntegrationFailureDetails(binding);
   _test(
     'native selection, expansion, focus and cell state follow sorted records',
     (tester) async {
@@ -51,7 +54,10 @@ void main() {
       expect(counter.count, 1);
       expect(state.selections.length, 1);
       expect(state.expansions.length, 1);
-      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.sendKeyEvent(
+        LogicalKeyboardKey.space,
+        physicalKey: PhysicalKeyboardKey.space,
+      );
       await _settle(tester);
       expect(state.selected, isEmpty);
       expect(_activeName, 'Select row Alpha');
@@ -66,7 +72,10 @@ void main() {
     state.replace(<Object>['g', 'a', 'b']);
     await _settle(tester);
     expect(_activeName, 'Expand row Beta');
-    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.sendKeyEvent(
+      LogicalKeyboardKey.enter,
+      physicalKey: PhysicalKeyboardKey.enter,
+    );
     await _settle(tester);
     expect(state.expanded, <Object>{'b'});
     expect(
@@ -83,7 +92,10 @@ void main() {
     _node('checkbox', 'Select row Alpha').focus();
     await _settle(tester);
     for (int i = 0; i < 3; i++) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.sendKeyEvent(
+        LogicalKeyboardKey.space,
+        physicalKey: PhysicalKeyboardKey.space,
+      );
       await _settle(tester);
       expect(_activeName, 'Select row Alpha');
       expect(_counter(tester, 'a'), same(counter));
@@ -183,7 +195,10 @@ void main() {
     );
     expect(_node('button', 'Cancel').getAttribute('aria-disabled'), 'true');
     expect(_focus(tester, 'Expand row Alpha').hasPrimaryFocus, isFalse);
-    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.sendKeyEvent(
+      LogicalKeyboardKey.enter,
+      physicalKey: PhysicalKeyboardKey.enter,
+    );
     await _settle(tester);
     expect(state.selections, isEmpty);
     expect(state.expansions, isEmpty);
@@ -221,7 +236,10 @@ void main() {
     await _settle(tester);
     _node('radio', 'Select row Beta').focus();
     await _settle(tester);
-    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.sendKeyEvent(
+      LogicalKeyboardKey.space,
+      physicalKey: PhysicalKeyboardKey.space,
+    );
     await _settle(tester);
     state.replace(<Object>['g', 'a', 'b']);
     await _settle(tester);
@@ -268,7 +286,10 @@ void main() {
         await _settle(tester);
         expect(_activeName, 'Select row Beta');
         expect(_focus(tester, 'Select row Beta').hasPrimaryFocus, isTrue);
-        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.sendKeyEvent(
+          LogicalKeyboardKey.space,
+          physicalKey: PhysicalKeyboardKey.space,
+        );
         await _settle(tester);
         expect(state.selected, isEmpty);
         _node('button', 'Expand row Gamma').focus();
@@ -277,7 +298,10 @@ void main() {
         await _settle(tester);
         expect(_activeName, 'Expand row Gamma');
         expect(_focus(tester, 'Expand row Gamma').hasPrimaryFocus, isTrue);
-        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.sendKeyEvent(
+          LogicalKeyboardKey.enter,
+          physicalKey: PhysicalKeyboardKey.enter,
+        );
         await _settle(tester);
         expect(state.expanded, <Object>{'g'});
       },
@@ -310,28 +334,16 @@ void main() {
     state.direction = TextDirection.rtl;
     state.replace(<Object>[for (int i = 0; i < 30; i++) i]);
     await _settle(tester);
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -500),
-    );
+    await tester.drag(_tableScroll, const Offset(0, -500));
     await _settle(tester);
-    final position = tester
-        .state<ScrollableState>(
-          find
-              .descendant(
-                of: find.byType(SingleChildScrollView),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        )
-        .position;
+    final position = tester.state<ScrollableState>(_tableScroll).position;
     final selector = tester
         .widgetList<Semantics>(find.byType(Semantics))
         .firstWhere((w) {
           final label = w.properties.label;
           if (label == null || !label.startsWith('Select row ')) return false;
           final rect = tester.getRect(find.byWidget(w));
-          final viewport = tester.getRect(find.byType(SingleChildScrollView));
+          final viewport = tester.getRect(_tableScroll);
           return rect.top >= viewport.top && rect.bottom <= viewport.bottom;
         });
     final label = selector.properties.label!;
@@ -377,6 +389,11 @@ void _test(String name, Future<void> Function(WidgetTester) body) =>
         handle.dispose();
       }
     });
+Finder get _tableScroll => find.descendant(
+  of: find.byType(CarbonDataTable),
+  matching: find.byType(Scrollable),
+);
+
 Future<void> _settle(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await Future<void>.delayed(const Duration(milliseconds: 100));

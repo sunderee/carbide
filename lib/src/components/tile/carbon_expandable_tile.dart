@@ -94,15 +94,13 @@ class CarbonExpandableTile extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = onExpandedChanged != null;
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     // Chevron per `_tile.scss` `__chevron svg`: transform $duration-fast-02
     // motion(standard, productive).
     final Widget chevron = AnimatedRotation(
       // 180° when expanded.
       turns: expanded ? 0.5 : 0,
-      duration: reducedMotion ? Duration.zero : CarbonDuration.fast02,
+      duration: carbonDuration(context, CarbonDuration.fast02),
       curve: CarbonEasing.standardProductive,
       child: CarbonIcon(CarbonIcons.chevronDown, color: theme.iconPrimary),
     );
@@ -111,7 +109,7 @@ class CarbonExpandableTile extends StatelessWidget {
     // $duration-moderate-01 motion(standard, productive).
     final Widget fold = TweenAnimationBuilder<double>(
       tween: Tween<double>(end: expanded ? 1 : 0),
-      duration: reducedMotion ? Duration.zero : CarbonDuration.moderate01,
+      duration: carbonDuration(context, CarbonDuration.moderate01),
       curve: CarbonEasing.standardProductive,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(

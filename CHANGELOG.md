@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+- Expose structural semantics for nested Carbon lists and document the static
+  tag/code-snippet accessibility policy (#318).
+
+- Adapt theme lookup to the nearest platform high-contrast preference with
+  `CarbonThemeData.highContrast`. Strengthen boundaries, focus indicators and
+  inactive labels across layers, preserve the base theme when the preference
+  is off, and apply theme changes instantly in high-contrast mode (#317).
+
+- Resolve decorative animation durations through `carbonDuration`, including
+  picker decoration, search clearing, link/list hover, slider focus and tree
+  expansion. Vertical tabs reveal selection instantly under reduced motion.
+  Guard the shared policy in CI; retain loading and indeterminate progress as
+  explicit essential-motion exceptions (#316).
+
+- Open context menus with Shift+F10 or the Context Menu key inside a focused
+  target region. Anchor to that focused child's logical start edge, enter the
+  first enabled item and restore the opener on dismissal. Tab continues normal
+  traversal, while consumer focus requests take precedence (#315).
+
+- Give data tables an accessible name and ordered table, row, header and cell
+  roles. Sortable headers expose a named button with a localizable sort-state
+  value and an activation target that fills the cell. Preserve keyed row focus,
+  expansion and sticky scrolling; enable the table tap-target gate (#307).
+
+- Share active-option semantics across dropdown, select, combo-box and
+  multi-select. Announce keyboard navigation without changing the committed
+  value or editor query, expose expanded state, and allow localization through
+  `activeOptionFormatter`. Each option has one accessible activation target;
+  multi-select rows toggle once across their full width (#311).
+
+- Align Select and Dropdown opening keys: Up starts at the last enabled
+  option, Down at the first, and Enter/Space at an enabled current selection.
+  Let picker keys reach ancestor form/dialog handlers when they perform no
+  action, including closed combo-box Enter and Escape and menus with no enabled
+  highlight. Closed Escape preserves the combo value; filterable multi-select
+  leaves Space available for text entry (#313, #314).
+
+- Add a consistent `readOnly` and localizable `readOnlyHint` contract to the
+  picker and search family. Keep names, selected values and keyboard focus
+  available while preventing popup opening, editing and clearing; close open
+  popups and discard date-range drafts when the policy changes. Distinguish
+  read-only and disabled styling and announce multi-select item values (#312).
+  **Behavior change:** select, dropdown and multi-select treat a null selection
+  callback as disabled, taking precedence over `readOnly`.
+
+- Add `CarbonSwitch.semanticLabel` for icon-only segments and accessible names
+  that differ from visible text. **Breaking assertion:** icon-only segments
+  must now supply a semantic label in debug mode. Icons remain decorative
+  inside their named buttons (#309).
+
+- Make password visibility keyboard-focusable after the input, with Enter,
+  Space, pointer and accessibility activation, a keyboard focus ring, and
+  density-sized targets matching Carbon. Disable visibility activation and
+  traversal with the field, including pending events (#308).
+
+- Make checkbox, radio, toggle and slider use a shared interaction policy.
+  Read-only binary controls remain focusable, expose their value, announce a
+  localizable read-only hint and use Carbon's outlined styling. Add explicit
+  disabled flags to binary controls and radio groups; null callbacks still
+  disable them. Read-only radio groups allow focus navigation without changing
+  selection (#310).
+
 - Exclude modal scrims from accessibility traversal and give the modal close
   button a 48×48 target while preserving its icon. Verify modal/dialog focus
   containment and restoration, choose safe initial focus, ignore disposed

@@ -21,8 +21,11 @@ import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
+import '../list_box/list_box_semantics.dart';
 import '../list_box/carbon_list_box.dart';
 
 /// Where a [CarbonDropdown] opens its menu relative to the field.
@@ -55,9 +58,17 @@ class CarbonDropdownItem<T> {
 
 /// A Carbon dropdown: a single-select picker on the ListBox chrome.
 ///
-/// Down/Enter/Space opens the menu; arrows move the highlight (skipping
-/// disabled items); Enter selects; Escape closes; typing jumps to the next
-/// matching label.
+/// Up opens at the last enabled option; Down opens at the first. Enter or Space
+/// opens at the enabled selection, falling back to the first enabled option.
+/// While open, arrows move the highlight (skipping disabled items), Enter or
+/// Space selects, Escape closes, and typing jumps to the next matching label.
+/// Keys that do not open, move, select or dismiss continue to ancestor handlers.
+/// Disabled and read-only controls do not open on any key.
+///
+/// Closed-state Up follows the optional
+/// [ARIA combobox convention](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
+/// and matches Carbide's Select. Carbon's React Dropdown currently omits this
+/// opening key.
 ///
 /// ```dart
 /// CarbonDropdown<String>(
@@ -71,6 +82,9 @@ class CarbonDropdownItem<T> {
 ///   onChanged: (String v) => setState(() => _value = v),
 /// )
 /// ```
+///
+/// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
+/// for the shared disabled and read-only contract.
 class CarbonDropdown<T> extends StatefulWidget {
   /// Creates a dropdown.
   const CarbonDropdown({
@@ -85,6 +99,8 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.direction = CarbonDropdownDirection.bottom,
     this.disabled = false,
     this.readOnly = false,
+    this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
+    this.activeOptionFormatter = carbonListBoxActiveOptionLabel,
     this.invalid = false,
     this.invalidText,
     this.warn = false,
@@ -128,6 +144,17 @@ class CarbonDropdown<T> extends StatefulWidget {
 
   /// Whether the value is read-only (shown, not editable).
   final bool readOnly;
+
+  /// The localizable announcement for read-only mode.
+  final String readOnlyHint;
+
+  /// Formats the highlighted option and its one-based position for assistive
+  /// technology. Defaults to [carbonListBoxActiveOptionLabel].
+  ///
+  /// Keyboard focus stays on the trigger, including editable filters. The
+  /// shared list-box policy updates a hint and polite live region while the
+  /// value remains the current text or committed selection.
+  final CarbonListBoxActiveOptionFormatter activeOptionFormatter;
 
   /// Whether the dropdown is invalid.
   final bool invalid;
@@ -181,6 +208,12 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
+  CarbonControlState get _controlState => CarbonControlState.resolve(
+    hasCallback: widget.onChanged != null,
+    disabled: widget.disabled,
+    readOnly: widget.readOnly,
+  );
+
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   late final OwnedFocusNode _focusOwner;
@@ -188,7 +221,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   int _highlighted = -1;
   double _triggerWidth = 0;
 
-  bool get _enabled => !widget.disabled && !widget.readOnly;
+  bool get _enabled => _controlState.canActivate;
 
   CarbonDropdownItem<T>? get _selected {
     for (final CarbonDropdownItem<T> item in widget.items) {
@@ -214,6 +247,15 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   void didUpdateWidget(CarbonDropdown<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
+    if (!_controlState.canActivate && _overlay.isShowing) {
+      // OverlayPortal cannot hide during the parent's build. Events already
+      // use the current policy while the popup is removed after this frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_controlState.canActivate && _overlay.isShowing) {
+          _close();
+        }
+      });
+    }
   }
 
   @override
@@ -223,17 +265,20 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   void _toggle() {
+    if (!mounted || !_controlState.canActivate) return;
     _focus.requestFocus();
     _overlay.isShowing ? _close() : _open();
   }
 
-  void _open() {
-    if (widget.onChanged == null || !_enabled) return;
-    _highlighted = widget.items.indexWhere(
-      (CarbonDropdownItem<T> i) => !i.disabled,
-    );
+  void _open({bool fromEnd = false, bool preferSelection = true}) {
+    if (!mounted || !_controlState.canActivate) return;
+    _highlighted = fromEnd
+        ? widget.items.lastIndexWhere((CarbonDropdownItem<T> i) => !i.disabled)
+        : widget.items.indexWhere((CarbonDropdownItem<T> i) => !i.disabled);
     final CarbonDropdownItem<T>? selected = _selected;
-    if (selected != null) _highlighted = widget.items.indexOf(selected);
+    if (preferSelection && selected != null && !selected.disabled) {
+      _highlighted = widget.items.indexOf(selected);
+    }
     _overlay.show();
     setState(() {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -242,38 +287,48 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   void _close() {
+    if (!mounted) return;
     _overlay.hide();
     setState(() {});
   }
 
   void _select(CarbonDropdownItem<T> item) {
-    if (item.disabled) return;
+    if (!mounted || !_controlState.canActivate || item.disabled) return;
     widget.onChanged?.call(item.value);
     _close();
     _focus.requestFocus();
   }
 
-  void _moveHighlight(int delta) {
+  bool _moveHighlight(int delta) {
     final List<CarbonDropdownItem<T>> items = widget.items;
     int next = _highlighted;
+    if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
       next = (next + delta + items.length) % items.length;
       if (!items[next].disabled) {
+        if (next == _highlighted) return false;
         setState(() => _highlighted = next);
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || widget.onChanged == null || !_enabled) {
+    if (!mounted || event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
       if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowUp ||
           event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.space) {
-        _open();
+        _open(
+          fromEnd: event.logicalKey == LogicalKeyboardKey.arrowUp,
+          preferSelection:
+              event.logicalKey != LogicalKeyboardKey.arrowDown &&
+              event.logicalKey != LogicalKeyboardKey.arrowUp,
+        );
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -283,17 +338,22 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         _close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
-        _moveHighlight(1);
-        return KeyEventResult.handled;
+        return _moveHighlight(1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.arrowUp:
-        _moveHighlight(-1);
-        return KeyEventResult.handled;
+        return _moveHighlight(-1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.enter:
       case LogicalKeyboardKey.space:
-        if (_highlighted >= 0 && _highlighted < widget.items.length) {
+        if (_highlighted >= 0 &&
+            _highlighted < widget.items.length &&
+            !widget.items[_highlighted].disabled) {
           _select(widget.items[_highlighted]);
+          return KeyEventResult.handled;
         }
-        return KeyEventResult.handled;
+        return KeyEventResult.ignored;
     }
     final String? ch = event.character;
     if (ch != null && ch.trim().isNotEmpty) {
@@ -304,6 +364,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
             widget.items[idx].label.toLowerCase().startsWith(
               ch.toLowerCase(),
             )) {
+          if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;
         }
@@ -313,20 +374,33 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => CarbonListBoxSemantics(
+    expanded: _controlState.canActivate && _overlay.isShowing,
+    activeIndex: _highlighted,
+    focusNode: _focus,
+    optionLabels: <String?>[
+      for (final item in widget.items) item.disabled ? null : item.label,
+    ],
+    formatActiveOption: widget.activeOptionFormatter,
+    builder: _build,
+  );
+
+  Widget _build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonDropdownItem<T>? selected = _selected;
     final String display = selected?.label ?? widget.label ?? '';
-    final Color textColor = widget.disabled
+    final Color textColor = _controlState.isDisabled
         ? theme.textDisabled
         : selected == null
         ? theme.textPlaceholder
         : theme.textPrimary;
 
     final Widget field = CarbonListBox(
+      includeSemantics: false,
       size: widget.size,
       expanded: _overlay.isShowing,
-      disabled: widget.disabled,
+      disabled: _controlState.isDisabled,
+      readOnly: _controlState.isReadOnly,
       invalid: widget.invalid,
       warn: widget.warn,
       focused: _focus.hasFocus,
@@ -345,13 +419,20 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       ),
     );
 
-    final Widget trigger = Semantics(
+    final Widget trigger = CarbonControlSemantics(
+      state: _controlState,
+      readOnlyHint: widget.readOnlyHint,
+      expanded: _controlState.canActivate && _overlay.isShowing,
+      activeOptionHint: CarbonListBoxSemantics.activeHintOf(context),
+      focusNode: _focus,
+      onActivate: _toggle,
       button: true,
-      enabled: _enabled,
       label: widget.titleText,
       value: selected?.label,
-      child: Focus(
-        focusNode: _focus,
+      builder: (FocusNode focusNode) => Focus(
+        focusNode: focusNode,
+        includeSemantics: false,
+        canRequestFocus: _controlState.canFocus,
         onKeyEvent: _onKey,
         autofocus: widget.autofocus,
         child: CompositedTransformTarget(
@@ -378,13 +459,19 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
             status: CarbonFieldStatus.warning,
           )
         : widget.helperText != null
-        ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
+        ? CarbonHelperText(
+            widget.helperText!,
+            disabled: _controlState.isDisabled,
+          )
         : null;
 
     final Widget? title = widget.hideLabel || _fluid
         ? null
         : ExcludeSemantics(
-            child: CarbonFormLabel(widget.titleText, disabled: widget.disabled),
+            child: CarbonFormLabel(
+              widget.titleText,
+              disabled: _controlState.isDisabled,
+            ),
           );
 
     if (widget.inline) {
@@ -455,10 +542,11 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     CarbonThemeData theme,
   ) {
     final bool selected = item.value == widget.selectedItem;
-    return Semantics(
-      button: true,
+    return CarbonListBoxOptionSemantics(
       selected: selected,
-      enabled: !item.disabled,
+      disabled: item.disabled,
+      active: index == _highlighted,
+      onActivate: () => _select(item),
       label: item.label,
       child: ExcludeSemantics(
         child: CarbonListBoxMenuItem(

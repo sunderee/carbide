@@ -11,8 +11,9 @@
 //
 // Known, upstream-inherited exceptions live in [_allowlist] with citations
 // into documentation/carbon/packages/themes. Disabled-state tokens
-// (textDisabled, iconDisabled, textOnColorDisabled) are not swept at all:
-// WCAG 1.4.3 exempts inactive UI components.
+// (textDisabled, iconDisabled, textOnColorDisabled) are swept only in the
+// high-contrast adaptation: WCAG exempts inactive controls, but our adaptation
+// explicitly promises readable labels and visible inactive boundaries.
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
@@ -179,6 +180,94 @@ final List<(String, Color Function(CarbonThemeData))> _surfaces =
       ('layer03', (CarbonThemeData t) => t.layer03),
     ];
 
+final List<(String, Color Function(CarbonThemeData))> _neutralSurfaces = [
+  ..._surfaces,
+  ('field01', (t) => t.field01),
+  ('field02', (t) => t.field02),
+  ('field03', (t) => t.field03),
+  ('fieldHover01', (t) => t.fieldHover01),
+  ('fieldHover02', (t) => t.fieldHover02),
+  ('fieldHover03', (t) => t.fieldHover03),
+  ('layerHover01', (t) => t.layerHover01),
+  ('layerHover02', (t) => t.layerHover02),
+  ('layerHover03', (t) => t.layerHover03),
+  ('layerSelected01', (t) => t.layerSelected01),
+  ('layerSelected02', (t) => t.layerSelected02),
+  ('layerSelected03', (t) => t.layerSelected03),
+  ('layerSelectedHover01', (t) => t.layerSelectedHover01),
+  ('layerSelectedHover02', (t) => t.layerSelectedHover02),
+  ('layerSelectedHover03', (t) => t.layerSelectedHover03),
+];
+
+final List<_Pair> _highContrastPairs = [
+  for (final (surface, bg) in _neutralSurfaces) ...[
+    (
+      name: 'boundary on $surface',
+      fg: (t) => t.borderSubtle00,
+      bg: bg,
+      floor: _nonText,
+    ),
+    (name: 'focus on $surface', fg: (t) => t.focus, bg: bg, floor: _nonText),
+  ],
+  for (final (surface, bg) in [
+    ..._surfaces,
+    ('field01', (CarbonThemeData t) => t.field01),
+    ('field02', (CarbonThemeData t) => t.field02),
+    ('field03', (CarbonThemeData t) => t.field03),
+    ('buttonDisabled', (CarbonThemeData t) => t.buttonDisabled),
+  ]) ...[
+    (
+      name: 'disabled text on $surface',
+      fg: (t) => t.textDisabled,
+      bg: bg,
+      floor: _text,
+    ),
+    (
+      name: 'disabled icon on $surface',
+      fg: (t) => t.iconDisabled,
+      bg: bg,
+      floor: _nonText,
+    ),
+  ],
+  for (final (surface, bg) in _surfaces)
+    (
+      name: 'disabled selected-tile boundary on $surface',
+      fg: (t) => t.layerSelectedDisabled,
+      bg: bg,
+      floor: _nonText,
+    ),
+  (
+    name: 'disabled button label',
+    fg: (t) => t.textOnColorDisabled,
+    bg: (t) => t.buttonDisabled,
+    floor: _text,
+  ),
+  (
+    name: 'disabled button icon',
+    fg: (t) => t.iconOnColorDisabled,
+    bg: (t) => t.buttonDisabled,
+    floor: _nonText,
+  ),
+  (
+    name: 'inverse boundary',
+    fg: (t) => t.borderInverse,
+    bg: (t) => t.backgroundInverse,
+    floor: _nonText,
+  ),
+  (
+    name: 'inverse focus',
+    fg: (t) => t.focusInverse,
+    bg: (t) => t.backgroundInverse,
+    floor: _nonText,
+  ),
+  (
+    name: 'dual focus strokes',
+    fg: (t) => t.focusInset,
+    bg: (t) => t.focus,
+    floor: _nonText,
+  ),
+];
+
 /// Upstream-inherited pairs that do not meet the floor, keyed
 /// `'<theme>: <pair name>'`, each citing the upstream token choice.
 ///
@@ -219,12 +308,19 @@ void main() {
     'g90': CarbonThemeData.gray90,
     'g100': CarbonThemeData.gray100,
   };
+  themes.addAll({
+    for (final entry in themes.entries)
+      '${entry.key} high contrast': CarbonThemeData.highContrast(entry.value),
+  });
 
   group('WCAG 2.1 token-pair contrast sweep', () {
     for (final MapEntry<String, CarbonThemeData> theme in themes.entries) {
       test(theme.key, () {
         final List<String> failures = <String>[];
-        for (final _Pair pair in _pairs) {
+        for (final _Pair pair in [
+          ..._pairs,
+          if (theme.key.endsWith('high contrast')) ..._highContrastPairs,
+        ]) {
           final String key = '${theme.key}: ${pair.name}';
           final double ratio = wcagContrastRatio(
             pair.fg(theme.value),
@@ -256,4 +352,26 @@ void main() {
       });
     }
   });
+
+  for (final entry in themes.entries.where(
+    (e) => e.key.endsWith('high contrast'),
+  )) {
+    test('${entry.key} filled controls retain a contrasting focus stroke', () {
+      final theme = entry.value;
+      for (final fill in [
+        theme.buttonPrimary,
+        theme.buttonSecondary,
+        theme.buttonDangerPrimary,
+      ]) {
+        expect(
+          [
+            wcagContrastRatio(theme.focus, fill),
+            wcagContrastRatio(theme.background, fill),
+          ].any((ratio) => ratio >= _nonText),
+          isTrue,
+          reason: 'The button focus or inner background stroke must contrast with the fill.',
+        );
+      }
+    });
+  }
 }

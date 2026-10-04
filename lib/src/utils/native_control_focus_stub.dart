@@ -8,3 +8,16 @@ bool restoreNativeControlFocus(String identifier) => false;
 
 /// No native DOM exists outside the browser.
 bool Function()? captureNativeControlFocus() => null;
+
+/// Native read-only focus is managed by Flutter on non-web platforms.
+bool Function()? captureReadOnlyControlFocus(String identifier) => null;
+
+/// Native editor focus is managed by Flutter on non-web platforms.
+bool Function()? captureTextControlFocus(
+  String identifier, {
+  required bool readOnly,
+  bool allowSharedEditor = false,
+}) => null;
+
+/// Browser focus ownership is managed by Flutter outside the browser.
+bool Function()? captureNativeFocusOwnership() => null;

@@ -81,8 +81,12 @@ table refreshes after filter changes.
 Announce busy states to assistive technology. `CarbonLoading` and
 `CarbonInlineLoading` carry semantics already; when you build custom
 composites, wrap the region in `Semantics(liveRegion: true)` and update its
-label when loading starts, finishes, or fails. All Carbide loading and
-skeleton animations respect `MediaQuery.disableAnimations`.
+label when loading starts, finishes, or fails. Skeleton shimmer becomes a static
+fill under `MediaQuery.disableAnimations`; determinate progress changes apply
+instantly. The `CarbonLoading` spinner, including its use in inline loading, and
+the indeterminate progress-bar sweep keep moving: they signal an ongoing
+operation when its progress cannot be measured. These essential-motion
+exceptions are recorded in `tool/check_motion_policy.py`.
 
 ## Related
 

@@ -21,6 +21,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/interaction.dart';
 import '../../utils/owned_listenable.dart';
 import '../form/carbon_form.dart';
 
@@ -487,6 +488,11 @@ class _FluidField extends StatelessWidget {
 
 /// A password input: a [CarbonTextInput] that obscures its text with a
 /// show/hide toggle (`View` / `ViewOff`).
+///
+/// The visibility button follows the editor in keyboard traversal. Enter,
+/// Space, pointer and accessibility actions toggle the localized label while
+/// preserving the field value. Read-only fields can reveal their value;
+/// disabled fields disable the visibility button.
 class CarbonPasswordInput extends StatefulWidget {
   /// Creates a password input.
   const CarbonPasswordInput({
@@ -584,50 +590,70 @@ class CarbonPasswordInput extends StatefulWidget {
 class _CarbonPasswordInputState extends State<CarbonPasswordInput> {
   bool _obscured = true;
 
+  void _toggleVisibility() {
+    if (!mounted || widget.disabled) return;
+    setState(() => _obscured = !_obscured);
+  }
+
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final Widget toggle = Semantics(
       button: true,
+      enabled: !widget.disabled,
       label: _obscured ? widget.showPasswordLabel : widget.hidePasswordLabel,
-      child: GestureDetector(
-        onTap: widget.disabled
-            ? null
-            : () => setState(() => _obscured = !_obscured),
-        child: Padding(
-          padding: const EdgeInsetsDirectional.only(
-            start: CarbonSpacing.spacing03,
-            end: CarbonField.paddingInline,
-          ),
-          child: CarbonIcon(
-            _obscured ? CarbonIcons.view : CarbonIcons.viewOff,
-            size: 16,
-            color: widget.disabled ? theme.iconDisabled : theme.iconPrimary,
-          ),
-        ),
+      child: CarbonInteraction(
+        enabled: !widget.disabled,
+        onPressed: _toggleVisibility,
+        builder: (BuildContext context, Set<WidgetState> states) =>
+            CarbonFocusRing(
+              visible: states.contains(WidgetState.focused),
+              // _text-input.scss: full field height, aspect-ratio: 1, centered
+              // icon. Carbon's 32/40px densities are below the 48px guideline;
+              // the large density provides a 48px target.
+              child: SizedBox.square(
+                dimension: widget.size.height,
+                child: Center(
+                  child: CarbonIcon(
+                    _obscured ? CarbonIcons.view : CarbonIcons.viewOff,
+                    size: 16,
+                    color: widget.disabled
+                        ? theme.iconDisabled
+                        : theme.iconPrimary,
+                  ),
+                ),
+              ),
+            ),
       ),
     );
 
-    return CarbonTextInput(
-      labelText: widget.labelText,
-      controller: widget.controller,
-      initialValue: widget.initialValue,
-      onChanged: widget.onChanged,
-      placeholder: widget.placeholder,
-      helperText: widget.helperText,
-      size: widget.size,
-      disabled: widget.disabled,
-      readOnly: widget.readOnly,
-      invalid: widget.invalid,
-      invalidText: widget.invalidText,
-      warn: widget.warn,
-      warnText: widget.warnText,
-      obscureText: _obscured,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      trailing: toggle,
-      aiLabel: widget.aiLabel,
-      aiRevert: widget.aiRevert,
+    return Semantics(
+      // Keep the editor and visibility button a local reading group, including
+      // when this RTL field is embedded in a page with another text direction.
+      container: true,
+      explicitChildNodes: true,
+      textDirection: Directionality.of(context),
+      child: CarbonTextInput(
+        labelText: widget.labelText,
+        controller: widget.controller,
+        initialValue: widget.initialValue,
+        onChanged: widget.onChanged,
+        placeholder: widget.placeholder,
+        helperText: widget.helperText,
+        size: widget.size,
+        disabled: widget.disabled,
+        readOnly: widget.readOnly,
+        invalid: widget.invalid,
+        invalidText: widget.invalidText,
+        warn: widget.warn,
+        warnText: widget.warnText,
+        obscureText: _obscured,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        trailing: toggle,
+        aiLabel: widget.aiLabel,
+        aiRevert: widget.aiRevert,
+      ),
     );
   }
 }

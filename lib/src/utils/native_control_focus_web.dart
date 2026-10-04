@@ -59,6 +59,94 @@ bool Function()? captureNativeControlFocus() {
   };
 }
 
+/// Captures browser focus ownership while an ordinary editor is reattached.
+///
+/// The caller checks framework ownership and requests the current editor through
+/// public Flutter APIs. A newer native control or an inactive document wins;
+/// the captured editor need not remain connected after a native blur.
+bool Function()? captureNativeFocusOwnership() {
+  if (!_document.hasFocus()) return null;
+  final _Element? previous = _document.activeElement;
+  return () {
+    if (!_document.hasFocus()) return false;
+    final _Element? active = _document.activeElement;
+    return active == previous ||
+        active == null ||
+        active.tagName == 'BODY' ||
+        active.tagName == 'FLUTTER-VIEW';
+  };
+}
+
+/// Captures a guarded native request for a newly focused read-only control.
+///
+/// The caller confirms framework ownership before invoking the callback after
+/// semantics updates. A different native target chosen since capture wins.
+/// No DOM listeners or long-lived element references are retained.
+bool Function()? captureReadOnlyControlFocus(String identifier) =>
+    _captureControlFocus(identifier);
+
+/// Captures guarded focus for an editor reparented by overlay semantics.
+///
+/// Targets the native input inside the named region. Framework ownership is
+/// checked by the caller; another native control or an inactive document wins.
+bool Function()? captureTextControlFocus(
+  String identifier, {
+  required bool readOnly,
+  bool allowSharedEditor = false,
+}) => _captureControlFocus(
+  identifier,
+  text: true,
+  readOnly: readOnly,
+  allowSharedEditor: allowSharedEditor,
+);
+
+bool Function()? _captureControlFocus(
+  String identifier, {
+  bool text = false,
+  bool readOnly = false,
+  bool allowSharedEditor = false,
+}) {
+  if (!_document.hasFocus()) return null;
+  if (text &&
+      _document
+              .querySelector('[flt-semantics-identifier^="$identifier-"]')
+              ?.querySelector('input,textarea') ==
+          null) {
+    if (!allowSharedEditor) return null;
+    // The ordinary web editing host is created by EditableText's public
+    // requestKeyboard API. Guard that attachment after editor replacement;
+    // there is no named semantics input to focus directly in this mode.
+    return captureNativeFocusOwnership();
+  }
+  final _Element? previous = _document.activeElement;
+  return () {
+    if (!_document.hasFocus()) return false;
+    final _Element? region = _document.querySelector(
+      text
+          ? '[flt-semantics-identifier^="$identifier-"]'
+          : '[flt-semantics-identifier="$identifier"]',
+    );
+    final _Element? target = text
+        ? region?.querySelector('input,textarea')
+        : region;
+    if (target == null || !target.isConnected) return false;
+    final _Element? active = target.getRootNode().activeElement;
+    if (active == target) {
+      if (text) target.readOnly = readOnly;
+      return true;
+    }
+    if (active != previous &&
+        active != null &&
+        active.tagName != 'BODY' &&
+        active.tagName != 'FLUTTER-VIEW') {
+      return false;
+    }
+    target.focus(_FocusOptions(preventScroll: true));
+    if (text) target.readOnly = readOnly;
+    return target.getRootNode().activeElement == target;
+  };
+}
+
 @JS('document')
 external _Document get _document;
 
@@ -69,6 +157,8 @@ extension type _Document(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external set readOnly(bool value);
+  external _Element? querySelector(String selector);
   external String get tagName;
   external bool get isConnected;
   external _Document getRootNode();

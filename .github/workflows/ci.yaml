@@ -41,6 +41,11 @@ jobs:
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
 
+      - name: Motion policy source guard
+        run: |
+          python3 tool/test_motion_policy.py
+          python3 tool/check_motion_policy.py
+
       - name: Analyze
         run: flutter analyze
 

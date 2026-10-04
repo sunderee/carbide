@@ -126,6 +126,8 @@ class _DropdownPage extends StatefulWidget {
 }
 
 class _DropdownPageState extends State<_DropdownPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
   String _value = 'cyan';
   bool _ai = false;
   bool _fluid = false;
@@ -138,6 +140,8 @@ class _DropdownPageState extends State<_DropdownPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonDropdown<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Favourite colour',
           selectedItem: _value,
           onChanged: (String v) => setState(() => _value = v),
@@ -153,6 +157,17 @@ class _DropdownPageState extends State<_DropdownPage> {
         ),
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+
         boolKnob(
           label: 'AI label',
           value: _ai,
@@ -176,7 +191,9 @@ class _ComboBoxPage extends StatefulWidget {
 }
 
 class _ComboBoxPageState extends State<_ComboBoxPage> {
-  String? _value;
+  bool _readOnly = false;
+  bool _disabled = false;
+  String? _value = 'ee';
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -186,6 +203,8 @@ class _ComboBoxPageState extends State<_ComboBoxPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonComboBox<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Country',
           selectedItem: _value,
           onChanged: (String? v) => setState(() => _value = v),
@@ -197,6 +216,18 @@ class _ComboBoxPageState extends State<_ComboBoxPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
       code: 'CarbonComboBox<String>(titleText: \'Country\', items: <…>[…]);',
     );
   }
@@ -209,6 +240,9 @@ class _MultiSelectPage extends StatefulWidget {
 }
 
 class _MultiSelectPageState extends State<_MultiSelectPage> {
+  bool _readOnly = false;
+  bool _disabled = false;
+  bool _filterable = false;
   Set<String> _selected = <String>{'read'};
   @override
   Widget build(BuildContext context) {
@@ -219,7 +253,10 @@ class _MultiSelectPageState extends State<_MultiSelectPage> {
       preview: SizedBox(
         width: 320,
         child: CarbonMultiSelect<String>(
+          readOnly: _readOnly,
+          disabled: _disabled,
           titleText: 'Permissions',
+          filterable: _filterable,
           label: 'Choose permissions',
           selectedValues: _selected,
           onChanged: (Set<String> v) => setState(() => _selected = v),
@@ -230,6 +267,24 @@ class _MultiSelectPageState extends State<_MultiSelectPage> {
           ],
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool value) => setState(() => _readOnly = value),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+
+        boolKnob(
+          label: 'Filterable',
+          value: _filterable,
+          onChanged: (bool value) => setState(() => _filterable = value),
+        ),
+      ],
       code: 'CarbonMultiSelect<String>(titleText: \'…\', items: <…>[…]);',
     );
   }
@@ -411,25 +466,57 @@ class _ContentSwitcherPage extends StatefulWidget {
 
 class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
   int _index = 0;
+  bool _iconOnly = false;
+  bool _disabled = false;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Content switcher',
-      description: 'A segmented control for mutually exclusive views.',
+      description: 'A segmented control for named text and icon-only views.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
-        width: 360,
+        width: _iconOnly ? null : 360,
         child: CarbonContentSwitcher(
           selectedIndex: _index,
           onChanged: (int i) => setState(() => _index = i),
-          switches: const <CarbonSwitch>[
-            CarbonSwitch(text: 'Day'),
-            CarbonSwitch(text: 'Week'),
-            CarbonSwitch(text: 'Month'),
-          ],
+          switches: _iconOnly
+              ? <CarbonSwitch>[
+                  const CarbonSwitch(
+                    icon: CarbonIcons.list,
+                    semanticLabel: 'List view',
+                  ),
+                  const CarbonSwitch(
+                    icon: CarbonIcons.grid,
+                    semanticLabel: 'Grid view',
+                  ),
+                  CarbonSwitch(
+                    icon: CarbonIcons.archive,
+                    semanticLabel: 'Archived view',
+                    disabled: _disabled,
+                  ),
+                ]
+              : <CarbonSwitch>[
+                  const CarbonSwitch(text: 'Day'),
+                  const CarbonSwitch(text: 'Week'),
+                  CarbonSwitch(text: 'Month', disabled: _disabled),
+                ],
         ),
       ),
-      code: 'CarbonContentSwitcher(switches: <CarbonSwitch>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Icon only',
+          value: _iconOnly,
+          onChanged: (bool value) => setState(() => _iconOnly = value),
+        ),
+        boolKnob(
+          label: 'Disable last segment',
+          value: _disabled,
+          onChanged: (bool value) => setState(() => _disabled = value),
+        ),
+      ],
+      code: _iconOnly
+          ? "CarbonContentSwitcher(switches: <CarbonSwitch>[\n  CarbonSwitch(icon: CarbonIcons.list, semanticLabel: 'List view'),\n  CarbonSwitch(icon: CarbonIcons.grid, semanticLabel: 'Grid view'),\n]);"
+          : 'CarbonContentSwitcher(switches: <CarbonSwitch>[…]);',
     );
   }
 }
@@ -945,14 +1032,23 @@ class _ContainedListPageState extends State<_ContainedListPage> {
   }
 }
 
-class _ContextMenuPage extends StatelessWidget {
+class _ContextMenuPage extends StatefulWidget {
   const _ContextMenuPage();
+
+  @override
+  State<_ContextMenuPage> createState() => _ContextMenuPageState();
+}
+
+class _ContextMenuPageState extends State<_ContextMenuPage> {
+  bool _focusVisible = false;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
     return DemoScaffold(
       title: 'Context menu',
-      description: 'Right-click (or long-press) the area to open a menu.',
+      description:
+          'Focus the target and press Shift+F10 or the Context Menu '
+          'key. Secondary click and long press also open the menu.',
       preview: CarbonContextMenu(
         items: <Widget>[
           CarbonMenuItem(label: 'Cut', icon: CarbonIcons.cut, onPressed: () {}),
@@ -967,21 +1063,36 @@ class _ContextMenuPage extends StatelessWidget {
             onPressed: () {},
           ),
         ],
-        child: Container(
-          width: 280,
-          height: 120,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: t.layer01,
-            border: Border.all(color: t.borderSubtle00),
-          ),
-          child: Text(
-            'Right-click here',
-            style: CarbonTypeStyles.body01.copyWith(color: t.textSecondary),
+        child: FocusableActionDetector(
+          onShowFocusHighlight: (bool visible) =>
+              setState(() => _focusVisible = visible),
+          child: Semantics(
+            hint: 'Press Shift+F10 or the Context Menu key for actions',
+            child: CarbonFocusRing(
+              visible: _focusVisible,
+              inset: true,
+              child: Container(
+                width: 280,
+                height: 120,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: t.layer01,
+                  border: Border.all(color: t.borderSubtle00),
+                ),
+                child: Text(
+                  'Context menu target',
+                  style: CarbonTypeStyles.body01.copyWith(
+                    color: t.textSecondary,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
-      code: 'CarbonContextMenu(items: <…>[…], child: …);',
+      code:
+          'CarbonContextMenu(items: <…>[…], '
+          'child: Focus(child: …));',
     );
   }
 }

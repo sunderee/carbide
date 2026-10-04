@@ -5,6 +5,7 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../foundations/motion.dart';
 import 'carbon_theme_data.dart';
 
 /// Provides a [CarbonThemeData] to its descendants.
@@ -12,6 +13,10 @@ import 'carbon_theme_data.dart';
 /// Wrap a subtree — usually the whole app — in a `CarbonTheme` so widgets below
 /// can read the active theme with [CarbonTheme.of]. Use [AnimatedCarbonTheme]
 /// to transition between themes smoothly.
+///
+/// Token lookup automatically derives [CarbonThemeData.highContrast] when the
+/// nearest [MediaQuery] requests high contrast. Readers rebuild when that
+/// preference changes, including overrides below this theme.
 ///
 /// ```dart
 /// CarbonTheme(
@@ -23,13 +28,16 @@ class CarbonTheme extends InheritedWidget {
   /// Creates a theme that exposes [data] to [child] and its descendants.
   const CarbonTheme({super.key, required this.data, required super.child});
 
-  /// The theme tokens provided to descendants.
+  /// The base tokens supplied by the application.
+  ///
+  /// Descendants should use [of] to receive the high-contrast adaptation.
   final CarbonThemeData data;
 
   /// The [CarbonThemeData] from the nearest enclosing [CarbonTheme].
   ///
   /// Asserts that a [CarbonTheme] is present; use [maybeOf] when it might not
-  /// be. The caller depends on the theme and rebuilds when it changes.
+  /// be. The caller depends on the theme and the nearest high-contrast
+  /// preference and rebuilds when either changes.
   static CarbonThemeData of(BuildContext context) {
     final CarbonThemeData? data = maybeOf(context);
     assert(
@@ -40,9 +48,19 @@ class CarbonTheme extends InheritedWidget {
     return data!;
   }
 
-  /// The [CarbonThemeData] from the nearest [CarbonTheme], or null if none.
-  static CarbonThemeData? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<CarbonTheme>()?.data;
+  /// The adapted data from the nearest [CarbonTheme], or null if none.
+  ///
+  /// High contrast is disabled when no [MediaQuery] is present. The caller
+  /// depends only on that media property, rather than all media properties.
+  static CarbonThemeData? maybeOf(BuildContext context) {
+    final data = context
+        .dependOnInheritedWidgetOfExactType<CarbonTheme>()
+        ?.data;
+    if (data == null) return null;
+    return (MediaQuery.maybeHighContrastOf(context) ?? false)
+        ? CarbonThemeData.highContrast(data)
+        : data;
+  }
 
   @override
   bool updateShouldNotify(CarbonTheme oldWidget) => data != oldWidget.data;
@@ -53,7 +71,8 @@ class CarbonTheme extends InheritedWidget {
 /// Swapping [data] interpolates every token via [CarbonThemeData.lerp], so a
 /// theme switch (for example light to dark) transitions smoothly rather than
 /// snapping. The crossfade is decorative: when the platform requests reduced
-/// motion, the new theme applies instantly.
+/// motion or high contrast, the new theme applies instantly. High contrast
+/// avoids intermediate surface colors weakening otherwise-visible boundaries.
 class AnimatedCarbonTheme extends ImplicitlyAnimatedWidget {
   /// Creates an animated theme around [child].
   const AnimatedCarbonTheme({
@@ -81,12 +100,11 @@ class _AnimatedCarbonThemeState
   _CarbonThemeDataTween? _data;
 
   void _syncDuration() {
-    // The theme crossfade is decorative, so it collapses to zero when the
-    // platform requests reduced motion.
-    final bool reducedMotion =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    controller.duration = reducedMotion ? Duration.zero : widget.duration;
-    if (reducedMotion && controller.isAnimating) {
+    // Intermediate colors can weaken contrast even when both endpoints pass.
+    controller.duration = (MediaQuery.maybeHighContrastOf(context) ?? false)
+        ? Duration.zero
+        : carbonDuration(context, widget.duration);
+    if (controller.duration == Duration.zero && controller.isAnimating) {
       // A crossfade already in flight was started with the pre-clamp
       // duration; jump it to its end state.
       controller.value = controller.upperBound;
