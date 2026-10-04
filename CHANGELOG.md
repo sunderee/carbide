@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Adapt theme lookup to the nearest platform high-contrast preference with
+  `CarbonThemeData.highContrast`. Strengthen boundaries, focus indicators and
+  inactive labels across layers, preserve the base theme when the preference
+  is off, and apply theme changes instantly in high-contrast mode (#317).
+
 - Resolve decorative animation durations through `carbonDuration`, including
   picker decoration, search clearing, link/list hover, slider focus and tree
   expansion. Vertical tabs reveal selection instantly under reduced motion.

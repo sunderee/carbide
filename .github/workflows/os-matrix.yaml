@@ -260,6 +260,14 @@ jobs:
           --target=integration_test/reduced_motion_test.dart
           -d web-server
 
+      - name: Drive high-contrast native focus and editing in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/high_contrast_test.dart
+          -d web-server
+
       - name: Drive list native marker and scrolling test
         working-directory: example
         run: >

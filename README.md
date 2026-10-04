@@ -134,6 +134,9 @@ uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 - **Accessible by construction.** Components expose Carbon's semantics — roles,
   labels, focus order, and a custom-painted focus ring — and target WCAG AA
   contrast.
+- **Platform preferences.** Decorative motion follows reduced motion, and
+  [increased contrast](docs/theming-and-layers.md#increased-contrast-accessibility)
+  strengthens boundaries, focus indicators and inactive labels centrally.
 - **Tested to a high bar.** Nothing ships without tests: each token group and
   component lands with state-matrix widget tests, golden tests against the
   Carbon spec, and semantics/accessibility tests. Every public API is

@@ -66,6 +66,9 @@ enum CarbonTagType {
   warmGray,
 
   /// High contrast (inverse background).
+  ///
+  /// This Carbon color variant is independent of the operating system's
+  /// increased-contrast preference, which [CarbonTheme] handles separately.
   highContrast,
 
   /// Outline (page background with an inverse outline).

@@ -37,6 +37,65 @@ final text = theme.textPrimary;   // primary text color
 Use `CarbonTheme.maybeOf(context)` when a theme may be absent. The full token
 set is documented on `CarbonThemeData` in the API reference.
 
+## Increased-contrast accessibility
+
+`CarbonTheme.of(context)` and `maybeOf` read the nearest
+`MediaQuery.highContrast` preference and return
+`CarbonThemeData.highContrast(base)` when it is enabled. Readers rebuild when
+the preference changes; disabling it restores the original base instance.
+This also respects a local `MediaQuery` below the theme. With no media query,
+the supplied theme is used as-is. `CarbonTheme.data` remains the supplied base;
+application widgets should read tokens through `of`.
+
+The decision for #317 is a derived theme at the common lookup point. This keeps
+the four upstream theme definitions intact and applies the same policy to all
+components and layer levels. A separate extension would require each component
+to decide whether to consult it. Derivation is cached by base instance and is
+idempotent, so repeated lookup does not allocate a new token set.
+
+The adaptation uses opaque black or white boundaries and focus indicators,
+including selected and disabled tile outlines. Inverse surfaces receive the
+opposite ink, and inset focus rings retain two contrasting strokes. Inactive
+labels and icons become opaque; dark disabled-button fills become darker so
+those labels remain readable. Secondary text, helpers and placeholders become
+opaque too, including the dark third layer where upstream secondary inks fall
+below the text floor. Backgrounds, contextual layer surfaces, brand colors,
+enabled control fills and validation colors retain their base values.
+
+The contrast sweep covers the derived themes without the upstream exceptions:
+normal text pairs meet 4.5:1 and meaningful boundaries and focus indicators meet
+3:1. It also checks inactive labels at 4.5:1 as an explicit Carbide policy,
+although WCAG exempts inactive controls. Disabled semantics, activation and
+focus traversal remain those of the component. Color alone does not make a
+control enabled. See [WCAG non-text contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html).
+
+`AnimatedCarbonTheme` applies theme changes instantly under increased contrast,
+including a transition already in progress, so intermediate color mixtures do
+not weaken the checked endpoint boundaries. Platform support follows Flutter's
+`MediaQuery.highContrast`; Flutter web maps the browser's `forced-colors: active`
+preference to this property. Browser or OS settings that do not set the property
+do not enable the adaptation. This is a token policy, rather than an attempt to
+copy a system-defined forced-color palette.
+
+Applications can explicitly enable the adaptation independently of the OS:
+
+```dart
+CarbonTheme(
+  data: CarbonThemeData.highContrast(CarbonThemeData.gray100),
+  child: const MyApp(),
+);
+```
+
+Custom themes preserve their surfaces and brand choices, and must keep those
+surfaces consistent with their declared brightness and verify their own
+contrast pairs. The sweep covers the built-in themes and the documented pairs;
+it does not guarantee arbitrary consumer colors or every status-color pairing.
+
+Carbon's similarly named `CarbonPopover.highContrast` and
+`CarbonTagType.highContrast` select inverse surfaces. They are independent of
+the OS preference. Tooltips and copy-button feedback deliberately use that
+inverse popover variant; their tokens still receive the theme adaptation.
+
 ## Animating theme changes
 
 `AnimatedCarbonTheme` is an implicitly-animated `CarbonTheme`: when its `data`
