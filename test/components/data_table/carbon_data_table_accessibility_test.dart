@@ -3,6 +3,7 @@
 // This file is part of Carbide and is licensed under the Apache License,
 // Version 2.0. See the LICENSE file in the project root.
 
+import 'dart:typed_data';
 import 'dart:ui'
     show
         SemanticsRole,
@@ -74,7 +75,12 @@ SemanticsNode _label(WidgetTester tester, String label) =>
     _nodes(tester)
         .singleWhere((node) => node.getSemanticsData().label == label);
 
-void _action(WidgetTester tester, SemanticsNode node, SemanticsAction action) {
+void _action(
+  WidgetTester tester,
+  SemanticsNode node,
+  SemanticsAction action, [
+  Object? arguments,
+]) {
   if (action == SemanticsAction.focus) {
     tester.binding.handleViewFocusChanged(
       ViewFocusEvent(
@@ -89,6 +95,7 @@ void _action(WidgetTester tester, SemanticsNode node, SemanticsAction action) {
       type: action,
       nodeId: node.id,
       viewId: tester.view.viewId,
+      arguments: arguments,
     ),
   );
 }
@@ -592,6 +599,27 @@ void main() {
         _action(tester, table(), SemanticsAction.scrollUp);
         await tester.pumpAndSettle();
         expect(position.pixels, 0);
+        _action(
+          tester,
+          table(),
+          SemanticsAction.scrollToOffset,
+          Float64List.fromList(<double>[0, 100000]),
+        );
+        await tester.pumpAndSettle();
+        expect(position.pixels, position.maxScrollExtent);
+        expect(
+          table().getSemanticsData().hasAction(SemanticsAction.scrollDown),
+          isFalse,
+        );
+        _action(
+          tester,
+          table(),
+          SemanticsAction.scrollToOffset,
+          Float64List.fromList(<double>[0, -100]),
+        );
+        await tester.pumpAndSettle();
+        expect(position.pixels, 0);
+        expect(tester.getRect(find.text('Name')), headerBefore);
         update(() => height = 144);
         await tester.pumpAndSettle();
         expect(
@@ -698,6 +726,47 @@ void main() {
         expect(selected, <Object>{'a'});
       },
     );
+    _test('empty sticky table keeps headers and no scroll actions $direction', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          CarbonDataTable(
+            columns: _columns,
+            rows: const <CarbonTableRow>[],
+            stickyHeader: true,
+            onSort: (_) {},
+          ),
+          direction: direction,
+        ),
+      );
+      final table = _nodes(tester)
+          .singleWhere((node) => node.role == SemanticsRole.table);
+      expect(
+        _nodes(tester).where((node) => node.role == SemanticsRole.row),
+        hasLength(1),
+      );
+      expect(
+        table.getSemanticsData().hasAction(SemanticsAction.scrollDown),
+        isFalse,
+      );
+      expect(
+        table.getSemanticsData().hasAction(SemanticsAction.scrollUp),
+        isFalse,
+      );
+      expect(
+        table.getSemanticsData().hasAction(SemanticsAction.scrollToOffset),
+        isFalse,
+      );
+      expect(table.getSemanticsData().scrollExtentMax, 0);
+      expect(
+        _label(
+          tester,
+          'Name',
+        ).getSemanticsData().hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+    });
   }
 
   testWidgets('full-cell focused sort in all themes and directions (#307)', (
