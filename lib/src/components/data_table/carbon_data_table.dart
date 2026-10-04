@@ -13,8 +13,13 @@
 // columns shared between the header and body rows.
 
 import 'dart:async';
+import 'dart:ui' show SemanticsRole;
+
+import 'package:flutter/rendering.dart'
+    show PipelineOwner, RenderProxyBox, SemanticsConfiguration;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/semantics.dart' show OrdinalSortKey;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -26,6 +31,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/native_control_focus.dart';
 import '../button/carbon_button.dart';
@@ -66,6 +73,22 @@ enum CarbonSortDirection {
   /// Descending.
   descending,
 }
+
+/// Formats the complete sort-state announcement for a table header.
+///
+/// Return a localized phrase for every [direction], including unsorted columns.
+/// The column title remains the button's separate accessible name.
+typedef CarbonTableSortDirectionFormatter = String Function(
+  CarbonSortDirection direction,
+);
+
+/// Describes a table column's sort state in English.
+String carbonTableSortDirectionLabel(CarbonSortDirection direction) =>
+    switch (direction) {
+      CarbonSortDirection.none => 'Not sorted',
+      CarbonSortDirection.ascending => 'Sorted ascending',
+      CarbonSortDirection.descending => 'Sorted descending',
+    };
 
 /// A column definition for a [CarbonDataTable].
 class CarbonTableColumn {
@@ -152,6 +175,18 @@ class CarbonTableBatchAction {
 /// sorting, filtering and paging. Absent IDs are retained and ignored while
 /// absent; counts include only the current data.
 ///
+/// Sortable columns expose one button named by the column title. Its semantics
+/// value describes [sortDirection], using [sortDirectionFormatter] for
+/// localization. A null [onSort] disables those buttons. Non-sortable column
+/// titles remain static headers; any AI label keeps its own action.
+///
+/// The table's accessible name defaults to [title]; provide [semanticsLabel]
+/// when a different or localized name is needed. Headers and keyed data rows
+/// expose the platform's table, row and cell roles in the current visual order.
+/// Sticky tables retain scrolling actions on the table node. Expanded details
+/// and batch actions occupy separate full-width semantic rows; Flutter does
+/// not expose column spans for those rows.
+///
 /// The deprecated index APIs remain functional for at least one minor release.
 /// To migrate, add an ID to every row and replace `selectedRows` /
 /// `onSelectionChanged` with `selectedRowIds` / `onSelectedRowIdsChanged`, and
@@ -188,9 +223,11 @@ class CarbonDataTable extends StatelessWidget {
     this.stickyHeaderHeight = 320,
     this.title,
     this.description,
+    this.semanticsLabel,
     this.aiLabel,
     this.sortColumnIndex,
     this.sortDirection = CarbonSortDirection.none,
+    this.sortDirectionFormatter = carbonTableSortDirectionLabel,
     this.onSort,
     this.selection = CarbonTableSelection.none,
     Set<int>? selectedRows,
@@ -245,11 +282,23 @@ class CarbonDataTable extends StatelessWidget {
   /// An optional table description.
   final String? description;
 
+  /// The table's accessible name.
+  ///
+  /// Defaults to [title], or `Data table` when no title is provided. Supply a
+  /// localized name when the visible title does not identify the table.
+  final String? semanticsLabel;
+
   /// The index of the currently sorted column, or null.
   final int? sortColumnIndex;
 
   /// The sort direction of [sortColumnIndex].
   final CarbonSortDirection sortDirection;
+
+  /// The localizable sort-state value of each sortable header button.
+  ///
+  /// Defaults to [carbonTableSortDirectionLabel]. Flutter has no `aria-sort`
+  /// property; the complete phrase is exposed as the button's semantics value.
+  final CarbonTableSortDirectionFormatter sortDirectionFormatter;
 
   /// Called with a sortable column's index when its header is activated; the
   /// consumer cycles none → ascending → descending → none.
@@ -352,6 +401,14 @@ class _TableBody extends StatefulWidget {
 }
 
 class _TableBodyState extends State<_TableBody> {
+  final ScrollController _bodyScroll = ScrollController();
+
+  @override
+  void dispose() {
+    _bodyScroll.dispose();
+    super.dispose();
+  }
+
   List<CarbonTableColumn> get columns => widget.table.columns;
   List<CarbonTableRow> get rows => widget.table.rows;
   CarbonTableSize get size => widget.table.size;
@@ -550,6 +607,8 @@ class _TableBodyState extends State<_TableBody> {
         children: <Widget>[
           if (expandable)
             _LeadingCell(
+              header: rowIndex == null,
+              semanticsOrder: 0,
               child: rowIndex != null && rows[rowIndex].expandedContent != null
                   ? _ExpandChevron(
                       expanded: _expanded(rowIndex),
@@ -562,6 +621,8 @@ class _TableBodyState extends State<_TableBody> {
             ),
           if (_selectable)
             _LeadingCell(
+              header: rowIndex == null,
+              semanticsOrder: 1,
               child: rowIndex == null
                   ? (selectAll ?? const SizedBox.shrink())
                   : _RowSelector(
@@ -583,6 +644,7 @@ class _TableBodyState extends State<_TableBody> {
       size: size,
       sortColumnIndex: sortColumnIndex,
       sortDirection: sortDirection,
+      sortDirectionFormatter: widget.table.sortDirectionFormatter,
       onSort: onSort,
       leading: leadingRow(rowIndex: null),
     );
@@ -592,6 +654,7 @@ class _TableBodyState extends State<_TableBody> {
         _BodyRow(
           key: _rowKey('body', i),
           row: rows[i],
+          semanticsOrder: i * 2 + 1,
           columns: columns,
           size: size,
           // Zebra tints even rows (`tr:nth-child(even)`); rows are 1-based in
@@ -606,6 +669,7 @@ class _TableBodyState extends State<_TableBody> {
           _ExpandedDetail(
             key: _rowKey('detail', i),
             expanded: _expanded(i),
+            semanticsOrder: i * 2 + 2,
             isLast: i == rows.length - 1,
             child: rows[i].expandedContent!,
           ),
@@ -626,11 +690,21 @@ class _TableBodyState extends State<_TableBody> {
     final Widget body = stickyHeader
         ? ConstrainedBox(
             constraints: BoxConstraints(maxHeight: stickyHeaderHeight),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: bodyRows,
+            child: Scrollable(
+              controller: _bodyScroll,
+              excludeFromSemantics: true,
+              viewportBuilder: (_, offset) => ShrinkWrappingViewport(
+                axisDirection: AxisDirection.down,
+                offset: offset,
+                slivers: <Widget>[
+                  SliverToBoxAdapter(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: bodyRows,
+                    ),
+                  ),
+                ],
               ),
             ),
           )
@@ -650,59 +724,72 @@ class _TableBodyState extends State<_TableBody> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             if (title != null || description != null)
-              Padding(
-                // TableContainer header: spacing-05 top, spacing-06 bottom.
-                padding: const EdgeInsets.fromLTRB(
-                  CarbonSpacing.spacing05,
-                  CarbonSpacing.spacing05,
-                  CarbonSpacing.spacing05,
-                  CarbonSpacing.spacing06,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    if (title != null)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            title!,
-                            style: CarbonTypeStyles.heading03.copyWith(
-                              color: theme.textPrimary,
+              Semantics(
+                container: true,
+                explicitChildNodes: true,
+                sortKey: const OrdinalSortKey(0),
+                child: Padding(
+                  // TableContainer header: spacing-05 top, spacing-06 bottom.
+                  padding: const EdgeInsets.fromLTRB(
+                    CarbonSpacing.spacing05,
+                    CarbonSpacing.spacing05,
+                    CarbonSpacing.spacing05,
+                    CarbonSpacing.spacing06,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (title != null)
+                        Semantics(
+                          container: true,
+                          header: true,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                title!,
+                                style: CarbonTypeStyles.heading03.copyWith(
+                                  color: theme.textPrimary,
+                                ),
+                              ),
+                              // The AI label flows after the table title.
+                              if (aiLabel != null) ...<Widget>[
+                                const SizedBox(width: CarbonSpacing.spacing03),
+                                aiLabel!,
+                              ],
+                            ],
+                          ),
+                        ),
+                      if (description != null)
+                        Semantics(
+                          container: true,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: CarbonSpacing.spacing02,
+                            ),
+                            child: Text(
+                              description!,
+                              style: CarbonTypeStyles.bodyCompact01.copyWith(
+                                color: theme.textSecondary,
+                              ),
                             ),
                           ),
-                          // The AI label flows after the table title.
-                          if (aiLabel != null) ...<Widget>[
-                            const SizedBox(width: CarbonSpacing.spacing03),
-                            aiLabel!,
-                          ],
-                        ],
-                      ),
-                    if (description != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: CarbonSpacing.spacing02,
                         ),
-                        child: Text(
-                          description!,
-                          style: CarbonTypeStyles.bodyCompact01.copyWith(
-                            color: theme.textSecondary,
-                          ),
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            // Separate the changing batch header from the stable row controls.
-            // Otherwise RTL reading-order updates can reparent the focused
-            // native checkbox when the batch bar appears.
-            Semantics(
-              container: true,
-              explicitChildNodes: true,
-              child: headerArea,
+            _TableScrollSemantics(
+              label: widget.table.semanticsLabel ?? title ?? 'Data table',
+              textDirection: Directionality.of(context),
+              controller: stickyHeader ? _bodyScroll : null,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[headerArea, body],
+              ),
             ),
-            Semantics(container: true, explicitChildNodes: true, child: body),
           ],
         ),
       ),
@@ -718,6 +805,7 @@ class _HeaderRow extends StatelessWidget {
     required this.size,
     required this.sortColumnIndex,
     required this.sortDirection,
+    required this.sortDirectionFormatter,
     required this.onSort,
     required this.leading,
   });
@@ -726,35 +814,53 @@ class _HeaderRow extends StatelessWidget {
   final CarbonTableSize size;
   final int? sortColumnIndex;
   final CarbonSortDirection sortDirection;
+  final CarbonTableSortDirectionFormatter sortDirectionFormatter;
   final ValueChanged<int>? onSort;
   final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
-    return ColoredBox(
-      color: layer.layerAccent,
-      // Row height is a minimum: cells grow the band under text scaling
-      // instead of clipping (docs/text-scaling.md).
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: size.height),
-        child: Row(
-          children: <Widget>[
-            ?leading,
-            for (int i = 0; i < columns.length; i++)
-              Expanded(
-                flex: columns[i].flex,
-                child: _HeaderCell(
-                  column: columns[i],
-                  direction: sortColumnIndex == i
-                      ? sortDirection
-                      : CarbonSortDirection.none,
-                  onSort: columns[i].sortable && onSort != null
-                      ? () => onSort!(i)
-                      : null,
-                ),
-              ),
-          ],
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      role: SemanticsRole.row,
+      sortKey: const OrdinalSortKey(0),
+      child: ColoredBox(
+        color: layer.layerAccent,
+        // Row height is a minimum: cells grow the band under text scaling
+        // instead of clipping (docs/text-scaling.md).
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: size.height),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ?leading,
+                for (int i = 0; i < columns.length; i++)
+                  Expanded(
+                    flex: columns[i].flex,
+                    child: Semantics(
+                      container: true,
+                      explicitChildNodes: true,
+                      role: SemanticsRole.columnHeader,
+                      label: columns[i].sortable ? null : columns[i].title,
+                      sortKey: OrdinalSortKey(i.toDouble() + 2),
+                      child: _HeaderCell(
+                        column: columns[i],
+                        direction: sortColumnIndex == i
+                            ? sortDirection
+                            : CarbonSortDirection.none,
+                        onSort: columns[i].sortable && onSort != null
+                            ? () => onSort!(i)
+                            : null,
+                        sortDirectionFormatter: sortDirectionFormatter,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -767,11 +873,13 @@ class _HeaderCell extends StatefulWidget {
     required this.column,
     required this.direction,
     required this.onSort,
+    required this.sortDirectionFormatter,
   });
 
   final CarbonTableColumn column;
   final CarbonSortDirection direction;
   final VoidCallback? onSort;
+  final CarbonTableSortDirectionFormatter sortDirectionFormatter;
 
   @override
   State<_HeaderCell> createState() => _HeaderCellState();
@@ -780,13 +888,29 @@ class _HeaderCell extends StatefulWidget {
 class _HeaderCellState extends State<_HeaderCell> {
   bool _hovered = false;
   bool _focused = false;
+  final FocusNode _focus = FocusNode(debugLabel: 'Carbon table sort');
+
+  bool get _interactive => widget.column.sortable && widget.onSort != null;
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _activate() {
+    if (!mounted || !_interactive) return;
+    _focus.requestFocus();
+    widget.onSort!();
+  }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (widget.onSort != null &&
+    if (_interactive &&
+        node.hasPrimaryFocus &&
         event is KeyDownEvent &&
         (event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.space)) {
-      widget.onSort!();
+      _activate();
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -798,12 +922,16 @@ class _HeaderCellState extends State<_HeaderCell> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool active = widget.direction != CarbonSortDirection.none;
 
-    Widget label = Text(
-      widget.column.title,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: CarbonTypeStyles.headingCompact01.copyWith(
-        color: theme.textPrimary,
+    Widget label = IgnorePointer(
+      child: ExcludeSemantics(
+        child: Text(
+          widget.column.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: CarbonTypeStyles.headingCompact01.copyWith(
+            color: theme.textPrimary,
+          ),
+        ),
       ),
     );
     // The AI label flows after the header label (column-ai-label-sort).
@@ -818,7 +946,7 @@ class _HeaderCellState extends State<_HeaderCell> {
       );
     }
 
-    if (widget.onSort == null) {
+    if (!widget.column.sortable) {
       return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: CarbonSpacing.spacing05,
@@ -846,38 +974,66 @@ class _HeaderCellState extends State<_HeaderCell> {
             ),
           );
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onSort,
-        child: Focus(
-          onKeyEvent: _onKey,
-          onFocusChange: (bool f) => setState(() => _focused = f),
-          child: CarbonFocusRing(
-            visible: _focused,
-            inset: true,
-            child: ColoredBox(
-              // Active / hovered sortable headers tint slightly.
-              color: active || _hovered
-                  ? layer.layerHover
-                  : const Color(0x00000000),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: CarbonSpacing.spacing05,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Flexible(child: label),
-                    const SizedBox(width: CarbonSpacing.spacing03),
-                    glyph,
-                  ],
+    return Focus(
+      focusNode: _focus,
+      includeSemantics: false,
+      canRequestFocus: _interactive,
+      onKeyEvent: _onKey,
+      onFocusChange: (focused) {
+        if (mounted) setState(() => _focused = focused);
+      },
+      child: MouseRegion(
+        cursor: _interactive
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
+        onEnter: (_) => setState(() => _hovered = _interactive),
+        onExit: (_) => setState(() => _hovered = false),
+        child: Stack(
+          alignment: AlignmentDirectional.centerStart,
+          children: <Widget>[
+            Positioned.fill(
+              child: CarbonControlSemantics(
+                state: CarbonControlState.resolve(hasCallback: _interactive),
+                label: widget.column.title,
+                value: widget.sortDirectionFormatter(widget.direction),
+                readOnlyHint: '',
+                button: true,
+                focusNode: _focus,
+                onActivate: _activate,
+                builder: (_) => ExcludeSemantics(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _interactive ? _activate : null,
+                    child: CarbonFocusRing(
+                      visible: _focused && _interactive,
+                      inset: true,
+                      child: ColoredBox(
+                        // Active / hovered sortable headers tint slightly.
+                        color: _interactive && (active || _hovered)
+                            ? layer.layerHover
+                            : const Color(0x00000000),
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: CarbonSpacing.spacing05,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Flexible(child: label),
+                  if (_interactive) ...<Widget>[
+                    const SizedBox(width: CarbonSpacing.spacing03),
+                    IgnorePointer(child: ExcludeSemantics(child: glyph)),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -889,6 +1045,7 @@ class _BodyRow extends StatefulWidget {
   const _BodyRow({
     super.key,
     required this.row,
+    required this.semanticsOrder,
     required this.columns,
     required this.size,
     required this.tinted,
@@ -899,6 +1056,7 @@ class _BodyRow extends StatefulWidget {
   });
 
   final CarbonTableRow row;
+  final int semanticsOrder;
   final List<CarbonTableColumn> columns;
   final CarbonTableSize size;
   final bool tinted;
@@ -962,15 +1120,21 @@ class _BodyRowState extends State<_BodyRow> {
                 for (int i = 0; i < widget.columns.length; i++)
                   Expanded(
                     flex: widget.columns[i].flex,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: CarbonSpacing.spacing05,
-                      ),
-                      child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: i < widget.row.cells.length
-                            ? widget.row.cells[i]
-                            : const SizedBox.shrink(),
+                    child: Semantics(
+                      container: true,
+                      explicitChildNodes: true,
+                      role: SemanticsRole.cell,
+                      sortKey: OrdinalSortKey(i.toDouble() + 2),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: CarbonSpacing.spacing05,
+                        ),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: i < widget.row.cells.length
+                              ? widget.row.cells[i]
+                              : const SizedBox.shrink(),
+                        ),
                       ),
                     ),
                   ),
@@ -983,32 +1147,50 @@ class _BodyRowState extends State<_BodyRow> {
 
     // Keep the wrapper in place when selection changes, preserving cell and
     // selector state/focus. Selected rows paint the 3px interactive marker.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: BorderDirectional(
-          start: BorderSide(
-            color: widget.selected
-                ? theme.borderInteractive
-                : const Color(0x00000000),
-            width: 3,
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      role: SemanticsRole.row,
+      sortKey: OrdinalSortKey(widget.semanticsOrder.toDouble()),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            start: BorderSide(
+              color: widget.selected
+                  ? theme.borderInteractive
+                  : const Color(0x00000000),
+              width: 3,
+            ),
           ),
         ),
+        child: content,
       ),
-      child: content,
     );
   }
 }
 
 /// A fixed-width leading cell holding an expand chevron or a selector.
 class _LeadingCell extends StatelessWidget {
-  const _LeadingCell({required this.child});
+  const _LeadingCell({
+    required this.child,
+    required this.header,
+    required this.semanticsOrder,
+  });
 
   final Widget child;
+  final bool header;
+  final double semanticsOrder;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    width: CarbonSpacing.spacing09,
-    child: Align(child: child),
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    explicitChildNodes: true,
+    role: header ? SemanticsRole.columnHeader : SemanticsRole.cell,
+    sortKey: OrdinalSortKey(semanticsOrder),
+    child: SizedBox(
+      width: CarbonSpacing.spacing09,
+      child: Align(child: child),
+    ),
   );
 }
 
@@ -1147,11 +1329,13 @@ class _ExpandedDetail extends StatelessWidget {
   const _ExpandedDetail({
     super.key,
     required this.expanded,
+    required this.semanticsOrder,
     required this.isLast,
     required this.child,
   });
 
   final bool expanded;
+  final int semanticsOrder;
   final bool isLast;
   final Widget child;
 
@@ -1161,35 +1345,55 @@ class _ExpandedDetail extends StatelessWidget {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     // Detail fold per `_data-table-expandable.scss` `tr[data-child-row]`:
     // height $duration-moderate-01 motion(standard, productive).
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
-      duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
-          ? Duration.zero
-          : CarbonDuration.moderate01,
-      curve: CarbonEasing.standardProductive,
-      builder: (BuildContext context, double t, Widget? child) => ClipRect(
-        child: Align(
-          alignment: AlignmentDirectional.topStart,
-          heightFactor: t,
-          child: child,
-        ),
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: layer.layerHover,
-          border: Border(
-            bottom: BorderSide(
-              color: isLast ? const Color(0x00000000) : layer.borderSubtle,
+    return ExcludeSemantics(
+      excluding: !expanded,
+      child: ExcludeFocus(
+        excluding: !expanded,
+        child: Semantics(
+          container: true,
+          explicitChildNodes: true,
+          role: SemanticsRole.row,
+          sortKey: OrdinalSortKey(semanticsOrder.toDouble()),
+          child: Semantics(
+            container: true,
+            explicitChildNodes: true,
+            role: SemanticsRole.cell,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
+              duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                  ? Duration.zero
+                  : CarbonDuration.moderate01,
+              curve: CarbonEasing.standardProductive,
+              builder: (BuildContext context, double t, Widget? child) =>
+                  ClipRect(
+                    child: Align(
+                      alignment: AlignmentDirectional.topStart,
+                      heightFactor: t,
+                      child: child,
+                    ),
+                  ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: layer.layerHover,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isLast
+                          ? const Color(0x00000000)
+                          : layer.borderSubtle,
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(CarbonSpacing.spacing05),
+                  child: DefaultTextStyle.merge(
+                    style: CarbonTypeStyles.bodyCompact01.copyWith(
+                      color: theme.textPrimary,
+                    ),
+                    child: child,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(CarbonSpacing.spacing05),
-          child: DefaultTextStyle.merge(
-            style: CarbonTypeStyles.bodyCompact01.copyWith(
-              color: theme.textPrimary,
-            ),
-            child: child,
           ),
         ),
       ),
@@ -1394,11 +1598,160 @@ class _BatchHeader extends StatelessWidget {
             curve: CarbonEasing.standardProductive,
             child: ExcludeSemantics(
               excluding: !active,
-              child: IgnorePointer(ignoring: !active, child: bar),
+              child: IgnorePointer(
+                ignoring: !active,
+                child: Semantics(
+                  container: true,
+                  explicitChildNodes: true,
+                  role: SemanticsRole.row,
+                  sortKey: const OrdinalSortKey(0.5),
+                  child: Semantics(
+                    container: true,
+                    explicitChildNodes: true,
+                    role: SemanticsRole.cell,
+                    child: bar,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+// A scrolling table must expose its rows directly: Flutter has no row-group
+// role, and Scrollable's usual semantics boundary would interrupt that
+// relationship. Keep the viewport's public scrolling contract on the table
+// node instead. Row semantics boundaries remain stable through sort/selection.
+class _TableScrollSemantics extends SingleChildRenderObjectWidget {
+  const _TableScrollSemantics({
+    required this.controller,
+    required this.label,
+    required this.textDirection,
+    required super.child,
+  });
+
+  final ScrollController? controller;
+  final String label;
+  final TextDirection textDirection;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderTableScrollSemantics(controller, label, textDirection);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant _RenderTableScrollSemantics renderObject,
+  ) {
+    renderObject
+      ..controller = controller
+      ..label = label
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderTableScrollSemantics extends RenderProxyBox {
+  _RenderTableScrollSemantics(
+    this._controller,
+    this._label,
+    this._textDirection,
+  );
+
+  String _label;
+  TextDirection _textDirection;
+
+  set label(String next) {
+    if (next == _label) return;
+    _label = next;
+    markNeedsSemanticsUpdate();
+  }
+
+  set textDirection(TextDirection next) {
+    if (next == _textDirection) return;
+    _textDirection = next;
+    markNeedsSemanticsUpdate();
+  }
+
+  ScrollController? _controller;
+  ScrollMetrics? _lastMetrics;
+
+  set controller(ScrollController? next) {
+    if (_controller == next) return;
+    if (attached) _controller?.removeListener(markNeedsSemanticsUpdate);
+    _controller = next;
+    if (attached) _controller?.addListener(markNeedsSemanticsUpdate);
+    markNeedsSemanticsUpdate();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _controller?.addListener(markNeedsSemanticsUpdate);
+  }
+
+  @override
+  void detach() {
+    _controller?.removeListener(markNeedsSemanticsUpdate);
+    super.detach();
+  }
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final ScrollMetrics? metrics = _position;
+    if (metrics?.maxScrollExtent != _lastMetrics?.maxScrollExtent ||
+        metrics?.viewportDimension != _lastMetrics?.viewportDimension) {
+      _lastMetrics = metrics?.copyWith();
+      markNeedsSemanticsUpdate();
+    }
+  }
+
+  ScrollPosition? get _position =>
+      _controller != null &&
+          _controller!.hasClients &&
+          _controller!.position.hasContentDimensions
+      ? _controller!.position
+      : null;
+
+  void _scrollTo(double offset) {
+    if (!attached) return;
+    final ScrollPosition? position = _position;
+    if (position == null) return;
+    position.jumpTo(
+      offset.clamp(position.minScrollExtent, position.maxScrollExtent),
+    );
+  }
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
+    config
+      ..isSemanticBoundary = true
+      ..explicitChildNodes = true
+      ..role = SemanticsRole.table
+      ..label = _label
+      ..textDirection = _textDirection
+      ..sortKey = const OrdinalSortKey(1);
+    final ScrollPosition? position = _position;
+    if (position == null) return;
+    config
+      ..hasImplicitScrolling = position.physics.allowImplicitScrolling
+      ..scrollPosition = position.pixels
+      ..scrollExtentMin = position.minScrollExtent
+      ..scrollExtentMax = position.maxScrollExtent;
+    if (position.pixels > position.minScrollExtent) {
+      config.onScrollUp = () =>
+          _scrollTo(position.pixels - position.viewportDimension * 0.8);
+    }
+    if (position.pixels < position.maxScrollExtent) {
+      config.onScrollDown = () =>
+          _scrollTo(position.pixels + position.viewportDimension * 0.8);
+    }
+    if (position.maxScrollExtent > position.minScrollExtent) {
+      config.onScrollToOffset = (offset) => _scrollTo(offset.dy);
+    }
   }
 }

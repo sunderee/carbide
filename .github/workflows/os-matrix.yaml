@@ -236,6 +236,14 @@ jobs:
           --target=integration_test/data_table_identity_test.dart
           -d web-server
 
+      - name: Drive data-table native accessibility in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/data_table_accessibility_test.dart
+          -d web-server
+
       - name: Drive list native marker and scrolling test
         working-directory: example
         run: >

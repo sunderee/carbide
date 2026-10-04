@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Give data tables an accessible name and ordered table, row, header and cell
+  roles. Sortable headers expose a named button with a localizable sort-state
+  value and an activation target that fills the cell. Preserve keyed row focus,
+  expansion and sticky scrolling; enable the table tap-target gate (#307).
+
 - Share active-option semantics across dropdown, select, combo-box and
   multi-select. Announce keyboard navigation without changing the committed
   value or editor query, expose expanded state, and allow localization through

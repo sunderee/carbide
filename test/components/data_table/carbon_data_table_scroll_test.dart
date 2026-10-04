@@ -51,15 +51,12 @@ void main() {
       );
       // The body viewport is capped at the default 320px sticky height even
       // though the 12 lg rows want 576px.
-      expect(tester.getSize(find.byType(SingleChildScrollView)).height, 320);
+      expect(tester.getSize(find.byType(Scrollable)).height, 320);
 
       final Offset headerBefore = tester.getTopLeft(find.text('Name'));
       final Offset row1Before = tester.getTopLeft(find.text('Row 1'));
 
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(0, -150),
-      );
+      await tester.drag(find.byType(Scrollable), const Offset(0, -150));
       await tester.pumpAndSettle();
 
       // The header did not move; the rows scrolled up underneath it.
@@ -100,13 +97,10 @@ void main() {
         ),
       );
       // Over-drag; clamping physics settle at the 256px max extent.
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(0, -600),
-      );
+      await tester.drag(find.byType(Scrollable), const Offset(0, -600));
       await tester.pumpAndSettle();
 
-      // The first row is still laid out (SingleChildScrollView keeps its
+      // The first row is still laid out (the body viewport keeps its
       // child mounted) but sits above the clipped viewport, so it can no
       // longer be hit — matching content hidden under the sticky header.
       expect(find.text('Row 1'), findsOneWidget);
@@ -141,10 +135,7 @@ void main() {
       final Offset headerBefore = tester.getTopLeft(find.text('Name'));
 
       // Scroll the body, then select a row that is visible after the scroll.
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(0, -150),
-      );
+      await tester.drag(find.byType(Scrollable), const Offset(0, -150));
       await tester.pumpAndSettle();
       await tester.tap(find.bySemanticsLabel('Select row 6'));
       await tester.pumpAndSettle();
@@ -160,10 +151,7 @@ void main() {
 
       // The body still scrolls with the bar shown.
       final Offset row6 = tester.getTopLeft(find.text('Row 6'));
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(0, -60),
-      );
+      await tester.drag(find.byType(Scrollable), const Offset(0, -60));
       await tester.pumpAndSettle();
       expect(tester.getTopLeft(find.text('Row 6')).dy, lessThan(row6.dy));
       expect(find.text('1 item selected'), findsOneWidget);

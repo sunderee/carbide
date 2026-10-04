@@ -160,10 +160,12 @@ void main() {
         tester.getSemantics(find.bySemanticsLabel('Name')),
         isSemantics(hasTapAction: true, isFocusable: true),
       );
-      // TODO(#226): upstream TableHeader exposes the direction via
-      // `aria-sort`, but the sorted column carries no sort-state
-      // semantics here (no hint/value/flag) — only the activation
-      // surface can be asserted until that lands.
+      final direction = tester
+          .getSemantics(find.bySemanticsLabel('Name'))
+          .getSemanticsData();
+      expect(direction.flagsCollection.isButton, isTrue);
+      expect(direction.value, 'Sorted ascending');
+      expect(direction.rect.height, 48);
       handle.dispose();
     });
   });

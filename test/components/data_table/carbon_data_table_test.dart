@@ -225,7 +225,7 @@ void main() {
           ),
         ),
       );
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      expect(find.byType(Scrollable), findsOneWidget);
     });
   });
 
@@ -269,17 +269,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      // The label gate passes: the column title merges into the sort
-      // node. Tap targets are gated off — TODO(#226), two defects:
-      //  * the sortable header's tappable node is the 18px text line
-      //    (216×18 here), not the 48px header cell, because _HeaderCell
-      //    does not stretch to the row height (upstream's sort button
-      //    fills the cell);
-      //  * row selectors and select-all expose no SemanticsAction.tap
-      //    (the checkbox sits inside ExcludeSemantics and the outer
-      //    Semantics has no onTap), so assistive tech cannot activate
-      //    them and the guideline cannot measure them.
-      await expectA11y(tester, tapTargets: false);
+      // Sorting and selection expose named, full-band 48dp targets.
+      await expectA11y(tester);
       handle.dispose();
     });
   });
