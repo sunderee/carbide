@@ -11,3 +11,9 @@ bool Function()? captureNativeControlFocus() => null;
 
 /// Native read-only focus is managed by Flutter on non-web platforms.
 bool Function()? captureReadOnlyControlFocus(String identifier) => null;
+
+/// Native editor focus is managed by Flutter on non-web platforms.
+bool Function()? captureTextControlFocus(
+  String identifier, {
+  required bool readOnly,
+}) => null;

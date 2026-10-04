@@ -100,9 +100,10 @@ jobs:
 
   gallery-web-integration:
     name: Gallery integration test — web
-    # All preceding fixtures consumed the 15-minute budget before the added
-    # binary-control fixture could complete. Keep a bounded 20-minute budget.
-    timeout-minutes: 20
+    # The expanded fixture suite reached the 20-minute limit during its final
+    # content-switcher run after adding the picker matrix. Keep a bounded
+    # 25-minute budget for the complete gallery browser suite.
+    timeout-minutes: 25
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

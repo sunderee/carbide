@@ -45,6 +45,7 @@ class PickerFixtureState extends State<PickerFixture> {
   int changes = 0;
   int clears = 0;
   int inputs = 0;
+  bool lockOnChange = false;
   String chosen = 'b';
   Set<String> selected = <String>{'b'};
   final TextEditingController query = TextEditingController(
@@ -55,19 +56,35 @@ class PickerFixtureState extends State<PickerFixture> {
   String get announcedValue => switch (widget.kind) {
     PickerKind.search || PickerKind.expandableSearch => 'Retained query',
     PickerKind.date || PickerKind.range => '01/02/2026',
-    _ => 'Beta',
+    PickerKind.multi || PickerKind.filteredMulti => <String>[
+      if (selected.contains('a')) 'Alpha',
+      if (selected.contains('b')) 'Beta',
+    ].join(', '),
+    _ => chosen == 'a' ? 'Alpha' : 'Beta',
   };
   void configure({
     bool? readOnly,
     bool? disabled,
     bool? callback,
+    bool? lockOnChange,
     Set<String>? selected,
   }) => setState(() {
     if (readOnly != null) this.readOnly = readOnly;
     if (disabled != null) this.disabled = disabled;
     if (callback != null) this.callback = callback;
+    if (lockOnChange != null) this.lockOnChange = lockOnChange;
     if (selected != null) this.selected = selected;
   });
+  void _changed(Object? value) {
+    changes++;
+    if (!lockOnChange) return;
+    setState(() {
+      if (value is String) chosen = value;
+      if (value is Set<String>) selected = value;
+      readOnly = true;
+    });
+  }
+
   @override
   void dispose() {
     query.dispose();
@@ -84,7 +101,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: callback ? (_) => changes++ : null,
+      onChanged: callback ? _changed : null,
       items: const <CarbonDropdownItem<String>>[
         CarbonDropdownItem(value: 'a', label: 'Alpha'),
         CarbonDropdownItem(value: 'b', label: 'Beta'),
@@ -97,7 +114,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: callback ? (_) => changes++ : null,
+      onChanged: callback ? _changed : null,
       items: const <CarbonSelectItem<String>>[
         CarbonSelectItem(value: 'a', label: 'Alpha'),
         CarbonSelectItem(value: 'b', label: 'Beta'),
@@ -110,7 +127,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: callback ? (_) => changes++ : null,
+      onChanged: callback ? _changed : null,
       onInputChange: (_) => inputs++,
       items: const <CarbonComboBoxItem<String>>[
         CarbonComboBoxItem(value: 'a', label: 'Alpha'),
@@ -126,7 +143,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: callback ? (_) => changes++ : null,
+      onChanged: callback ? _changed : null,
       items: const <CarbonMultiSelectItem<String>>[
         CarbonMultiSelectItem(value: 'a', label: 'Alpha'),
         CarbonMultiSelectItem(value: 'b', label: 'Beta'),
@@ -139,7 +156,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: callback ? (_) => changes++ : null,
+      onChanged: callback ? _changed : null,
       onClear: () => clears++,
     ),
     PickerKind.expandableSearch => CarbonExpandableSearch(
@@ -148,7 +165,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnly: readOnly,
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
-      onChanged: (_) => changes++,
+      onChanged: _changed,
       onClear: () => clears++,
     ),
     PickerKind.date => CarbonDatePicker(
@@ -158,7 +175,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
       fluid: widget.fluid,
-      onChanged: (_) => changes++,
+      onChanged: _changed,
     ),
     PickerKind.range => CarbonDateRangePicker(
       startLabelText: 'Field',
@@ -168,7 +185,7 @@ class PickerFixtureState extends State<PickerFixture> {
       readOnlyHint: 'Nur lesen',
       disabled: disabled,
       fluid: widget.fluid,
-      onChanged: (_) => changes++,
+      onChanged: _changed,
     ),
   };
 }

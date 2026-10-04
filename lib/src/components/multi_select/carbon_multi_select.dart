@@ -271,6 +271,10 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     if (!mounted || !_controlState.canActivate || item.disabled) return;
     final Set<T> next = Set<T>.of(widget.selectedValues);
     next.contains(item.value) ? next.remove(item.value) : next.add(item.value);
+    // A pointer selection can blur the native editor before Flutter receives
+    // the tap. Keep keyboard navigation on the trigger; a caller's subsequent
+    // focus request from onChanged still takes precedence.
+    _focus.requestFocus();
     widget.onChanged?.call(next);
   }
 

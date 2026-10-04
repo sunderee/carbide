@@ -64,17 +64,41 @@ bool Function()? captureNativeControlFocus() {
 /// The caller confirms framework ownership before invoking the callback after
 /// semantics updates. A different native target chosen since capture wins.
 /// No DOM listeners or long-lived element references are retained.
-bool Function()? captureReadOnlyControlFocus(String identifier) {
+bool Function()? captureReadOnlyControlFocus(String identifier) =>
+    _captureControlFocus(identifier);
+
+/// Captures guarded focus for an editor reparented by overlay semantics.
+///
+/// Targets the native input inside the named region. Framework ownership is
+/// checked by the caller; another native control or an inactive document wins.
+bool Function()? captureTextControlFocus(
+  String identifier, {
+  required bool readOnly,
+}) => _captureControlFocus(identifier, text: true, readOnly: readOnly);
+
+bool Function()? _captureControlFocus(
+  String identifier, {
+  bool text = false,
+  bool readOnly = false,
+}) {
   if (!_document.hasFocus()) return null;
   final _Element? previous = _document.activeElement;
   return () {
     if (!_document.hasFocus()) return false;
-    final _Element? target = _document.querySelector(
-      '[flt-semantics-identifier="$identifier"]',
+    final _Element? region = _document.querySelector(
+      text
+          ? '[flt-semantics-identifier^="$identifier-"]'
+          : '[flt-semantics-identifier="$identifier"]',
     );
+    final _Element? target = text
+        ? region?.querySelector('input,textarea')
+        : region;
     if (target == null || !target.isConnected) return false;
     final _Element? active = target.getRootNode().activeElement;
-    if (active == target) return true;
+    if (active == target) {
+      if (text) target.readOnly = readOnly;
+      return true;
+    }
     if (active != previous &&
         active != null &&
         active.tagName != 'BODY' &&
@@ -82,6 +106,7 @@ bool Function()? captureReadOnlyControlFocus(String identifier) {
       return false;
     }
     target.focus(_FocusOptions(preventScroll: true));
+    if (text) target.readOnly = readOnly;
     return target.getRootNode().activeElement == target;
   };
 }
@@ -96,6 +121,8 @@ extension type _Document(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external set readOnly(bool value);
+  external _Element? querySelector(String selector);
   external String get tagName;
   external bool get isConnected;
   external _Document getRootNode();

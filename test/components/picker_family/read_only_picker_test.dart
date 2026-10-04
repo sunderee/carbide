@@ -399,6 +399,39 @@ void main() {
   });
 
   for (final PickerKind kind in <PickerKind>[
+    PickerKind.combo,
+    PickerKind.filteredMulti,
+    PickerKind.search,
+  ]) {
+    testWidgets('$kind retained inspection focus becomes inert (#312)', (
+      tester,
+    ) async {
+      final GlobalKey<PickerFixtureState> key = GlobalKey<PickerFixtureState>();
+      await tester.pumpWidget(_host(PickerFixture(key: key, kind: kind)));
+      await tester.pumpAndSettle();
+      final VoidCallback retained = tester
+          .widget<Semantics>(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is Semantics &&
+                  widget.properties.label == 'Field' &&
+                  widget.properties.onFocus != null,
+            ),
+          )
+          .properties
+          .onFocus!;
+      key.currentState!.configure(disabled: true);
+      await tester.pumpAndSettle();
+      retained();
+      await tester.pumpAndSettle();
+      expect(key.currentState!.focus.hasFocus, isFalse);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      expect(retained, returnsNormally);
+    });
+  }
+
+  for (final PickerKind kind in <PickerKind>[
     PickerKind.dropdown,
     PickerKind.select,
     PickerKind.multi,

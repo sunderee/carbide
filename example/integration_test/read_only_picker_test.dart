@@ -127,6 +127,10 @@ void main() {
             _button('Before').focus();
             await _settle(tester, 'before reopening');
             await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
+            if (_isText(kind)) {
+              if (_hasPopup()) await _domKey(tester, 'Escape');
+              await _domKey(tester, 'ArrowDown');
+            }
             if (!_hasPopup()) {
               await _key(
                 tester,
@@ -143,11 +147,28 @@ void main() {
               expect(key.currentState!.focus.hasPrimaryFocus, isTrue);
               expect(_document.activeElement == _field(), isTrue);
             }
-            key.currentState!.configure(readOnly: true);
+            final int expectedChanges;
+            if (_isText(kind)) {
+              key.currentState!.configure(lockOnChange: true);
+              await _settle(tester);
+              // Reproduce a browser blur before a pointer selection. Locking
+              // from onChanged must also work before the next semantics frame.
+              _document.querySelectorAll('flutter-view').item(0)!.focus();
+              await _settle(tester, 'native blur before selection');
+              await tester.tap(find.text('Alpha').first);
+              expectedChanges = 1;
+            } else {
+              key.currentState!.configure(readOnly: true);
+              expectedChanges = 0;
+            }
             await _settle(tester, 'lock focused open picker');
             _expectClosed();
-            expect(key.currentState!.changes, 0);
+            expect(key.currentState!.changes, expectedChanges);
             if (_isText(kind)) {
+              expect(
+                tester.widget<EditableText>(find.byType(EditableText)).readOnly,
+                isTrue,
+              );
               expect(_document.activeElement == _field(), isTrue);
               expect(_field().readOnly, isTrue);
               expect(_field().value, key.currentState!.announcedValue);
@@ -177,7 +198,10 @@ bool _isText(PickerKind kind) => <PickerKind>[
 bool _hasPopup() =>
     find.byType(CarbonCalendar).evaluate().isNotEmpty ||
     find.byType(CarbonListBoxMenu).evaluate().isNotEmpty ||
-    find.text('Alpha').evaluate().isNotEmpty;
+    find
+        .byWidgetPredicate((widget) => widget is Text && widget.data == 'Alpha')
+        .evaluate()
+        .isNotEmpty;
 
 void _expectClosed() => expect(_hasPopup(), isFalse);
 
@@ -195,6 +219,26 @@ Future<void> _key(
 ) async {
   await tester.sendKeyEvent(logical, physicalKey: physical);
   await _settle(tester);
+}
+
+// A browser key reaches both Flutter's keyboard handling and the native
+// editing strategy. A synthesized framework event alone misses DOM blur.
+Future<void> _domKey(WidgetTester tester, String key) async {
+  final _Element target = _document.activeElement!;
+  for (final String type in <String>['keydown', 'keyup']) {
+    target.dispatchEvent(
+      _KeyboardEvent(
+        type,
+        _KeyboardEventInit(
+          key: key,
+          code: key,
+          bubbles: true,
+          cancelable: true,
+        ),
+      ),
+    );
+  }
+  await _settle(tester, 'browser $key');
 }
 
 _Element _field() {
@@ -241,6 +285,7 @@ extension type _NodeList(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external bool dispatchEvent(JSObject event);
   external String get tagName;
   external String? get textContent;
   external String get value;
@@ -249,4 +294,18 @@ extension type _Element(JSObject _) implements JSObject {
   external String? getAttribute(String name);
   external void click();
   external void focus();
+}
+
+@JS('KeyboardEvent')
+extension type _KeyboardEvent._(JSObject _) implements JSObject {
+  external factory _KeyboardEvent(String type, _KeyboardEventInit options);
+}
+
+extension type _KeyboardEventInit._(JSObject _) implements JSObject {
+  external factory _KeyboardEventInit({
+    String key,
+    String code,
+    bool bubbles,
+    bool cancelable,
+  });
 }
