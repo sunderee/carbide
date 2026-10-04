@@ -4,7 +4,8 @@
 // Apache License, Version 2.0. See the LICENSE file in the project root.
 
 import 'dart:js_interop';
-import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
+import 'dart:ui'
+    show PointerDeviceKind, ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/semantics.dart' show SemanticsBinding;
@@ -393,14 +394,21 @@ void testNativePickerOptionSemantics() {
               // Model the native blur caused by a real pointer on a disabled
               // row, then exercise the complete Flutter row hit target.
               _document.querySelectorAll('flutter-view').item(0)!.focus();
-              await tester.tapAt(
+              final TestGesture pointer = await tester.startGesture(
                 tester.getCenter(
                   find.descendant(
                     of: find.byType(CompositedTransformFollower),
                     matching: find.text('Beta'),
                   ),
                 ),
+                kind: PointerDeviceKind.mouse,
               );
+              await _settle(tester);
+              expect(_document.activeElement == _field(), isTrue);
+              // A trusted browser click can blur again after the down-frame
+              // repair. Model that final native default before pointer-up.
+              _document.querySelectorAll('flutter-view').item(0)!.focus();
+              await pointer.up();
               await _settle(tester);
               expect(_document.activeElement == _field(), isTrue);
               expect(state.focus.hasPrimaryFocus, isTrue);

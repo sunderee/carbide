@@ -147,6 +147,20 @@ class _CarbonListBoxSemanticsState extends State<CarbonListBoxSemantics> {
     setState(() {});
   }
 
+  void _settleFocus() {
+    if (!mounted || !widget.focusNode.hasPrimaryFocus) return;
+    final FocusNode target = widget.focusNode;
+    // Browser click defaults can blur a named editor after pointer-up. Rebuild
+    // its guarded semantics repair after that final default action, yielding
+    // to selection callbacks that choose a different control or remove us.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.focusNode == target && target.hasPrimaryFocus) {
+        setState(() {});
+      }
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final String? label =
@@ -166,6 +180,7 @@ class _CarbonListBoxSemanticsState extends State<CarbonListBoxSemantics> {
       activeHint: hint,
       focusNode: widget.focusNode,
       retainFocus: _retainFocus,
+      settleFocus: _settleFocus,
       child: Stack(
         clipBehavior: Clip.none,
         children: <Widget>[
@@ -199,12 +214,14 @@ class _ListBoxSemanticsScope extends InheritedWidget {
     required this.activeHint,
     required this.focusNode,
     required this.retainFocus,
+    required this.settleFocus,
     required super.child,
   });
 
   final String? activeHint;
   final FocusNode focusNode;
   final VoidCallback retainFocus;
+  final VoidCallback settleFocus;
 
   @override
   bool updateShouldNotify(_ListBoxSemanticsScope oldWidget) =>
@@ -268,6 +285,13 @@ class _CarbonListBoxOptionSemanticsState
         ?.retainFocus();
   }
 
+  void _pointerUp(PointerUpEvent event) {
+    if (!mounted) return;
+    context
+        .getInheritedWidgetOfExactType<_ListBoxSemanticsScope>()
+        ?.settleFocus();
+  }
+
   @override
   Widget build(BuildContext context) => TextFieldTapRegion(
     // An option is part of its editable picker, not an outside tap. A unique
@@ -278,6 +302,7 @@ class _CarbonListBoxOptionSemanticsState
     child: Listener(
       behavior: HitTestBehavior.opaque,
       onPointerDown: _pointerDown,
+      onPointerUp: _pointerUp,
       child: Semantics(
         container: true,
         excludeSemantics: true,
