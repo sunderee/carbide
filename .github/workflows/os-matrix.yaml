@@ -276,6 +276,14 @@ jobs:
           --target=integration_test/list_markers_test.dart
           -d web-server
 
+      - name: Drive static content semantics in release mode
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/static_semantics_test.dart
+          -d web-server
+
       - name: Drive modal and dialog native focus contracts in release mode
         working-directory: example
         run: >

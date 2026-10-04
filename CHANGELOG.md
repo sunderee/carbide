@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Expose structural semantics for nested Carbon lists and document the static
+  tag/code-snippet accessibility policy (#318).
+
 - Adapt theme lookup to the nearest platform high-contrast preference with
   `CarbonThemeData.highContrast`. Strengthen boundaries, focus indicators and
   inactive labels across layers, preserve the base theme when the preference

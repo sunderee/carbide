@@ -8,6 +8,7 @@
 //   react/src/components/{OrderedList,UnorderedList,ListItem}
 
 import 'package:flutter/rendering.dart' show OverflowBoxFit;
+import 'package:flutter/semantics.dart' show OrdinalSortKey, SemanticsRole;
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
@@ -60,6 +61,8 @@ class CarbonListItem extends StatelessWidget {
 ///
 /// Top-level items are numbered `1.`, `2.`, …; nested ordered lists use
 /// lower-latin markers (`a.` … `z.`, `aa.`, `ab.`, …), per `_list.scss`.
+/// Exposes a list container with a list-item node for each direct child.
+/// Nested lists retain their own structure; visible markers remain readable.
 class CarbonOrderedList extends StatelessWidget {
   /// Creates an ordered list.
   const CarbonOrderedList({
@@ -86,6 +89,7 @@ class CarbonOrderedList extends StatelessWidget {
 ///
 /// Top-level items use an en-dash (`–`) marker; nested unordered lists use a
 /// small square (`▪`), per `_list.scss`.
+/// Exposes list and list-item semantics while preserving child controls.
 class CarbonUnorderedList extends StatelessWidget {
   /// Creates an unordered list.
   const CarbonUnorderedList({
@@ -170,35 +174,41 @@ class _CarbonList extends StatelessWidget {
           padding: EdgeInsetsDirectional.only(
             start: nested ? nestedIndent - gutter : 0,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                width: gutter,
-                // Native CSS markers hang into the margin when wider than the
-                // gutter. Keep the content edge fixed and the marker on one
-                // line, including expressive/scaled multi-letter markers.
-                child: OverflowBox(
-                  fit: OverflowBoxFit.deferToChild,
-                  alignment: AlignmentDirectional.topEnd,
-                  minWidth: gutter,
-                  maxWidth: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      end: CarbonSpacing.spacing02,
-                    ),
-                    child: Text(
-                      _marker(i, nested),
-                      style: style,
-                      softWrap: false,
+          child: Semantics(
+            container: true,
+            explicitChildNodes: true,
+            role: SemanticsRole.listItem,
+            sortKey: OrdinalSortKey(i.toDouble()),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(
+                  width: gutter,
+                  // Native CSS markers hang into the margin when wider than the
+                  // gutter. Keep the content edge fixed and the marker on one
+                  // line, including expressive/scaled multi-letter markers.
+                  child: OverflowBox(
+                    fit: OverflowBoxFit.deferToChild,
+                    alignment: AlignmentDirectional.topEnd,
+                    minWidth: gutter,
+                    maxWidth: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        end: CarbonSpacing.spacing02,
+                      ),
+                      child: Text(
+                        _marker(i, nested),
+                        style: style,
+                        softWrap: false,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: DefaultTextStyle(style: style, child: children[i]),
-              ),
-            ],
+                Expanded(
+                  child: DefaultTextStyle(style: style, child: children[i]),
+                ),
+              ],
+            ),
           ),
         ),
     ];
@@ -206,10 +216,15 @@ class _CarbonList extends StatelessWidget {
     return _ListScope(
       depth: (parent?.depth ?? -1) + 1,
       expressive: effectiveExpressive,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: rows,
+      child: Semantics(
+        container: true,
+        explicitChildNodes: true,
+        role: SemanticsRole.list,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: rows,
+        ),
       ),
     );
   }

@@ -208,6 +208,11 @@ class CarbonTagColors {
 /// `layer` token, so a disabled tag matches its surface inside a
 /// [CarbonLayer]. Interactive variants are `CarbonDismissibleTag`,
 /// `CarbonSelectableTag`, and `CarbonOperationalTag`.
+///
+/// The complete [label] is accessible text, including when visually truncated.
+/// Wrap redundant decorative tags in [ExcludeSemantics]. Applications can
+/// supply contextual replacement text using [Semantics] with
+/// `excludeSemantics: true`; static tags do not create live announcements.
 class CarbonTag extends StatelessWidget {
   /// Creates a read-only tag.
   const CarbonTag({

@@ -17,6 +17,8 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/overlay_entries.dart';
+
 /// CarbonCopyButton uses a Popover; tests need an Overlay and a TapRegion
 /// surface. The 240px-wide slot forces long lines to overflow horizontally.
 Widget _host(Widget child) => Directionality(
@@ -26,7 +28,7 @@ Widget _host(Widget child) => Directionality(
       data: CarbonThemeData.white,
       child: Overlay(
         initialEntries: <OverlayEntry>[
-          OverlayEntry(
+          managedOverlayEntry(
             builder: (BuildContext context) =>
                 Center(child: SizedBox(width: 240, child: child)),
           ),

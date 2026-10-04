@@ -131,6 +131,9 @@ uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 
 ## Accessibility & testing
 
+See the [semantics policy](docs/accessibility.md) for static tags, nested lists,
+code snippets and application-supplied context.
+
 - **Accessible by construction.** Components expose Carbon's semantics — roles,
   labels, focus order, and a custom-painted focus ring — and target WCAG AA
   contrast.
