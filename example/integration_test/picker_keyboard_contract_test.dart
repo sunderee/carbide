@@ -457,6 +457,11 @@ void testNativePickerOptionSemantics() {
                 );
                 await _settle(tester);
                 _expectNativeActive(announcements, state, 'Alpha', 1, 3);
+                expect(
+                  _nativeParents(_field()),
+                  parents,
+                  reason: 'native editor ancestry after clearing no matches',
+                );
               }
               _nativeOptions('Charlie').single.click();
               await _settle(tester);
@@ -768,7 +773,7 @@ List<String?> _nativeParents(_Element element) {
 }
 
 String _describe(PickerKeyboardFixtureState state) =>
-    'framework=${state.focus.hasPrimaryFocus}, primary=${FocusManager.instance.primaryFocus?.debugLabel}, active=${_document.activeElement?.tagName}/${_document.activeElement?.getAttribute('aria-label')}/${_document.activeElement?.getAttribute('flt-semantics-identifier')}, field=${_field().outerHTML}';
+    'framework=${state.focus.hasPrimaryFocus}, document=${_document.hasFocus()}, primary=${FocusManager.instance.primaryFocus?.debugLabel}, active=${_document.activeElement?.tagName}/${_document.activeElement?.getAttribute('aria-label')}/${_document.activeElement?.getAttribute('flt-semantics-identifier')}, parents=${_nativeParents(_field())}, field=${_field().outerHTML}';
 
 @JS('document')
 external _Document get _document;
@@ -776,6 +781,7 @@ external _Document get _document;
 extension type _Document(JSObject _) implements JSObject {
   external _NodeList querySelectorAll(String selector);
   external _Element? get activeElement;
+  external bool hasFocus();
 }
 
 extension type _NodeList(JSObject _) implements JSObject {

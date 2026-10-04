@@ -531,11 +531,23 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                           )
                         : editable,
                   ),
-                  if (_controller.text.isNotEmpty &&
-                      _controlState.canActivate) ...<Widget>[
-                    const SizedBox(width: CarbonSpacing.spacing03),
-                    CarbonListBoxSelection(onClear: _clear),
-                  ],
+                  // Keep the clear control's semantics region attached while
+                  // the query becomes empty. Removing a sibling region can
+                  // move and blur the native editor during web reconciliation.
+                  Semantics(
+                    container: true,
+                    explicitChildNodes: true,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        if (_controller.text.isNotEmpty &&
+                            _controlState.canActivate) ...<Widget>[
+                          const SizedBox(width: CarbonSpacing.spacing03),
+                          CarbonListBoxSelection(onClear: _clear),
+                        ],
+                      ],
+                    ),
+                  ),
                   // The AI label sits before the menu chevron
                   // (`_list-box.scss` decorator placement).
                   if (widget.aiLabel != null) ...<Widget>[

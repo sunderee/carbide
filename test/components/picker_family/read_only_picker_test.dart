@@ -35,7 +35,21 @@ Widget _host(Widget child, {TextDirection direction = TextDirection.ltr}) =>
     );
 
 void _action(WidgetTester tester, SemanticsAction action) {
-  final Finder control = find.bySemanticsLabel(RegExp(r'^Field($|\n)')).first;
+  // Editable pickers also name their popup button "Field". Target the field
+  // that exposes focus, rather than depending on those nodes' geometry/order.
+  final Finder control = find
+      .bySemanticsLabel(RegExp(r'^Field($|\n)'))
+      .evaluate()
+      .map(
+        (element) =>
+            find.byElementPredicate((candidate) => candidate == element),
+      )
+      .firstWhere(
+        (finder) => tester
+            .getSemantics(finder)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.focus),
+      );
   final SemanticsNode node = tester.getSemantics(control);
   tester
       .renderObject(control)
