@@ -340,10 +340,17 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _triggerWidth = constraints.maxWidth;
-          return OverlayPortal(
-            controller: _overlay,
-            overlayChildBuilder: _buildMenu,
-            child: TapRegion(groupId: this, child: _buildField(context)),
+          // Keep the trigger and portal in a stable semantics region. Otherwise
+          // opening the popup reparents the native editor, blurring it while
+          // Flutter still considers its text-input connection attached.
+          return Semantics(
+            container: true,
+            explicitChildNodes: true,
+            child: OverlayPortal(
+              controller: _overlay,
+              overlayChildBuilder: _buildMenu,
+              child: TapRegion(groupId: this, child: _buildField(context)),
+            ),
           );
         },
       ),

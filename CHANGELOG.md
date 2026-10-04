@@ -7,6 +7,8 @@
   available while preventing popup opening, editing and clearing; close open
   popups and discard date-range drafts when the policy changes. Distinguish
   read-only and disabled styling and announce multi-select item values (#312).
+  **Behavior change:** select, dropdown and multi-select treat a null selection
+  callback as disabled, taking precedence over `readOnly`.
 
 - Add `CarbonSwitch.semanticLabel` for icon-only segments and accessible names
   that differ from visible text. **Breaking assertion:** icon-only segments

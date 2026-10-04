@@ -74,7 +74,7 @@ void main() {
             _document.activeElement == field,
             isTrue,
             reason:
-                'active=${_document.activeElement?.getAttribute('aria-label')}/${_document.activeElement?.getAttribute('role')} expected=${field.getAttribute('aria-label')}/${field.getAttribute('role')}',
+                'active=${_document.activeElement?.getAttribute('aria-label') ?? _document.activeElement?.textContent}/${_document.activeElement?.getAttribute('role')} expected=${field.getAttribute('aria-label') ?? field.textContent}/${field.getAttribute('role')}',
           );
           expect(field.getAttribute('aria-description'), 'Nur lesen');
           if (_isText(kind)) {
@@ -112,20 +112,21 @@ void main() {
           await _settle(tester);
           expect(_document.activeElement == _button('After'), isTrue);
           key.currentState!.configure(disabled: true);
-          await _settle(tester);
+          await _settle(tester, 'disable');
           _button('Before').focus();
           await _settle(tester);
           await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
           expect(_document.activeElement == _button('After'), isTrue);
           key.currentState!.configure(disabled: false, readOnly: false);
-          await _settle(tester);
+          await _settle(tester, 'enable editing');
           if (kind == PickerKind.expandableSearch) {
             _button('Expand search').click();
             await _settle(tester);
           }
           if (kind.hasPopup) {
-            _field().focus();
-            await _settle(tester);
+            _button('Before').focus();
+            await _settle(tester, 'before reopening');
+            await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
             if (!_hasPopup()) {
               await _key(
                 tester,
@@ -138,10 +139,22 @@ void main() {
               );
             }
             expect(_hasPopup(), isTrue);
+            if (_isText(kind)) {
+              expect(key.currentState!.focus.hasPrimaryFocus, isTrue);
+              expect(_document.activeElement == _field(), isTrue);
+            }
             key.currentState!.configure(readOnly: true);
-            await _settle(tester);
+            await _settle(tester, 'lock focused open picker');
             _expectClosed();
             expect(key.currentState!.changes, 0);
+            if (_isText(kind)) {
+              expect(_document.activeElement == _field(), isTrue);
+              expect(_field().readOnly, isTrue);
+              expect(_field().value, key.currentState!.announcedValue);
+            }
+            _button('After').focus();
+            await _settle(tester, 'leave locked picker');
+            expect(_document.activeElement == _button('After'), isTrue);
           }
           expect(tester.takeException(), isNull);
         } finally {
@@ -168,11 +181,11 @@ bool _hasPopup() =>
 
 void _expectClosed() => expect(_hasPopup(), isFalse);
 
-Future<void> _settle(WidgetTester tester) async {
+Future<void> _settle(WidgetTester tester, [String phase = 'settle']) async {
   await tester.pumpAndSettle();
   await Future<void>.delayed(const Duration(milliseconds: 70));
   await tester.pumpAndSettle();
-  expect(tester.takeException(), isNull);
+  expect(tester.takeException(), isNull, reason: phase);
 }
 
 Future<void> _key(
@@ -188,13 +201,19 @@ _Element _field() {
   final _NodeList fields = _document.querySelectorAll(
     'input,textarea,[role="button"]',
   );
-  return <_Element>[for (int i = 0; i < fields.length; i++) fields.item(i)!]
-      .firstWhere(
-        (element) =>
-            (element.getAttribute('aria-label') ?? element.textContent ?? '')
-                .trim()
-                .startsWith('Field'),
-      );
+  final List<_Element> candidates = <_Element>[
+    for (int i = 0; i < fields.length; i++) fields.item(i)!,
+  ];
+  candidates.sort(
+    (a, b) => (a.tagName == 'INPUT' || a.tagName == 'TEXTAREA' ? 0 : 1)
+        .compareTo(b.tagName == 'INPUT' || b.tagName == 'TEXTAREA' ? 0 : 1),
+  );
+  return candidates.firstWhere((element) {
+    final String name =
+        (element.getAttribute('aria-label') ?? element.textContent ?? '')
+            .trim();
+    return name.startsWith('Field') && !name.startsWith('Field end');
+  });
 }
 
 _Element _button(String name) {
@@ -222,6 +241,7 @@ extension type _NodeList(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external String get tagName;
   external String? get textContent;
   external String get value;
   external bool get readOnly;

@@ -98,6 +98,8 @@ class CarbonMultiSelect<T> extends StatefulWidget {
   final Set<T> selectedValues;
 
   /// Called with the new selection when a row toggles or all are cleared.
+  ///
+  /// A null callback disables selection and takes precedence over [readOnly].
   final ValueChanged<Set<T>>? onChanged;
 
   /// Helper text (hidden when invalid/warn).
@@ -343,12 +345,19 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _triggerWidth = constraints.maxWidth;
-          return OverlayPortal(
-            controller: _overlay,
-            overlayChildBuilder: _buildMenu,
-            child: widget.filterable
-                ? _buildFilterField(context)
-                : _buildField(context),
+          // Keep the trigger and portal in a stable semantics region. Otherwise
+          // opening the popup reparents the native editor, blurring it while
+          // Flutter still considers its text-input connection attached.
+          return Semantics(
+            container: true,
+            explicitChildNodes: true,
+            child: OverlayPortal(
+              controller: _overlay,
+              overlayChildBuilder: _buildMenu,
+              child: widget.filterable
+                  ? _buildFilterField(context)
+                  : _buildField(context),
+            ),
           );
         },
       ),
@@ -470,12 +479,9 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         ? Border.all(color: theme.supportError, width: 2)
         : Border(bottom: BorderSide(color: borderColor));
 
-    return CarbonTextControlSemantics(
-      state: _controlState,
-      label: widget.titleText,
-      value: controller.text,
-      readOnlyHint: widget.readOnlyHint,
-      focusNode: _focus,
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
       child: Focus(
         canRequestFocus: false,
         skipTraversal: true,
@@ -510,19 +516,26 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                     const SizedBox(width: CarbonSpacing.spacing03),
                   ],
                   Expanded(
-                    child: _FilterInput(
-                      controller: controller,
+                    child: CarbonTextControlSemantics(
+                      state: _controlState,
+                      label: widget.titleText,
+                      value: controller.text,
+                      readOnlyHint: widget.readOnlyHint,
                       focusNode: _focus,
-                      enabled: _controlState.canActivate,
-                      placeholder: widget.filterPlaceholder ?? widget.label,
-                      style: CarbonTypeStyles.bodyCompact01.copyWith(
-                        color: _controlState.isDisabled
-                            ? theme.textDisabled
-                            : theme.textPrimary,
+                      child: _FilterInput(
+                        controller: controller,
+                        focusNode: _focus,
+                        enabled: _controlState.canActivate,
+                        placeholder: widget.filterPlaceholder ?? widget.label,
+                        style: CarbonTypeStyles.bodyCompact01.copyWith(
+                          color: _controlState.isDisabled
+                              ? theme.textDisabled
+                              : theme.textPrimary,
+                        ),
+                        placeholderColor: theme.textPlaceholder,
+                        cursorColor: theme.focus,
+                        onChanged: _onFilter,
                       ),
-                      placeholderColor: theme.textPlaceholder,
-                      cursorColor: theme.focus,
-                      onChanged: _onFilter,
                     ),
                   ),
                   const SizedBox(width: CarbonSpacing.spacing03),
