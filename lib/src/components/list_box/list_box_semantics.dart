@@ -275,7 +275,13 @@ class CarbonListBoxOptionSemantics extends StatefulWidget {
 class _CarbonListBoxOptionSemanticsState
     extends State<CarbonListBoxOptionSemantics> {
   void _activate() {
-    if (mounted && !widget.disabled) widget.onActivate();
+    if (!mounted || widget.disabled) return;
+    final _ListBoxSemanticsScope? scope = context
+        .getInheritedWidgetOfExactType<_ListBoxSemanticsScope>();
+    widget.onActivate();
+    // Native semantics activation can bypass Flutter pointer-up. Settle after
+    // its browser click default as well, while respecting a newer focus owner.
+    scope?.settleFocus();
   }
 
   void _pointerDown(PointerDownEvent event) {

@@ -464,6 +464,9 @@ void testNativePickerOptionSemantics() {
                 );
               }
               _nativeOptions('Charlie').single.click();
+              // Trusted semantics clicks can apply their native focus default
+              // after activation, without a Flutter pointer-up notification.
+              _document.querySelectorAll('flutter-view').item(0)!.focus();
               await _settle(tester);
               expect(state.changes, 1);
               if (multiple) {
