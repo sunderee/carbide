@@ -21,6 +21,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/picker_overlay.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/owned_listenable.dart';
@@ -51,8 +52,10 @@ class CarbonComboBoxItem<T> {
 /// as you type.
 ///
 /// Typing filters the menu (case-insensitive substring); arrows move the
-/// highlight; Enter selects; Escape clears or closes; the clear (X) control
-/// resets the value.
+/// highlight; Enter selects an enabled highlighted option. Escape closes an
+/// open popup, preserving the value. Enter without a selectable highlight and
+/// Escape with no popup continue to ancestor form or dialog handlers. The clear
+/// (X) control resets the value; arbitrary filter text is not a selection.
 ///
 /// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
 /// for the shared disabled and read-only contract.
@@ -169,7 +172,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     readOnly: widget.readOnly,
   );
 
-  final OverlayPortalController _overlay = OverlayPortalController();
+  final CarbonPickerOverlayController _overlay =
+      CarbonPickerOverlayController();
   final LayerLink _link = LayerLink();
   late final TextEditingController _controller;
   late final OwnedFocusNode _focusOwner;
@@ -177,6 +181,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   int _highlighted = -1;
   double _triggerWidth = 0;
   bool _hovered = false;
+  bool _dismissedWhileFocused = false;
 
   CarbonComboBoxItem<T>? get _selected {
     for (final CarbonComboBoxItem<T> item in widget.items) {
@@ -225,6 +230,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   @override
   void dispose() {
+    _overlay.dispose();
     _focusOwner.dispose();
     _controller.dispose();
     super.dispose();
@@ -232,7 +238,15 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   void _onFocusChange() {
     if (!mounted) return;
-    if (_focus.hasFocus && !_overlay.isShowing && _controlState.canActivate) {
+    if (!_focus.hasFocus &&
+        FocusManager.instance.primaryFocus != FocusManager.instance.rootScope &&
+        FocusManager.instance.primaryFocus != _focus.enclosingScope) {
+      _dismissedWhileFocused = false;
+    }
+    if (_focus.hasFocus &&
+        !_dismissedWhileFocused &&
+        !_overlay.isShowing &&
+        _controlState.canActivate) {
       _open();
     }
     setState(() {});
@@ -241,7 +255,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   void _onText(String value) {
     if (!mounted || !_controlState.canActivate) return;
     widget.onInputChange?.call(value);
-    if (!_overlay.isShowing) _overlay.show();
+    if (!_overlay.isShowing) {
+      _dismissedWhileFocused = false;
+      _overlay.show();
+    }
     final List<CarbonComboBoxItem<T>> items = _filtered;
     _highlighted = items.indexWhere((CarbonComboBoxItem<T> i) => !i.disabled);
     setState(() {});
@@ -249,10 +266,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   void _open() {
     if (!mounted || !_controlState.canActivate) return;
+    _dismissedWhileFocused = false;
     final List<CarbonComboBoxItem<T>> items = _filtered;
     _highlighted = items.indexWhere((CarbonComboBoxItem<T> i) => !i.disabled);
     final CarbonComboBoxItem<T>? selected = _selected;
-    if (selected != null && items.contains(selected)) {
+    if (selected != null && !selected.disabled && items.contains(selected)) {
       _highlighted = items.indexOf(selected);
     }
     _overlay.show();
@@ -261,6 +279,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   void _close() {
     if (!mounted) return;
+    // A semantics DOM move can briefly park focus at the root before repair.
+    // Restoring this editor must preserve a user's dismissed popup. Leaving
+    // for a different framework control permits the usual focus-open behavior.
+    _dismissedWhileFocused =
+        _focus.hasFocus ||
+        FocusManager.instance.primaryFocus == FocusManager.instance.rootScope;
     _overlay.hide();
     setState(() {});
   }
@@ -290,45 +314,54 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     _overlay.isShowing ? _close() : _open();
   }
 
-  void _moveHighlight(int delta) {
+  bool _moveHighlight(int delta) {
     final List<CarbonComboBoxItem<T>> items = _filtered;
-    if (items.isEmpty) return;
     int next = _highlighted;
+    if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
       next = (next + delta + items.length) % items.length;
       if (!items[next].disabled) {
+        if (next == _highlighted) return false;
         setState(() => _highlighted = next);
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || !_controlState.canActivate) {
+    if (!mounted || event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     switch (event.logicalKey) {
       case LogicalKeyboardKey.arrowDown:
-        _overlay.isShowing ? _moveHighlight(1) : _open();
+        if (_overlay.isShowing) {
+          return _moveHighlight(1)
+              ? KeyEventResult.handled
+              : KeyEventResult.ignored;
+        }
+        _open();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
-        if (_overlay.isShowing) _moveHighlight(-1);
-        return KeyEventResult.handled;
+        return _overlay.isShowing && _moveHighlight(-1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.enter:
         final List<CarbonComboBoxItem<T>> items = _filtered;
         if (_overlay.isShowing &&
             _highlighted >= 0 &&
-            _highlighted < items.length) {
+            _highlighted < items.length &&
+            !items[_highlighted].disabled) {
           _select(items[_highlighted]);
+          return KeyEventResult.handled;
         }
-        return KeyEventResult.handled;
+        return KeyEventResult.ignored;
       case LogicalKeyboardKey.escape:
         if (_overlay.isShowing) {
           _close();
-        } else if (_controller.text.isNotEmpty) {
-          _clear();
+          return KeyEventResult.handled;
         }
-        return KeyEventResult.handled;
+        return KeyEventResult.ignored;
     }
     return KeyEventResult.ignored;
   }
@@ -340,17 +373,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _triggerWidth = constraints.maxWidth;
-          // Keep the trigger and portal in a stable semantics region. Otherwise
-          // opening the popup reparents the native editor, blurring it while
-          // Flutter still considers its text-input connection attached.
-          return Semantics(
-            container: true,
-            explicitChildNodes: true,
-            child: OverlayPortal(
-              controller: _overlay,
-              overlayChildBuilder: _buildMenu,
-              child: TapRegion(groupId: this, child: _buildField(context)),
-            ),
+          return CarbonPickerOverlay(
+            controller: _overlay,
+            overlayChildBuilder: _buildMenu,
+            child: TapRegion(groupId: this, child: _buildField(context)),
           );
         },
       ),

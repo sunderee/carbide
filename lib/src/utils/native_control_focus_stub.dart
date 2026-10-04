@@ -16,4 +16,5 @@ bool Function()? captureReadOnlyControlFocus(String identifier) => null;
 bool Function()? captureTextControlFocus(
   String identifier, {
   required bool readOnly,
+  bool allowSharedEditor = false,
 }) => null;

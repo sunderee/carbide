@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Align Select and Dropdown opening keys: Up starts at the last enabled
+  option, Down at the first, and Enter/Space at an enabled current selection.
+  Let picker keys reach ancestor form/dialog handlers when they perform no
+  action, including closed combo-box Enter and Escape and menus with no enabled
+  highlight. Closed Escape preserves the combo value; filterable multi-select
+  leaves Space available for text entry (#313, #314).
+
 - Add a consistent `readOnly` and localizable `readOnlyHint` contract to the
   picker and search family. Keep names, selected values and keyboard focus
   available while preventing popup opening, editing and clearing; close open

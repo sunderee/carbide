@@ -16,8 +16,9 @@ typedef CarbonControlBuilder = Widget Function(FocusNode focusNode);
 /// Shared value semantics and guarded native focus for non-text controls.
 ///
 /// Flutter's web focus manager suppresses focus for `enabled: false`, including
-/// read-only controls. Repair only while this focusable read-only control owns
-/// framework focus, respecting a later native control or an inactive window.
+/// read-only controls, and popup updates can move a trigger's native element.
+/// Repair only while this focusable control owns framework focus, respecting a
+/// later native control or an inactive window.
 class CarbonControlSemantics extends StatefulWidget {
   /// Creates the named control region with its editing and value policy.
   const CarbonControlSemantics({
@@ -100,9 +101,9 @@ class _CarbonControlSemanticsState extends State<CarbonControlSemantics> {
           widget.focusNode ?? FocusNode(debugLabel: 'Carbon value control');
       _focus.addListener(_focusChanged);
     }
-    if (widget.state != oldWidget.state ||
-        widget.focusNode != oldWidget.focusNode) {
+    if (!widget.state.canFocus) {
       _repair.cancel();
+    } else {
       _scheduleRepair();
     }
   }
@@ -127,11 +128,11 @@ class _CarbonControlSemanticsState extends State<CarbonControlSemantics> {
   }
 
   void _scheduleRepair() {
-    if (!kIsWeb || !widget.state.isReadOnly || !_focus.hasPrimaryFocus) return;
+    if (!kIsWeb || !widget.state.canFocus || !_focus.hasPrimaryFocus) return;
     _repair.schedule(
       _focus,
       captureReadOnlyControlFocus(_identifier),
-      isCurrent: () => mounted && widget.state.isReadOnly,
+      isCurrent: () => mounted && widget.state.canFocus,
     );
   }
 

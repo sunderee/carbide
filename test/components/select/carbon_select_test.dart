@@ -248,7 +248,8 @@ void main() {
       );
       node.requestFocus();
       await tester.pump();
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      // Enter opens at the current selection (Banana).
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
       // Highlight at Banana(1); Down skips Cherry(2, disabled) → Date(3).
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);

@@ -121,9 +121,12 @@ void main() {
             .first;
         final SemanticsNode node = tester.getSemantics(control);
         expect(node.getSemanticsData().hint, 'Nur lesen');
-        expect(node.flagsCollection.isFocused, isNot(Tristate.none));
-        if (node.flagsCollection.isTextField) {
-          expect(node.flagsCollection.isReadOnly, isTrue);
+        expect(
+          node.getSemanticsData().flagsCollection.isFocused,
+          isNot(Tristate.none),
+        );
+        if (node.getSemanticsData().flagsCollection.isTextField) {
+          expect(node.getSemanticsData().flagsCollection.isReadOnly, isTrue);
         } else {
           expect(
             node.getSemanticsData().hasAction(SemanticsAction.tap),
@@ -141,7 +144,11 @@ void main() {
         _action(tester, SemanticsAction.focus);
         await tester.pumpAndSettle();
         expect(
-          tester.getSemantics(control).flagsCollection.isFocused,
+          tester
+              .getSemantics(control)
+              .getSemanticsData()
+              .flagsCollection
+              .isFocused,
           Tristate.isTrue,
         );
         _expectClosed();
@@ -150,7 +157,10 @@ void main() {
         final SemanticsNode disabled = tester.getSemantics(
           find.bySemanticsLabel(RegExp(r'^Field($|\n)')).first,
         );
-        expect(disabled.flagsCollection.isFocused, Tristate.none);
+        expect(
+          disabled.getSemanticsData().flagsCollection.isFocused,
+          Tristate.none,
+        );
         expect(disabled.getSemanticsData().hint, isEmpty);
         expect(
           disabled.getSemanticsData().value,
@@ -375,6 +385,14 @@ void main() {
     );
     await tester.enterText(find.byType(EditableText), 'Al');
     await tester.pumpAndSettle();
+    const TextEditingValue draft = TextEditingValue(
+      text: 'Al',
+      selection: TextSelection(baseOffset: 0, extentOffset: 1),
+      composing: TextRange(start: 0, end: 2),
+    );
+    tester.widget<EditableText>(find.byType(EditableText)).controller.value =
+        draft;
+    await tester.pumpAndSettle();
     key.currentState!.configure(readOnly: true);
     await tester.pumpAndSettle();
     expect(
@@ -390,8 +408,8 @@ void main() {
     key.currentState!.configure(readOnly: false);
     await tester.pumpAndSettle();
     expect(
-      tester.widget<EditableText>(find.byType(EditableText)).controller.text,
-      'Al',
+      tester.widget<EditableText>(find.byType(EditableText)).controller.value,
+      draft,
     );
     expect(key.currentState!.changes, 0);
     await tester.pumpWidget(const SizedBox.shrink());
@@ -449,7 +467,10 @@ void main() {
           final SemanticsNode node = tester.getSemantics(
             find.bySemanticsLabel('Field'),
           );
-          expect(node.flagsCollection.isFocused, Tristate.none);
+          expect(
+            node.getSemanticsData().flagsCollection.isFocused,
+            Tristate.none,
+          );
           expect(node.getSemanticsData().hint, isEmpty);
           expect(
             node.getSemanticsData().hasAction(SemanticsAction.tap),

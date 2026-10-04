@@ -57,9 +57,17 @@ class CarbonDropdownItem<T> {
 
 /// A Carbon dropdown: a single-select picker on the ListBox chrome.
 ///
-/// Down/Enter/Space opens the menu; arrows move the highlight (skipping
-/// disabled items); Enter selects; Escape closes; typing jumps to the next
-/// matching label.
+/// Up opens at the last enabled option; Down opens at the first. Enter or Space
+/// opens at the enabled selection, falling back to the first enabled option.
+/// While open, arrows move the highlight (skipping disabled items), Enter or
+/// Space selects, Escape closes, and typing jumps to the next matching label.
+/// Keys that do not open, move, select or dismiss continue to ancestor handlers.
+/// Disabled and read-only controls do not open on any key.
+///
+/// Closed-state Up follows the optional
+/// [ARIA combobox convention](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
+/// and matches Carbide's Select. Carbon's React Dropdown currently omits this
+/// opening key.
 ///
 /// ```dart
 /// CarbonDropdown<String>(
@@ -252,13 +260,15 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     _overlay.isShowing ? _close() : _open();
   }
 
-  void _open() {
+  void _open({bool fromEnd = false, bool preferSelection = true}) {
     if (!mounted || !_controlState.canActivate) return;
-    _highlighted = widget.items.indexWhere(
-      (CarbonDropdownItem<T> i) => !i.disabled,
-    );
+    _highlighted = fromEnd
+        ? widget.items.lastIndexWhere((CarbonDropdownItem<T> i) => !i.disabled)
+        : widget.items.indexWhere((CarbonDropdownItem<T> i) => !i.disabled);
     final CarbonDropdownItem<T>? selected = _selected;
-    if (selected != null) _highlighted = widget.items.indexOf(selected);
+    if (preferSelection && selected != null && !selected.disabled) {
+      _highlighted = widget.items.indexOf(selected);
+    }
     _overlay.show();
     setState(() {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -279,27 +289,36 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     _focus.requestFocus();
   }
 
-  void _moveHighlight(int delta) {
+  bool _moveHighlight(int delta) {
     final List<CarbonDropdownItem<T>> items = widget.items;
     int next = _highlighted;
+    if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
       next = (next + delta + items.length) % items.length;
       if (!items[next].disabled) {
+        if (next == _highlighted) return false;
         setState(() => _highlighted = next);
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || !_controlState.canActivate) {
+    if (!mounted || event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
       if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowUp ||
           event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.space) {
-        _open();
+        _open(
+          fromEnd: event.logicalKey == LogicalKeyboardKey.arrowUp,
+          preferSelection:
+              event.logicalKey != LogicalKeyboardKey.arrowDown &&
+              event.logicalKey != LogicalKeyboardKey.arrowUp,
+        );
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -309,17 +328,22 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         _close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
-        _moveHighlight(1);
-        return KeyEventResult.handled;
+        return _moveHighlight(1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.arrowUp:
-        _moveHighlight(-1);
-        return KeyEventResult.handled;
+        return _moveHighlight(-1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.enter:
       case LogicalKeyboardKey.space:
-        if (_highlighted >= 0 && _highlighted < widget.items.length) {
+        if (_highlighted >= 0 &&
+            _highlighted < widget.items.length &&
+            !widget.items[_highlighted].disabled) {
           _select(widget.items[_highlighted]);
+          return KeyEventResult.handled;
         }
-        return KeyEventResult.handled;
+        return KeyEventResult.ignored;
     }
     final String? ch = event.character;
     if (ch != null && ch.trim().isNotEmpty) {
@@ -330,6 +354,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
             widget.items[idx].label.toLowerCase().startsWith(
               ch.toLowerCase(),
             )) {
+          if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;
         }

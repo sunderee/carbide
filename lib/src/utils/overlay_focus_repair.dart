@@ -15,10 +15,15 @@ class OverlayFocusRepair {
   int _generation = 0;
 
   /// Schedules repair while the target and overlay transition remain current.
+  ///
+  /// [parkingScope] identifies the target's enclosing scope when the owner
+  /// deliberately parks focus there while replacing an editor. Other scopes
+  /// and other focused controls still take precedence.
   void schedule(
     FocusNode? target,
     bool Function()? restoreNativeFocus, {
     required bool Function() isCurrent,
+    FocusScopeNode? parkingScope,
   }) {
     cancel();
     if (target == null || restoreNativeFocus == null) return;
@@ -35,7 +40,13 @@ class OverlayFocusRepair {
           return;
         }
         final FocusNode? current = FocusManager.instance.primaryFocus;
-        if (current != target && current != FocusManager.instance.rootScope) {
+        final bool parked =
+            parkingScope != null &&
+            current == parkingScope &&
+            target.enclosingScope == parkingScope;
+        if (current != target &&
+            current != FocusManager.instance.rootScope &&
+            !parked) {
           return;
         }
         if (restoreNativeFocus()) target.requestFocus();

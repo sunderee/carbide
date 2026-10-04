@@ -74,14 +74,40 @@ bool Function()? captureReadOnlyControlFocus(String identifier) =>
 bool Function()? captureTextControlFocus(
   String identifier, {
   required bool readOnly,
-}) => _captureControlFocus(identifier, text: true, readOnly: readOnly);
+  bool allowSharedEditor = false,
+}) => _captureControlFocus(
+  identifier,
+  text: true,
+  readOnly: readOnly,
+  allowSharedEditor: allowSharedEditor,
+);
 
 bool Function()? _captureControlFocus(
   String identifier, {
   bool text = false,
   bool readOnly = false,
+  bool allowSharedEditor = false,
 }) {
   if (!_document.hasFocus()) return null;
+  if (text &&
+      _document
+              .querySelector('[flt-semantics-identifier^="$identifier-"]')
+              ?.querySelector('input,textarea') ==
+          null) {
+    if (!allowSharedEditor) return null;
+    // The ordinary web editing host is created by EditableText's public
+    // requestKeyboard API. Guard that attachment after editor replacement;
+    // there is no named semantics input to focus directly in this mode.
+    final _Element? previous = _document.activeElement;
+    return () {
+      if (!_document.hasFocus()) return false;
+      final _Element? active = _document.activeElement;
+      return active == previous ||
+          active == null ||
+          active.tagName == 'BODY' ||
+          active.tagName == 'FLUTTER-VIEW';
+    };
+  }
   final _Element? previous = _document.activeElement;
   return () {
     if (!_document.hasFocus()) return false;

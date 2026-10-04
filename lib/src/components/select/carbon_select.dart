@@ -68,8 +68,12 @@ class CarbonSelectItemGroup<T> extends CarbonSelectEntry<T> {
 /// A Carbon select (single-choice picker).
 ///
 /// A field with a trailing `ChevronDown` that opens a Carbon list-box. Keyboard
-/// support: Down/Enter/Space opens; arrows move the highlight; Enter selects;
-/// Escape closes; typing jumps to the next matching label. Reuses the
+/// support: Up opens at the last enabled option; Down opens at the first.
+/// Enter or Space opens at the enabled selection, falling back to the first
+/// enabled option. While open, arrows move the highlight (skipping disabled
+/// items), Enter or Space selects, Escape closes, and typing jumps to the next
+/// matching label. Keys that perform no action continue to ancestor handlers.
+/// Disabled and read-only controls do not open on any key. Reuses the
 /// [CarbonField] chrome with [inline] and [fluid] layouts.
 ///
 /// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
@@ -244,12 +248,14 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     super.dispose();
   }
 
-  void _open() {
+  void _open({bool fromEnd = false, bool preferSelection = true}) {
     if (!mounted || !_controlState.canActivate) return;
     final List<CarbonSelectItem<T>> items = _flatItems;
-    _highlighted = items.indexWhere((CarbonSelectItem<T> i) => !i.disabled);
+    _highlighted = fromEnd
+        ? items.lastIndexWhere((CarbonSelectItem<T> i) => !i.disabled)
+        : items.indexWhere((CarbonSelectItem<T> i) => !i.disabled);
     final CarbonSelectItem<T>? selected = _selectedItem;
-    if (selected != null) {
+    if (preferSelection && selected != null && !selected.disabled) {
       _highlighted = items.indexOf(selected);
     }
     _overlay.show();
@@ -282,23 +288,26 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     _focus.requestFocus();
   }
 
-  void _moveHighlight(int delta) {
+  bool _moveHighlight(int delta) {
     final List<CarbonSelectItem<T>> items = _flatItems;
     int next = _highlighted;
+    if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
       next = (next + delta + items.length) % items.length;
       if (!items[next].disabled) {
+        if (next == _highlighted) return false;
         setState(() => _highlighted = next);
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   /// All keyboard handling lives on the trigger (the menu is non-focusable,
-  /// so the trigger keeps focus while open): Down/Enter/Space open; arrows
+  /// so the trigger keeps focus while open): Up/Down/Enter/Space open; arrows
   /// navigate; Enter/Space select; Escape closes; characters type-ahead.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || !_controlState.canActivate) {
+    if (!mounted || event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
@@ -308,7 +317,12 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
           event.logicalKey == LogicalKeyboardKey.arrowUp ||
           event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.space) {
-        _open();
+        _open(
+          fromEnd: event.logicalKey == LogicalKeyboardKey.arrowUp,
+          preferSelection:
+              event.logicalKey != LogicalKeyboardKey.arrowDown &&
+              event.logicalKey != LogicalKeyboardKey.arrowUp,
+        );
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -318,20 +332,25 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      _moveHighlight(1);
-      return KeyEventResult.handled;
+      return _moveHighlight(1)
+          ? KeyEventResult.handled
+          : KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-      _moveHighlight(-1);
-      return KeyEventResult.handled;
+      return _moveHighlight(-1)
+          ? KeyEventResult.handled
+          : KeyEventResult.ignored;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space) {
       final List<CarbonSelectItem<T>> items = _flatItems;
-      if (_highlighted >= 0 && _highlighted < items.length) {
+      if (_highlighted >= 0 &&
+          _highlighted < items.length &&
+          !items[_highlighted].disabled) {
         _select(items[_highlighted]);
+        return KeyEventResult.handled;
       }
-      return KeyEventResult.handled;
+      return KeyEventResult.ignored;
     }
     final String? ch = event.character;
     if (ch != null && ch.trim().isNotEmpty) {
@@ -341,6 +360,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         final int idx = (start + i) % items.length;
         if (!items[idx].disabled &&
             items[idx].label.toLowerCase().startsWith(ch.toLowerCase())) {
+          if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;
         }

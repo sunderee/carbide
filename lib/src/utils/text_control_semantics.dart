@@ -4,6 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/semantics.dart' show OrdinalSortKey;
 import 'package:flutter/widgets.dart';
 
 import 'control_state.dart';
@@ -56,7 +57,9 @@ class _CarbonTextControlSemanticsState
   final String _identifier = 'carbide-text-control-${_nextIdentifier++}';
   final OverlayFocusRepair _repair = OverlayFocusRepair();
   int _revision = 0;
+  OrdinalSortKey _editorOrder = const OrdinalSortKey(0);
   int _generation = 0;
+  FocusScopeNode? _parkingScope;
 
   @override
   void initState() {
@@ -76,10 +79,32 @@ class _CarbonTextControlSemanticsState
     if (!widget.state.canFocus) {
       _cancelRepair();
     } else {
+      final bool policyChanged =
+          widget.state.canActivate != oldWidget.state.canActivate;
+      final bool parked =
+          _parkingScope != null &&
+          FocusManager.instance.primaryFocus == _parkingScope;
+      final bool replacing =
+          kIsWeb &&
+          policyChanged &&
+          widget.focusNode.hasPrimaryFocus &&
+          captureTextControlFocus(
+                _identifier,
+                readOnly: !widget.state.canActivate,
+                allowSharedEditor: true,
+              ) !=
+              null;
+      if (policyChanged) {
+        // A newer policy can arrive while the previous editor is still parked.
+        // Supersede that native snapshot and reconcile the current connection.
+        final FocusScopeNode? scope = replacing || parked
+            ? widget.focusNode.enclosingScope
+            : null;
+        _cancelRepair();
+        _parkingScope = scope;
+      }
       _scheduleRepair();
-      if (kIsWeb &&
-          widget.state.canActivate != oldWidget.state.canActivate &&
-          widget.focusNode.hasPrimaryFocus) {
+      if (replacing) {
         // Replacing the web editor must park focus at its scope rather than
         // walking back to a previously focused control. The scheduled repair
         // restores this node after attachment and yields to a later control.
@@ -97,6 +122,7 @@ class _CarbonTextControlSemanticsState
 
   void _cancelRepair() {
     _generation++;
+    _parkingScope = null;
     _repair.cancel();
   }
 
@@ -104,9 +130,12 @@ class _CarbonTextControlSemanticsState
     if (!mounted) return;
     setState(() {});
     if (widget.focusNode.hasPrimaryFocus) {
+      _parkingScope = null;
       _scheduleRepair();
     } else if (FocusManager.instance.primaryFocus !=
-        FocusManager.instance.rootScope) {
+            FocusManager.instance.rootScope &&
+        (_parkingScope == null ||
+            FocusManager.instance.primaryFocus != _parkingScope)) {
       _cancelRepair();
     }
   }
@@ -116,33 +145,85 @@ class _CarbonTextControlSemanticsState
   }
 
   void _scheduleRepair() {
+    final bool parked =
+        _parkingScope != null &&
+        FocusManager.instance.primaryFocus == _parkingScope;
     if (!kIsWeb ||
         !widget.state.canFocus ||
-        !widget.focusNode.hasPrimaryFocus) {
+        (!widget.focusNode.hasPrimaryFocus && !parked)) {
       return;
     }
     final bool Function()? restore = captureTextControlFocus(
       _identifier,
       readOnly: !widget.state.canActivate,
+      // Reattach the ordinary web editor only for a policy replacement.
+      // Routine owner/value updates must preserve its current connection.
+      allowSharedEditor: _parkingScope != null,
     );
     if (restore == null) return;
+    // A popup DOM move can park focus at this view's scope, just as an editor
+    // replacement does. Capture that scope while ownership is still known;
+    // a later control or a different scope cancels the guarded repair.
+    if (widget.focusNode.hasPrimaryFocus) {
+      _parkingScope ??= widget.focusNode.enclosingScope;
+    }
     final int generation = ++_generation;
+    final FocusScopeNode? parkingScope = _parkingScope;
     bool isCurrent() =>
         mounted && generation == _generation && widget.state.canFocus;
-    _repair.schedule(widget.focusNode, restore, isCurrent: isCurrent);
+    _repair.schedule(
+      widget.focusNode,
+      () {
+        if (!restore()) return false;
+        _requestKeyboard();
+        _refreshEditorSemantics();
+        return true;
+      },
+      isCurrent: isCurrent,
+      parkingScope: parkingScope,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!isCurrent()) return;
       final FocusNode? current = FocusManager.instance.primaryFocus;
       if (current != widget.focusNode &&
-          current != FocusManager.instance.rootScope) {
+          current != FocusManager.instance.rootScope &&
+          (parkingScope == null || current != parkingScope)) {
         return;
       }
       // A native blur detaches Flutter's web editing strategy even when the
       // framework connection stays attached. A subsequent focused semantics
       // update reactivates it. The revision changes metadata without replacing
       // the editor node or its accessible name, value and selection.
-      setState(() => _revision++);
+      _refreshEditorSemantics();
     });
+  }
+
+  void _refreshEditorSemantics() {
+    // Flutter 3.47.6 omits identifier from its semantics dirty comparison.
+    // Refresh the ordinal so the focused native role is sent again. This field
+    // is the region's only child; its traversal position stays fixed.
+    setState(() {
+      _revision++;
+      _editorOrder = OrdinalSortKey(_revision.toDouble());
+    });
+  }
+
+  void _requestKeyboard() {
+    // A native blur can detach the engine strategy without a framework focus
+    // change. Ask the current editor to attach through its public API before
+    // refreshing the focused text-field semantics.
+    void visit(Element element) {
+      if (element is StatefulElement && element.state is EditableTextState) {
+        final EditableTextState editor = element.state as EditableTextState;
+        if (editor.widget.focusNode == widget.focusNode) {
+          editor.requestKeyboard();
+        }
+        return;
+      }
+      element.visitChildElements(visit);
+    }
+
+    context.visitChildElements(visit);
   }
 
   @override
@@ -158,21 +239,17 @@ class _CarbonTextControlSemanticsState
             child: widget.child,
           )
         : widget.child;
-    // On the web a blur can detach the native editing strategy before its
-    // next semantics update. Reattach on a read-only transition instead of
-    // updating that inactive connection. The caller-owned controller and focus
-    // node retain the value and selection; the guarded repair restores focus.
-    final Widget editable = kIsWeb
-        ? KeyedSubtree(
-            key: ValueKey<bool>(widget.state.canActivate),
-            child: editor,
-          )
-        : editor;
+    // The outer region remains discoverable while its merged text-field role
+    // moves with popup semantics. Replacing both on a web policy change
+    // reconnects the current editor; the caller's value and focus node persist.
     return Semantics(
-      identifier: '$_identifier-$_revision',
+      key: kIsWeb ? ValueKey<bool>(widget.state.canActivate) : null,
+      identifier: '$_identifier-region',
       container: true,
       child: MergeSemantics(
         child: Semantics(
+          identifier: '$_identifier-editor-$_revision',
+          sortKey: _editorOrder,
           textField: true,
           label: widget.label,
           enabled: !widget.state.isDisabled,
@@ -186,7 +263,7 @@ class _CarbonTextControlSemanticsState
             excluding: widget.state.isDisabled,
             child: ExcludeSemantics(
               excluding: widget.state.isDisabled,
-              child: editable,
+              child: editor,
             ),
           ),
         ),

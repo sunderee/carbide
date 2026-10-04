@@ -21,6 +21,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/picker_overlay.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
@@ -52,8 +53,11 @@ class CarbonMultiSelectItem<T> {
 /// A Carbon multi-select: a multi-choice picker with a selection-count badge
 /// and checkbox menu rows.
 ///
-/// Down/Enter/Space opens; arrows move the highlight; Space toggles the
-/// highlighted row; Escape closes. The count badge clears all selections.
+/// Down or Enter opens; Space also opens a non-filterable picker. Arrows move
+/// the highlight; Enter toggles an enabled highlighted row; Space toggles it
+/// only in a non-filterable picker, leaving spaces available for filter text.
+/// Escape closes an open popup. Keys that perform no action continue to
+/// ancestor handlers. The count badge clears all selections.
 ///
 /// See the [forms pattern](https://github.com/sunderee/carbide/blob/master/docs/patterns/forms.md#disabled-and-read-only-controls)
 /// for the shared disabled and read-only contract.
@@ -176,10 +180,11 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     readOnly: widget.readOnly,
   );
 
-  final OverlayPortalController _overlay = OverlayPortalController();
+  final CarbonPickerOverlayController _overlay =
+      CarbonPickerOverlayController();
   final LayerLink _link = LayerLink();
   final TextEditingController _filter = TextEditingController();
-  final TextEditingController _inspection = TextEditingController();
+  TextEditingValue _filterDraft = TextEditingValue.empty;
 
   String get _selectedLabels => widget.items
       .where(
@@ -207,7 +212,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   @override
   void initState() {
     super.initState();
-    _inspection.text = _selectedLabels;
+    if (!_controlState.canActivate) _showInspectionValue();
     _focusOwner = OwnedFocusNode(
       external: widget.focusNode,
       onChanged: _rebuild,
@@ -222,7 +227,20 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   void didUpdateWidget(CarbonMultiSelect<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _focusOwner.update(widget.focusNode);
-    if (_inspection.text != _selectedLabels) _inspection.text = _selectedLabels;
+    final bool wasEditable = CarbonControlState.resolve(
+      hasCallback: oldWidget.onChanged != null,
+      disabled: oldWidget.disabled,
+      readOnly: oldWidget.readOnly,
+    ).canActivate;
+    // Keep one editor controller across the policy change. Swapping controllers
+    // can leave Flutter web's native connection on the inspection value after
+    // re-enabling. The full draft retains selection and composing state.
+    if (wasEditable && !_controlState.canActivate) _filterDraft = _filter.value;
+    if (_controlState.canActivate) {
+      if (!wasEditable) _filter.value = _filterDraft;
+    } else {
+      _showInspectionValue();
+    }
     if (!_controlState.canActivate && _overlay.isShowing) {
       // OverlayPortal cannot hide during the parent's build. Events already
       // use the current policy while the popup is removed after this frame.
@@ -234,11 +252,20 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     }
   }
 
+  void _showInspectionValue() {
+    final String text = _selectedLabels;
+    if (_filter.text == text) return;
+    _filter.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+
   @override
   void dispose() {
+    _overlay.dispose();
     _focusOwner.dispose();
     _filter.dispose();
-    _inspection.dispose();
     super.dispose();
   }
 
@@ -294,21 +321,23 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     setState(() {});
   }
 
-  void _moveHighlight(int delta) {
+  bool _moveHighlight(int delta) {
     final List<CarbonMultiSelectItem<T>> items = _filtered;
-    if (items.isEmpty) return;
     int next = _highlighted;
+    if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
       next = (next + delta + items.length) % items.length;
       if (!items[next].disabled) {
+        if (next == _highlighted) return false;
         setState(() => _highlighted = next);
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || !_controlState.canActivate) {
+    if (!mounted || event is! KeyDownEvent || !_controlState.canActivate) {
       return KeyEventResult.ignored;
     }
     if (!_overlay.isShowing) {
@@ -327,17 +356,25 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         _close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
-        _moveHighlight(1);
-        return KeyEventResult.handled;
+        return _moveHighlight(1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.arrowUp:
-        _moveHighlight(-1);
-        return KeyEventResult.handled;
+        return _moveHighlight(-1)
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
       case LogicalKeyboardKey.space:
       case LogicalKeyboardKey.enter:
-        if (_highlighted >= 0 && _highlighted < items.length) {
-          _toggle(items[_highlighted]);
+        if (widget.filterable && event.logicalKey == LogicalKeyboardKey.space) {
+          return KeyEventResult.ignored;
         }
-        return KeyEventResult.handled;
+        if (_highlighted >= 0 &&
+            _highlighted < items.length &&
+            !items[_highlighted].disabled) {
+          _toggle(items[_highlighted]);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
     }
     return KeyEventResult.ignored;
   }
@@ -349,19 +386,12 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _triggerWidth = constraints.maxWidth;
-          // Keep the trigger and portal in a stable semantics region. Otherwise
-          // opening the popup reparents the native editor, blurring it while
-          // Flutter still considers its text-input connection attached.
-          return Semantics(
-            container: true,
-            explicitChildNodes: true,
-            child: OverlayPortal(
-              controller: _overlay,
-              overlayChildBuilder: _buildMenu,
-              child: widget.filterable
-                  ? _buildFilterField(context)
-                  : _buildField(context),
-            ),
+          return CarbonPickerOverlay(
+            controller: _overlay,
+            overlayChildBuilder: _buildMenu,
+            child: widget.filterable
+                ? _buildFilterField(context)
+                : _buildField(context),
           );
         },
       ),
@@ -465,9 +495,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = !_controlState.isDisabled;
-    final TextEditingController controller = _controlState.canActivate
-        ? _filter
-        : _inspection;
+    final TextEditingController controller = _filter;
     final int count = widget.selectedValues.length;
     final Color background = _controlState.isReadOnly
         ? const Color(0x00000000)
