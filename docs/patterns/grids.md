@@ -17,7 +17,10 @@ sets the 32px gutter and 1px condensed gutter, while
 [`_css-grid.scss`](https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/grid/scss/_css-grid.scss)
 gives wide columns two half-gutters and sets narrow's start gutter to zero.
 Narrow content moves 16px toward the logical start relative to wide; the end
-gutter is retained. RTL mirrors these logical edges. Current Carbon does not
+gutter is retained. Carbide mirrors these logical edges with `Directionality`,
+as requested by #322. It does not reproduce Carbon's separate RTL CSS
+`margin-inline` variable swap; the native layout uses the same logical policy
+in both directions. Current Carbon's base narrow rules do not
 use symmetric outer-edge expansion or 32px narrow interior gaps.
 
 Previously Carbide's wide and narrow modes were identical, and wide omitted
