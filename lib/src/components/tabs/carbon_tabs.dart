@@ -564,40 +564,44 @@ class _CarbonTabsState extends State<CarbonTabs> {
                                   _scheduleLayout();
                                   return false;
                                 },
-                                child: SingleChildScrollView(
-                                  controller: _overflow.controller,
-                                  scrollDirection: Axis.horizontal,
-                                  child: Semantics(
-                                    container: true,
-                                    explicitChildNodes: true,
-                                    role: widget.tabs.isEmpty
-                                        ? SemanticsRole.none
-                                        : SemanticsRole.tabBar,
-                                    label: widget.tabListLabel,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        for (
-                                          int i = 0;
-                                          i < widget.tabs.length;
-                                          i++
-                                        )
-                                          _TabButton(
-                                            tab: widget.tabs[i],
-                                            variant: widget.variant,
-                                            size: widget.size,
-                                            selected: i == _current,
-                                            focusNode: _nodes[i],
-                                            roving: i == _activeIndex,
-                                            maxWidth: available,
-                                            identifier: '$_semanticId-tab-$i',
-                                            panelId: widget.panels.isEmpty
-                                                ? ''
-                                                : _panelId,
-                                            onKey: _onKey,
-                                            onTap: () => _select(i),
-                                          ),
-                                      ],
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false),
+                                  child: SingleChildScrollView(
+                                    controller: _overflow.controller,
+                                    scrollDirection: Axis.horizontal,
+                                    child: Semantics(
+                                      container: true,
+                                      explicitChildNodes: true,
+                                      role: widget.tabs.isEmpty
+                                          ? SemanticsRole.none
+                                          : SemanticsRole.tabBar,
+                                      label: widget.tabListLabel,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          for (
+                                            int i = 0;
+                                            i < widget.tabs.length;
+                                            i++
+                                          )
+                                            _TabButton(
+                                              tab: widget.tabs[i],
+                                              variant: widget.variant,
+                                              size: widget.size,
+                                              selected: i == _current,
+                                              focusNode: _nodes[i],
+                                              roving: i == _activeIndex,
+                                              maxWidth: available,
+                                              identifier: '$_semanticId-tab-$i',
+                                              panelId: widget.panels.isEmpty
+                                                  ? ''
+                                                  : _panelId,
+                                              onKey: _onKey,
+                                              onTap: () => _select(i),
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -925,31 +929,35 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
 
       child: Stack(
         children: <Widget>[
-          SingleChildScrollView(
-            controller: _overflow.controller,
-            child: Semantics(
-              container: true,
-              explicitChildNodes: true,
-              role: widget.tabs.isEmpty
-                  ? SemanticsRole.none
-                  : SemanticsRole.tabBar,
-              label: widget.tabListLabel,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  for (int i = 0; i < widget.tabs.length; i++)
-                    _VerticalTabButton(
-                      tab: widget.tabs[i],
-                      size: widget.size,
-                      selected: i == _current,
-                      roving: i == _activeIndex,
-                      identifier: '$_semanticId-tab-$i',
-                      panelId: widget.panels.isEmpty ? '' : _panelId,
-                      focusNode: _nodes[i],
-                      onKey: _onKey,
-                      onTap: () => _select(i),
-                    ),
-                ],
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context)
+                .copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              controller: _overflow.controller,
+              child: Semantics(
+                container: true,
+                explicitChildNodes: true,
+                role: widget.tabs.isEmpty
+                    ? SemanticsRole.none
+                    : SemanticsRole.tabBar,
+                label: widget.tabListLabel,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    for (int i = 0; i < widget.tabs.length; i++)
+                      _VerticalTabButton(
+                        tab: widget.tabs[i],
+                        size: widget.size,
+                        selected: i == _current,
+                        roving: i == _activeIndex,
+                        identifier: '$_semanticId-tab-$i',
+                        panelId: widget.panels.isEmpty ? '' : _panelId,
+                        focusNode: _nodes[i],
+                        onKey: _onKey,
+                        onTap: () => _select(i),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

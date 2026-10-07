@@ -408,7 +408,7 @@ class _TabsPageState extends State<_TabsPage> {
           'with arrows and selects with Enter or Space.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
-        width: _many ? 320 : 480,
+        width: _many && !_vertical ? 320 : 480,
         child: _vertical
             ? SizedBox(
                 height: 260,

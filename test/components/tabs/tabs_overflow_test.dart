@@ -6,6 +6,7 @@
 import 'dart:ui' show Tristate;
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -77,6 +78,29 @@ Future<void> _key(WidgetTester tester, LogicalKeyboardKey key) async {
 }
 
 void main() {
+  for (final bool vertical in <bool>[false, true]) {
+    testWidgets('desktop tab scrollbar is suppressed vertical=$vertical', (
+      WidgetTester tester,
+    ) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+      try {
+        await tester.pumpWidget(
+          _host(
+            vertical
+                ? CarbonTabsVertical(tabs: _many, panels: _panels, height: 240)
+                : CarbonTabs(tabs: _many, panels: _panels),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(RawScrollbar), findsNothing);
+      } finally {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+  }
+
   for (final CarbonTabVariant variant in CarbonTabVariant.values) {
     for (final TextDirection direction in TextDirection.values) {
       testWidgets('$variant 320px logical controls and Home/End $direction', (
@@ -544,8 +568,12 @@ void main() {
         containsText: true,
         size: const Size(320, 150),
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
-        builder: (_) =>
-            CarbonTabs(tabs: _many, panels: _panels, variant: variant),
+        builder: (BuildContext context) => DefaultTextStyle(
+          style: CarbonTypeStyles.body01.copyWith(
+            color: CarbonTheme.of(context).textPrimary,
+          ),
+          child: CarbonTabs(tabs: _many, panels: _panels, variant: variant),
+        ),
         afterPump: (WidgetTester tester) async => tester.pumpAndSettle(),
       );
     });
