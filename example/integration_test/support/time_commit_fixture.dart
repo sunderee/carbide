@@ -189,7 +189,7 @@ class TimeCommitFixtureState extends State<TimeCommitFixture> {
             CarbonTimePickerSelect<String>(
               labelText: 'Timezone',
               value: _zone,
-              width: 112,
+              width: widget.fluid ? 180 : 112,
               fluid: widget.fluid,
               onChanged: (String zone) => setState(() => _zone = zone),
               items: const <CarbonSelectEntry<String>>[

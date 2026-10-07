@@ -147,7 +147,10 @@ class CarbonTimePicker extends StatefulWidget {
   /// The localized label for the afternoon/evening period.
   final String pmLabel;
 
-  /// The built-in selector width, tunable for longer localized period labels.
+  /// The built-in selector's base width at 1× text scale.
+  ///
+  /// It follows user text scaling so its fluid label remains readable. Increase
+  /// this value for longer localized period labels.
   final double periodWidth;
 
   /// The field size.
@@ -504,7 +507,10 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
                       value: _period,
                       size: widget.size,
                       fluid: _fluid,
-                      width: widget.periodWidth,
+                      width:
+                          widget.periodWidth *
+                          MediaQuery.textScalerOf(context).scale(12) /
+                          12,
                       disabled: widget.disabled || widget.readOnly,
                       onChanged: _onPeriodChanged,
                       items: <CarbonSelectEntry<CarbonTimePeriod>>[

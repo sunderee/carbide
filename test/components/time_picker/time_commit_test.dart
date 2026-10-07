@@ -626,6 +626,14 @@ void main() {
         );
         expect(tester.takeException(), isNull);
         expect(find.text('AM'), findsOneWidget);
+        expect(
+          tester
+              .widget<CarbonTimePickerSelect<CarbonTimePeriod>>(
+                find.byType(CarbonTimePickerSelect<CarbonTimePeriod>),
+              )
+              .width,
+          closeTo(CarbonTimePickerSelect.defaultWidth * scale, 0.01),
+        );
       });
     }
   }

@@ -55,7 +55,8 @@ selector, and `onPeriodChanged` reports later choices. Disabled/read-only
 pickers block both editing and period changes.
 
 Use `periodLabel`, `amLabel`, `pmLabel` and, for longer labels, `periodWidth`
-to localize the selector. It follows the picker's fluid treatment. `children`
+to localize the selector. Its base width follows user text scaling, and it
+follows the picker's fluid treatment. `children`
 remain available for independent timezone or other selects. When migrating an
 existing manually controlled AM/PM child to `twelveHour`, remove that child;
 the built-in selector now owns period coordination. Twenty-four-hour mode
