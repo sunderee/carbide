@@ -187,6 +187,7 @@ jobs:
             data)
               drive_native --target=integration_test/date_picker_state_test.dart
               drive_native --release --target=integration_test/date_picker_state_test.dart
+              drive_native --release --target=integration_test/date_localization_test.dart
               drive_native --target=integration_test/data_table_identity_test.dart
               drive_native --release --target=integration_test/data_table_accessibility_test.dart
               drive_native --release --target=integration_test/context_menu_keyboard_test.dart

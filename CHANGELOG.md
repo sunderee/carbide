@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add injectable date-picker localization with a shared format/parser pattern,
+  derived placeholders, translated calendar labels and configurable week start.
+  Use logical RTL day navigation and mirrored month chevrons; retain selection
+  and drafts when locale changes and grow long localized text (#319).
+
 - Support Unicode menu typeahead, including supplementary letters and combining
   graphemes. Share documented Latin-1 accent folding with Select and Dropdown,
   preserving single-key cycling and their existing prefix-input policy (#327).
