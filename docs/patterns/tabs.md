@@ -5,6 +5,8 @@ and reveal coordinator. Horizontal strips scroll when their content exceeds
 the available width; controls point toward the first/last tab and disable at
 the corresponding extents. Narrow strips cap individual tab widths and retain
 the complete accessible label when visible text is ellipsized.
+Desktop scrollbars are hidden so the tab indicators and overflow controls
+remain unobstructed.
 
 `activation: CarbonTabActivationMode.automatic` retains the original default:
 navigation focuses and selects the destination. Manual activation moves focus
