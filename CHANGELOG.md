@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Make horizontal tabs scroll with logical edge controls and shared vertical
+  overflow/reveal logic. Support automatic/manual activation, preserve roving
+  focus independently of selection and expose tab/list/panel roles and panel
+  controls. Honor reduced motion, including a preference changed mid-scroll;
+  correct the unused underline position and narrow overflow goldens (#321).
+
 - Correct grid tracks and per-column gutters. Wide columns receive their
   documented 16px start/end gutters; narrow removes only the logical start
   gutter and condensed uses 0.5px per edge. Match current Carbon's 16px narrow

@@ -16,7 +16,9 @@ Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
   child: CarbonTheme(
     data: CarbonThemeData.white,
-    child: Center(child: SizedBox(width: 420, child: child)),
+    // Selection/style cases fit four labels even with the web test font.
+    // tabs_overflow_test.dart separately forces and navigates 320px overflow.
+    child: Center(child: SizedBox(width: 760, child: child)),
   ),
 );
 
