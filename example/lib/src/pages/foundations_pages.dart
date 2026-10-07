@@ -372,11 +372,26 @@ class _FluidTypePageState extends State<_FluidTypePage> {
     return _ScrollPage(
       title: 'Fluid typography',
       description:
-          'Fluid styles interpolate across the Carbon breakpoints. Drag the '
-          'width to watch each style resolve for that viewport.',
+          'Fluid styles select a size at each Carbon breakpoint. The live '
+          'sample follows your viewport; drag the preview width to explore '
+          'the same cascade. System text scaling applies on top.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          const CarbonFluidText(
+            'A responsive title',
+            style: CarbonFluidTypeStyles.expressiveHeading05,
+          ),
+          const SizedBox(height: CarbonSpacing.spacing04),
+          const SizedBox(
+            width: 320,
+            child: CarbonFluidText(
+              'A quotation sized for this column.',
+              style: CarbonFluidTypeStyles.quotation01,
+              widthSource: CarbonFluidTextWidthSource.constraints,
+            ),
+          ),
+          const SizedBox(height: CarbonSpacing.spacing06),
           sliderKnob(
             label: 'Viewport width',
             value: _width,
@@ -393,36 +408,39 @@ class _FluidTypePageState extends State<_FluidTypePage> {
           const SizedBox(height: CarbonSpacing.spacing06),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Container(
-              width: _width,
-              padding: const EdgeInsets.all(CarbonSpacing.spacing05),
-              decoration: BoxDecoration(
-                border: Border.all(color: t.borderSubtle01),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  for (final (String, CarbonFluidTextStyle) sample
-                      in _samples) ...<Widget>[
-                    Text(
-                      '${sample.$1} · '
-                      '${sample.$2.resolve(_width).fontSize!.round()}px',
-                      style: CarbonTypeStyles.code01.copyWith(
-                        color: t.textSecondary,
+            child: MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(size: Size(_width, MediaQuery.sizeOf(context).height)),
+              child: Container(
+                width: _width,
+                padding: const EdgeInsets.all(CarbonSpacing.spacing05),
+                decoration: BoxDecoration(
+                  border: Border.all(color: t.borderSubtle01),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    for (final (String, CarbonFluidTextStyle) sample
+                        in _samples) ...<Widget>[
+                      Text(
+                        '${sample.$1} · '
+                        '${sample.$2.resolve(_width).fontSize!.round()}px',
+                        style: CarbonTypeStyles.code01.copyWith(
+                          color: t.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: CarbonSpacing.spacing02),
-                    Text(
-                      'Carbide is carbon, fluid.',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: sample.$2
-                          .resolve(_width)
-                          .copyWith(color: t.textPrimary),
-                    ),
-                    const SizedBox(height: CarbonSpacing.spacing06),
+                      const SizedBox(height: CarbonSpacing.spacing02),
+                      CarbonFluidText(
+                        'Carbide is carbon, fluid.',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: sample.$2,
+                      ),
+                      const SizedBox(height: CarbonSpacing.spacing06),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
@@ -434,7 +452,8 @@ class _FluidTypePageState extends State<_FluidTypePage> {
           const SizedBox(height: CarbonSpacing.spacing04),
           for (final (String, CarbonFluidTextStyle) style
               in _styles) ...<Widget>[
-            Row(
+            Wrap(
+              spacing: CarbonSpacing.spacing04,
               children: <Widget>[
                 SizedBox(
                   width: 220,

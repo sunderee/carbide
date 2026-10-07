@@ -21,10 +21,8 @@ import '../../theme/carbon_theme.dart';
 /// CarbonText('Hint', color: CarbonTheme.of(context).textHelper);
 /// ```
 ///
-/// Fluid (responsive) styles are resolved per viewport width, not fixed, so
-/// they are deliberately not accepted here; resolve a `CarbonFluidTextStyle`
-/// with `resolve(width)` and pass the result as [style], or use the dedicated
-/// fluid text widget once it lands with the component layer.
+/// For responsive styles, use `CarbonFluidText` to select the breakpoint
+/// automatically, or resolve a `CarbonFluidTextStyle` and pass it as [style].
 class CarbonText extends StatelessWidget {
   /// Creates Carbon-styled text.
   const CarbonText(

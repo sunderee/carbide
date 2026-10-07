@@ -51,10 +51,17 @@ Future<void> loadCarbidePlexFonts() async {
   }
   for (final MapEntry<String, List<String>> family
       in carbidePlexFontAssets.entries) {
-    final FontLoader loader = FontLoader(family.key);
-    for (final String asset in family.value) {
-      loader.addFont(rootBundle.load(asset));
+    // Dependencies register package-qualified families in real apps. Keep the
+    // root-package names for existing specimens and exercise both identities.
+    for (final String name in <String>[
+      family.key,
+      'packages/carbide/${family.key}',
+    ]) {
+      final FontLoader loader = FontLoader(name);
+      for (final String asset in family.value) {
+        loader.addFont(rootBundle.load(asset));
+      }
+      await loader.load();
     }
-    await loader.load();
   }
 }
