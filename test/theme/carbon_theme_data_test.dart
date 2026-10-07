@@ -333,6 +333,28 @@ void main() {
       _alpha(CarbonColors.gray50, 0.2),
     );
     expect(CarbonThemeData.white.chatButtonTextSelected, CarbonColors.gray70);
+    expect(
+      CarbonThemeData.white.statusAccessibilityBackground,
+      CarbonColors.white,
+    );
+    expect(CarbonThemeData.white.statusRed, CarbonColors.red60);
+    expect(CarbonThemeData.white.statusOrange, CarbonColors.orange40);
+    expect(CarbonThemeData.white.statusOrangeOutline, CarbonColors.orange60);
+    expect(CarbonThemeData.white.statusYellow, CarbonColors.yellow30);
+    expect(CarbonThemeData.white.statusYellowOutline, CarbonColors.yellow60);
+    expect(CarbonThemeData.white.statusPurple, CarbonColors.purple60);
+    expect(CarbonThemeData.white.statusGreen, CarbonColors.green50);
+    expect(CarbonThemeData.white.statusBlue, CarbonColors.blue70);
+    expect(CarbonThemeData.white.statusGray, CarbonColors.gray60);
+    expect(CarbonThemeData.white.contentSwitcherSelected, CarbonColors.white);
+    expect(
+      CarbonThemeData.white.contentSwitcherBackground,
+      CarbonColors.gray20,
+    );
+    expect(
+      CarbonThemeData.white.contentSwitcherBackgroundHover,
+      CarbonColors.gray20Hover,
+    );
   });
 
   test('gray10 theme tokens match the Carbon source', () {
@@ -664,6 +686,28 @@ void main() {
       _alpha(CarbonColors.gray50, 0.2),
     );
     expect(CarbonThemeData.gray10.chatButtonTextSelected, CarbonColors.gray70);
+    expect(
+      CarbonThemeData.gray10.statusAccessibilityBackground,
+      CarbonColors.white,
+    );
+    expect(CarbonThemeData.gray10.statusRed, CarbonColors.red60);
+    expect(CarbonThemeData.gray10.statusOrange, CarbonColors.orange40);
+    expect(CarbonThemeData.gray10.statusOrangeOutline, CarbonColors.orange60);
+    expect(CarbonThemeData.gray10.statusYellow, CarbonColors.yellow30);
+    expect(CarbonThemeData.gray10.statusYellowOutline, CarbonColors.yellow60);
+    expect(CarbonThemeData.gray10.statusPurple, CarbonColors.purple60);
+    expect(CarbonThemeData.gray10.statusGreen, CarbonColors.green50);
+    expect(CarbonThemeData.gray10.statusBlue, CarbonColors.blue70);
+    expect(CarbonThemeData.gray10.statusGray, CarbonColors.gray60);
+    expect(CarbonThemeData.gray10.contentSwitcherSelected, CarbonColors.white);
+    expect(
+      CarbonThemeData.gray10.contentSwitcherBackground,
+      CarbonColors.gray20,
+    );
+    expect(
+      CarbonThemeData.gray10.contentSwitcherBackgroundHover,
+      CarbonColors.gray20Hover,
+    );
   });
 
   test('gray90 theme tokens match the Carbon source', () {
@@ -1013,6 +1057,31 @@ void main() {
       _alpha(CarbonColors.gray50, 0.24),
     );
     expect(CarbonThemeData.gray90.chatButtonTextSelected, CarbonColors.gray30);
+    expect(
+      CarbonThemeData.gray90.statusAccessibilityBackground,
+      CarbonColors.gray100,
+    );
+    expect(CarbonThemeData.gray90.statusRed, CarbonColors.red50);
+    expect(CarbonThemeData.gray90.statusOrange, CarbonColors.orange40);
+    expect(CarbonThemeData.gray90.statusOrangeOutline, null);
+    expect(CarbonThemeData.gray90.statusYellow, CarbonColors.yellow30);
+    expect(CarbonThemeData.gray90.statusYellowOutline, null);
+    expect(CarbonThemeData.gray90.statusPurple, CarbonColors.purple50);
+    expect(CarbonThemeData.gray90.statusGreen, CarbonColors.green40);
+    expect(CarbonThemeData.gray90.statusBlue, CarbonColors.blue50);
+    expect(CarbonThemeData.gray90.statusGray, CarbonColors.gray50);
+    expect(
+      CarbonThemeData.gray90.contentSwitcherSelected,
+      _alpha(CarbonColors.gray50, 0.24),
+    );
+    expect(
+      CarbonThemeData.gray90.contentSwitcherBackground,
+      _alpha(CarbonColors.black, 0.0),
+    );
+    expect(
+      CarbonThemeData.gray90.contentSwitcherBackgroundHover,
+      _alpha(CarbonColors.gray50, 0.12),
+    );
   });
 
   test('gray100 theme tokens match the Carbon source', () {
@@ -1386,6 +1455,586 @@ void main() {
       _alpha(CarbonColors.gray50, 0.24),
     );
     expect(CarbonThemeData.gray100.chatButtonTextSelected, CarbonColors.gray30);
+    expect(
+      CarbonThemeData.gray100.statusAccessibilityBackground,
+      CarbonColors.gray100,
+    );
+    expect(CarbonThemeData.gray100.statusRed, CarbonColors.red50);
+    expect(CarbonThemeData.gray100.statusOrange, CarbonColors.orange40);
+    expect(CarbonThemeData.gray100.statusOrangeOutline, null);
+    expect(CarbonThemeData.gray100.statusYellow, CarbonColors.yellow30);
+    expect(CarbonThemeData.gray100.statusYellowOutline, null);
+    expect(CarbonThemeData.gray100.statusPurple, CarbonColors.purple50);
+    expect(CarbonThemeData.gray100.statusGreen, CarbonColors.green40);
+    expect(CarbonThemeData.gray100.statusBlue, CarbonColors.blue50);
+    expect(CarbonThemeData.gray100.statusGray, CarbonColors.gray50);
+    expect(
+      CarbonThemeData.gray100.contentSwitcherSelected,
+      _alpha(CarbonColors.gray50, 0.24),
+    );
+    expect(
+      CarbonThemeData.gray100.contentSwitcherBackground,
+      _alpha(CarbonColors.black, 0.0),
+    );
+    expect(
+      CarbonThemeData.gray100.contentSwitcherBackgroundHover,
+      _alpha(CarbonColors.gray50, 0.12),
+    );
+  });
+
+  test('component defaults preserve legacy custom theme construction', () {
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final legacy = CarbonThemeData(
+        brightness: base.brightness,
+        background: base.background,
+        backgroundInverse: base.backgroundInverse,
+        backgroundBrand: base.backgroundBrand,
+        backgroundActive: base.backgroundActive,
+        backgroundHover: base.backgroundHover,
+        backgroundInverseHover: base.backgroundInverseHover,
+        backgroundSelected: base.backgroundSelected,
+        backgroundSelectedHover: base.backgroundSelectedHover,
+        layer01: base.layer01,
+        layerActive01: base.layerActive01,
+        layerBackground01: base.layerBackground01,
+        layerHover01: base.layerHover01,
+        layerSelected01: base.layerSelected01,
+        layerSelectedHover01: base.layerSelectedHover01,
+        layer02: base.layer02,
+        layerActive02: base.layerActive02,
+        layerBackground02: base.layerBackground02,
+        layerHover02: base.layerHover02,
+        layerSelected02: base.layerSelected02,
+        layerSelectedHover02: base.layerSelectedHover02,
+        layer03: base.layer03,
+        layerActive03: base.layerActive03,
+        layerBackground03: base.layerBackground03,
+        layerHover03: base.layerHover03,
+        layerSelected03: base.layerSelected03,
+        layerSelectedHover03: base.layerSelectedHover03,
+        layerSelectedInverse: base.layerSelectedInverse,
+        layerSelectedDisabled: base.layerSelectedDisabled,
+        layerAccent01: base.layerAccent01,
+        layerAccentActive01: base.layerAccentActive01,
+        layerAccentHover01: base.layerAccentHover01,
+        layerAccent02: base.layerAccent02,
+        layerAccentActive02: base.layerAccentActive02,
+        layerAccentHover02: base.layerAccentHover02,
+        layerAccent03: base.layerAccent03,
+        layerAccentActive03: base.layerAccentActive03,
+        layerAccentHover03: base.layerAccentHover03,
+        field01: base.field01,
+        fieldHover01: base.fieldHover01,
+        field02: base.field02,
+        fieldHover02: base.fieldHover02,
+        field03: base.field03,
+        fieldHover03: base.fieldHover03,
+        borderSubtle00: base.borderSubtle00,
+        borderSubtle01: base.borderSubtle01,
+        borderSubtleSelected01: base.borderSubtleSelected01,
+        borderSubtle02: base.borderSubtle02,
+        borderSubtleSelected02: base.borderSubtleSelected02,
+        borderSubtle03: base.borderSubtle03,
+        borderSubtleSelected03: base.borderSubtleSelected03,
+        borderStrong01: base.borderStrong01,
+        borderStrong02: base.borderStrong02,
+        borderStrong03: base.borderStrong03,
+        borderTile01: base.borderTile01,
+        borderTile02: base.borderTile02,
+        borderTile03: base.borderTile03,
+        borderInverse: base.borderInverse,
+        borderInteractive: base.borderInteractive,
+        borderDisabled: base.borderDisabled,
+        textPrimary: base.textPrimary,
+        textSecondary: base.textSecondary,
+        textPlaceholder: base.textPlaceholder,
+        textHelper: base.textHelper,
+        textError: base.textError,
+        textInverse: base.textInverse,
+        textOnColor: base.textOnColor,
+        textOnColorDisabled: base.textOnColorDisabled,
+        textDisabled: base.textDisabled,
+        linkPrimary: base.linkPrimary,
+        linkPrimaryHover: base.linkPrimaryHover,
+        linkSecondary: base.linkSecondary,
+        linkInverse: base.linkInverse,
+        linkVisited: base.linkVisited,
+        linkInverseVisited: base.linkInverseVisited,
+        linkInverseActive: base.linkInverseActive,
+        linkInverseHover: base.linkInverseHover,
+        iconPrimary: base.iconPrimary,
+        iconSecondary: base.iconSecondary,
+        iconInverse: base.iconInverse,
+        iconOnColor: base.iconOnColor,
+        iconOnColorDisabled: base.iconOnColorDisabled,
+        iconDisabled: base.iconDisabled,
+        iconInteractive: base.iconInteractive,
+        supportError: base.supportError,
+        supportSuccess: base.supportSuccess,
+        supportWarning: base.supportWarning,
+        supportInfo: base.supportInfo,
+        supportErrorInverse: base.supportErrorInverse,
+        supportSuccessInverse: base.supportSuccessInverse,
+        supportWarningInverse: base.supportWarningInverse,
+        supportInfoInverse: base.supportInfoInverse,
+        supportCautionMinor: base.supportCautionMinor,
+        supportCautionMajor: base.supportCautionMajor,
+        supportCautionUndefined: base.supportCautionUndefined,
+        focus: base.focus,
+        focusInset: base.focusInset,
+        focusInverse: base.focusInverse,
+        skeletonBackground: base.skeletonBackground,
+        skeletonElement: base.skeletonElement,
+        interactive: base.interactive,
+        highlight: base.highlight,
+        overlay: base.overlay,
+        toggleOff: base.toggleOff,
+        shadow: base.shadow,
+        buttonSeparator: base.buttonSeparator,
+        buttonPrimary: base.buttonPrimary,
+        buttonSecondary: base.buttonSecondary,
+        buttonTertiary: base.buttonTertiary,
+        buttonDangerPrimary: base.buttonDangerPrimary,
+        buttonDangerSecondary: base.buttonDangerSecondary,
+        buttonDangerActive: base.buttonDangerActive,
+        buttonPrimaryActive: base.buttonPrimaryActive,
+        buttonSecondaryActive: base.buttonSecondaryActive,
+        buttonTertiaryActive: base.buttonTertiaryActive,
+        buttonDangerHover: base.buttonDangerHover,
+        buttonPrimaryHover: base.buttonPrimaryHover,
+        buttonSecondaryHover: base.buttonSecondaryHover,
+        buttonTertiaryHover: base.buttonTertiaryHover,
+        buttonDisabled: base.buttonDisabled,
+        tagBackgroundRed: base.tagBackgroundRed,
+        tagColorRed: base.tagColorRed,
+        tagHoverRed: base.tagHoverRed,
+        tagBackgroundMagenta: base.tagBackgroundMagenta,
+        tagColorMagenta: base.tagColorMagenta,
+        tagHoverMagenta: base.tagHoverMagenta,
+        tagBackgroundPurple: base.tagBackgroundPurple,
+        tagColorPurple: base.tagColorPurple,
+        tagHoverPurple: base.tagHoverPurple,
+        tagBackgroundBlue: base.tagBackgroundBlue,
+        tagColorBlue: base.tagColorBlue,
+        tagHoverBlue: base.tagHoverBlue,
+        tagBackgroundCyan: base.tagBackgroundCyan,
+        tagColorCyan: base.tagColorCyan,
+        tagHoverCyan: base.tagHoverCyan,
+        tagBackgroundTeal: base.tagBackgroundTeal,
+        tagColorTeal: base.tagColorTeal,
+        tagHoverTeal: base.tagHoverTeal,
+        tagBackgroundGreen: base.tagBackgroundGreen,
+        tagColorGreen: base.tagColorGreen,
+        tagHoverGreen: base.tagHoverGreen,
+        tagBackgroundGray: base.tagBackgroundGray,
+        tagColorGray: base.tagColorGray,
+        tagHoverGray: base.tagHoverGray,
+        tagBackgroundCoolGray: base.tagBackgroundCoolGray,
+        tagColorCoolGray: base.tagColorCoolGray,
+        tagHoverCoolGray: base.tagHoverCoolGray,
+        tagBackgroundWarmGray: base.tagBackgroundWarmGray,
+        tagColorWarmGray: base.tagColorWarmGray,
+        tagHoverWarmGray: base.tagHoverWarmGray,
+        tagBorderRed: base.tagBorderRed,
+        tagBorderBlue: base.tagBorderBlue,
+        tagBorderCyan: base.tagBorderCyan,
+        tagBorderTeal: base.tagBorderTeal,
+        tagBorderGreen: base.tagBorderGreen,
+        tagBorderMagenta: base.tagBorderMagenta,
+        tagBorderPurple: base.tagBorderPurple,
+        tagBorderGray: base.tagBorderGray,
+        tagBorderCoolGray: base.tagBorderCoolGray,
+        tagBorderWarmGray: base.tagBorderWarmGray,
+        notificationBackgroundError: base.notificationBackgroundError,
+        notificationBackgroundSuccess: base.notificationBackgroundSuccess,
+        notificationBackgroundInfo: base.notificationBackgroundInfo,
+        notificationBackgroundWarning: base.notificationBackgroundWarning,
+        notificationActionHover: base.notificationActionHover,
+        notificationActionTertiaryInverse:
+            base.notificationActionTertiaryInverse,
+        notificationActionTertiaryInverseActive:
+            base.notificationActionTertiaryInverseActive,
+        notificationActionTertiaryInverseHover:
+            base.notificationActionTertiaryInverseHover,
+        notificationActionTertiaryInverseText:
+            base.notificationActionTertiaryInverseText,
+        notificationActionTertiaryInverseTextOnColorDisabled:
+            base.notificationActionTertiaryInverseTextOnColorDisabled,
+        aiInnerShadow: base.aiInnerShadow,
+        aiAuraStartSm: base.aiAuraStartSm,
+        aiAuraStart: base.aiAuraStart,
+        aiAuraEnd: base.aiAuraEnd,
+        aiBorderStrong: base.aiBorderStrong,
+        aiBorderStart: base.aiBorderStart,
+        aiBorderEnd: base.aiBorderEnd,
+        aiDropShadow: base.aiDropShadow,
+        aiAuraHoverBackground: base.aiAuraHoverBackground,
+        aiAuraHoverStart: base.aiAuraHoverStart,
+        aiAuraHoverEnd: base.aiAuraHoverEnd,
+        aiPopoverBackground: base.aiPopoverBackground,
+        aiPopoverShadowOuter01: base.aiPopoverShadowOuter01,
+        aiPopoverShadowOuter02: base.aiPopoverShadowOuter02,
+        aiSkeletonBackground: base.aiSkeletonBackground,
+        aiSkeletonElementBackground: base.aiSkeletonElementBackground,
+        aiOverlay: base.aiOverlay,
+        aiPopoverCaretCenter: base.aiPopoverCaretCenter,
+        aiPopoverCaretBottom: base.aiPopoverCaretBottom,
+        aiPopoverCaretBottomBackgroundActions:
+            base.aiPopoverCaretBottomBackgroundActions,
+        aiPopoverCaretBottomBackground: base.aiPopoverCaretBottomBackground,
+        chatButton: base.chatButton,
+        chatButtonHover: base.chatButtonHover,
+        chatButtonTextHover: base.chatButtonTextHover,
+        chatButtonActive: base.chatButtonActive,
+        chatButtonSelected: base.chatButtonSelected,
+        chatButtonTextSelected: base.chatButtonTextSelected,
+      );
+      expect(legacy, base);
+      expect(legacy.hashCode, base.hashCode);
+    }
+  });
+
+  test('statusAccessibilityBackground participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusAccessibilityBackground: custom);
+      expect(changed.statusAccessibilityBackground, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusAccessibilityBackground: null), base);
+    }
+  });
+
+  test('statusRed participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusRed: custom);
+      expect(changed.statusRed, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusRed: null), base);
+    }
+  });
+
+  test('statusOrange participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusOrange: custom);
+      expect(changed.statusOrange, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusOrange: null), base);
+    }
+  });
+
+  test(
+    'statusOrangeOutline participates in custom themes and value equality',
+    () {
+      const custom = Color(0xFF123456);
+      for (final base in <CarbonThemeData>[
+        CarbonThemeData.white,
+        CarbonThemeData.gray10,
+        CarbonThemeData.gray90,
+        CarbonThemeData.gray100,
+      ]) {
+        final changed = base.copyWith(statusOrangeOutline: custom);
+        expect(changed.statusOrangeOutline, custom);
+        expect(changed, isNot(base));
+        expect(changed.copyWith(), changed);
+        expect(changed.copyWith().hashCode, changed.hashCode);
+        expect(base.copyWith(statusOrangeOutline: null), base);
+      }
+    },
+  );
+
+  test('statusYellow participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusYellow: custom);
+      expect(changed.statusYellow, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusYellow: null), base);
+    }
+  });
+
+  test(
+    'statusYellowOutline participates in custom themes and value equality',
+    () {
+      const custom = Color(0xFF123456);
+      for (final base in <CarbonThemeData>[
+        CarbonThemeData.white,
+        CarbonThemeData.gray10,
+        CarbonThemeData.gray90,
+        CarbonThemeData.gray100,
+      ]) {
+        final changed = base.copyWith(statusYellowOutline: custom);
+        expect(changed.statusYellowOutline, custom);
+        expect(changed, isNot(base));
+        expect(changed.copyWith(), changed);
+        expect(changed.copyWith().hashCode, changed.hashCode);
+        expect(base.copyWith(statusYellowOutline: null), base);
+      }
+    },
+  );
+
+  test('statusPurple participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusPurple: custom);
+      expect(changed.statusPurple, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusPurple: null), base);
+    }
+  });
+
+  test('statusGreen participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusGreen: custom);
+      expect(changed.statusGreen, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusGreen: null), base);
+    }
+  });
+
+  test('statusBlue participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusBlue: custom);
+      expect(changed.statusBlue, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusBlue: null), base);
+    }
+  });
+
+  test('statusGray participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(statusGray: custom);
+      expect(changed.statusGray, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(statusGray: null), base);
+    }
+  });
+
+  test(
+    'contentSwitcherSelected participates in custom themes and value equality',
+    () {
+      const custom = Color(0xFF123456);
+      for (final base in <CarbonThemeData>[
+        CarbonThemeData.white,
+        CarbonThemeData.gray10,
+        CarbonThemeData.gray90,
+        CarbonThemeData.gray100,
+      ]) {
+        final changed = base.copyWith(contentSwitcherSelected: custom);
+        expect(changed.contentSwitcherSelected, custom);
+        expect(changed, isNot(base));
+        expect(changed.copyWith(), changed);
+        expect(changed.copyWith().hashCode, changed.hashCode);
+        expect(base.copyWith(contentSwitcherSelected: null), base);
+      }
+    },
+  );
+
+  test('contentSwitcherBackground participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(contentSwitcherBackground: custom);
+      expect(changed.contentSwitcherBackground, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(contentSwitcherBackground: null), base);
+    }
+  });
+
+  test('contentSwitcherBackgroundHover participates in custom themes and value equality', () {
+    const custom = Color(0xFF123456);
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final changed = base.copyWith(contentSwitcherBackgroundHover: custom);
+      expect(changed.contentSwitcherBackgroundHover, custom);
+      expect(changed, isNot(base));
+      expect(changed.copyWith(), changed);
+      expect(changed.copyWith().hashCode, changed.hashCode);
+      expect(base.copyWith(contentSwitcherBackgroundHover: null), base);
+    }
+  });
+
+  test('new component tokens interpolate including absent outlines', () {
+    final themes = <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ];
+    for (final a in themes) {
+      for (final b in themes) {
+        expect(CarbonThemeData.lerp(a, b, 0), same(a));
+        expect(CarbonThemeData.lerp(a, b, 1), same(b));
+        final mid = CarbonThemeData.lerp(a, b, 0.5);
+        expect(
+          mid.statusAccessibilityBackground,
+          Color.lerp(
+            a.statusAccessibilityBackground,
+            b.statusAccessibilityBackground,
+            0.5,
+          ),
+        );
+        expect(mid.statusRed, Color.lerp(a.statusRed, b.statusRed, 0.5));
+        expect(
+          mid.statusOrange,
+          Color.lerp(a.statusOrange, b.statusOrange, 0.5),
+        );
+        expect(
+          mid.statusOrangeOutline,
+          Color.lerp(a.statusOrangeOutline, b.statusOrangeOutline, 0.5),
+        );
+        expect(
+          mid.statusYellow,
+          Color.lerp(a.statusYellow, b.statusYellow, 0.5),
+        );
+        expect(
+          mid.statusYellowOutline,
+          Color.lerp(a.statusYellowOutline, b.statusYellowOutline, 0.5),
+        );
+        expect(
+          mid.statusPurple,
+          Color.lerp(a.statusPurple, b.statusPurple, 0.5),
+        );
+        expect(mid.statusGreen, Color.lerp(a.statusGreen, b.statusGreen, 0.5));
+        expect(mid.statusBlue, Color.lerp(a.statusBlue, b.statusBlue, 0.5));
+        expect(mid.statusGray, Color.lerp(a.statusGray, b.statusGray, 0.5));
+        expect(
+          mid.contentSwitcherSelected,
+          Color.lerp(a.contentSwitcherSelected, b.contentSwitcherSelected, 0.5),
+        );
+        expect(
+          mid.contentSwitcherBackground,
+          Color.lerp(
+            a.contentSwitcherBackground,
+            b.contentSwitcherBackground,
+            0.5,
+          ),
+        );
+        expect(
+          mid.contentSwitcherBackgroundHover,
+          Color.lerp(
+            a.contentSwitcherBackgroundHover,
+            b.contentSwitcherBackgroundHover,
+            0.5,
+          ),
+        );
+      }
+    }
+  });
+
+  test('high contrast preserves semantic component colors', () {
+    for (final base in <CarbonThemeData>[
+      CarbonThemeData.white,
+      CarbonThemeData.gray10,
+      CarbonThemeData.gray90,
+      CarbonThemeData.gray100,
+    ]) {
+      final adapted = CarbonThemeData.highContrast(base);
+      expect(
+        adapted.statusAccessibilityBackground,
+        base.statusAccessibilityBackground,
+      );
+      expect(adapted.statusRed, base.statusRed);
+      expect(adapted.statusOrange, base.statusOrange);
+      expect(adapted.statusOrangeOutline, base.statusOrangeOutline);
+      expect(adapted.statusYellow, base.statusYellow);
+      expect(adapted.statusYellowOutline, base.statusYellowOutline);
+      expect(adapted.statusPurple, base.statusPurple);
+      expect(adapted.statusGreen, base.statusGreen);
+      expect(adapted.statusBlue, base.statusBlue);
+      expect(adapted.statusGray, base.statusGray);
+      expect(adapted.contentSwitcherSelected, base.contentSwitcherSelected);
+      expect(adapted.contentSwitcherBackground, base.contentSwitcherBackground);
+      expect(
+        adapted.contentSwitcherBackgroundHover,
+        base.contentSwitcherBackgroundHover,
+      );
+    }
+  });
+
+  test('a transparent custom color can suppress a light status outline', () {
+    const transparent = Color(0x00000000);
+    final theme = CarbonThemeData.white.copyWith(
+      statusOrangeOutline: transparent,
+      statusYellowOutline: transparent,
+    );
+    expect(theme.statusOrangeOutline, transparent);
+    expect(theme.statusYellowOutline, transparent);
   });
 
   test('themes carry the expected brightness', () {

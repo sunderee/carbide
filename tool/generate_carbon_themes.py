@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Generate the ported Carbon theme tokens from authoritative DTCG JSON.
 
-Reads themes/src/dtcg/themes.json and the button, tag, and notification
+Reads themes/src/dtcg/themes.json and the button, tag, notification, status,
+and content-switcher
 component files. Resolves palette/theme aliases, per-theme alpha modifiers,
 and DTCG color objects into CarbonThemeData and exhaustive value tests.
-The public token subset stays stable: syntax, other chat tokens, status, and
-content-switcher remain outside this generator's scope.
+Syntax and chat tokens beyond the shipped chat button remain out of scope.
 
 Run from the repository root: python3 tool/generate_carbon_themes.py
 """
@@ -236,6 +236,26 @@ PORTED_TOKENS = [
     'chatButtonTextSelected',
 ]
 
+# New groups have generated compatibility defaults, so existing callers of
+# the const constructor need not add thirteen arguments to custom themes.
+COMPONENT_TOKENS = [
+    'statusAccessibilityBackground',
+    'statusRed',
+    'statusOrange',
+    'statusOrangeOutline',
+    'statusYellow',
+    'statusYellowOutline',
+    'statusPurple',
+    'statusGreen',
+    'statusBlue',
+    'statusGray',
+    'contentSwitcherSelected',
+    'contentSwitcherBackground',
+    'contentSwitcherBackgroundHover',
+]
+PORTED_TOKENS += COMPONENT_TOKENS
+NULLABLE_TOKENS = {'statusOrangeOutline', 'statusYellowOutline'}
+
 
 def camel(path: str) -> str:
     return re.sub(r"[.-]([a-z0-9])", lambda match: match[1].upper(), path)
@@ -258,6 +278,9 @@ def resolve_token(path, theme, tokens, palette, visiting=()):
     extensions = tokens[path]["$extensions"]
     values = extensions["carbon.themes"]
     if theme not in values:
+        # Upstream does not define status outlines on either dark theme.
+        if camel(path) in NULLABLE_TOKENS and theme in ("g90", "g100"):
+            return "null"
         # _notification.scss supplies layer-hover on dark action surfaces.
         if path != "notification.action-hover" or theme not in ("g90", "g100"):
             raise ValueError(f"missing {theme} value for {path}")
@@ -292,7 +315,7 @@ def build():
     tokens = {}
     dtcg = THEME_DIR / "dtcg"
     sources = [dtcg / "themes.json"]
-    sources += [dtcg / "components" / f"{name}.json" for name in ("button", "tag", "notification")]
+    sources += [dtcg / "components" / f"{name}.json" for name in ("button", "tag", "notification", "status", "content-switcher")]
     for source in sources:
         tokens.update(flatten_tokens(json.loads(source.read_text())))
     paths = {camel(path): path for path in tokens}
@@ -303,6 +326,32 @@ def build():
     }
     brightness = {field: "light" if field in ("white", "gray10") else "dark" for field in THEMES}
     return PORTED_TOKENS, brightness, resolved
+
+
+def constant_color(expression: str) -> str:
+    """Express a resolved token as a const constructor-compatible value."""
+    if not expression.startswith("_alpha("):
+        return expression
+    match = re.fullmatch(r"_alpha\(CarbonColors\.(\w+), ([\d.]+)\)", expression)
+    if not match:
+        raise ValueError(f"unsupported const color default: {expression}")
+    palette = dict(parse_colors())
+    rgb = palette[match[1]][4:]
+    channels = [int(rgb[index:index + 2], 16) for index in (0, 2, 4)]
+    return (
+        f"const Color.from(alpha: {match[2]}, "
+        f"red: {channels[0]} / 255, green: {channels[1]} / 255, "
+        f"blue: {channels[2]} / 255)"
+    )
+
+
+def component_defaults(resolved, name):
+    """Reject future theme divergence rather than emitting inaccurate defaults."""
+    if resolved['white'][name] != resolved['gray10'][name]:
+        raise ValueError(f"light compatibility defaults differ for {name}")
+    if resolved['gray90'][name] != resolved['gray100'][name]:
+        raise ValueError(f"dark compatibility defaults differ for {name}")
+    return constant_color(resolved['white'][name]), constant_color(resolved['gray100'][name])
 
 
 def emit_lib(order, brightness, resolved) -> str:
@@ -323,11 +372,24 @@ def emit_lib(order, brightness, resolved) -> str:
         "@immutable",
         "class CarbonThemeData {",
         "  /// Creates a theme from an explicit set of semantic tokens.",
+        "  ///",
+        "  /// Status and content-switcher tokens default to the upstream light",
+        "  /// or dark palette for [brightness] when omitted. All built-in",
+        "  /// themes explicitly supply their generated values.",
         "  const CarbonThemeData({",
         "    required this.brightness,",
     ]
-    lines += [f"    required this.{n}," for n in order]
-    lines.append("  });")
+    lines += [f"    required this.{n}," for n in order if n not in COMPONENT_TOKENS]
+    lines += [f"    Color? {n}," for n in order if n in COMPONENT_TOKENS]
+    new_fields = [n for n in order if n in COMPONENT_TOKENS]
+    if new_fields:
+        lines.append("  }) :")
+        for index, name in enumerate(new_fields):
+            light, dark = component_defaults(resolved, name)
+            end = ";" if index == len(new_fields) - 1 else ","
+            lines.append(f"    {name} = {name} ?? (brightness == Brightness.dark ? {dark} : {light}){end}")
+    else:
+        lines.append("  });")
     lines.append("")
     lines.append("  /// Whether this is a light or dark theme.")
     lines.append("  final Brightness brightness;")
@@ -337,7 +399,10 @@ def emit_lib(order, brightness, resolved) -> str:
             section = section_of(n)
             lines.append("")
         lines.append(f"  /// The `{n}` token.")
-        lines.append(f"  final Color {n};")
+        if n in NULLABLE_TOKENS:
+            lines.append("  ///")
+            lines.append("  /// Null on the built-in dark themes, which omit this outline.")
+        lines.append(f"  final {'Color?' if n in NULLABLE_TOKENS else 'Color'} {n};")
     lines.append("")
     for field in THEMES:
         lines.append(f"  /// The {TITLES[field]} theme.")
@@ -352,6 +417,9 @@ def emit_lib(order, brightness, resolved) -> str:
 
     # copyWith
     lines.append("  /// A copy of this theme with the given tokens replaced.")
+    lines.append("  ///")
+    lines.append("  /// Null arguments retain their current values, including nullable status")
+    lines.append("  /// outlines. Pass a transparent color to suppress an existing outline.")
     lines.append("  CarbonThemeData copyWith({")
     lines.append("    Brightness? brightness,")
     lines += [f"    Color? {n}," for n in order]
@@ -371,9 +439,13 @@ def emit_lib(order, brightness, resolved) -> str:
         "  static CarbonThemeData lerp("
         "CarbonThemeData a, CarbonThemeData b, double t) {"
     )
+    # Color.lerp(color, null, 1) returns a transparent color, not null.
+    # Preserve exact theme endpoints, including genuinely absent outlines.
+    lines.append("    if (t == 0) return a;")
+    lines.append("    if (t == 1) return b;")
     lines.append("    return CarbonThemeData(")
     lines.append("      brightness: t < 0.5 ? a.brightness : b.brightness,")
-    lines += [f"      {n}: Color.lerp(a.{n}, b.{n}, t)!," for n in order]
+    lines += [f"      {n}: Color.lerp(a.{n}, b.{n}, t){'' if n in NULLABLE_TOKENS else '!'}," for n in order]
     lines.append("    );")
     lines.append("  }")
     lines.append("")
@@ -437,6 +509,63 @@ def emit_test(order, brightness, resolved) -> str:
         ]
         lines.append("  });")
         lines.append("")
+    new_fields = [name for name in order if name in COMPONENT_TOKENS]
+    if new_fields:
+        lines += [
+            "  test('component defaults preserve legacy custom theme construction', () {",
+            "    for (final base in <CarbonThemeData>[",
+            "      CarbonThemeData.white, CarbonThemeData.gray10,",
+            "      CarbonThemeData.gray90, CarbonThemeData.gray100,",
+            "    ]) {",
+            "      final legacy = CarbonThemeData(",
+            "        brightness: base.brightness,",
+        ]
+        lines += [f"        {name}: base.{name}," for name in order if name not in COMPONENT_TOKENS]
+        lines += ["      );", "      expect(legacy, base);",
+                  "      expect(legacy.hashCode, base.hashCode);", "    }", "  });", ""]
+        for name in new_fields:
+            lines += [
+                f"  test('{name} participates in custom themes and value equality', () {{",
+                "    const custom = Color(0xFF123456);",
+                "    for (final base in <CarbonThemeData>[",
+                "      CarbonThemeData.white, CarbonThemeData.gray10,",
+                "      CarbonThemeData.gray90, CarbonThemeData.gray100,",
+                "    ]) {",
+                f"      final changed = base.copyWith({name}: custom);",
+                f"      expect(changed.{name}, custom);",
+                "      expect(changed, isNot(base));",
+                "      expect(changed.copyWith(), changed);",
+                "      expect(changed.copyWith().hashCode, changed.hashCode);",
+                f"      expect(base.copyWith({name}: null), base);",
+                "    }", "  });", "",
+            ]
+        lines += [
+            "  test('new component tokens interpolate including absent outlines', () {",
+            "    final themes = <CarbonThemeData>[",
+            "      CarbonThemeData.white, CarbonThemeData.gray10,",
+            "      CarbonThemeData.gray90, CarbonThemeData.gray100,",
+            "    ];",
+            "    for (final a in themes) {",
+            "      for (final b in themes) {",
+            "        expect(CarbonThemeData.lerp(a, b, 0), same(a));",
+            "        expect(CarbonThemeData.lerp(a, b, 1), same(b));",
+            "        final mid = CarbonThemeData.lerp(a, b, 0.5);",
+        ]
+        lines += [f"        expect(mid.{name}, Color.lerp(a.{name}, b.{name}, 0.5));" for name in new_fields]
+        lines += ["      }", "    }", "  });", "",
+                  "  test('high contrast preserves semantic component colors', () {",
+                  "    for (final base in <CarbonThemeData>[",
+                  "      CarbonThemeData.white, CarbonThemeData.gray10,",
+                  "      CarbonThemeData.gray90, CarbonThemeData.gray100,",
+                  "    ]) {", "      final adapted = CarbonThemeData.highContrast(base);"]
+        lines += [f"      expect(adapted.{name}, base.{name});" for name in new_fields]
+        lines += ["    }", "  });", "",
+                  "  test('a transparent custom color can suppress a light status outline', () {",
+                  "    const transparent = Color(0x00000000);",
+                  "    final theme = CarbonThemeData.white.copyWith(",
+                  "      statusOrangeOutline: transparent, statusYellowOutline: transparent,",
+                  "    );", "    expect(theme.statusOrangeOutline, transparent);",
+                  "    expect(theme.statusYellowOutline, transparent);", "  });", ""]
     lines += [
         "  test('themes carry the expected brightness', () {",
         "    expect(CarbonThemeData.white.brightness, Brightness.light);",

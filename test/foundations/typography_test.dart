@@ -275,6 +275,26 @@ void main() {
         letterSpacing: 0,
       ),
     );
+    expect(
+      CarbonTypeStyles.expressiveHeading01,
+      const TextStyle(
+        fontFamily: CarbonFontFamily.sans,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        height: 1.25,
+        letterSpacing: 0.16,
+      ),
+    );
+    expect(
+      CarbonTypeStyles.expressiveHeading02,
+      const TextStyle(
+        fontFamily: CarbonFontFamily.sans,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        height: 1.5,
+        letterSpacing: 0,
+      ),
+    );
     expect(CarbonTypeStyles.bodyCompact01, CarbonTypeStyles.bodyShort01);
     expect(CarbonTypeStyles.bodyCompact02, CarbonTypeStyles.bodyShort02);
     expect(CarbonTypeStyles.body01, CarbonTypeStyles.bodyLong01);
@@ -320,6 +340,8 @@ void main() {
       CarbonTypeStyles.productiveHeading05,
       CarbonTypeStyles.productiveHeading06,
       CarbonTypeStyles.productiveHeading07,
+      CarbonTypeStyles.expressiveHeading01,
+      CarbonTypeStyles.expressiveHeading02,
     ]) {
       expect(families, contains(style.fontFamily));
       expect(style.fontSize, greaterThan(0));

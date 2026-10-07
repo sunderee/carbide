@@ -24,6 +24,7 @@ library;
 // Foundations — design tokens.
 export 'src/foundations/colors.dart';
 export 'src/foundations/fluid_text_style.dart';
+export 'src/foundations/fluid_spacing.dart';
 export 'src/foundations/fluid_typography.dart';
 export 'src/foundations/fonts.dart';
 export 'src/foundations/layout.dart';

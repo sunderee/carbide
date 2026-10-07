@@ -5,10 +5,9 @@ Reads @carbon/type (Apache-2.0) and emits:
   - lib/src/foundations/typography.dart    (scale, weights, fixed styles)
   - test/foundations/typography_test.dart  (an exhaustive value lock)
 
-Scope: the 23-step type scale, the three font weights, and the *fixed* named
-type styles. Fluid styles (display/quotation/expressive and their `fluid*`
-aliases) are breakpoint-driven and depend on the layout breakpoints (#7); they
-are deferred to a follow-up.
+Scope: the 23-step type scale, the three font weights, and fixed named type
+styles, including expressiveHeading01/02. Responsive expressive, display and
+quotation styles are generated separately by generate_carbon_fluid_type.py.
 
 Carbon units → Flutter:
   fontSize: rem(scale[i])  -> scale[i] logical px (1rem = 16px base)
@@ -39,6 +38,7 @@ OBJECTS = [
     "productiveHeading01", "productiveHeading02", "productiveHeading03",
     "productiveHeading04", "productiveHeading05", "productiveHeading06",
     "productiveHeading07",
+    "expressiveHeading01", "expressiveHeading02",
 ]
 # V11 fixed aliases -> the object they reference.
 ALIASES = {
