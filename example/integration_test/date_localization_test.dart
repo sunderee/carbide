@@ -106,8 +106,9 @@ _Element _button(String name) {
   for (int i = 0; i < nodes.length; i++) {
     final _Element node = nodes.item(i)!;
     if (node.getAttribute('aria-label') == name ||
-        node.textContent?.trim() == name)
+        node.textContent?.trim() == name) {
       return node;
+    }
   }
   throw StateError('No native date button named $name');
 }
