@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/date_localizations.dart';
+import '../../support/date_locale_fonts.dart';
 import '../../support/overlay_entries.dart';
 import '../../support/legibility.dart';
 import '../../support/golden.dart';
@@ -29,7 +30,12 @@ Widget _host(
       child: Overlay(
         initialEntries: <OverlayEntry>[
           managedOverlayEntry(
-            builder: (BuildContext context) => Center(child: child),
+            builder: (BuildContext context) => DefaultTextStyle.merge(
+              style: const TextStyle(
+                fontFamilyFallback: dateLocaleFontFallbacks,
+              ),
+              child: Center(child: child),
+            ),
           ),
         ],
       ),
@@ -38,6 +44,7 @@ Widget _host(
 );
 
 void main() {
+  setUpAll(loadDateLocaleFonts);
   testWidgets('long Arabic weekday labels grow at 2x instead of clipping', (
     WidgetTester tester,
   ) async {
@@ -542,13 +549,16 @@ void main() {
               ? TextDirection.rtl
               : TextDirection.ltr,
         },
-        builder: (BuildContext context) => Center(
-          child: SizedBox(
-            width: 312,
-            child: CarbonCalendar(
-              value: DateTime(2025, 10, 17),
-              localizations: labels,
-              onChanged: (DateTime _) {},
+        builder: (BuildContext context) => DefaultTextStyle.merge(
+          style: const TextStyle(fontFamilyFallback: dateLocaleFontFallbacks),
+          child: Center(
+            child: SizedBox(
+              width: 312,
+              child: CarbonCalendar(
+                value: DateTime(2025, 10, 17),
+                localizations: labels,
+                onChanged: (DateTime _) {},
+              ),
             ),
           ),
         ),
