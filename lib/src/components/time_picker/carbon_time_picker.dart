@@ -12,9 +12,13 @@
 // followed by one or more inline selects (AM/PM, timezone). Reuses CarbonField
 // (#66) for the field chrome and CarbonSelect (#70) for the dropdowns.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../utils/focus_ring.dart';
+import '../../utils/native_text_composition.dart';
+import '../../utils/native_text_value.dart';
 import '../../utils/owned_listenable.dart';
 import '../../theme/carbon_layer.dart';
 import '../../foundations/layout.dart';
@@ -23,8 +27,16 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../form/carbon_form.dart';
 import '../select/carbon_select.dart';
+import 'time_format.dart';
 
 /// A compact time field followed by inline [CarbonTimePickerSelect]s.
+///
+/// Omitting [format] retains permissive free-text typing. Supplying a format
+/// enables draft/Enter/Done/group-blur commits: valid times optionally
+/// normalize, empty drafts clear the time, and invalid drafts retain their
+/// text with [invalidText]. Active composition does not commit. A twelve-hour
+/// format supplies its own coordinated period selector; [children] can supply
+/// other controls such as a timezone selector.
 ///
 /// ```dart
 /// CarbonTimePicker(
@@ -52,7 +64,16 @@ class CarbonTimePicker extends StatefulWidget {
     this.controller,
     this.initialValue,
     this.onChanged,
-    this.placeholder = 'hh:mm',
+    this._placeholder,
+    this.format,
+    this.normalizeOnCommit = true,
+    this.onCommitted,
+    this.initialPeriod = CarbonTimePeriod.am,
+    this.onPeriodChanged,
+    this.periodLabel = 'AM/PM',
+    this.amLabel = 'AM',
+    this.pmLabel = 'PM',
+    this.periodWidth = CarbonTimePickerSelect.defaultWidth,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
     this.readOnly = false,
@@ -79,11 +100,55 @@ class CarbonTimePicker extends StatefulWidget {
   /// The initial text, used only when [controller] is null.
   final String? initialValue;
 
-  /// Called when the text changes.
+  /// Called when text changes in permissive mode, or successfully commits
+  /// when [format] is supplied. Typing in formatted mode remains a draft.
   final ValueChanged<String>? onChanged;
 
-  /// The placeholder shown when empty.
-  final String placeholder;
+  final String? _placeholder;
+
+  /// The explicit empty hint, the format's pattern hint, or `hh:mm`.
+  String get placeholder => _placeholder ?? format?.placeholder ?? 'hh:mm';
+
+  /// An optional parser/formatter that enables validation on commit.
+  ///
+  /// Without it, arbitrary text and immediate [onChanged] callbacks retain
+  /// their original behavior. With it, Enter, Done and leaving the entire
+  /// input/select focus group commit drafts. Invalid drafts remain visible
+  /// through the existing [invalidText] chrome and do not report a success.
+  final CarbonTimeFormat? format;
+
+  /// Whether valid formatted commits replace text with canonical output.
+  ///
+  /// Applies only when [format] is supplied. False still parses and validates.
+  final bool normalizeOnCommit;
+
+  /// Reports canonical times on successful formatted commits, once per edit.
+  ///
+  /// Empty drafts commit null; invalid drafts and repeated unchanged commits
+  /// do not call this. [onChanged] reports the corresponding displayed text.
+  final ValueChanged<CarbonTimeValue?>? onCommitted;
+
+  /// The initial period of the built-in twelve-hour selector.
+  ///
+  /// Used on first construction and when changing the format's hour cycle.
+  final CarbonTimePeriod initialPeriod;
+
+  /// Reports changes to the built-in twelve-hour selector.
+  ///
+  /// Changing the period also commits a valid pending time with that period.
+  final ValueChanged<CarbonTimePeriod>? onPeriodChanged;
+
+  /// The accessible label of the built-in twelve-hour selector.
+  final String periodLabel;
+
+  /// The localized label for the morning period.
+  final String amLabel;
+
+  /// The localized label for the afternoon/evening period.
+  final String pmLabel;
+
+  /// The built-in selector width, tunable for longer localized period labels.
+  final double periodWidth;
 
   /// The field size.
   final CarbonFieldSize size;
@@ -115,7 +180,8 @@ class CarbonTimePicker extends StatefulWidget {
   /// The fluid treatment (`_fluid-time-picker.scss`): a 64px field with the
   /// label rendered inside above the value. Attached
   /// [CarbonTimePickerSelect]s pick the treatment up automatically when
-  /// hosted in a [CarbonFluidForm]; pass `fluid` to them otherwise.
+  /// hosted in a [CarbonFluidForm]. The built-in period selector follows this
+  /// flag; pass `fluid` to independently supplied selects otherwise.
   final bool fluid;
 
   /// A caller-owned focus node, rebound when this property changes.
@@ -125,7 +191,10 @@ class CarbonTimePicker extends StatefulWidget {
   /// here.
   final FocusNode? focusNode;
 
-  /// Trailing selects (typically [CarbonTimePickerSelect]s).
+  /// Independently controlled trailing selects, such as a timezone selector.
+  ///
+  /// In formatted twelve-hour mode the picker already supplies its period
+  /// selector; remove a manually supplied AM/PM child when opting into it.
   final List<Widget> children;
 
   /// The `code-02` input width (`4.875rem`).
@@ -139,12 +208,24 @@ class CarbonTimePicker extends StatefulWidget {
 }
 
 class _CarbonTimePickerState extends State<CarbonTimePicker> {
+  static int _nextSemanticId = 0;
+  final String _semanticId = 'carbide-time-${_nextSemanticId++}';
+
   /// The effective fluid flag: the widget's own, or an enclosing
   /// [CarbonFluidForm] scope.
   bool get _fluid => widget.fluid || CarbonFluidForm.of(context);
 
   late final OwnedTextEditingController _controllerOwner;
   late final OwnedFocusNode _focusOwner;
+  late final NativeTextComposition _nativeComposition;
+  late final TextInputFormatter _compositionFormatter;
+  late CarbonTimePeriod _period;
+  CarbonTimeValue? _committed;
+  bool _dirty = false;
+  bool _parseInvalid = false;
+  bool _componentFocused = false;
+  bool _updatingText = false;
+  String _observedText = '';
 
   TextEditingController get _controller => _controllerOwner.value;
   FocusNode get _focus => _focusOwner.value;
@@ -152,26 +233,61 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
   @override
   void initState() {
     super.initState();
+    _period = widget.initialPeriod;
     _controllerOwner = OwnedTextEditingController(
       external: widget.controller,
       initialText: widget.initialValue,
-      onChanged: _onChange,
+      onChanged: _onControllerChange,
     );
     _focusOwner = OwnedFocusNode(
       external: widget.focusNode,
       onChanged: _onChange,
     );
+    _observedText = _controller.text;
+    _committed = widget.format?.tryParse(_controller.text, period: _period);
+    _nativeComposition = NativeTextComposition(
+      isFocused: () => _focus.hasFocus,
+      onCommit: (String text) {
+        if (mounted && _controller.text == text) {
+          _controller.value = _controller.value.copyWith(
+            composing: TextRange.empty,
+          );
+        }
+      },
+    );
+    _compositionFormatter = TextInputFormatter.withFunction(
+      (_, TextEditingValue value) => _nativeComposition.resolve(value),
+    );
+    if (kIsWeb) {
+      WidgetsBinding.instance.addSemanticsEnabledListener(_onChange);
+    }
   }
 
   @override
   void didUpdateWidget(CarbonTimePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _controllerOwner.update(widget.controller);
+    if (_controllerOwner.update(widget.controller)) {
+      _observedText = _controller.text;
+      _dirty = false;
+      _parseInvalid = false;
+      _committed = widget.format?.tryParse(_controller.text, period: _period);
+    }
     _focusOwner.update(widget.focusNode);
+    if (widget.format?.hourCycle != oldWidget.format?.hourCycle) {
+      _period = widget.initialPeriod;
+    }
+    if (widget.format != oldWidget.format) {
+      _parseInvalid = false;
+      _committed = widget.format?.tryParse(_controller.text, period: _period);
+    }
   }
 
   @override
   void dispose() {
+    if (kIsWeb) {
+      WidgetsBinding.instance.removeSemanticsEnabledListener(_onChange);
+    }
+    _nativeComposition.dispose();
     _controllerOwner.dispose();
     _focusOwner.dispose();
     super.dispose();
@@ -183,40 +299,146 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
     }
   }
 
-  CarbonFieldStatus get _status => widget.invalid
+  void _onControllerChange() {
+    if (!_updatingText && _controller.text != _observedText) {
+      _dirty = true;
+      _parseInvalid = false;
+    }
+    _observedText = _controller.text;
+    _onChange();
+  }
+
+  bool get _invalid => widget.invalid || _parseInvalid;
+
+  CarbonFieldStatus get _status => _invalid
       ? CarbonFieldStatus.invalid
       : widget.warn
       ? CarbonFieldStatus.warning
       : CarbonFieldStatus.none;
 
+  bool get _composing =>
+      _controller.value.composing.isValid &&
+      !_controller.value.composing.isCollapsed;
+
+  void _commitDraft() {
+    final CarbonTimeFormat? format = widget.format;
+    if (format == null || widget.disabled || widget.readOnly || _composing) {
+      return;
+    }
+    final String draft = _controller.text;
+    final bool empty = draft.trim().isEmpty;
+    final CarbonTimeValue? value = empty
+        ? null
+        : format.tryParse(draft, period: _period);
+    if (!empty && value == null) {
+      setState(() => _parseInvalid = true);
+      return;
+    }
+    final String output = widget.normalizeOnCommit
+        ? value == null
+              ? ''
+              : format.format(value)
+        : draft;
+    final bool notify = _dirty || value != _committed || output != draft;
+    _dirty = false;
+    _committed = value;
+    _updatingText = true;
+    try {
+      if (_controller.text != output) {
+        _controller.value = TextEditingValue(
+          text: output,
+          selection: TextSelection.collapsed(offset: output.length),
+        );
+      }
+    } finally {
+      _updatingText = false;
+    }
+    setState(() => _parseInvalid = false);
+    if (notify) {
+      widget.onChanged?.call(output);
+      widget.onCommitted?.call(value);
+    }
+  }
+
+  void _onPeriodChanged(CarbonTimePeriod period) {
+    if (period == _period || widget.disabled || widget.readOnly) return;
+    setState(() {
+      _period = period;
+      _dirty = true;
+    });
+    widget.onPeriodChanged?.call(period);
+    _commitDraft();
+  }
+
+  void _onComponentFocusChange(bool focused) {
+    if (_componentFocused && !focused && mounted) _commitDraft();
+    _componentFocused = focused;
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (widget.format == null ||
+        event is! KeyDownEvent ||
+        widget.disabled ||
+        widget.readOnly ||
+        _composing) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _commitDraft();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          syncNativeTextValue(
+            _semanticId,
+            _controller.text,
+            readOnly: widget.readOnly || widget.disabled,
+          );
+        }
+      });
+    }
     final CarbonThemeData theme = CarbonTheme.of(context);
     final bool enabled = !widget.disabled && !widget.readOnly;
 
     final Widget editable = MergeSemantics(
       child: Semantics(
         label: widget.labelText,
+        identifier: _semanticId,
         enabled: !widget.disabled,
         textField: true,
-        child: _TimeEditable(
-          controller: _controller,
-          focusNode: _focus,
-          selectAllOnFocus: _focusOwner.selectAllOnFocus,
-          placeholder: widget.placeholder,
-          enabled: enabled,
-          readOnly: widget.readOnly,
-          onChanged: widget.onChanged,
-          color: widget.disabled ? theme.textDisabled : theme.textPrimary,
-          placeholderColor: theme.textPlaceholder,
-          cursorColor: theme.focus,
-          selectionColor: theme.focus.withValues(alpha: 0.2),
+        child: Focus(
+          canRequestFocus: false,
+          includeSemantics: false,
+          onKeyEvent: _onKey,
+          child: _TimeEditable(
+            groupId: this,
+            controller: _controller,
+            focusNode: _focus,
+            selectAllOnFocus: _focusOwner.selectAllOnFocus,
+            placeholder: widget.placeholder,
+            enabled: enabled,
+            readOnly: widget.readOnly,
+            onChanged: widget.format == null ? widget.onChanged : null,
+            onEditingComplete: widget.format == null ? null : _commitDraft,
+            compositionFormatter: _compositionFormatter,
+            color: widget.disabled ? theme.textDisabled : theme.textPrimary,
+            placeholderColor: theme.textPlaceholder,
+            cursorColor: theme.focus,
+            selectionColor: theme.focus.withValues(alpha: 0.2),
+          ),
         ),
       ),
     );
 
     final Widget field = SizedBox(
-      width: widget.invalid
+      width: _invalid
           ? CarbonTimePicker.fieldWidthError
           : CarbonTimePicker.fieldWidth,
       child: _fluid
@@ -237,7 +459,7 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
             ),
     );
 
-    final Widget? message = widget.invalid && widget.invalidText != null
+    final Widget? message = _invalid && widget.invalidText != null
         ? CarbonFieldRequirement(widget.invalidText!)
         : widget.warn && widget.warnText != null
         ? CarbonFieldRequirement(
@@ -248,32 +470,68 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
         ? CarbonHelperText(widget.helperText!, disabled: widget.disabled)
         : null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        if (!widget.hideLabel && !_fluid)
-          ExcludeSemantics(
-            child: CarbonFormLabel(widget.labelText, disabled: widget.disabled),
-          ),
-        // The row aligns the field and selects to their bottom edge so the
-        // sizes line up (`align-items: flex-end`).
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+    return Focus(
+      canRequestFocus: false,
+      includeSemantics: false,
+      onFocusChange: _onComponentFocusChange,
+      child: TextFieldTapRegion(
+        groupId: this,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            field,
-            for (final Widget child in widget.children)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(
-                  start: CarbonSpacing.spacing01,
+            if (!widget.hideLabel && !_fluid)
+              ExcludeSemantics(
+                child: CarbonFormLabel(
+                  widget.labelText,
+                  disabled: widget.disabled,
                 ),
-                child: child,
               ),
+            // The row aligns the field and selects to their bottom edge so the
+            // sizes line up (`align-items: flex-end`).
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                field,
+                if (widget.format?.hourCycle == CarbonTimeHourCycle.twelveHour)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: CarbonSpacing.spacing01,
+                    ),
+                    child: CarbonTimePickerSelect<CarbonTimePeriod>(
+                      labelText: widget.periodLabel,
+                      value: _period,
+                      size: widget.size,
+                      fluid: _fluid,
+                      width: widget.periodWidth,
+                      disabled: widget.disabled || widget.readOnly,
+                      onChanged: _onPeriodChanged,
+                      items: <CarbonSelectEntry<CarbonTimePeriod>>[
+                        CarbonSelectItem<CarbonTimePeriod>(
+                          value: CarbonTimePeriod.am,
+                          label: widget.amLabel,
+                        ),
+                        CarbonSelectItem<CarbonTimePeriod>(
+                          value: CarbonTimePeriod.pm,
+                          label: widget.pmLabel,
+                        ),
+                      ],
+                    ),
+                  ),
+                for (final Widget child in widget.children)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: CarbonSpacing.spacing01,
+                    ),
+                    child: child,
+                  ),
+              ],
+            ),
+            ?message,
           ],
         ),
-        ?message,
-      ],
+      ),
     );
   }
 }
@@ -281,6 +539,7 @@ class _CarbonTimePickerState extends State<CarbonTimePicker> {
 /// `EditableText` in `code-02` with a placeholder overlay, for the time field.
 class _TimeEditable extends StatelessWidget {
   const _TimeEditable({
+    required this.groupId,
     required this.controller,
     required this.focusNode,
     required this.selectAllOnFocus,
@@ -288,12 +547,15 @@ class _TimeEditable extends StatelessWidget {
     required this.enabled,
     required this.readOnly,
     required this.onChanged,
+    required this.onEditingComplete,
+    required this.compositionFormatter,
     required this.color,
     required this.placeholderColor,
     required this.cursorColor,
     required this.selectionColor,
   });
 
+  final Object groupId;
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool? selectAllOnFocus;
@@ -301,6 +563,8 @@ class _TimeEditable extends StatelessWidget {
   final bool enabled;
   final bool readOnly;
   final ValueChanged<String>? onChanged;
+  final VoidCallback? onEditingComplete;
+  final TextInputFormatter compositionFormatter;
   final Color color;
   final Color placeholderColor;
   final Color cursorColor;
@@ -324,11 +588,15 @@ class _TimeEditable extends StatelessWidget {
             ),
           ),
         EditableText(
+          groupId: groupId,
           controller: controller,
           focusNode: focusNode,
           selectAllOnFocus: selectAllOnFocus,
           readOnly: readOnly || !enabled,
           onChanged: onChanged,
+          onEditingComplete: onEditingComplete,
+          inputFormatters: <TextInputFormatter>[compositionFormatter],
+          textInputAction: TextInputAction.done,
           style: style,
           cursorColor: cursorColor,
           backgroundCursorColor: placeholderColor,
@@ -353,6 +621,7 @@ class CarbonTimePickerSelect<T> extends StatelessWidget {
     this.onChanged,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
+    this.fluid = false,
     this.width = defaultWidth,
   });
 
@@ -374,6 +643,9 @@ class CarbonTimePickerSelect<T> extends StatelessWidget {
   /// Whether the select is disabled.
   final bool disabled;
 
+  /// Whether to use the fluid field treatment outside [CarbonFluidForm].
+  final bool fluid;
+
   /// The select width. Carbon sizes the select to its content (`inline-size:
   /// auto`); Flutter can't derive an intrinsic width through the field's
   /// internal flex, so the width is fixed and tunable for longer options
@@ -394,6 +666,7 @@ class CarbonTimePickerSelect<T> extends StatelessWidget {
         onChanged: onChanged,
         size: size,
         disabled: disabled,
+        fluid: fluid,
         hideLabel: true,
       ),
     );
@@ -432,11 +705,12 @@ class _FluidTimeField extends StatelessWidget {
           ),
         ),
       ),
-      child: SizedBox(
-        height: 64,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 64),
         child: Padding(
           padding: const EdgeInsetsDirectional.only(start: 16),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[

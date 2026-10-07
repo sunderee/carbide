@@ -118,6 +118,7 @@ jobs:
           test/theme test/utils test/foundations
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
+          test/components/time_picker
           test/components/content_switcher
           test/components/menu
           test/components/picker_family test/components/dropdown
@@ -178,6 +179,7 @@ jobs:
               drive_native --release --target=integration_test/static_semantics_test.dart
               ;;
             lifecycle)
+              drive_native --release --target=integration_test/time_commit_test.dart
               drive_native --target=integration_test/form_ownership_test.dart
               drive_native --target=integration_test/text_area_limit_test.dart
               drive_native --target=integration_test/number_input_commit_test.dart

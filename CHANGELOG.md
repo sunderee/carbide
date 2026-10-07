@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add opt-in time format/parser policies with draft/Enter/Done/group-blur
+  commits, canonical normalization, standard parse-error chrome and typed
+  12/24-hour behavior with coordinated AM/PM. Keep unconfigured free-text
+  typing behavior and caller-owned controllers (#326).
+
 - Add injectable date-picker localization with a shared format/parser pattern,
   derived placeholders, translated calendar labels and configurable week start.
   Use logical RTL day navigation and mirrored month chevrons; retain selection
