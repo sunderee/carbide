@@ -11,7 +11,7 @@
 //
 // Spike outcome (Flutter has no CSS-grid engine): resolve the active
 // CarbonBreakpoint from the laid-out width, derive one column "unit" from the
-// content width, and place CarbonColumns in a Wrap with the gutter as spacing
+// content width, and place CarbonColumns in a Wrap with per-column gutters
 // so full rows auto-wrap. Per-breakpoint spans cascade from smaller
 // breakpoints like CSS; offsets add empty leading tracks. The legacy flexbox
 // FlexGrid is intentionally not ported — the CSS grid supersedes it.
@@ -25,14 +25,22 @@ enum CarbonGridMode {
   /// 32px gutters (16px of padding on each column edge).
   wide,
 
-  /// 32px gutters, but the first/last columns hang into the margin.
+  /// Removes the 16px logical start gutter; keeps the 16px end gutter.
+  ///
+  /// Column content hangs toward the start relative to [wide]. Interior
+  /// visible gaps are 16px. This follows the current Carbon CSS grid's
+  /// `--cds-grid-gutter-start: 0`, rather than a symmetric outer-edge shift.
   narrow,
 
   /// 1px gutters, for dense data layouts.
   condensed;
 
-  /// The gutter width in logical pixels.
-  double get gutter => this == CarbonGridMode.condensed ? 1 : 32;
+  /// The visible gap between adjacent column contents, in logical pixels.
+  double get gutter => switch (this) {
+    wide => CarbonSpacing.spacing07,
+    narrow => CarbonSpacing.spacing07 / 2,
+    condensed => 1,
+  };
 }
 
 /// A responsive 2x Grid.
@@ -40,6 +48,18 @@ enum CarbonGridMode {
 /// Lay out [CarbonColumn]s inside a grid; each column spans a number of the
 /// grid's columns (16 at `lg`+, 8 at `md`, 4 at `sm`). The grid must be given a
 /// bounded width (e.g. a page body).
+///
+/// Gutters belong to columns: [CarbonGridMode.wide] adds 16px at each logical
+/// content edge, [CarbonGridMode.narrow] removes the start gutter and keeps the
+/// end gutter, and [CarbonGridMode.condensed] adds 0.5px at each edge. Narrow
+/// nested grids therefore keep the same start edge without applying an outer
+/// negative offset again. A nested grid still has its own responsive margin;
+/// use [fullWidth] to omit that independent inset.
+///
+/// This uses Flutter [Wrap], so it does not implement CSS grid's named tracks,
+/// row spanning, explicit placement or inherited subgrid track definitions.
+/// Breakpoints resolve from this grid's available width. One pixel of shared
+/// track slack prevents floating-point sums from prematurely wrapping a row.
 ///
 /// ```dart
 /// CarbonGrid(
@@ -78,14 +98,20 @@ class CarbonGrid extends StatelessWidget {
         final double width = constraints.maxWidth;
         final CarbonBreakpoint breakpoint = CarbonBreakpoint.of(width);
         final int totalColumns = breakpoint.columns;
-        final double gutter = mode.gutter;
+        final double endGutter = mode == CarbonGridMode.condensed
+            ? mode.gutter / 2
+            : CarbonSpacing.spacing07 / 2;
+        final double startGutter = mode == CarbonGridMode.narrow
+            ? 0
+            : endGutter;
         final double margin = fullWidth ? 0 : breakpoint.margin;
         final double contentWidth = width - 2 * margin;
         // One column track. Reserve 1px of slack so floating-point sums never
         // push a full row over the available width and wrap prematurely.
-        final double unit =
-            ((contentWidth - (totalColumns - 1) * gutter - 1) / totalColumns)
-                .clamp(0, double.infinity);
+        final double unit = ((contentWidth - 1) / totalColumns).clamp(
+          0,
+          double.infinity,
+        );
 
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: margin),
@@ -93,12 +119,9 @@ class CarbonGrid extends StatelessWidget {
             breakpoint: breakpoint,
             totalColumns: totalColumns,
             unit: unit,
-            gutter: gutter,
-            child: Wrap(
-              spacing: gutter,
-              runSpacing: rowSpacing,
-              children: children,
-            ),
+            startGutter: startGutter,
+            endGutter: endGutter,
+            child: Wrap(runSpacing: rowSpacing, children: children),
           ),
         );
       },
@@ -170,15 +193,16 @@ class CarbonColumn extends StatelessWidget {
       scope.totalColumns,
     ).clamp(1, scope.totalColumns);
     final int tracks = resolved + offset;
-    final double width = tracks * scope.unit + (tracks - 1) * scope.gutter;
-    final double leading = offset > 0
-        ? offset * scope.unit + offset * scope.gutter
-        : 0;
+    final double width = tracks * scope.unit;
+    final double leading = offset > 0 ? offset * scope.unit : 0;
 
     return SizedBox(
       width: width.clamp(0, double.infinity),
       child: Padding(
-        padding: EdgeInsetsDirectional.only(start: leading),
+        padding: EdgeInsetsDirectional.only(
+          start: leading + scope.startGutter,
+          end: scope.endGutter,
+        ),
         child: child,
       ),
     );
@@ -191,14 +215,16 @@ class _CarbonGridScope extends InheritedWidget {
     required this.breakpoint,
     required this.totalColumns,
     required this.unit,
-    required this.gutter,
+    required this.startGutter,
+    required this.endGutter,
     required super.child,
   });
 
   final CarbonBreakpoint breakpoint;
   final int totalColumns;
   final double unit;
-  final double gutter;
+  final double startGutter;
+  final double endGutter;
 
   static _CarbonGridScope of(BuildContext context) {
     final _CarbonGridScope? scope = context
@@ -212,5 +238,6 @@ class _CarbonGridScope extends InheritedWidget {
       breakpoint != oldWidget.breakpoint ||
       totalColumns != oldWidget.totalColumns ||
       unit != oldWidget.unit ||
-      gutter != oldWidget.gutter;
+      startGutter != oldWidget.startGutter ||
+      endGutter != oldWidget.endGutter;
 }

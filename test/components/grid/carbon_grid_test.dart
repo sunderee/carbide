@@ -18,9 +18,9 @@ Widget _host(double width, Widget grid) => Directionality(
   ),
 );
 
-// One column track at a given grid width / total columns (wide mode, margin).
+// CSS tracks divide the content width; gutters belong inside each column.
 double _unit(double width, int totalColumns, double margin) =>
-    ((width - 2 * margin) - (totalColumns - 1) * 32 - 1) / totalColumns;
+    ((width - 2 * margin) - 1) / totalColumns;
 
 // Pumps [grid] in a surface wide enough that a [width]px grid is not clamped
 // to the 800px default surface (which would resolve to a smaller breakpoint).
@@ -57,7 +57,7 @@ void main() {
       final double unit = _unit(1056, 16, 16);
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(8 * unit + 7 * 32, 0.6),
+        closeTo(8 * unit, 0.6),
       );
       // Two half-width columns share one row.
       expect(
@@ -85,7 +85,7 @@ void main() {
       final double unit = _unit(400, 4, 0); // sm: 4 columns, margin 0.
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(2 * unit + 32, 0.6),
+        closeTo(2 * unit, 0.6),
       );
     });
 
@@ -109,7 +109,7 @@ void main() {
       final double unit = _unit(1056, 16, 16);
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(4 * unit + 3 * 32, 0.6),
+        closeTo(4 * unit, 0.6),
       );
     });
 
@@ -135,12 +135,12 @@ void main() {
       final double unit = _unit(1056, 16, 16);
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(4 * unit + 3 * 32, 0.6),
+        closeTo(4 * unit, 0.6),
       );
       // No span at all → the full 16-column width.
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('b'))).width,
-        closeTo(16 * unit + 15 * 32, 0.6),
+        closeTo(16 * unit, 0.6),
       );
     });
 
@@ -162,7 +162,7 @@ void main() {
       final double lgUnit = _unit(1056, 16, 16);
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(8 * lgUnit + 7 * 32, 0.6),
+        closeTo(8 * lgUnit, 0.6),
       );
 
       // Shrinking to sm re-resolves the scope; dependents must be notified.
@@ -170,7 +170,7 @@ void main() {
       final double smUnit = _unit(400, 4, 0);
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(2 * smUnit + 32, 0.6),
+        closeTo(2 * smUnit, 0.6),
       );
     });
 
@@ -188,7 +188,7 @@ void main() {
       await _pump(tester, 1200, const CarbonGrid(children: <Widget>[column]));
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(8 * _unit(1200, 16, 16) + 7 * 32, 0.6),
+        closeTo(8 * _unit(1200, 16, 16), 0.6),
       );
 
       // An unrelated grid property change keeps the column layout stable.
@@ -199,7 +199,7 @@ void main() {
       );
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('a'))).width,
-        closeTo(8 * _unit(1200, 16, 16) + 7 * 32, 0.6),
+        closeTo(8 * _unit(1200, 16, 16), 0.6),
       );
     });
   });
@@ -254,11 +254,11 @@ void main() {
         ),
       );
       final double unit = _unit(1056, 16, 16);
-      // Content begins after the 16px margin + 2 empty tracks.
+      // Content begins after the margin, two empty tracks and start gutter.
       final double contentLeft = tester
           .getTopLeft(find.byKey(const ValueKey<String>('content')))
           .dx;
-      expect(contentLeft, closeTo(16 + 2 * unit + 2 * 32, 1.0));
+      expect(contentLeft, closeTo(16 + 2 * unit + 16, 1.0));
     });
 
     testWidgets('a column outside a grid asserts', (WidgetTester tester) async {
@@ -290,7 +290,9 @@ void main() {
                   lg: 4,
                   child: SizedBox(
                     height: 48,
-                    child: ColoredBox(color: CarbonThemeData.white.layer01),
+                    child: ColoredBox(
+                      color: CarbonTheme.of(context).layerAccent01,
+                    ),
                   ),
                 ),
             ],

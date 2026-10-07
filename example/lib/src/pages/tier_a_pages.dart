@@ -746,16 +746,28 @@ class _AspectRatioPageState extends State<_AspectRatioPage> {
   }
 }
 
-class _GridPage extends StatelessWidget {
+class _GridPage extends StatefulWidget {
   const _GridPage();
+
+  @override
+  State<_GridPage> createState() => _GridPageState();
+}
+
+class _GridPageState extends State<_GridPage> {
+  CarbonGridMode _mode = CarbonGridMode.wide;
+  bool _fullWidth = false;
+
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
     return DemoScaffold(
       title: 'Grid',
-      description: 'A responsive 16-column layout (8 at md, 4 at sm).',
+      description:
+          'Responsive columns with wide, narrow or condensed content gutters.',
       previewAlignment: Alignment.topLeft,
       preview: CarbonGrid(
+        mode: _mode,
+        fullWidth: _fullWidth,
         rowSpacing: 8,
         children: <Widget>[
           for (int i = 0; i < 4; i++)
@@ -770,7 +782,23 @@ class _GridPage extends StatelessWidget {
             ),
         ],
       ),
-      code: 'CarbonGrid(children: <Widget>[CarbonColumn(lg: 4, child: …)]);',
+      controls: <Widget>[
+        choiceKnob<CarbonGridMode>(
+          label: 'Gutter mode',
+          value: _mode,
+          options: CarbonGridMode.values,
+          labelOf: (CarbonGridMode mode) => mode.name,
+          onChanged: (CarbonGridMode mode) => setState(() => _mode = mode),
+        ),
+        boolKnob(
+          label: 'Full width',
+          value: _fullWidth,
+          onChanged: (bool full) => setState(() => _fullWidth = full),
+        ),
+      ],
+      code:
+          'CarbonGrid(mode: CarbonGridMode.${_mode.name}, '
+          'fullWidth: $_fullWidth, children: <Widget>[CarbonColumn(lg: 4, child: …)]);',
     );
   }
 }

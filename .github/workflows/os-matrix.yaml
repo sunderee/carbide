@@ -119,6 +119,7 @@ jobs:
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
           test/components/time_picker
+          test/components/grid
           test/components/content_switcher
           test/components/menu
           test/components/picker_family test/components/dropdown
@@ -173,6 +174,7 @@ jobs:
           }
           case "$NATIVE_TEST_GROUP" in
             gallery)
+              drive_native --release --target=integration_test/grid_gutters_test.dart
               drive_native --target=integration_test/gallery_smoke_test.dart
               drive_native --release --target=integration_test/tabs_release_contract_test.dart
               drive_native --target=integration_test/list_markers_test.dart

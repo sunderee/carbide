@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Correct grid tracks and per-column gutters. Wide columns receive their
+  documented 16px start/end gutters; narrow removes only the logical start
+  gutter and condensed uses 0.5px per edge. Match current Carbon's 16px narrow
+  interior gaps, preserve offsets and prevent nested negative hangs (#322).
+
 - Add opt-in time format/parser policies with draft/Enter/Done/group-blur
   commits, canonical normalization, standard parse-error chrome and typed
   12/24-hour behavior with coordinated AM/PM. Keep unconfigured free-text
