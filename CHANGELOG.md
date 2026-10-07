@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Support Unicode menu typeahead, including supplementary letters and combining
+  graphemes. Share documented Latin-1 accent folding with Select and Dropdown,
+  preserving single-key cycling and their existing prefix-input policy (#327).
+
 - Resolve menu and list-box elevation colors from the active theme, including
   stronger dark-theme shadows and custom overrides, while retaining Carbon's
   existing offset and blur (#323).

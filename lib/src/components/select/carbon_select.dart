@@ -24,6 +24,7 @@ import '../../theme/carbon_theme_data.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/typeahead.dart';
 import '../../utils/interaction.dart';
 import '../../utils/owned_listenable.dart';
 import '../../utils/scroll_into_view.dart';
@@ -362,14 +363,15 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       }
       return KeyEventResult.ignored;
     }
-    final String? ch = event.character;
-    if (ch != null && ch.trim().isNotEmpty) {
+    final String? character = event.character;
+    if (character != null && character.trim().isNotEmpty) {
+      final String ch = carbonTypeaheadKey(character);
       final List<CarbonSelectItem<T>> items = _flatItems;
       final int start = _highlighted + 1;
       for (int i = 0; i < items.length; i++) {
         final int idx = (start + i) % items.length;
         if (!items[idx].disabled &&
-            items[idx].label.toLowerCase().startsWith(ch.toLowerCase())) {
+            carbonTypeaheadKey(items[idx].label).startsWith(ch)) {
           if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;
