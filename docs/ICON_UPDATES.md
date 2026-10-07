@@ -31,7 +31,7 @@ the gitlink — no submodule checkout needed).
    dart format lib test
    ```
 
-   Carbon 11.117 uses DTCG JSON for colors and themes. The generators read
+   Carbon 11.118 uses DTCG JSON for colors and themes. The generators read
    those authoritative files directly, preserve palette aliases and the
    ported theme subset, and resolve per-theme opacity and token references.
    `test_carbon_generation.py` runs without a submodule checkout in CI.

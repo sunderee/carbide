@@ -1,7 +1,7 @@
 {
   "source": "https://react.carbondesignsystem.com",
-  "capturedAt": "2026-10-02T12:53:36.975Z",
-  "carbonReactVersion": "1.117.0",
+  "capturedAt": "2026-10-07T16:36:53.448Z",
+  "carbonReactVersion": "1.118.0",
   "themes": [
     "white",
     "g10",
@@ -836,5 +836,10 @@
       "theme": "g100",
       "ok": true
     }
-  ]
+  ],
+  "preservedAnimationReferences": [
+    "inline-loading",
+    "loading"
+  ],
+  "preservedAnimationReferenceReason": "Default story anatomy and token values are unchanged; keep the established loading animation phases rather than introducing timing-only changes."
 }
