@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Resolve menu and list-box elevation colors from the active theme, including
+  stronger dark-theme shadows and custom overrides, while retaining Carbon's
+  existing offset and blur (#323).
+
 - Add `CarbonFluidText` with automatic viewport breakpoint updates, optional
   enclosing-width resolution, user text scaling and the bundled Plex fonts.
   Preserve text layout/accessibility options and showcase the widget in the
