@@ -59,6 +59,7 @@ class CarbonOverflowMenu extends StatelessWidget {
     this.menuAlignment = CarbonMenuAlignment.end,
     this.menuSide,
     this.iconDescription = 'Options',
+    this.focusNode,
     this.triggerBuilder,
   });
 
@@ -80,6 +81,12 @@ class CarbonOverflowMenu extends StatelessWidget {
   /// The accessible label for the trigger.
   final String iconDescription;
 
+  /// An optional caller-owned trigger focus node used for focus restoration.
+  ///
+  /// A [triggerBuilder] should attach this same node to its custom button.
+  /// When omitted, keyboard dismissal returns to the focus captured on open.
+  final FocusNode? focusNode;
+
   /// Builds an optional custom trigger from its open state and toggle action.
   ///
   /// Supply a named, focusable button that calls the toggle action. The menu
@@ -95,6 +102,7 @@ class CarbonOverflowMenu extends StatelessWidget {
       menuSize: size,
       menuAlignment: menuAlignment,
       menuSide: menuSide,
+      focusNode: focusNode,
       triggerBuilder:
           triggerBuilder ??
           (BuildContext context, bool open, VoidCallback toggle) =>
@@ -103,6 +111,7 @@ class CarbonOverflowMenu extends StatelessWidget {
                 iconDescription: iconDescription,
                 kind: CarbonButtonKind.ghost,
                 size: buttonSize,
+                focusNode: focusNode,
                 isSelected: open,
                 onPressed: toggle,
               ),
@@ -255,9 +264,11 @@ class _AnchoredMenu extends StatefulWidget {
     required this.menuAlignment,
     required this.menuSide,
     required this.triggerBuilder,
+    this.focusNode,
   });
 
   final List<Widget> items;
+  final FocusNode? focusNode;
   final CarbonMenuSize menuSize;
   final CarbonMenuAlignment menuAlignment;
 
@@ -274,18 +285,23 @@ class _AnchoredMenuState extends State<_AnchoredMenu> {
   final OverlayPortalController _overlay = OverlayPortalController();
   final LayerLink _link = LayerLink();
   final Object _group = UniqueKey();
+  FocusNode? _launcher;
 
   void _toggle() {
     _overlay.isShowing ? _close() : _open();
   }
 
   void _open() {
+    _launcher = widget.focusNode ?? FocusManager.instance.primaryFocus;
     _overlay.show();
     setState(() {});
   }
 
-  void _close() {
+  void _close({bool restoreFocus = true}) {
     _overlay.hide();
+    if (restoreFocus && _launcher?.context != null) {
+      _launcher!.requestFocus();
+    }
     setState(() {});
   }
 
@@ -314,7 +330,7 @@ class _AnchoredMenuState extends State<_AnchoredMenu> {
           : CarbonOverlayAlignment.start,
       child: TapRegion(
         groupId: _group,
-        onTapOutside: (_) => _close(),
+        onTapOutside: (_) => _close(restoreFocus: false),
         child: CarbonMenu(
           size: widget.menuSize,
           onClose: _close,
