@@ -99,7 +99,7 @@ class _FormPageState extends State<_FormPage> {
         const CarbonFormItem(
           children: <Widget>[
             CarbonFormLabel('Account ID'),
-            CarbonField(readOnly: true, child: Text('customer-1042')),
+            CarbonField(readOnly: true, child: CarbonText('customer-1042')),
             CarbonHelperText('A display field supplied by the application.'),
           ],
         ),
@@ -110,7 +110,7 @@ class _FormPageState extends State<_FormPage> {
               ? null
               : () => setState(() => _saved++),
         ),
-        Text('Saved: $_saved'),
+        CarbonText('Saved: $_saved'),
       ],
     );
     return DemoScaffold(
@@ -175,7 +175,7 @@ class _ButtonSetPageState extends State<_ButtonSetPage> {
               ),
             ],
           ),
-          Text('Saved: $_saved'),
+          CarbonText('Saved: $_saved'),
         ],
       ),
     ),
@@ -238,7 +238,7 @@ class _MenuPageState extends State<_MenuPage> {
               const CarbonMenuItem(label: 'Delete report', disabled: true),
             ],
           ),
-          Text('Action: $_action'),
+          CarbonText('Action: $_action'),
         ],
       ),
     ),
@@ -286,7 +286,10 @@ class _PopoverPageState extends State<_PopoverPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const Text('Apply these report settings?'),
+                CarbonText(
+                  'Apply these report settings?',
+                  color: _contrast ? CarbonTheme.of(context).textInverse : null,
+                ),
                 const SizedBox(height: 8),
                 CarbonButton(
                   label: 'Apply settings',
@@ -307,7 +310,7 @@ class _PopoverPageState extends State<_PopoverPage> {
             },
           ),
         ),
-        Text('Applied: $_applied'),
+        CarbonText('Applied: $_applied'),
       ],
     ),
     controls: <Widget>[
@@ -358,8 +361,8 @@ class _TableToolbarPageState extends State<_TableToolbarPage> {
               ),
             ],
           ),
-          Text('Search: $_query'),
-          Text('Added: $_added'),
+          CarbonText('Search: $_query'),
+          CarbonText('Added: $_added'),
         ],
       ),
     ),
@@ -413,8 +416,8 @@ class _UIShellPageState extends State<_UIShellPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(_page, style: CarbonTypeStyles.heading03),
-                const Text('Choose a section using navigation.'),
+                CarbonText(_page, style: CarbonTypeStyles.heading03),
+                const CarbonText('Choose a section using navigation.'),
                 CarbonButton(label: 'Refresh section', onPressed: () {}),
               ],
             ),
@@ -544,7 +547,9 @@ class _LayersPageState extends State<_LayersPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text('$label: level ${CarbonLayer.levelOf(context)}'),
+                      CarbonText(
+                        '$label: level ${CarbonLayer.levelOf(context)}',
+                      ),
                       CarbonTextInput(labelText: '$label field'),
                       ?child,
                     ],
@@ -555,7 +560,7 @@ class _LayersPageState extends State<_LayersPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
+              CarbonText(
                 '${constraints.maxWidth.round()}px → ${breakpoint.name}, ${breakpoint.columns} columns',
               ),
               CarbonLayer(

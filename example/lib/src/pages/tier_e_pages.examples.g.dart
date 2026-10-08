@@ -66,7 +66,7 @@ class _FormExampleState extends State<FormExample> {
         const CarbonFormItem(
           children: <Widget>[
             CarbonFormLabel('Account ID'),
-            CarbonField(readOnly: true, child: Text('customer-1042')),
+            CarbonField(readOnly: true, child: CarbonText('customer-1042')),
             CarbonHelperText('A display field supplied by the application.'),
           ],
         ),
@@ -77,7 +77,7 @@ class _FormExampleState extends State<FormExample> {
               ? null
               : () => setState(() => _saved++),
         ),
-        Text('Saved: $_saved'),
+        CarbonText('Saved: $_saved'),
       ],
     );
     return SizedBox(
@@ -130,7 +130,7 @@ class _ButtonSetExampleState extends State<ButtonSetExample> {
             ),
           ],
         ),
-        Text('Saved: $_saved'),
+        CarbonText('Saved: $_saved'),
       ],
     ),
   );
@@ -195,7 +195,7 @@ class _MenuExampleState extends State<MenuExample> {
             const CarbonMenuItem(label: 'Delete report', disabled: true),
           ],
         ),
-        Text('Action: $_action'),
+        CarbonText('Action: $_action'),
       ],
     ),
   );
@@ -253,7 +253,10 @@ class _PopoverExampleState extends State<PopoverExample> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Text('Apply these report settings?'),
+              CarbonText(
+                'Apply these report settings?',
+                color: _contrast ? CarbonTheme.of(context).textInverse : null,
+              ),
               const SizedBox(height: 8),
               CarbonButton(
                 label: 'Apply settings',
@@ -274,7 +277,7 @@ class _PopoverExampleState extends State<PopoverExample> {
           },
         ),
       ),
-      Text('Applied: $_applied'),
+      CarbonText('Applied: $_applied'),
     ],
   );
 }
@@ -326,8 +329,8 @@ class _TableToolbarExampleState extends State<TableToolbarExample> {
             ),
           ],
         ),
-        Text('Search: $_query'),
-        Text('Added: $_added'),
+        CarbonText('Search: $_query'),
+        CarbonText('Added: $_added'),
       ],
     ),
   );
@@ -390,8 +393,8 @@ class _UIShellExampleState extends State<UIShellExample> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(_page, style: CarbonTypeStyles.heading03),
-              const Text('Choose a section using navigation.'),
+              CarbonText(_page, style: CarbonTypeStyles.heading03),
+              const CarbonText('Choose a section using navigation.'),
               CarbonButton(label: 'Refresh section', onPressed: () {}),
             ],
           ),
@@ -524,7 +527,7 @@ class _LayersExampleState extends State<LayersExample> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('$label: level ${CarbonLayer.levelOf(context)}'),
+                    CarbonText('$label: level ${CarbonLayer.levelOf(context)}'),
                     CarbonTextInput(labelText: '$label field'),
                     ?child,
                   ],
@@ -535,7 +538,7 @@ class _LayersExampleState extends State<LayersExample> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
+            CarbonText(
               '${constraints.maxWidth.round()}px → ${breakpoint.name}, ${breakpoint.columns} columns',
             ),
             CarbonLayer(

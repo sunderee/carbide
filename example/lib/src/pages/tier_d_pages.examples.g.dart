@@ -121,7 +121,7 @@ class _DataTableExampleState extends State<DataTableExample> {
               CarbonTableRow(
                 id: row[0],
                 label: row[0],
-                expandedContent: Text('Details for ${row[0]}'),
+                expandedContent: CarbonText('Details for ${row[0]}'),
                 cells: <Widget>[cell(row[0]), cell(row[1]), cell(row[2])],
               ),
           ],
@@ -129,9 +129,9 @@ class _DataTableExampleState extends State<DataTableExample> {
         if (_empty)
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('No load balancers. Add one to get started.'),
+            child: CarbonText('No load balancers. Add one to get started.'),
           ),
-        Text('Exports: $_exports'),
+        CarbonText('Exports: $_exports'),
       ],
     );
   }

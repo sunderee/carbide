@@ -37,6 +37,13 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/code_snippet_focus_test.dart
           -d web-server
+      - name: Preserve native popover trigger focus
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/popover_focus_test.dart
+          -d web-server
       - name: Verify consumer font registration and actual glyph metrics
         working-directory: example
         run: >

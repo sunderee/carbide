@@ -1662,12 +1662,12 @@
       ]
     },
     "CarbonText": {
-      "mode": "composition",
+      "mode": "demonstrated",
       "routes": [
-        "typography",
-        "fluid-type"
-      ],
-      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+        "form",
+        "button-set",
+        "layers-and-breakpoints"
+      ]
     },
     "CarbonTextArea": {
       "mode": "demonstrated",
