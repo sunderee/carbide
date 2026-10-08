@@ -259,12 +259,50 @@ class _RenderFollower extends RenderFollowerLayer {
     : super(showWhenUnlinked: false);
 
   _Follower settings;
+  Offset _layoutScale = const Offset(1, 1);
+  bool _scaleUpdatePending = false;
+  Offset? _pendingScale;
+
+  @override
+  void performLayout() {
+    final BoxConstraints scaled = constraints.copyWith(
+      maxWidth: _layoutScale.dx == 0
+          ? constraints.maxWidth
+          : constraints.maxWidth / _layoutScale.dx,
+      maxHeight: _layoutScale.dy == 0
+          ? constraints.maxHeight
+          : constraints.maxHeight / _layoutScale.dy,
+    );
+    child?.layout(scaled, parentUsesSize: true);
+    size = constraints.constrain(child?.size ?? Size.zero);
+  }
+
+  bool _matchesScale(Offset scale) =>
+      (scale.dx - _layoutScale.dx).abs() < 0.000001 &&
+      (scale.dy - _layoutScale.dy).abs() < 0.000001;
+
+  void _checkScale(Offset scale) {
+    if (!_scaleUpdatePending && _matchesScale(scale)) return;
+    _pendingScale = scale;
+    if (_scaleUpdatePending) return;
+    _scaleUpdatePending = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scaleUpdatePending = false;
+      final Offset next = _pendingScale!;
+      _pendingScale = null;
+      if (!attached || _matchesScale(next)) return;
+      _layoutScale = next;
+      markNeedsLayout();
+    });
+    WidgetsBinding.instance.scheduleFrame();
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     layer ??= _PlacementLayer(link: link);
     (layer! as _PlacementLayer)
       ..settings = settings
+      ..checkScale = _checkScale
       ..surface = size;
     super.paint(context, offset);
   }
@@ -275,6 +313,7 @@ class _PlacementLayer extends FollowerLayer {
 
   late _Follower settings;
   Size surface = Size.zero;
+  ValueChanged<Offset>? checkScale;
 
   @override
   void addToScene(ui.SceneBuilder builder) {
@@ -292,6 +331,15 @@ class _PlacementLayer extends FollowerLayer {
       for (int i = chain.length - 2; i >= 0; i--) {
         chain[i].applyTransform(i == 0 ? null : chain[i - 1], transform);
       }
+      final Offset origin = MatrixUtils.transformPoint(transform, Offset.zero);
+      checkScale?.call(
+        Offset(
+          (MatrixUtils.transformPoint(transform, const Offset(1, 0)) - origin)
+              .distance,
+          (MatrixUtils.transformPoint(transform, const Offset(0, 1)) - origin)
+              .distance,
+        ),
+      );
       final Rect target = MatrixUtils.transformRect(
         transform,
         Offset.zero & targetSize,

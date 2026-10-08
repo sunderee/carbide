@@ -87,7 +87,7 @@ void main() {
         key: ValueKey<String>('popup'),
         width: 250,
         height: 130,
-        child: Text('Popover body'),
+        child: Text('Popover body', style: CarbonTypeStyles.bodyCompact01),
       ),
       child: SizedBox(width: 180, height: 32),
     ),
@@ -562,4 +562,50 @@ void main() {
     expect(popup.height, 50);
     expect(popup.left, moreOrLessEquals(trigger.left));
   });
+  testWidgets(
+    'a transformed wide menu remains bounded by the physical viewport',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 360);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+      final ValueNotifier<double> scale = ValueNotifier<double>(1.25);
+      addTearDown(scale.dispose);
+      await tester.pumpWidget(
+        _host(
+          ValueListenableBuilder<double>(
+            valueListenable: scale,
+            builder: (_, value, child) => Transform.scale(
+              scale: value,
+              alignment: Alignment.topLeft,
+              child: child,
+            ),
+            child: CarbonOverflowMenu(
+              items: <Widget>[
+                CarbonMenuItem(label: 'Edit', onPressed: () {}),
+                CarbonMenuItem(label: 'Duplicate', onPressed: () {}),
+              ],
+            ),
+          ),
+          TextDirection.ltr,
+          Alignment.topLeft,
+        ),
+      );
+      await _open(tester, 'overflow menu');
+      expect(
+        tester.getRect(find.byType(CarbonMenu)).right,
+        lessThanOrEqualTo(320.01),
+      );
+      // Transform changes only paint, so an open surface must refresh its layout
+      // constraints when the composited scale changes, without an idle loop.
+      scale.value = 1.5;
+      await tester.pumpAndSettle();
+      final Rect bounds = tester.getRect(find.byType(CarbonMenu));
+      expect(bounds.right, lessThanOrEqualTo(320.01));
+      expect(bounds.bottom, lessThanOrEqualTo(360.01));
+      expect(tester.binding.hasScheduledFrame, isFalse);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
