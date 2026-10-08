@@ -173,6 +173,9 @@ code snippets and application-supplied context.
 
 ## Documentation
 
+- [0.5.0 adoption and migration](docs/releases/0.5.0-adoption.md) — prepared
+  changes from the published 0.4.2 API, ownership, defaults and opt-in features.
+
 - [Getting started](docs/getting-started.md)
 - [Theming & layers](docs/theming-and-layers.md)
 - [Architecture](docs/ARCHITECTURE.md)
