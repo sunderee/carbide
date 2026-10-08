@@ -65,6 +65,9 @@ class _DataTablePageState extends State<_DataTablePage> {
   bool _expandable = false;
   bool _multi = true;
   bool _selectionEnabled = true;
+  bool _sticky = false;
+  bool _empty = false;
+  int _exports = 0;
 
   static const List<List<String>> _data = <List<String>>[
     <String>['Load balancer 1', 'HTTP', 'Active'],
@@ -79,7 +82,14 @@ class _DataTablePageState extends State<_DataTablePage> {
       s,
       style: CarbonTypeStyles.bodyCompact01.copyWith(color: t.textPrimary),
     );
-    final List<List<String>> displayed = <List<String>>[..._data];
+    final List<List<String>> displayed = _empty
+        ? <List<String>>[]
+        : <List<String>>[
+            ..._data,
+            if (_sticky)
+              for (int i = 4; i <= 20; i++)
+                <String>['Load balancer $i', 'HTTPS', 'Active'],
+          ];
     if (_sortColumn != null && _sortDir != CarbonSortDirection.none) {
       displayed.sort((a, b) {
         final int comparison = a[_sortColumn!].compareTo(b[_sortColumn!]);
@@ -93,51 +103,82 @@ class _DataTablePageState extends State<_DataTablePage> {
       description:
           'Selection and expansion follow records when rows are sorted.',
       previewAlignment: Alignment.topLeft,
-      preview: CarbonDataTable(
-        title: 'Load balancers',
-        description: 'A list of your edge load balancers.',
-        zebra: true,
-        selection: _multi
-            ? CarbonTableSelection.multi
-            : CarbonTableSelection.single,
-        selectedRowIds: _selected,
-        expandable: _expandable,
-        expandedRowIds: _expanded,
-        onExpansionChanged: (Set<Object> ids) =>
-            setState(() => _expanded = ids),
-        onSelectedRowIdsChanged: _selectionEnabled
-            ? (Set<Object> s) => setState(() => _selected = s)
-            : null,
-        sortColumnIndex: _sortColumn,
-        sortDirection: _sortDir,
-        onSort: (int col) => setState(() {
-          if (_sortColumn != col) {
-            _sortColumn = col;
-            _sortDir = CarbonSortDirection.ascending;
-          } else {
-            _sortDir = switch (_sortDir) {
-              CarbonSortDirection.none => CarbonSortDirection.ascending,
-              CarbonSortDirection.ascending => CarbonSortDirection.descending,
-              CarbonSortDirection.descending => CarbonSortDirection.none,
-            };
-          }
-        }),
-        columns: const <CarbonTableColumn>[
-          CarbonTableColumn(title: 'Name', sortable: true),
-          CarbonTableColumn(title: 'Protocol', sortable: true),
-          CarbonTableColumn(title: 'Status'),
-        ],
-        rows: <CarbonTableRow>[
-          for (final List<String> row in displayed)
-            CarbonTableRow(
-              id: row[0],
-              label: row[0],
-              expandedContent: Text('Details for ${row[0]}'),
-              cells: <Widget>[cell(row[0]), cell(row[1]), cell(row[2])],
+      preview: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          CarbonDataTable(
+            title: 'Load balancers',
+            description: 'A list of your edge load balancers.',
+            zebra: true,
+            stickyHeader: _sticky,
+            stickyHeaderHeight: 200,
+            batchActions: <CarbonTableBatchAction>[
+              CarbonTableBatchAction(
+                label: 'Export selected',
+                onPressed: () => setState(() => _exports++),
+              ),
+            ],
+            selection: _multi
+                ? CarbonTableSelection.multi
+                : CarbonTableSelection.single,
+            selectedRowIds: _selected,
+            expandable: _expandable,
+            expandedRowIds: _expanded,
+            onExpansionChanged: (Set<Object> ids) =>
+                setState(() => _expanded = ids),
+            onSelectedRowIdsChanged: _selectionEnabled
+                ? (Set<Object> s) => setState(() => _selected = s)
+                : null,
+            sortColumnIndex: _sortColumn,
+            sortDirection: _sortDir,
+            onSort: (int col) => setState(() {
+              if (_sortColumn != col) {
+                _sortColumn = col;
+                _sortDir = CarbonSortDirection.ascending;
+              } else {
+                _sortDir = switch (_sortDir) {
+                  CarbonSortDirection.none => CarbonSortDirection.ascending,
+                  CarbonSortDirection.ascending =>
+                    CarbonSortDirection.descending,
+                  CarbonSortDirection.descending => CarbonSortDirection.none,
+                };
+              }
+            }),
+            columns: const <CarbonTableColumn>[
+              CarbonTableColumn(title: 'Name', sortable: true),
+              CarbonTableColumn(title: 'Protocol', sortable: true),
+              CarbonTableColumn(title: 'Status'),
+            ],
+            rows: <CarbonTableRow>[
+              for (final List<String> row in displayed)
+                CarbonTableRow(
+                  id: row[0],
+                  label: row[0],
+                  expandedContent: Text('Details for ${row[0]}'),
+                  cells: <Widget>[cell(row[0]), cell(row[1]), cell(row[2])],
+                ),
+            ],
+          ),
+          if (_empty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('No load balancers. Add one to get started.'),
             ),
+          Text('Exports: $_exports'),
         ],
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Sticky header',
+          value: _sticky,
+          onChanged: (bool v) => setState(() => _sticky = v),
+        ),
+        boolKnob(
+          label: 'Empty',
+          value: _empty,
+          onChanged: (bool v) => setState(() => _empty = v),
+        ),
         boolKnob(
           label: 'Multi-select',
           value: _multi,

@@ -51,6 +51,16 @@ class GallerySourceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unsupported live example field'):
             template_for(WIDGET, state)
 
+    def test_owned_focus_resource_keeps_initializer_and_disposal(self):
+        state = STATE.replace("bool _enabled = true;", "final FocusNode _focus = FocusNode();\n  bool _enabled = true;")
+        state = state.replace("  @override", "  @override\n  void dispose() { _focus.dispose(); super.dispose(); }\n  @override", 1)
+        result = template_for(WIDGET, state)
+        self.assertIn('final FocusNode _focus = FocusNode();', result)
+        self.assertIn('_focus.dispose()', result)
+        self.assertNotIn('@@_focus@@', result)
+        with self.assertRaisesRegex(ValueError, 'needs initializer'):
+            template_for(WIDGET, state.replace('= FocusNode()', ''))
+
     def test_missing_or_ambiguous_preview_fails(self):
         for source in ["class Demo {}", STATE + STATE, STATE.replace('preview:', 'child:')]:
             with self.subTest(source=source), self.assertRaises(ValueError):

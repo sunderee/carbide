@@ -479,6 +479,10 @@ class _SliderPage extends StatefulWidget {
 
 class _SliderPageState extends State<_SliderPage> {
   num _value = 60;
+  num _upper = 80;
+  bool _range = false;
+  bool _disabled = false;
+  bool _readOnly = false;
 
   @override
   Widget build(BuildContext context) {
@@ -491,13 +495,34 @@ class _SliderPageState extends State<_SliderPage> {
       preview: SizedBox(
         width: 360,
         child: CarbonSlider(
-          labelText: 'Volume',
+          labelText: _range ? 'Volume range' : 'Volume',
+          disabled: _disabled,
+          readOnly: _readOnly,
+          upperValue: _range ? _upper : null,
+          onUpperChanged: _range ? (num v) => setState(() => _upper = v) : null,
           value: _value,
           min: 0,
           max: 100,
           onChanged: (num v) => setState(() => _value = v),
         ),
       ),
+      controls: <Widget>[
+        boolKnob(
+          label: 'Two handles',
+          value: _range,
+          onChanged: (bool v) => setState(() => _range = v),
+        ),
+        boolKnob(
+          label: 'Disabled',
+          value: _disabled,
+          onChanged: (bool v) => setState(() => _disabled = v),
+        ),
+        boolKnob(
+          label: 'Read only',
+          value: _readOnly,
+          onChanged: (bool v) => setState(() => _readOnly = v),
+        ),
+      ],
       code: exampleSource,
     );
   }

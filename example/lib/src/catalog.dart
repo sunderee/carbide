@@ -9,6 +9,7 @@ import 'pages/tier_a_pages.dart';
 import 'pages/tier_b_pages.dart';
 import 'pages/tier_c_pages.dart';
 import 'pages/tier_d_pages.dart';
+import 'pages/tier_e_pages.dart';
 
 /// The full set of side-nav categories shown in the gallery.
 final List<GalleryCategory> kCatalog = <GalleryCategory>[
@@ -17,4 +18,5 @@ final List<GalleryCategory> kCatalog = <GalleryCategory>[
   tierBCategory,
   tierCCategory,
   tierDCategory,
+  tierECategory,
 ];

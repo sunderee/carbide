@@ -59,6 +59,13 @@ What the number means:
 
 ### CI
 
+The [gallery coverage report](docs/testing/gallery-coverage.md) classifies every
+barrel export as a live page reference, a composition building block, or a
+nonvisual API. Update `tool/gallery_coverage.json` when changing the public
+surface or routes, then run `python3 tool/gallery_coverage.py`. CI checks the
+policy and generated report with `--check`; a reasoned exemption describes a
+discovery decision and does not claim visual parity for every variant.
+
 PR CI, tag publication and publication rehearsal call the same
 [`verify.yaml`](.github/workflows/verify.yaml) workflow on the **latest Flutter
 stable**. Publication depends on its complete result, including gallery checks:

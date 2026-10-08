@@ -140,6 +140,41 @@ BoxDecoration _surfaceBox(WidgetTester tester) =>
         as BoxDecoration;
 
 void main() {
+  testWidgets('surface instructions do not merge into the action name', (
+    WidgetTester tester,
+  ) async {
+    final SemanticsHandle semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(
+        _host(
+          CarbonPopover(
+            open: true,
+            content: SizedBox(
+              width: 240,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text('Apply these report settings?'),
+                  CarbonButton(label: 'Apply settings', onPressed: () {}),
+                ],
+              ),
+            ),
+            child: _trigger(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Apply settings'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Apply these report settings?'),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    } finally {
+      semantics.dispose();
+    }
+  });
+
   final CarbonThemeData theme = CarbonThemeData.white;
 
   group('surface chrome (_popover.scss)', () {

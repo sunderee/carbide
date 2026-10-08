@@ -372,7 +372,11 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     // A feedback-only surface can exclude every text descendant. Keep a
     // boundary at the painted surface so its empty native semantics region
     // cannot expand to the entire Overlay and intercept unrelated controls.
-    surface = Semantics(container: true, child: surface);
+    surface = Semantics(
+      container: true,
+      explicitChildNodes: true,
+      child: surface,
+    );
 
     return CarbonAnchoredOverlay(
       link: _link,

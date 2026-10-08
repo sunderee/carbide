@@ -107,6 +107,12 @@ def template_for(widget, state=None):
         for match in re.finditer(pattern, masked, re.M):
             type_name, name = match[1], match[2]
             finish = expression_end(masked, match.end(), ";")
+            # Owned lifecycle resources are created and disposed by the copied
+            # State too. Focus, keys and scroll positions are not value knobs.
+            if type_name in {"FocusNode", "GlobalKey", "ScrollController"}:
+                if not owner[match.end(2):finish].strip().startswith("="):
+                    raise ValueError(f"lifecycle resource needs initializer: {name}")
+                continue
             snapshots.append((name, snapshot_expression(type_name, name)))
             # Replace the complete initializer, including declarations without one.
             replacements.append((match.end(2), finish, f" = @@{name}@@"))
@@ -120,7 +126,9 @@ def template_for(widget, state=None):
         body = re.sub(rf"\b{before}\b", after, body)
     template = (
         "import 'package:carbide/carbide.dart';\n"
-        "import 'package:flutter/widgets.dart';\n\n" + body + "\n"
+        "import 'package:flutter/widgets.dart';\n"
+        + ("import 'package:flutter/services.dart';\n" if re.search(r"\b(?:KeyEvent|KeyDownEvent|LogicalKeyboardKey|PhysicalKeyboardKey)\b", body) else "")
+        + "\n" + body + "\n"
     )
     if "'''" in template:
         raise ValueError("triple-quoted preview source needs explicit template handling")

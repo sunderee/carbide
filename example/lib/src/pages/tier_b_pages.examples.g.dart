@@ -382,7 +382,13 @@ class _ToggleExampleState extends State<ToggleExample> {
 extension _SliderPageStateSource on _SliderPageState {
   String get exampleSource {
     final ExampleConfiguration configuration = ExampleConfiguration(
-      <String, String>{'_value': sourceValue(_value)},
+      <String, String>{
+        '_value': sourceValue(_value),
+        '_upper': sourceValue(_upper),
+        '_range': sourceValue(_range),
+        '_disabled': sourceValue(_disabled),
+        '_readOnly': sourceValue(_readOnly),
+      },
     );
     return configuration.fill(r'''import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
@@ -395,13 +401,21 @@ class SliderExample extends StatefulWidget {
 
 class _SliderExampleState extends State<SliderExample> {
   num _value = @@_value@@;
+  num _upper = @@_upper@@;
+  bool _range = @@_range@@;
+  bool _disabled = @@_disabled@@;
+  bool _readOnly = @@_readOnly@@;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 360,
       child: CarbonSlider(
-        labelText: 'Volume',
+        labelText: _range ? 'Volume range' : 'Volume',
+        disabled: _disabled,
+        readOnly: _readOnly,
+        upperValue: _range ? _upper : null,
+        onUpperChanged: _range ? (num v) => setState(() => _upper = v) : null,
         value: _value,
         min: 0,
         max: 100,
