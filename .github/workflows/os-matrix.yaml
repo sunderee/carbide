@@ -1,7 +1,8 @@
 name: OS matrix
 
-# Cross-platform behavioral runs (#233). PR CI stays Linux-only and fast;
-# this workflow proves the suite on the other engines on a weekly cadence
+# Cross-platform canary runs (#233). PR verification includes an explicit Chrome
+# component subset and every gallery route; this broader workflow proves the
+# suite on the other engines and additional native contracts on a weekly cadence
 # (and on demand via workflow_dispatch):
 #
 # - macOS + Windows: the full package suite. Text goldens are
