@@ -559,22 +559,101 @@ class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
   }
 }
 
-class _BreadcrumbPage extends StatelessWidget {
+class _BreadcrumbPage extends StatefulWidget {
   const _BreadcrumbPage();
   @override
+  State<_BreadcrumbPage> createState() => _BreadcrumbPageState();
+}
+
+class _BreadcrumbPageState extends State<_BreadcrumbPage> {
+  bool _many = false;
+  bool _narrow = false;
+  bool _rtl = false;
+  bool _trailing = false;
+  String _opened = 'none';
+  CarbonLinkSize _size = CarbonLinkSize.md;
+
+  @override
   Widget build(BuildContext context) {
+    final CarbonThemeData theme = CarbonTheme.of(context);
+    final List<String> labels = _many
+        ? <String>[
+            'Home',
+            'Organization',
+            'Projects',
+            'Research',
+            'Reports',
+            'Quarter',
+            'Breadcrumb',
+          ]
+        : <String>['Home', 'Components', 'Breadcrumb'];
+    final List<CarbonBreadcrumbItem> items = <CarbonBreadcrumbItem>[
+      for (int i = 0; i < labels.length; i++)
+        CarbonBreadcrumbItem(
+          label: labels[i],
+          isCurrentPage: i == labels.length - 1,
+          onPressed: () => setState(() => _opened = labels[i]),
+        ),
+    ];
     return DemoScaffold(
       title: 'Breadcrumb',
-      description: 'A trail of ancestor pages.',
+      description: 'A measured trail that keeps the first and current page visible and discloses hidden ancestors through a keyboard-accessible menu.',
       previewAlignment: Alignment.topLeft,
-      preview: CarbonBreadcrumb(
-        items: <CarbonBreadcrumbItem>[
-          CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
-          CarbonBreadcrumbItem(label: 'Components', onPressed: () {}),
-          const CarbonBreadcrumbItem(label: 'Breadcrumb', isCurrentPage: true),
-        ],
+      preview: Directionality(
+        textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+        child: SizedBox(
+          width: _narrow ? 320 : 760,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonBreadcrumb(
+                items: items,
+                size: _size,
+                noTrailingSlash: !_trailing,
+              ),
+              const SizedBox(height: CarbonSpacing.spacing05),
+              Text(
+                'Opened: $_opened',
+                style: CarbonTypeStyles.body01.copyWith(
+                  color: theme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      code: 'CarbonBreadcrumb(items: <CarbonBreadcrumbItem>[…]);',
+      controls: <Widget>[
+        boolKnob(
+          label: 'Many crumbs',
+          value: _many,
+          onChanged: (bool value) => setState(() => _many = value),
+        ),
+        boolKnob(
+          label: 'Narrow trail',
+          value: _narrow,
+          onChanged: (bool value) => setState(() => _narrow = value),
+        ),
+        boolKnob(
+          label: 'RTL trail',
+          value: _rtl,
+          onChanged: (bool value) => setState(() => _rtl = value),
+        ),
+        boolKnob(
+          label: 'Trailing slash',
+          value: _trailing,
+          onChanged: (bool value) => setState(() => _trailing = value),
+        ),
+        choiceKnob<CarbonLinkSize>(
+          label: 'Size',
+          value: _size,
+          options: CarbonLinkSize.values,
+          labelOf: (CarbonLinkSize value) => value.name,
+          onChanged: (CarbonLinkSize value) => setState(() => _size = value),
+        ),
+      ],
+      code:
+          'CarbonBreadcrumb(items: <CarbonBreadcrumbItem>[…], size: CarbonLinkSize.${_size.name}, noTrailingSlash: ${!_trailing});',
     );
   }
 }
