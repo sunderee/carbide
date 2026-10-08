@@ -111,6 +111,36 @@ The four values represent 0, 2, 5 and 10 percent of viewport width. They do not
 measure a parent column. Negative, infinite or NaN widths are rejected; finite
 large widths resolve without overflowing an intermediate multiplication.
 
+### Responsive text
+
+`CarbonFluidText` resolves a `CarbonFluidTextStyle` automatically as its width
+changes. The default is the `MediaQuery` viewport, matching Carbon's viewport
+breakpoints even when the text sits in a narrow column. Choose
+`CarbonFluidTextWidthSource.constraints` for a column-sized cascade; unbounded
+horizontal constraints fall back to the viewport.
+
+```dart
+const CarbonFluidText(
+  'A responsive title',
+  style: CarbonFluidTypeStyles.expressiveHeading05,
+);
+const CarbonFluidText(
+  'An editorial quotation',
+  style: CarbonFluidTypeStyles.quotation01,
+  widthSource: CarbonFluidTextWidthSource.constraints,
+  semanticsLabel: 'An editorial quotation',
+  maxLines: 3,
+  overflow: TextOverflow.ellipsis,
+);
+```
+
+The generated cascade selects discrete breakpoint steps. User text scaling
+applies after that selection, including at 1.3× and 2×. Alignment, wrapping,
+truncation, direction and alternative semantics labels follow `CarbonText`.
+Built-in families select the package-qualified bundled Plex fonts; custom
+families and fallback lists retain their original names. A bounded constraints
+consumer works without a `MediaQuery`; viewport resolution requires one.
+
 ## Increased-contrast accessibility
 
 `CarbonTheme.of(context)` and `maybeOf` read the nearest

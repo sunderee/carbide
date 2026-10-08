@@ -93,6 +93,7 @@ export 'src/components/tag/carbon_interactive_tags.dart';
 export 'src/components/tag/carbon_tag.dart';
 export 'src/components/tabs/carbon_tabs.dart';
 export 'src/components/text/carbon_text.dart';
+export 'src/components/text/carbon_fluid_text.dart';
 export 'src/components/toggle/carbon_toggle.dart';
 export 'src/components/tooltip/carbon_tooltip.dart';
 export 'src/components/toggletip/carbon_toggletip.dart';

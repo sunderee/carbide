@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add `CarbonFluidText` with automatic viewport breakpoint updates, optional
+  enclosing-width resolution, user text scaling and the bundled Plex fonts.
+  Preserve text layout/accessibility options and showcase the widget in the
+  fluid typography gallery, including serif quotations (#332).
+
 - Generate status and low-contrast content-switcher tokens, honor custom status
   colors in indicators, and publish the token coverage contract. Add viewport
   spacing tokens and fixed expressive heading styles; preserve existing custom

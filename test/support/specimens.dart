@@ -20,6 +20,13 @@ import 'package:flutter/widgets.dart';
 
 /// The registry: family name → specimen builder.
 final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
+  'fluid text': (_) => const SizedBox(
+    width: 320,
+    child: CarbonFluidText(
+      'A responsive quotation in IBM Plex Serif.',
+      style: CarbonFluidTypeStyles.quotation01,
+    ),
+  ),
   'button': (_) =>
       CarbonButton(label: 'Save', icon: CarbonIcons.add, onPressed: () {}),
   'chat button': (_) => CarbonChatButton(
