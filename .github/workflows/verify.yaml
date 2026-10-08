@@ -193,6 +193,12 @@ jobs:
         working-directory: example
         run: flutter test
 
+      - name: Check source-derived, compilable gallery examples
+        run: |
+          python3 tool/test_gallery_examples.py
+          python3 tool/generate_gallery_examples.py --check
+          python3 tool/check_gallery_examples.py
+
       # Visual review surface (fidelity epic, W2): render every component's
       # preview per theme and assemble per-theme contact-sheet montages. This
       # is an artifact for human eyes, not a pixel gate — it surfaces the kind

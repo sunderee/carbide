@@ -291,6 +291,52 @@ void main() {
   });
 
   group('semantics', () {
+    testWidgets(
+      'copy owns semantics focus while borrowed nodes remain reusable',
+      (WidgetTester tester) async {
+        final SemanticsHandle handle = tester.ensureSemantics();
+        final FocusNode first = FocusNode(), second = FocusNode();
+        final ValueNotifier<FocusNode> active = ValueNotifier<FocusNode>(first);
+        try {
+          await tester.pumpWidget(
+            _host(
+              ValueListenableBuilder<FocusNode>(
+                valueListenable: active,
+                builder: (_, FocusNode focus, _) => CarbonCopyButton(
+                  iconDescription: 'Copy borrowed value',
+                  focusNode: focus,
+                ),
+              ),
+            ),
+          );
+          SemanticsData data() => tester
+              .getSemantics(find.bySemanticsLabel('Copy borrowed value'))
+              .getSemanticsData();
+          expect(data().flagsCollection.isFocused.toBoolOrNull(), isFalse);
+          expect(data().hasAction(SemanticsAction.focus), isTrue);
+          first.requestFocus();
+          await tester.pumpAndSettle();
+          expect(first.hasPrimaryFocus, isTrue);
+          active.value = second;
+          await tester.pumpAndSettle();
+          second.requestFocus();
+          await tester.pumpAndSettle();
+          expect(second.hasPrimaryFocus, isTrue);
+          expect(first.hasPrimaryFocus, isFalse);
+          await tester.pumpWidget(const SizedBox.shrink());
+          // Disposing the copy region must not dispose either caller-owned node.
+          first.addListener(() {});
+          second.addListener(() {});
+        } finally {
+          await tester.pumpWidget(const SizedBox.shrink());
+          active.dispose();
+          first.dispose();
+          second.dispose();
+          handle.dispose();
+        }
+      },
+    );
+
     testWidgets('is a labelled button with a tap action', (
       WidgetTester tester,
     ) async {
@@ -299,7 +345,7 @@ void main() {
 
       expect(find.bySemanticsLabel('Copy to clipboard'), findsOneWidget);
       final SemanticsData data = tester
-          .getSemantics(find.byType(CarbonCopyButton))
+          .getSemantics(find.bySemanticsLabel('Copy to clipboard'))
           .getSemanticsData();
       expect(data.flagsCollection.isButton, isTrue);
       expect(data.hasAction(SemanticsAction.tap), isTrue);

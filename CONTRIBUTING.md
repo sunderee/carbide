@@ -67,6 +67,13 @@ stable**. Publication depends on its complete result, including gallery checks:
   lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
   golden comparison is strict and authoritative.
 - **Gallery — analyze & test** — the example app's suite + contact sheet.
+- **Compiled gallery examples** — `python3 tool/generate_gallery_examples.py
+  --check` rejects source-template drift; `python3 tool/check_gallery_examples.py`
+  collects displayed examples and compiles them against the real package API.
+  Run both after changing demo previews. Source templates come from the preview
+  builders, with immutable snapshots of current demo fields. The separate Button
+  configuration is checked across every enum/boolean combination. No sample
+  depends on the gallery scaffold or knob helpers.
 - **Browser component contracts** — the explicit `tool/pr_chrome_suites.json`
   subset runs in Chrome on every PR, including component focus, state,
   semantics, scaling, RTL and overlay lifetimes. Run

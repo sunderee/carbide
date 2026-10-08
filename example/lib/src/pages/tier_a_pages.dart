@@ -7,8 +7,12 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
 import '../demo_scaffold.dart';
+import '../examples/source_literals.dart';
+import '../examples/button_example.dart';
 import '../knobs.dart';
 import '../registry.dart';
+
+part 'tier_a_pages.examples.g.dart';
 
 /// Tier A — the foundational components.
 final GalleryCategory tierACategory = GalleryCategory(
@@ -93,17 +97,17 @@ class _ButtonPageState extends State<_ButtonPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ButtonExample example = ButtonExample(
+      kind: _kind,
+      size: _size,
+      withIcon: _withIcon,
+      enabled: _enabled,
+      expressive: _expressive,
+    );
     return DemoScaffold(
       title: 'Button',
       description: 'Eight kinds across six sizes, with an optional icon.',
-      preview: CarbonButton(
-        label: 'Button',
-        kind: _kind,
-        size: _size,
-        icon: _withIcon ? CarbonIcons.add : null,
-        isExpressive: _expressive,
-        onPressed: _enabled ? () {} : null,
-      ),
+      preview: example.build(),
       controls: <Widget>[
         choiceKnob<CarbonButtonKind>(
           label: 'Kind',
@@ -135,15 +139,7 @@ class _ButtonPageState extends State<_ButtonPage> {
           onChanged: (bool v) => setState(() => _enabled = v),
         ),
       ],
-      code:
-          "CarbonButton(\n"
-          "  label: 'Button',\n"
-          '  kind: CarbonButtonKind.${_kind.name},\n'
-          '  size: CarbonButtonSize.${_size.name},\n'
-          '${_withIcon ? '  icon: CarbonIcons.add,\n' : ''}'
-          '${_expressive ? '  isExpressive: true,\n' : ''}'
-          '  onPressed: ${_enabled ? '() {}' : 'null'},\n'
-          ');',
+      code: example.code,
     );
   }
 }
@@ -194,7 +190,7 @@ class _TagPageState extends State<_TagPage> {
           onChanged: (CarbonTagType t) => setState(() => _type = t),
         ),
       ],
-      code: "CarbonTag(label: 'Read-only', type: CarbonTagType.${_type.name});",
+      code: exampleSource,
     );
   }
 }
@@ -247,8 +243,7 @@ class _LinkPageState extends State<_LinkPage> {
           onChanged: (bool v) => setState(() => _enabled = v),
         ),
       ],
-      code:
-          "CarbonLink(label: 'Learn more', size: CarbonLinkSize.${_size.name});",
+      code: exampleSource,
     );
   }
 }
@@ -343,7 +338,7 @@ class _TilePageState extends State<_TilePage> {
           onChanged: (bool v) => setState(() => _ai = v),
         ),
       ],
-      code: 'CarbonClickableTile(onPressed: () {}, child: Text(...));',
+      code: exampleSource,
     );
   }
 }
@@ -352,10 +347,10 @@ class _LoadingPage extends StatelessWidget {
   const _LoadingPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Loading',
       description: 'The spinner and inline loading states.',
-      preview: Wrap(
+      preview: const Wrap(
         spacing: CarbonSpacing.spacing09,
         runSpacing: CarbonSpacing.spacing07,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -369,7 +364,7 @@ class _LoadingPage extends StatelessWidget {
           ),
         ],
       ),
-      code: 'const CarbonLoading();',
+      code: exampleSource,
     );
   }
 }
@@ -412,9 +407,7 @@ class _ProgressBarPageState extends State<_ProgressBarPage> {
             onChanged: (double v) => setState(() => _value = v),
           ),
       ],
-      code:
-          'CarbonProgressBar(label: \'Uploading\', value: '
-          '${_indeterminate ? 'null' : _value.round()});',
+      code: exampleSource,
     );
   }
 }
@@ -457,7 +450,7 @@ class _ListPage extends StatelessWidget {
           ),
         ],
       ),
-      code: 'CarbonUnorderedList(children: <Widget>[CarbonListItem(...)]);',
+      code: exampleSource,
     );
   }
 }
@@ -501,7 +494,7 @@ class _StackPageState extends State<_StackPage> {
           onChanged: (double v) => setState(() => _gap = v),
         ),
       ],
-      code: 'CarbonStack(gapStep: ${_gap.round()}, children: <Widget>[...]);',
+      code: exampleSource,
     );
   }
 }
@@ -510,12 +503,12 @@ class _HeadingPage extends StatelessWidget {
   const _HeadingPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Heading',
       description:
           'Semantic headings whose level comes from the ambient CarbonSection.',
       previewAlignment: Alignment.topLeft,
-      preview: CarbonSection(
+      preview: const CarbonSection(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -532,7 +525,7 @@ class _HeadingPage extends StatelessWidget {
           ],
         ),
       ),
-      code: 'CarbonSection(child: CarbonHeading(\'Title\'));',
+      code: exampleSource,
     );
   }
 }
@@ -573,7 +566,7 @@ class _CopyButtonPageState extends State<_CopyButtonPage> {
           onChanged: (bool value) => setState(() => _enabled = value),
         ),
       ],
-      code: "CarbonCopyButton(value: 'npm i @carbon/react');",
+      code: exampleSource,
     );
   }
 }
@@ -618,7 +611,7 @@ class _CodeSnippetPageState extends State<_CodeSnippetPage> {
               setState(() => _type = type),
         ),
       ],
-      code: "CarbonCodeSnippet(code: 'flutter pub add carbide');",
+      code: exampleSource,
     );
   }
 }
@@ -657,7 +650,7 @@ class _IconButtonPageState extends State<_IconButtonPage> {
           onChanged: (CarbonButtonKind k) => setState(() => _kind = k),
         ),
       ],
-      code: "CarbonIconButton(icon: CarbonIcons.add, label: 'Add item');",
+      code: exampleSource,
     );
   }
 }
@@ -666,11 +659,11 @@ class _IndicatorsPage extends StatelessWidget {
   const _IndicatorsPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Indicators',
       description: 'Badge, icon, and colour-blind-safe shape status markers.',
       previewAlignment: Alignment.topLeft,
-      preview: Column(
+      preview: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -705,7 +698,7 @@ class _IndicatorsPage extends StatelessWidget {
           ),
         ],
       ),
-      code: "CarbonIconIndicator(kind: …, label: 'Failed');",
+      code: exampleSource,
     );
   }
 }
@@ -741,7 +734,7 @@ class _AspectRatioPageState extends State<_AspectRatioPage> {
           onChanged: (CarbonAspectRatioValue r) => setState(() => _ratio = r),
         ),
       ],
-      code: 'CarbonAspectRatio(ratio: CarbonAspectRatioValue.r16x9, child: …);',
+      code: exampleSource,
     );
   }
 }
@@ -796,9 +789,7 @@ class _GridPageState extends State<_GridPage> {
           onChanged: (bool full) => setState(() => _fullWidth = full),
         ),
       ],
-      code:
-          'CarbonGrid(mode: CarbonGridMode.${_mode.name}, '
-          'fullWidth: $_fullWidth, children: <Widget>[CarbonColumn(lg: 4, child: …)]);',
+      code: exampleSource,
     );
   }
 }
@@ -807,11 +798,11 @@ class _SkeletonsPage extends StatelessWidget {
   const _SkeletonsPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Skeletons',
       description: 'Loading placeholders that mimic a component footprint.',
       previewAlignment: Alignment.topLeft,
-      preview: Column(
+      preview: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -836,7 +827,7 @@ class _SkeletonsPage extends StatelessWidget {
           ),
         ],
       ),
-      code: 'CarbonTextInputSkeleton();',
+      code: exampleSource,
     );
   }
 }

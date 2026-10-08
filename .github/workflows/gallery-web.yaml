@@ -30,6 +30,13 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/gallery_smoke_test.dart
           -d web-server
+      - name: Check native copy and expand focus
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/code_snippet_focus_test.dart
+          -d web-server
       - name: Build deployed configuration
         working-directory: example
         run: flutter build web --release --wasm --base-href /carbide/
