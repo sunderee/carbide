@@ -15,6 +15,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../utils/anchored_overlay.dart';
 import '../../utils/typeahead.dart';
 
 import '../../foundations/layout.dart';
@@ -98,7 +99,7 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.label,
     this.helperText,
     this.size = CarbonFieldSize.md,
-    this.direction = CarbonDropdownDirection.bottom,
+    CarbonDropdownDirection? direction,
     this.disabled = false,
     this.readOnly = false,
     this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
@@ -115,7 +116,9 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.condensed = false,
     this.focusNode,
     this.autofocus = false,
-  }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
+  }) : direction = direction ?? CarbonDropdownDirection.bottom,
+       _automaticDirection = direction == null,
+       assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
   /// The field title shown above (or beside, when [inline]) the trigger.
   final String titleText;
@@ -138,8 +141,10 @@ class CarbonDropdown<T> extends StatefulWidget {
   /// The field size.
   final CarbonFieldSize size;
 
-  /// Which way the menu opens.
+  /// Pins the menu to this side when supplied. Omitting it prefers the bottom
+  /// and flips automatically when the viewport has more room above.
   final CarbonDropdownDirection direction;
+  final bool _automaticDirection;
 
   /// Whether the dropdown is disabled.
   final bool disabled;
@@ -513,14 +518,12 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     ];
 
     final bool below = widget.direction == CarbonDropdownDirection.bottom;
-    return Positioned.directional(
-      textDirection: Directionality.of(context),
-      width: _triggerWidth,
-      child: CompositedTransformFollower(
-        link: _link,
-        targetAnchor: below ? Alignment.bottomLeft : Alignment.topLeft,
-        followerAnchor: below ? Alignment.topLeft : Alignment.bottomLeft,
-        showWhenUnlinked: false,
+    return CarbonAnchoredOverlay(
+      link: _link,
+      side: below ? CarbonOverlaySide.bottom : CarbonOverlaySide.top,
+      automatic: widget._automaticDirection,
+      child: SizedBox(
+        width: _triggerWidth,
         child: TapRegion(
           onTapOutside: (_) => _close(),
           // Non-focusable so the trigger keeps keyboard focus (and its key

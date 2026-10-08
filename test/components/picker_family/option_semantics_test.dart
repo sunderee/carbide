@@ -7,6 +7,7 @@ import 'dart:ui'
     show Tristate, ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
 import 'package:carbide/carbide.dart';
+import 'package:carbide/src/utils/anchored_overlay.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -66,7 +67,7 @@ Future<void> _focusClosed(
   );
   state.focus.requestFocus();
   await tester.pumpAndSettle();
-  if (find.byType(CompositedTransformFollower).evaluate().isNotEmpty) {
+  if (find.byType(CarbonAnchoredOverlay).evaluate().isNotEmpty) {
     await _press(tester, LogicalKeyboardKey.escape);
   }
 }
@@ -400,7 +401,7 @@ void main() {
         await _focusClosed(tester, state);
         await _press(tester, LogicalKeyboardKey.arrowDown);
         final Finder row = find.descendant(
-          of: find.byType(CompositedTransformFollower),
+          of: find.byType(CarbonAnchoredOverlay),
           matching: find.text('Beta'),
         );
         await tester.tapAt(tester.getCenter(row));

@@ -21,6 +21,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/anchored_overlay.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
@@ -91,6 +92,7 @@ class CarbonSelect<T> extends StatefulWidget {
     this.placeholder,
     this.helperText,
     this.size = CarbonFieldSize.md,
+    this.menuSide,
     this.disabled = false,
     this.readOnly = false,
     this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
@@ -128,6 +130,10 @@ class CarbonSelect<T> extends StatefulWidget {
 
   /// The field size.
   final CarbonFieldSize size;
+
+  /// Pins the options to a side. Null prefers below and adapts to the viewport.
+  /// Logical [CarbonOverlaySide.start] and [CarbonOverlaySide.end] follow RTL.
+  final CarbonOverlaySide? menuSide;
 
   /// Whether disabled.
   final bool disabled;
@@ -577,14 +583,12 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       }
     }
 
-    return Positioned.directional(
-      textDirection: Directionality.of(context),
-      width: _triggerWidth,
-      child: CompositedTransformFollower(
-        link: _link,
-        targetAnchor: Alignment.bottomLeft,
-        followerAnchor: Alignment.topLeft,
-        showWhenUnlinked: false,
+    return CarbonAnchoredOverlay(
+      link: _link,
+      side: widget.menuSide ?? CarbonOverlaySide.bottom,
+      automatic: widget.menuSide == null,
+      child: SizedBox(
+        width: _triggerWidth,
         child: TapRegion(
           onTapOutside: (_) => _close(),
           // Non-focusable so the trigger keeps keyboard focus (and its key

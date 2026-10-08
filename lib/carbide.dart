@@ -124,5 +124,6 @@ export 'src/theme/carbon_theme.dart';
 export 'src/theme/carbon_theme_data.dart';
 
 // Utilities — interaction & styling primitives.
+export 'src/utils/anchored_overlay.dart' show CarbonOverlaySide;
 export 'src/utils/focus_ring.dart';
 export 'src/utils/interaction.dart';

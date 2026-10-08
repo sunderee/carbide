@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Share viewport placement across pickers, popovers and anchored action menus:
+  logical alignment, automatic flipping/clamping, bounded popup constraints,
+  composition-time scroll/resize updates and side overrides. Preserve explicit
+  dropdown directions and keep popover carets pointing toward their triggers
+  after clamping (#335).
+
 - Grow small field, fluid list-box, combo-box, filterable multi-select, search,
   selection-count and menu chrome with scaled text. Add missing specimens,
   inherited-font/editor clipping guards and closed/open scaling coverage while

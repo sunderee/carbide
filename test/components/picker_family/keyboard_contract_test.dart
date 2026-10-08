@@ -6,6 +6,7 @@
 import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
 import 'package:carbide/carbide.dart';
+import 'package:carbide/src/utils/anchored_overlay.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,8 +47,7 @@ Future<void> _press(WidgetTester tester, LogicalKeyboardKey key) async {
   expect(tester.takeException(), isNull);
 }
 
-bool get _open =>
-    find.byType(CompositedTransformFollower).evaluate().isNotEmpty;
+bool get _open => find.byType(CarbonAnchoredOverlay).evaluate().isNotEmpty;
 
 Future<void> _focusClosed(
   WidgetTester tester,

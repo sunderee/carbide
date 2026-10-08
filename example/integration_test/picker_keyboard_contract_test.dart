@@ -8,6 +8,7 @@ import 'dart:ui'
     show PointerDeviceKind, ViewFocusDirection, ViewFocusEvent, ViewFocusState;
 
 import 'package:carbide/carbide.dart';
+import 'package:carbide/src/utils/anchored_overlay.dart';
 import 'package:flutter/semantics.dart' show SemanticsBinding;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -397,7 +398,7 @@ void testNativePickerOptionSemantics() {
               final TestGesture pointer = await tester.startGesture(
                 tester.getCenter(
                   find.descendant(
-                    of: find.byType(CompositedTransformFollower),
+                    of: find.byType(CarbonAnchoredOverlay),
                     matching: find.text('Beta'),
                   ),
                 ),
@@ -603,7 +604,7 @@ void testSharedEditingHostPickerPolicy() {
             await tester.tapAt(
               tester.getCenter(
                 find.descendant(
-                  of: find.byType(CompositedTransformFollower),
+                  of: find.byType(CarbonAnchoredOverlay),
                   matching: find.text('Beta'),
                 ),
               ),
@@ -684,8 +685,7 @@ Widget _host(Widget child, TextDirection direction) => WidgetsApp(
   ),
 );
 
-bool get _open =>
-    find.byType(CompositedTransformFollower).evaluate().isNotEmpty;
+bool get _open => find.byType(CarbonAnchoredOverlay).evaluate().isNotEmpty;
 
 Future<void> _focusClosed(
   WidgetTester tester,
