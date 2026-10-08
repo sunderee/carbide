@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/overlay_entries.dart';
+import '../../support/golden.dart';
 
 Widget host(Widget child, {bool reduced = false}) => Directionality(
   textDirection: TextDirection.ltr,
@@ -60,7 +61,32 @@ void check(String name, WidgetTesterCallback body) =>
 
 void main() {
   for (final kind in ['modal', 'dialog', 'nonmodal']) {
-    testWidgets(
+    check('$kind keeps a visible semantics anchor only while present', (
+      tester,
+    ) async {
+      final open = ValueNotifier(false);
+      addTearDown(open.dispose);
+      final type = kind == 'modal' ? CarbonModal : CarbonDialog;
+      await tester.pumpWidget(
+        host(
+          Align(
+            alignment: Alignment.topLeft,
+            child: ValueListenableBuilder(
+              valueListenable: open,
+              builder: (_, value, _) => dialog(value, kind),
+            ),
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byType(type)), Size.zero);
+      open.value = true;
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(type)), const Size(1, 1));
+      open.value = false;
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(type)), Size.zero);
+    });
+    check(
       '$kind remains present during exit and restores modal focus at completion',
       (tester) async {
         final semantics = tester.ensureSemantics(),
@@ -116,7 +142,24 @@ void main() {
           await tester.pump(const Duration(milliseconds: 100));
           expect(find.text('Surface title'), findsOneWidget);
           expect(find.bySemanticsLabel('Inside'), findsOneWidget);
+          final labels = tester.semantics
+              .simulatedAccessibilityTraversal()
+              .map((node) => node.label)
+              .toList();
+          expect(labels, contains('Inside'));
+          if (kind != 'nonmodal') expect(labels, isNot(contains('Launch')));
           expect(inside.hasPrimaryFocus, isTrue);
+          for (final fade in tester.widgetList<FadeTransition>(
+            find.byType(FadeTransition),
+          )) {
+            expect(fade.opacity.value, allOf(greaterThan(0), lessThan(1)));
+          }
+          expect(
+            tester
+                .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+                .every((fade) => fade.duration == CarbonDuration.moderate02),
+            isTrue,
+          );
           await tester.pump(CarbonDuration.moderate02);
           await tester.pumpAndSettle();
           expect(find.text('Surface title'), findsNothing);
@@ -238,18 +281,20 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      if (kind == 'nonmodal')
+      if (kind == 'nonmodal') {
         expect(scroll.offset, greaterThan(0));
-      else
+      } else {
         expect(scroll.offset, 0);
+      }
       scroll.jumpTo(0);
       await tester.pump();
       await tester.dragFrom(const Offset(20, 100), const Offset(0, -60));
       await tester.pumpAndSettle();
-      if (kind == 'nonmodal')
+      if (kind == 'nonmodal') {
         expect(scroll.offset, greaterThan(0));
-      else
+      } else {
         expect(scroll.offset, 0);
+      }
       scroll.jumpTo(0);
       await tester.pump();
       await tester.tapAt(background);
@@ -257,5 +302,157 @@ void main() {
       expect(clicks, kind == 'nonmodal' ? 1 : 0);
       await tester.pumpWidget(const SizedBox.shrink());
     });
+    check('$kind reduced motion enabled during exit removes it immediately', (
+      tester,
+    ) async {
+      final open = ValueNotifier(true), reduced = ValueNotifier(false);
+      addTearDown(open.dispose);
+      addTearDown(reduced.dispose);
+      await tester.pumpWidget(
+        host(
+          AnimatedBuilder(
+            animation: Listenable.merge([open, reduced]),
+            builder: (context, _) => MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(disableAnimations: reduced.value),
+              child: dialog(open.value, kind),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      open.value = false;
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(find.text('Surface title'), findsOneWidget);
+      reduced.value = true;
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Surface title'), findsNothing);
+    });
+    check('$kind disposal during exit cancels the removal timer', (
+      tester,
+    ) async {
+      final open = ValueNotifier(true);
+      addTearDown(open.dispose);
+      await tester.pumpWidget(
+        host(
+          ValueListenableBuilder(
+            valueListenable: open,
+            builder: (_, v, _) => dialog(v, kind),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      open.value = false;
+      await tester.pump();
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(CarbonDuration.moderate02);
+      expect(tester.takeException(), isNull);
+    });
+    check('$kind exit goldens across themes and directions', (tester) async {
+      final open = ValueNotifier(true);
+      addTearDown(open.dispose);
+      await expectThemeGoldens(
+        tester,
+        name: '${kind}_exit',
+        containsText: true,
+        size: const Size(760, 420),
+        directions: const {TextDirection.ltr, TextDirection.rtl},
+        builder: (_) {
+          open.value = true;
+          return Overlay(
+            initialEntries: [
+              managedOverlayEntry(
+                builder: (_) => ValueListenableBuilder(
+                  valueListenable: open,
+                  builder: (_, v, _) => dialog(v, kind),
+                ),
+              ),
+            ],
+          );
+        },
+        afterPump: (tester) async {
+          await tester.pumpAndSettle();
+          open.value = false;
+          await tester.pump();
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 100));
+          expect(find.text('Surface title'), findsOneWidget);
+        },
+      );
+    });
+  }
+  for (final kind in ['modal', 'dialog']) {
+    check(
+      '$kind body scrolls without chaining to the background at its limit',
+      (tester) async {
+        final background = ScrollController();
+        addTearDown(background.dispose);
+        final content = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [for (int i = 0; i < 80; i++) Text('Line $i')],
+        );
+        final surface = kind == 'modal'
+            ? CarbonModal(open: true, title: 'Long content', child: content)
+            : CarbonDialog(
+                open: true,
+                children: [
+                  const CarbonDialogHeader(
+                    children: [CarbonDialogTitle('Long content')],
+                  ),
+                  CarbonDialogBody(child: content),
+                ],
+              );
+        await tester.pumpWidget(
+          host(
+            SingleChildScrollView(
+              controller: background,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 600,
+                    child: Overlay(
+                      initialEntries: [
+                        managedOverlayEntry(builder: (_) => surface),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2000),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final body = find.byType(Scrollable).last,
+            position = tester.state<ScrollableState>(body).position,
+            point = tester.getCenter(body);
+        await tester.sendEventToBinding(
+          PointerScrollEvent(
+            position: point,
+            scrollDelta: const Offset(0, 120),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(position.pixels, greaterThan(0));
+        expect(background.offset, 0);
+        position.jumpTo(position.maxScrollExtent);
+        await tester.pump();
+        await tester.sendEventToBinding(
+          PointerScrollEvent(
+            position: point,
+            scrollDelta: const Offset(0, 120),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(background.offset, 0);
+        await tester.dragFrom(point, const Offset(0, -80));
+        await tester.pumpAndSettle();
+        expect(background.offset, 0);
+      },
+    );
   }
 }

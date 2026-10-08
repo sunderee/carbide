@@ -122,10 +122,10 @@ v12 radius mode or a public border-radius token family yet.
   built on `OverlayPortal` show/hide: closed content is not in the tree at
   all. That is the flagged semantics by construction, and it is already
   stated in the component doc comments ("Controlled via [open]"). One
-  nuance: upstream presence also coordinates **exit** transitions before
-  unmount; Carbide currently unmounts immediately on close (entrance
-  animations only). If Carbon v12 ships exit motion specs for modals, that
-  lands as motion work under rule 4 — the mount semantics don't change.
+  nuance: presence also coordinates exit transitions before unmount. #339
+  implements this for Modal and Dialog with moderate-02 expressive exit motion,
+  retaining focus, semantics and modal background locking until removal.
+  Reduced motion removes immediately; reopening cancels pending removal.
 
 #### N/A — the mechanism doesn't exist in Flutter
 

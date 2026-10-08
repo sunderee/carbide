@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Modal and dialog surfaces retain focus and semantics through expressive exit
+  motion, cancel removal on reopening, and honor live reduced-motion changes.
+  A shared modal boundary blocks ancestor wheel/touch scrolling and background
+  pointer interaction while preserving body scrolling and non-modal behavior (#339).
+
 - Validate pagination input, clamp stale pages after result changes, bound page
   choices and avoid integer overflow. Reflow narrow/scaled bars while retaining
   open control state and focus, and add injectable labels, numbering, range
