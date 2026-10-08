@@ -242,6 +242,7 @@ class CarbonOperationalTag extends StatelessWidget {
   const CarbonOperationalTag({
     super.key,
     required this.label,
+    this.focusNode,
     this.onPressed,
     this.type = CarbonTagType.gray,
     this.size = CarbonTagSize.md,
@@ -250,6 +251,9 @@ class CarbonOperationalTag extends StatelessWidget {
 
   /// The tag text.
   final String label;
+
+  /// An optional caller-owned focus node for the tag action.
+  final FocusNode? focusNode;
 
   /// Called on activation; null disables the tag.
   final VoidCallback? onPressed;
@@ -275,6 +279,7 @@ class CarbonOperationalTag extends StatelessWidget {
       enabled: !disabled,
       label: label,
       child: CarbonInteraction(
+        focusNode: focusNode,
         enabled: !disabled,
         onPressed: onPressed,
         builder: (BuildContext context, Set<WidgetState> states) {

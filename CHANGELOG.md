@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add opt-in measured PageHeader tag collapse with a named `+N` popover,
+  original keyed child state, interactive tag actions and localized disclosure
+  labels. Preserve wrapping custom tags and caller controller ownership (#396).
+
 - Add opt-in responsive PageHeader actions with stable identities, measured
   button widths, narrow title/action rows and accessible overflow menus.
   Preserve custom action slots and keep keyboard focus during menu reflow (#395).

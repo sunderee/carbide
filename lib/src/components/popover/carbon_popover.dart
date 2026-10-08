@@ -142,6 +142,7 @@ class CarbonPopover extends StatefulWidget {
     this.tapRegionGroupId,
     this.surfaceColor,
     this.surfaceBorderColor,
+    this.portalController,
     super.key,
   });
 
@@ -194,12 +195,22 @@ class CarbonPopover extends StatefulWidget {
   /// to the contextual `borderSubtle` token when [border] is set.
   final Color? surfaceBorderColor;
 
+  /// An optional caller-owned portal controller for coordinated transitions.
+  ///
+  /// Ordinary controlled use only needs [open]. Owners that move keyed content
+  /// between inline and popup layouts can call `show` or `hide` outside build
+  /// while updating [open], so reparenting occurs in the same frame. A
+  /// controller must belong to only one mounted popover at a time.
+  final OverlayPortalController? portalController;
+
   @override
   State<CarbonPopover> createState() => _CarbonPopoverState();
 }
 
 class _CarbonPopoverState extends State<CarbonPopover> {
-  final OverlayPortalController _overlay = OverlayPortalController();
+  final OverlayPortalController _internalOverlay = OverlayPortalController();
+  OverlayPortalController get _overlay =>
+      widget.portalController ?? _internalOverlay;
   final LayerLink _link = LayerLink();
   final GlobalKey _triggerKey = GlobalKey();
 
@@ -212,14 +223,15 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     super.initState();
     // Safe in initState: the child OverlayPortal is not mounted yet, so the
     // controller only records the intent rather than mutating live state.
-    if (widget.open) _overlay.show();
+    if (widget.open && !_overlay.isShowing) _overlay.show();
   }
 
   @override
   void didUpdateWidget(CarbonPopover oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.align != oldWidget.align) _resolved = widget.align;
-    if (widget.open != oldWidget.open) {
+    if (widget.open != oldWidget.open ||
+        widget.portalController != oldWidget.portalController) {
       if (widget.open) _resolved = widget.align;
       _syncOverlay();
     }

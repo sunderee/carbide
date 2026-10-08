@@ -19,13 +19,13 @@
 // scope. The SCSS above remains in core and stays our citation. Re-evaluate
 // only if a PageHeader re-stabilizes inside Carbon core (checked at each
 // knowledge-base bump, per ADR 0002's cadence). The upstream-web behaviors
-// not ported — "+N" tag overflow, the
-// truncated-title tooltip, the hero-image slot (callers compose
+// not ported — the truncated-title tooltip, the hero-image slot (callers compose
 // CarbonAspectRatio) — are catalogued in the #222 gap table. No
 // sticky/condensed collapse-on-scroll exists upstream in core either.
 
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
@@ -36,10 +36,17 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../breadcrumb/carbon_breadcrumb.dart';
 import '../button/carbon_button.dart';
 import '../menu/carbon_menu.dart';
 import '../overflow_menu/carbon_overflow_menu.dart';
+import '../popover/carbon_popover.dart';
+import '../tag/carbon_tag.dart';
+import '../tag/carbon_interactive_tags.dart';
+
+part 'page_header_tags.dart';
 
 /// A named action in a [CarbonPageHeader]'s responsive action area.
 ///
@@ -82,9 +89,8 @@ class CarbonPageHeaderAction {
 /// Ports the layered band, optional breadcrumbs/icon/actions, title and
 /// description, wrapping tags and a tabs slot. Opt into [actions] for measured
 /// responsive buttons and an overflow menu; [pageActions] preserves arbitrary
-/// caller composition. Tag `+N` disclosure, a truncated-title tooltip and a
-/// hero/content slot are separate follow-ups:
-/// [tags](https://github.com/sunderee/carbide/issues/396),
+/// caller composition. Opt into [collapseTags] for measured `+N` disclosure.
+/// A truncated-title tooltip and a hero/content slot are separate follow-ups:
 /// [tooltip](https://github.com/sunderee/carbide/issues/397), and
 /// [hero](https://github.com/sunderee/carbide/issues/398).
 /// The former core React preview was deprecated and moved to IBM Products;
@@ -384,11 +390,17 @@ class _Content extends StatelessWidget {
           if (header.tags.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: CarbonSpacing.spacing05),
-              child: Wrap(
-                spacing: CarbonSpacing.spacing03,
-                runSpacing: CarbonSpacing.spacing03,
-                children: header.tags,
-              ),
+              child: header.collapseTags
+                  ? _ResponsiveTags(
+                      tags: header.tags,
+                      overflowLabel: header.tagsOverflowLabel,
+                      disclosureLabel: header.tagsDisclosureLabel,
+                    )
+                  : Wrap(
+                      spacing: CarbonSpacing.spacing03,
+                      runSpacing: CarbonSpacing.spacing03,
+                      children: header.tags,
+                    ),
             ),
         ],
       ),

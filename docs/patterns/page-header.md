@@ -56,3 +56,59 @@ icons; arbitrary editor/controller widgets belong in the existing slot.
 The 320 px, 2× scale stress case has the long title on its own two-line row and
 keeps `Edit report` visible while disclosing secondary actions. Widths below
 the room needed by a title glyph/icon remain the host's composition decision.
+
+## Tag disclosure
+
+Set `collapseTags: true` to keep fitting leading tags on one row and expose
+remaining tags through Carbon's `+N` operational tag and popover. By default,
+the existing `tags` list wraps. Localize `tagsOverflowLabel` with a count
+formatter and `tagsDisclosureLabel` with the disclosed list name.
+
+```dart
+CarbonPageHeader(
+  title: 'Quarterly report',
+  collapseTags: true,
+  tags: <Widget>[
+    const CarbonTag(key: ValueKey('finance'), label: 'Finance'),
+    CarbonOperationalTag(
+      key: const ValueKey('region'),
+      label: 'View regional report',
+      onPressed: openRegion,
+    ),
+    CarbonDismissibleTag(
+      key: const ValueKey('draft'),
+      label: 'Draft',
+      onClose: removeDraft,
+    ),
+  ],
+)
+```
+
+The row measures the actual children with their current typeface and text
+scale, reserving space for the exact hidden count. A prefix stays inline;
+every remaining tag appears once in the popover, in original order, with its
+original label, disabled state and actions. Even a single long tag can move
+into disclosure. Carbon's ordinary 208 px tag maximum and ellipsis still apply
+inside the popover; complete names remain accessible.
+
+Give stateful or reordered tags stable, unique keys. Hidden children stay
+mounted offstage, outside focus traversal and accessibility, then move into
+the popover. They are not cloned: local widget state and caller-owned
+controllers remain intact. Widths update after layout, including changes to
+labels, font, scale or constraints. A resize or text-scale change dismisses an
+open disclosure, following the reference's resize behavior. Enter/Space and
+accessibility activation open it; Tab reaches interactive tags, and Escape
+returns focus to the count trigger while it remains present.
+
+The collapse mode supports Carbon tags and custom tags that can report their
+natural size through Flutter's dry-layout contract, within the 208 px tag
+maximum. Use wrapping mode for custom scroll views, `LayoutBuilder` content or
+other children that cannot be measured this way. Unkeyed tags use their list
+position as identity; reordering stateful unkeyed children has normal Flutter
+positional-state behavior.
+
+`CarbonPopover.portalController` is an optional coordination hook for owners
+moving keyed content between inline and popup layouts. Ordinary popovers need
+only `open`; advanced owners call the controller outside build and update
+`open` together. `CarbonOperationalTag` accepts a caller-owned `focusNode`; the
+count uses shared control semantics and guarded native focus restoration.
