@@ -229,6 +229,7 @@ void main() {
           ),
           Expanded(
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 CarbonSideNav(
                   items: <Widget>[
@@ -243,7 +244,18 @@ void main() {
                     ),
                   ],
                 ),
-                const Expanded(child: CarbonShellContent(child: Text('Body'))),
+                Expanded(
+                  child: CarbonShellContent(
+                    child: Builder(
+                      builder: (context) => Text(
+                        'Body',
+                        style: CarbonTypeStyles.bodyCompact01.copyWith(
+                          color: CarbonTheme.of(context).textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
