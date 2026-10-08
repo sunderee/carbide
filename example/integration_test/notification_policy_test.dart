@@ -101,6 +101,14 @@ void main() {
             stage = 'action pointer';
             await _settle(tester);
             expect(key.currentState!.actions, 1);
+            // WidgetTester synthesizes a Flutter pointer tap, not a browser
+            // click. Focus the real native node before simulating its keys.
+            _button('Retry operation').focus();
+            await _settle(tester);
+            expect(
+              _document.activeElement?.textContent?.trim(),
+              'Retry operation',
+            );
             await tester.sendKeyEvent(
               LogicalKeyboardKey.enter,
               physicalKey: PhysicalKeyboardKey.enter,
@@ -179,6 +187,20 @@ _Element _staticNote() {
   throw StateError('No native static note');
 }
 
+_Element _button(String label) {
+  final _NodeList nodes = _document.querySelectorAll(
+    'flt-semantics[role="button"]',
+  );
+  for (int i = 0; i < nodes.length; i++) {
+    final _Element node = nodes.item(i)!;
+    if (node.getAttribute('aria-label') == label ||
+        node.textContent?.trim() == label) {
+      return node;
+    }
+  }
+  throw StateError('No native button named $label');
+}
+
 @JS('document')
 external _Document get _document;
 
@@ -193,6 +215,7 @@ extension type _NodeList(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external void focus();
   external _Element? closest(String selector);
   external String? getAttribute(String name);
   external String? get textContent;
