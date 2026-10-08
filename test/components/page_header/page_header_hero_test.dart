@@ -335,7 +335,10 @@ void main() {
             ],
           ),
           afterPump: (tester) async {
-            if (kind == 'image') {
+            // Web widget tests skip pixels; their image decoder can await a
+            // frame while runAsync is waiting. Native release-browser checks
+            // wait for decoded frames, and Linux pixel baselines precache here.
+            if (kind == 'image' && !kIsWeb) {
               await tester.runAsync(
                 () => precacheImage(
                   MemoryImage(_image),
