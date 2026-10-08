@@ -14,7 +14,7 @@ import 'package:carbide_gallery/main.dart' as app;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../test/support/gallery_routes.dart';
+import 'support/gallery_routes.dart';
 import 'support/failure_diagnostics.dart';
 
 void main() {

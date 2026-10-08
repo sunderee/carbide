@@ -4,7 +4,7 @@ import 'package:carbide_gallery/src/gallery_app.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'support/gallery_routes.dart';
+import '../integration_test/support/gallery_routes.dart';
 
 void main() {
   testWidgets('every registered route renders its page and preview', (
