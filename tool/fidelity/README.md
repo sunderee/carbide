@@ -45,6 +45,23 @@ Carbide render is non-blank/non-flat (a reliable cross-renderer sanity check); a
 coarse, framing-tolerant difference score is shown on each comparison for
 context, and a human reviews the side-by-side.
 
+## Matching fixtures
+
+Each of the 33 entries records its pinned story source, capture viewport, root
+bounds and audit finding in `stories.json`. The fixtures share their builders
+with anatomy tests, so the comparison cannot silently substitute another
+component or lose a selected/disabled state. The 1280×720 capture environment,
+Plex typography, full story-root width and decorators are reproduced; reference
+images remain unchanged when only a Carbide fixture is corrected.
+
+The existing Modal reference is a 48px story-root crop across the open dialog.
+The harness also writes `modal_full_<theme>.png` for complete form review; the
+cropped score alone cannot cover its body/footer. Closed Tooltip and Overflow
+Menu icons can fall between the grid samples. An exact pixel-range nonblank
+check keeps their renders honest; the coarse score needs structural checks for
+those small controls. Comparison artifacts are written before drift assertions
+so failed cases are available for review.
+
 ## Extending coverage
 
 1. Add `{ "component": "<slug>", "storyId": "<storybook-id>" }` to `stories.json`

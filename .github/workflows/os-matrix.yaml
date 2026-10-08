@@ -135,7 +135,7 @@ jobs:
           test/components/overflow_menu
           test/components/notification
           test/components/page_header test/components/ui_shell
-          test/components/content_switcher
+          test/components/content_switcher test/fidelity/fixtures_test.dart
           test/components/menu
           test/components/picker_family test/components/dropdown
           test/components/select test/components/combo_box

@@ -34,6 +34,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/overlay_entries.dart';
+import 'support/fixtures.dart';
 
 const String _refDir = 'test/fidelity/references';
 const String _outDir = 'test/fidelity/comparisons';
@@ -41,16 +42,21 @@ const String _storiesPath = 'tool/fidelity/stories.json';
 const String _submodulePackage =
     'documentation/carbon/packages/react/package.json';
 
-/// Per-component drift thresholds from stories.json (absent → bootstrap).
-final Map<String, double> _thresholds = () {
-  final Map<String, dynamic> stories =
-      jsonDecode(File(_storiesPath).readAsStringSync()) as Map<String, dynamic>;
-  return <String, double>{
-    for (final dynamic s in stories['stories'] as List<dynamic>)
-      if ((s as Map<String, dynamic>)['threshold'] != null)
-        s['component'] as String: (s['threshold'] as num).toDouble(),
-  };
-}();
+/// Capture environment and drift budgets are reviewed with each story.
+final Map<String, Map<String, dynamic>> _stories =
+    <String, Map<String, dynamic>>{
+      for (final dynamic story
+          in (jsonDecode(File(_storiesPath).readAsStringSync())
+                  as Map<String, dynamic>)['stories']
+              as List<dynamic>)
+        (story as Map<String, dynamic>)['component'] as String: story,
+    };
+
+final Map<String, double> _thresholds = <String, double>{
+  for (final MapEntry<String, Map<String, dynamic>> story in _stories.entries)
+    if (story.value['threshold'] is num)
+      story.key: (story.value['threshold'] as num).toDouble(),
+};
 
 /// The four Carbon themes, keyed by the reference-file slug (the Storybook
 /// theme global).
@@ -66,337 +72,6 @@ CarbonThemeData _whiteTheme() => CarbonThemeData.white;
 CarbonThemeData _g10Theme() => CarbonThemeData.gray10;
 CarbonThemeData _g90Theme() => CarbonThemeData.gray90;
 CarbonThemeData _g100Theme() => CarbonThemeData.gray100;
-
-void _noop() {}
-
-/// Carbide widgets that mirror the captured Carbon default stories. Add an
-/// entry (plus a story in tool/fidelity/stories.json) to extend coverage.
-final Map<String, Widget Function()> _builders = <String, Widget Function()>{
-  'button': () => const CarbonButton(label: 'Button', onPressed: _noop),
-  'tag': () => const Wrap(
-    spacing: 8,
-    runSpacing: 8,
-    children: <Widget>[
-      CarbonTag(label: 'Tag', type: CarbonTagType.gray),
-      CarbonTag(label: 'Tag', type: CarbonTagType.blue),
-      CarbonTag(label: 'Tag', type: CarbonTagType.green),
-      CarbonTag(label: 'Tag', type: CarbonTagType.red),
-    ],
-  ),
-  'checkbox': () =>
-      CarbonCheckbox(label: 'Checkbox', value: true, onChanged: (_) {}),
-  'toggle': () =>
-      CarbonToggle(labelText: 'Toggle', toggled: true, onToggled: (_) {}),
-  'text-input': () => const SizedBox(
-    width: 320,
-    child: CarbonTextInput(
-      labelText: 'Text input label',
-      placeholder: 'Placeholder text',
-    ),
-  ),
-  'tree-view': () => const SizedBox(
-    width: 320,
-    child: CarbonTreeView(
-      label: 'Tree view',
-      initiallyExpandedIds: <Object>{'a'},
-      nodes: <CarbonTreeNode>[
-        CarbonTreeNode(
-          id: 'a',
-          label: 'Artificial intelligence',
-          children: <CarbonTreeNode>[
-            CarbonTreeNode(id: 'a1', label: 'Machine learning'),
-            CarbonTreeNode(id: 'a2', label: 'Deep learning'),
-          ],
-        ),
-        CarbonTreeNode(id: 'b', label: 'Blockchain'),
-      ],
-    ),
-  ),
-  'data-table': () => const SizedBox(
-    width: 640,
-    child: CarbonDataTable(
-      columns: <CarbonTableColumn>[
-        CarbonTableColumn(title: 'Name'),
-        CarbonTableColumn(title: 'Rule'),
-        CarbonTableColumn(title: 'Status'),
-      ],
-      rows: <CarbonTableRow>[
-        CarbonTableRow(
-          cells: <Widget>[
-            Text('Load Balancer 1'),
-            Text('Round robin'),
-            Text('Starting'),
-          ],
-        ),
-        CarbonTableRow(
-          cells: <Widget>[
-            Text('Load Balancer 2'),
-            Text('DNS delegation'),
-            Text('Active'),
-          ],
-        ),
-        CarbonTableRow(
-          cells: <Widget>[
-            Text('Load Balancer 3'),
-            Text('Round robin'),
-            Text('Disabled'),
-          ],
-        ),
-      ],
-    ),
-  ),
-  'notification': () => const SizedBox(
-    width: 480,
-    child: CarbonInlineNotification(
-      kind: CarbonNotificationKind.error,
-      title: 'Notification title',
-      subtitle: 'Subtitle text goes here.',
-    ),
-  ),
-  'dropdown': () => SizedBox(
-    width: 400,
-    child: CarbonDropdown<int>(
-      titleText: 'Label',
-      label: 'Choose an option',
-      helperText: 'Helper text',
-      onChanged: (int _) {},
-      items: const <CarbonDropdownItem<int>>[
-        CarbonDropdownItem<int>(value: 0, label: 'Option 1'),
-        CarbonDropdownItem<int>(value: 1, label: 'Option 2'),
-      ],
-    ),
-  ),
-  'tabs': () => SizedBox(
-    width: 480,
-    child: CarbonTabs(
-      tabs: const <CarbonTab>[
-        CarbonTab(label: 'Dashboard'),
-        CarbonTab(label: 'Monitoring'),
-        CarbonTab(label: 'Activity'),
-        CarbonTab(label: 'Settings'),
-      ],
-      panels: const <Widget>[
-        Text('Tab Panel 1'),
-        Text('Tab Panel 2'),
-        Text('Tab Panel 3'),
-        Text('Tab Panel 4'),
-      ],
-    ),
-  ),
-  'accordion': () => const SizedBox(
-    width: 640,
-    child: CarbonAccordion(
-      children: <Widget>[
-        CarbonAccordionItem(title: 'Choose your plan', child: Text('Body')),
-        CarbonAccordionItem(title: 'Add team members', child: Text('Body')),
-        CarbonAccordionItem(title: 'Set payment details', child: Text('Body')),
-        CarbonAccordionItem(
-          title: 'Review and confirm (title can be a node)',
-          child: Text('Body'),
-        ),
-      ],
-    ),
-  ),
-  'multiselect': () => SizedBox(
-    width: 400,
-    child: CarbonMultiSelect<int>(
-      titleText: 'Label',
-      label: 'This is a label',
-      helperText: 'This is helper text',
-      onChanged: (Set<int> _) {},
-      items: const <CarbonMultiSelectItem<int>>[
-        CarbonMultiSelectItem<int>(value: 0, label: 'Option 1'),
-        CarbonMultiSelectItem<int>(value: 1, label: 'Option 2'),
-      ],
-    ),
-  ),
-  'search': () =>
-      const SizedBox(width: 400, child: CarbonSearch(placeholder: 'Search')),
-  'number-input': () => SizedBox(
-    width: 300,
-    child: CarbonNumberInput(
-      labelText: 'NumberInput label',
-      helperText: 'Optional helper text',
-      value: 50,
-      min: 0,
-      max: 100,
-      onChanged: (num? _) {},
-    ),
-  ),
-  'select': () => SizedBox(
-    width: 400,
-    child: CarbonSelect<int>(
-      labelText: 'Select an option',
-      helperText: 'Optional helper text',
-      value: 0,
-      onChanged: (int? _) {},
-      items: const <CarbonSelectItem<int>>[
-        CarbonSelectItem<int>(value: 0, label: 'Option 1'),
-        CarbonSelectItem<int>(value: 1, label: 'Option 2'),
-      ],
-    ),
-  ),
-  'combo-box': () => SizedBox(
-    width: 400,
-    child: CarbonComboBox<int>(
-      titleText: 'ComboBox title',
-      onChanged: (int? _) {},
-      items: const <CarbonComboBoxItem<int>>[
-        CarbonComboBoxItem<int>(value: 0, label: 'Option 1'),
-        CarbonComboBoxItem<int>(value: 1, label: 'Option 2'),
-      ],
-    ),
-  ),
-  'date-picker': () => SizedBox(
-    width: 300,
-    child: CarbonDatePicker(
-      labelText: 'Date Picker label',
-      onChanged: (DateTime? _) {},
-    ),
-  ),
-  'radio-button': () => CarbonRadioButtonGroup<int>(
-    legend: 'Radio button heading',
-    value: 0,
-    orientation: Axis.vertical,
-    onChanged: (int _) {},
-    options: const <(int, String)>[
-      (0, 'Radio button label'),
-      (1, 'Radio button label'),
-      (2, 'Radio button label'),
-    ],
-  ),
-  'slider': () => SizedBox(
-    width: 400,
-    child: CarbonSlider(
-      // @carbon/react v1.118.0 Slider.stories.js: Default sharedArgs.
-      labelText: 'Storage allocation',
-      value: 50,
-      min: 0,
-      max: 100,
-      formatLabel: (num value) => '$value GB',
-      onChanged: (num _) {},
-    ),
-  ),
-  // The Storybook reference captures the story root: the trigger button
-  // with the opened modal's scrim/header band cropped over it. No Carbide
-  // composition reproduces that crop, so the builder renders the same
-  // trigger + open dialog and the threshold stays wide (drift detection
-  // only).
-  'modal': () => const SizedBox(
-    width: 640,
-    height: 400,
-    child: Stack(
-      children: <Widget>[
-        CarbonButton(label: 'Launch modal', onPressed: _noop),
-        CarbonDialog(
-          open: true,
-          modal: true,
-          onRequestClose: _noop,
-          children: <Widget>[
-            CarbonDialogHeader(children: <Widget>[Text('Add a custom domain')]),
-            CarbonDialogBody(
-              child: Text(
-                'Custom domains direct requests for your apps in this '
-                'Cloud Foundry organization to a URL that you own.',
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  ),
-  // DefinitionTooltip closed state: the underlined term only. The bare
-  // host has no DefaultTextStyle, so the child styles itself.
-  'tooltip': () => Builder(
-    builder: (BuildContext context) => CarbonTooltip(
-      label: 'Uniform Resource Locator; the address of a resource.',
-      child: Text(
-        'URL',
-        style: CarbonTypeStyles.bodyCompact01.copyWith(
-          color: CarbonTheme.of(context).textPrimary,
-        ),
-      ),
-    ),
-  ),
-  'progress-bar': () => const SizedBox(
-    width: 400,
-    child: CarbonProgressBar(label: 'Progress bar label', value: 75),
-  ),
-  'progress-indicator': () => const SizedBox(
-    width: 640,
-    child: CarbonProgressIndicator(
-      currentIndex: 1,
-      steps: <CarbonProgressStep>[
-        CarbonProgressStep(label: 'First step'),
-        CarbonProgressStep(label: 'Second step'),
-        CarbonProgressStep(label: 'Third step'),
-        CarbonProgressStep(label: 'Fourth step'),
-        CarbonProgressStep(label: 'Fifth step'),
-      ],
-    ),
-  ),
-  'breadcrumb': () => const CarbonBreadcrumb(
-    items: <CarbonBreadcrumbItem>[
-      CarbonBreadcrumbItem(label: 'Breadcrumb 1', onPressed: _noop),
-      CarbonBreadcrumbItem(label: 'Breadcrumb 2', onPressed: _noop),
-      CarbonBreadcrumbItem(label: 'Breadcrumb 3', onPressed: _noop),
-    ],
-  ),
-  'pagination': () => SizedBox(
-    width: 720,
-    child: CarbonPagination(
-      page: 1,
-      pageSize: 10,
-      totalItems: 103,
-      onPageChanged: (int _) {},
-      onPageSizeChanged: (int _) {},
-    ),
-  ),
-  'code-snippet': () => const SizedBox(
-    width: 560,
-    child: CarbonCodeSnippet(
-      code: 'yarn add carbon-components@latest carbon-components-react@latest',
-    ),
-  ),
-  'content-switcher': () => CarbonContentSwitcher(
-    selectedIndex: 0,
-    onChanged: (int _) {},
-    switches: const <CarbonSwitch>[
-      CarbonSwitch(text: 'First section'),
-      CarbonSwitch(text: 'Second section'),
-      CarbonSwitch(text: 'Third section'),
-    ],
-  ),
-  'structured-list': () => const SizedBox(
-    width: 640,
-    child: CarbonStructuredList(
-      headers: <String>['ColumnA', 'ColumnB', 'ColumnC'],
-      rows: <CarbonStructuredListRow>[
-        CarbonStructuredListRow(
-          cells: <Widget>[Text('Row 1'), Text('Row 1'), Text('Row 1')],
-        ),
-        CarbonStructuredListRow(
-          cells: <Widget>[Text('Row 2'), Text('Row 2'), Text('Row 2')],
-        ),
-      ],
-    ),
-  ),
-  'tile': () => const SizedBox(
-    width: 320,
-    child: CarbonTile(child: Text('Default tile')),
-  ),
-  'loading': () => const CarbonLoading(),
-  'inline-loading': () =>
-      const CarbonInlineLoading(description: 'Loading data...'),
-  'overflow-menu': () => const CarbonOverflowMenu(
-    items: <CarbonMenuItem>[
-      CarbonMenuItem(label: 'Stop app', onPressed: _noop),
-      CarbonMenuItem(label: 'Restart app', onPressed: _noop),
-      CarbonMenuItem(label: 'Rename app', onPressed: _noop),
-    ],
-  ),
-  'link': () => const CarbonLink(label: 'Link', onPressed: _noop),
-};
 
 void main() {
   test('references are not stale relative to the submodule pin', () {
@@ -443,7 +118,8 @@ void main() {
     expect(captured, greaterThan(0));
   });
 
-  for (final MapEntry<String, Widget Function()> entry in _builders.entries) {
+  for (final MapEntry<String, Widget Function()> entry
+      in fidelityBuilders.entries) {
     final String component = entry.key;
     for (final String themeSlug in _themes.keys) {
       testWidgets('fidelity: $component ($themeSlug)', (
@@ -458,9 +134,37 @@ void main() {
         final ui.Image carbide = await _renderCarbide(
           tester,
           _themes[themeSlug]!(),
+          component,
+          themeSlug,
           entry.value(),
         );
         final _Grid carbideGrid = await _luminanceGrid(tester, carbide);
+
+        final ui.Image reference = await _decodePng(
+          tester,
+          refFile.readAsBytesSync(),
+        );
+        final _Grid refGrid = await _luminanceGrid(tester, reference);
+        final double diff = _meanAbsDiff(refGrid, carbideGrid);
+
+        debugPrint(
+          'FIDELITY-SCORE $component $themeSlug ${diff.toStringAsFixed(6)}',
+        );
+
+        final ui.Image comparison = await _composeSideBySide(
+          tester,
+          reference,
+          carbide,
+          label: '$component — $themeSlug   (coarse diff ${_pct(diff)})',
+        );
+        await _writePng(
+          tester,
+          comparison,
+          '$_outDir/${component}_$themeSlug.png',
+        );
+        comparison.dispose();
+        reference.dispose();
+        carbide.dispose();
 
         // The hard gate: Carbide rendered something with real contrast, not a
         // blank or single-colour box. (A clipped-to-nothing or collapsed
@@ -470,13 +174,6 @@ void main() {
           greaterThan(0.1),
           reason: '$component ($themeSlug) rendered blank/flat',
         );
-
-        final ui.Image reference = await _decodePng(
-          tester,
-          refFile.readAsBytesSync(),
-        );
-        final _Grid refGrid = await _luminanceGrid(tester, reference);
-        final double diff = _meanAbsDiff(refGrid, carbideGrid);
 
         // The soft drift gate (#230): the committed per-story threshold
         // bounds the coarse diff. No threshold yet → bootstrap line for
@@ -499,18 +196,6 @@ void main() {
             'FIDELITY-SCORE $component $themeSlug ${diff.toStringAsFixed(4)}',
           );
         }
-
-        final ui.Image comparison = await _composeSideBySide(
-          tester,
-          reference,
-          carbide,
-          label: '$component — $themeSlug   (coarse diff ${_pct(diff)})',
-        );
-        await _writePng(
-          tester,
-          comparison,
-          '$_outDir/${component}_$themeSlug.png',
-        );
       });
     }
   }
@@ -520,35 +205,78 @@ void main() {
 Future<ui.Image> _renderCarbide(
   WidgetTester tester,
   CarbonThemeData theme,
+  String component,
+  String themeSlug,
   Widget child,
 ) async {
   final GlobalKey key = GlobalKey();
-  await tester.binding.setSurfaceSize(const Size(800, 600));
+  final GlobalKey scene = GlobalKey();
+  final Map<String, dynamic> fixture =
+      _stories[component]!['fixture'] as Map<String, dynamic>;
+  final List<dynamic> dimensions = fixture['viewport'] as List<dynamic>;
+  final Size viewport = Size(
+    (dimensions[0] as num).toDouble(),
+    (dimensions[1] as num).toDouble(),
+  );
+  final Map<String, dynamic> rect = fixture['root'] as Map<String, dynamic>;
+  final Rect storyRoot = Rect.fromLTWH(
+    (rect['x'] as num).toDouble(),
+    (rect['y'] as num).toDouble(),
+    (rect['width'] as num).toDouble(),
+    (rect['height'] as num).toDouble(),
+  );
+  await tester.binding.setSurfaceSize(viewport);
   addTearDown(() => tester.binding.setSurfaceSize(null));
+  final Widget root = RepaintBoundary(
+    key: key,
+    child: ColoredBox(
+      color: theme.background,
+      child: SizedBox(
+        width: storyRoot.width,
+        child: Align(
+          alignment: Alignment.topLeft,
+          heightFactor: 1,
+          child: child,
+        ),
+      ),
+    ),
+  );
   await tester.pumpWidget(
     Directionality(
       textDirection: TextDirection.ltr,
       child: MediaQuery(
-        data: const MediaQueryData(),
+        data: MediaQueryData(size: viewport),
         child: CarbonTheme(
           data: theme,
-          child: TapRegionSurface(
-            child: Overlay(
-              initialEntries: <OverlayEntry>[
-                managedOverlayEntry(
-                  builder: (BuildContext context) => Center(
-                    // Capture the component tight, on the theme background (as
-                    // the Carbon reference has it). The background keeps
-                    // light-theme content from sitting on transparent black;
-                    // the tight bounds keep small components (checkbox) from
-                    // being diluted below the non-blank threshold.
-                    child: RepaintBoundary(
-                      key: key,
-                      child: ColoredBox(color: theme.background, child: child),
-                    ),
+          child: DefaultTextStyle(
+            style: CarbonTypeStyles.body02.copyWith(color: theme.textPrimary),
+            child: RepaintBoundary(
+              key: scene,
+              child: ColoredBox(
+                color: theme.background,
+                child: TapRegionSurface(
+                  child: Overlay(
+                    initialEntries: <OverlayEntry>[
+                      managedOverlayEntry(
+                        builder: (_) => component == 'modal'
+                            ? child
+                            : component == 'tooltip'
+                            ? Center(child: root)
+                            : Align(
+                                alignment: Alignment.topLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    left: storyRoot.left,
+                                    top: storyRoot.top,
+                                  ),
+                                  child: root,
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -556,32 +284,58 @@ Future<ui.Image> _renderCarbide(
     ),
   );
   await tester.pump(const Duration(milliseconds: 16));
-  await tester.pump(const Duration(milliseconds: 200));
+  await tester.pump(const Duration(milliseconds: 300));
   final RenderRepaintBoundary boundary =
-      key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-  return (await tester.runAsync<ui.Image>(
+      (component == 'modal' ? scene : key).currentContext!.findRenderObject()!
+          as RenderRepaintBoundary;
+  final ui.Image rendered = (await tester.runAsync<ui.Image>(
     () => boundary.toImage(pixelRatio: 2),
   ))!;
+  if (component != 'modal') return rendered;
+  // Storybook screenshots #storybook-root, a 48px launcher-sized rectangle,
+  // even though its open modal paints across the viewport. Keep that original
+  // crop; also retain the full scene so humans can inspect the complete form.
+  await _writePng(tester, rendered, '$_outDir/modal_full_$themeSlug.png');
+  final ui.PictureRecorder recorder = ui.PictureRecorder();
+  Canvas(recorder).drawImageRect(
+    rendered,
+    Rect.fromLTWH(
+      storyRoot.left * 2,
+      storyRoot.top * 2,
+      storyRoot.width * 2,
+      storyRoot.height * 2,
+    ),
+    Rect.fromLTWH(0, 0, storyRoot.width * 2, storyRoot.height * 2),
+    Paint(),
+  );
+  final ui.Picture picture = recorder.endRecording();
+  final ui.Image cropped = await picture.toImage(
+    (storyRoot.width * 2).ceil(),
+    (storyRoot.height * 2).ceil(),
+  );
+  picture.dispose();
+  rendered.dispose();
+  return cropped;
 }
 
 Future<ui.Image> _decodePng(WidgetTester tester, Uint8List bytes) async {
   return (await tester.runAsync<ui.Image>(() async {
     final ui.Codec codec = await ui.instantiateImageCodec(bytes);
     final ui.FrameInfo frame = await codec.getNextFrame();
+    codec.dispose();
     return frame.image;
   }))!;
 }
 
 /// A downsampled luminance grid used for the coarse, framing-tolerant metric.
 class _Grid {
-  _Grid(this.cells);
+  _Grid(this.cells, this.range);
   static const int n = 24;
   final List<double> cells; // n*n luminance values in 0..1.
 
-  /// Brightest minus darkest cell. A blank/flat render is ~0; any component
-  /// with content (e.g. light text on a dark field) is well above, regardless
-  /// of how much surrounding background dilutes a global variance.
-  double get range => cells.reduce(math.max) - cells.reduce(math.min);
+  /// Exact pixel luminance range, independent of grid sampling. Tiny icon
+  /// triggers can fall entirely between the coarse metric's sample points.
+  final double range;
 }
 
 Future<_Grid> _luminanceGrid(WidgetTester tester, ui.Image image) async {
@@ -616,7 +370,15 @@ Future<_Grid> _luminanceGrid(WidgetTester tester, ui.Image image) async {
       cells[i] /= counts[i];
     }
   }
-  return _Grid(cells);
+  double darkest = 1, brightest = 0;
+  for (int i = 0; i < bytes.length; i += 4) {
+    final double lum =
+        (0.2126 * bytes[i] + 0.7152 * bytes[i + 1] + 0.0722 * bytes[i + 2]) /
+        255;
+    darkest = math.min(darkest, lum);
+    brightest = math.max(brightest, lum);
+  }
+  return _Grid(cells, brightest - darkest);
 }
 
 double _meanAbsDiff(_Grid a, _Grid b) {
@@ -676,9 +438,11 @@ Future<ui.Image> _composeSideBySide(
   );
 
   final ui.Picture picture = recorder.endRecording();
-  return (await tester.runAsync<ui.Image>(
+  final ui.Image composed = (await tester.runAsync<ui.Image>(
     () => picture.toImage(width.ceil(), height.ceil()),
   ))!;
+  picture.dispose();
+  return composed;
 }
 
 void _drawContained(Canvas canvas, ui.Image image, Rect area) {

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Audit all 33 upstream fidelity fixtures against their pinned stories. Use the
+  complete Modal and icon Tooltip compositions, correct default copy, variants,
+  counts, selection and story framing, and emit full modal review artifacts.
+  Correct bounded text content-switcher segments to divide the available width,
+  preserving intrinsic icon-only and unbounded layouts (#324).
+
 - Make the gallery shell keyboard accessible with skip-to-main and home actions.
   Move primary navigation between header and side nav at Carbon's lg breakpoint,
   retain full-width mobile content, grow scaled shell labels and preserve

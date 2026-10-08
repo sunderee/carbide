@@ -4,167 +4,701 @@
     {
       "component": "button",
       "storyId": "components-button--default",
-      "threshold": 0.64
+      "threshold": 0.64,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Button/Button.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 48
+        },
+        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      }
     },
     {
       "component": "tag",
       "storyId": "components-tag--read-only",
-      "threshold": 0.21
+      "threshold": 0.21,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Tag/Tag.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 24
+        },
+        "finding": "Correct twelve read-only tag variants, 4px gaps and long red label."
+      }
     },
     {
       "component": "checkbox",
       "storyId": "components-checkbox--default",
-      "threshold": 0.3
+      "threshold": 0.3,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Checkbox/Checkbox.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 89.9844
+        },
+        "finding": "Correct grouped legend/helper and two unchecked rows."
+      }
     },
     {
       "component": "toggle",
       "storyId": "components-toggle--default",
-      "threshold": 0.28
+      "threshold": 0.28,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Toggle/Toggle.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 57.9844
+        },
+        "finding": "Correct default Label and on state."
+      }
     },
     {
       "component": "text-input",
       "storyId": "components-textinput--default",
-      "threshold": 0.12
+      "threshold": 0.12,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/TextInput/TextInput.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 83.9844
+        },
+        "finding": "Correct 300px width, label and helper; counter remains disabled."
+      }
     },
     {
       "component": "dropdown",
       "storyId": "components-dropdown--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Dropdown/Dropdown.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 85.9844
+        },
+        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      }
     },
     {
       "component": "tabs",
       "storyId": "components-tabs--default",
-      "threshold": 0.13
+      "threshold": 0.13,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Tabs/Tabs.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 88
+        },
+        "finding": "Match full-width root and four labels/panels; first selected."
+      }
     },
     {
       "component": "accordion",
       "storyId": "components-accordion--default",
-      "threshold": 0.09
+      "threshold": 0.09,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Accordion/Accordion.stories.tsx",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 165
+        },
+        "finding": "Match full-width collapsed four-row story."
+      }
     },
     {
       "component": "tree-view",
       "storyId": "components-treeview--default",
-      "threshold": 0.14
+      "threshold": 0.14,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/TreeView/Treeview.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 602
+        },
+        "finding": "Restore complete nested hierarchy, five expanded branches and disabled Models."
+      }
     },
     {
       "component": "multiselect",
       "storyId": "components-multiselect--default",
-      "threshold": 0.11
+      "threshold": 0.11,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/MultiSelect/MultiSelect.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 85.9844
+        },
+        "finding": "Correct 300px width and empty initial selection."
+      }
     },
     {
       "component": "data-table",
       "storyId": "components-datatable-basic--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/DataTable/stories/DataTable-basic.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 384.5
+        },
+        "finding": "Correct five columns, seven rows and complete cell data."
+      }
     },
     {
       "component": "notification",
       "storyId": "components-notifications-inline--default",
-      "threshold": 0.44
+      "threshold": 0.44,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Notification/stories/InlineNotification.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 48
+        },
+        "finding": "Match 736px error bar and exact subtitle; dismiss control present."
+      }
     },
     {
       "component": "search",
       "storyId": "components-search--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Search/Search.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 40
+        },
+        "finding": "Correct 800px width and Placeholder text."
+      }
     },
     {
       "component": "number-input",
       "storyId": "components-numberinput--default",
-      "threshold": 0.09
+      "threshold": 0.09,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/NumberInput/NumberInput.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 83.9844
+        },
+        "finding": "Use full root width, value50 and exact helper punctuation."
+      }
     },
     {
       "component": "select",
       "storyId": "components-select--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Select/Select.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 83.9844
+        },
+        "finding": "Correct Deployment region placeholder, five options and helper."
+      }
     },
     {
       "component": "combo-box",
       "storyId": "components-combobox--default",
-      "threshold": 0.12
+      "threshold": 0.12,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/ComboBox/ComboBox.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 85.9844
+        },
+        "finding": "Correct 300px Label/helper/Filter... empty combobox."
+      }
     },
     {
       "component": "date-picker",
       "storyId": "components-datepicker--default",
-      "threshold": 0.12
+      "threshold": 0.12,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/DatePicker/DatePicker.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 64
+        },
+        "finding": "Correct 288px calendar input; closed, empty state."
+      }
     },
     {
       "component": "radio-button",
       "storyId": "components-radiobutton--default",
-      "threshold": 0.18
+      "threshold": 0.18,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/RadioButton/RadioButton.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 66.9844
+        },
+        "finding": "Correct horizontal group, second selection, legend and helper."
+      }
     },
     {
       "component": "slider",
       "storyId": "components-slider--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Slider/Slider.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 64
+        },
+        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      }
     },
     {
       "component": "modal",
       "storyId": "components-modal--default",
-      "threshold": 0.44
+      "threshold": 0.44,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Modal/Modal.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 48
+        },
+        "finding": "Replace Dialog with complete open large Modal, form and footer. Preserve original launcher-root crop and additionally emit full scene for anatomy review.",
+        "limitation": "The existing reference crops only the launcher-sized 48px root across the open modal. Its body/footer need structural assertions and full-scene review. Existing max-height/layout differences remain visible."
+      }
     },
     {
       "component": "tooltip",
       "storyId": "components-tooltip--default",
-      "threshold": 0.24
+      "threshold": 0.24,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Tooltip/Tooltip.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 0,
+          "y": 219,
+          "width": 1280,
+          "height": 282
+        },
+        "finding": "Replace underlined URL term with closed Options tooltip and 16px vertical-overflow icon, centered in the 1280x282 decorator.",
+        "limitation": "A closed 16px icon is extremely diluted by the large decorator and can fall between grid samples; anatomy/dimension/colour guards are essential."
+      }
     },
     {
       "component": "progress-bar",
       "storyId": "components-progressbar--default",
-      "threshold": 0.22
+      "threshold": 0.22,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/ProgressBar/ProgressBar.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 57.9844
+        },
+        "finding": "Correct Uploading files label, 75% and helper, full root width."
+      }
     },
     {
       "component": "progress-indicator",
       "storyId": "components-progressindicator--default",
-      "threshold": 0.1
+      "threshold": 0.1,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/ProgressIndicator/ProgressIndicator.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 28.2969
+        },
+        "finding": "Restore optional/invalid labels and complete/current/invalid states. The story does not set a 640px host width; preserve its full root framing.",
+        "limitation": "The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity."
+      }
     },
     {
       "component": "breadcrumb",
       "storyId": "components-breadcrumb--default",
-      "threshold": 0.16
+      "threshold": 0.16,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Breadcrumb/Breadcrumb.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 18
+        },
+        "finding": "Restore fourth linked breadcrumb."
+      }
     },
     {
       "component": "pagination",
       "storyId": "components-pagination--default",
-      "threshold": 0.12
+      "threshold": 0.12,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Pagination/Pagination.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 56
+        },
+        "finding": "Correct 800px max width, 16px top margin, page sizes10..50, page1/103items."
+      }
     },
     {
       "component": "code-snippet",
       "storyId": "components-codesnippet--singleline",
-      "threshold": 0.13
+      "threshold": 0.13,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/CodeSnippet/CodeSnippet.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 40
+        },
+        "finding": "Correct complete single-line command and 768px framed control."
+      }
     },
     {
       "component": "content-switcher",
       "storyId": "components-contentswitcher--default",
-      "threshold": 0.13
+      "threshold": 0.13,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/ContentSwitcher/ContentSwitcher.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 40
+        },
+        "finding": "Match full-width three text segments, first selected. Audit exposed intrinsic-only segment sizing; bounded text controls now divide width equally, while icon-only/unbounded controls retain intrinsic sizing."
+      }
     },
     {
       "component": "structured-list",
       "storyId": "components-structuredlist--default",
-      "threshold": 0.11
+      "threshold": 0.11,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/StructuredList/StructuredList.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 164.9688
+        },
+        "finding": "Correct Service/Status/Description headings and complete two-row copy."
+      }
     },
     {
       "component": "tile",
       "storyId": "components-tile--default",
-      "threshold": 0.08
+      "threshold": 0.08,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Tile/Tile.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 86
+        },
+        "finding": "Restore second-line Link in full-width default Tile."
+      }
     },
     {
       "component": "loading",
       "storyId": "components-loading--default",
-      "threshold": 0.21
+      "threshold": 0.21,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Loading/Loading.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 88
+        },
+        "finding": "Match inline 88px active spinner, no overlay; animation remains phase-sensitive.",
+        "limitation": "Capture timing determines essential spinner rotation; compare with a documented animation margin."
+      }
     },
     {
       "component": "inline-loading",
       "storyId": "components-inlineloading--default",
-      "threshold": 0.14
+      "threshold": 0.14,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/InlineLoading/InlineLoading.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 32
+        },
+        "finding": "Correct Loading text and active32px state.",
+        "limitation": "Capture timing determines essential spinner rotation; compare with a documented animation margin."
+      }
     },
     {
       "component": "overflow-menu",
       "storyId": "components-overflowmenu--default",
-      "threshold": 0.07
+      "threshold": 0.07,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 40
+        },
+        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing.",
+        "limitation": "Closed 16px glyph can fall between grid samples; verify trigger anatomy/dimensions/colour separately."
+      }
     },
     {
       "component": "link",
       "storyId": "components-link--default",
-      "threshold": 0.18
+      "threshold": 0.18,
+      "fixture": {
+        "carbonTag": "v11.118.0",
+        "source": "documentation/carbon/packages/react/src/components/Link/Link.stories.js",
+        "auditDate": "2026-10-08",
+        "viewport": [
+          1280,
+          720
+        ],
+        "root": {
+          "x": 42,
+          "y": 42,
+          "width": 1196,
+          "height": 18
+        },
+        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      }
     }
   ]
 }
