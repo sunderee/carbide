@@ -101,18 +101,27 @@ void main() {
             stage = 'action pointer';
             await _settle(tester);
             expect(key.currentState!.actions, 1);
-            await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+            await tester.sendKeyEvent(
+              LogicalKeyboardKey.enter,
+              physicalKey: PhysicalKeyboardKey.enter,
+            );
             stage = 'action Enter';
             await _settle(tester);
             expect(key.currentState!.actions, 2);
-            await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+            await tester.sendKeyEvent(
+              LogicalKeyboardKey.tab,
+              physicalKey: PhysicalKeyboardKey.tab,
+            );
             stage = 'action Tab';
             await _settle(tester);
             expect(
               _document.activeElement?.textContent?.trim(),
               'Close notification',
             );
-            await tester.sendKeyEvent(LogicalKeyboardKey.space);
+            await tester.sendKeyEvent(
+              LogicalKeyboardKey.space,
+              physicalKey: PhysicalKeyboardKey.space,
+            );
             stage = 'close Space';
             await _settle(tester);
             expect(key.currentState!.closes, 1);
