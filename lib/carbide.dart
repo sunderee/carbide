@@ -77,6 +77,7 @@ export 'src/components/number_input/carbon_number_input.dart';
 export 'src/components/notification/carbon_notification.dart';
 export 'src/components/popover/carbon_popover.dart';
 export 'src/components/pagination/carbon_pagination.dart';
+export 'src/components/pagination/pagination_localizations.dart';
 export 'src/components/pagination_nav/carbon_pagination_nav.dart';
 export 'src/components/progress_bar/carbon_progress_bar.dart';
 export 'src/components/progress_indicator/carbon_progress_indicator.dart';
