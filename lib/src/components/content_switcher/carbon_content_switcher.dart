@@ -198,20 +198,33 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                for (int i = 0; i < widget.switches.length; i++)
-                  _SwitchSegment(
-                    data: widget.switches[i],
-                    size: widget.size,
-                    selected: i == _current,
-                    isFirst: i == 0,
-                    focusNode: _nodes[i],
-                    onKey: _onKey,
-                    onTap: () => _select(i),
-                  ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final bool expand =
+                    constraints.hasBoundedWidth &&
+                    widget.switches.any((segment) => segment.text != null);
+                final List<Widget> segments = <Widget>[
+                  for (int i = 0; i < widget.switches.length; i++)
+                    _SwitchSegment(
+                      data: widget.switches[i],
+                      size: widget.size,
+                      selected: i == _current,
+                      isFirst: i == 0,
+                      focusNode: _nodes[i],
+                      onKey: _onKey,
+                      onTap: () => _select(i),
+                    ),
+                ];
+                return Row(
+                  mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+                  children: expand
+                      ? <Widget>[
+                          for (final Widget segment in segments)
+                            Expanded(child: segment),
+                        ]
+                      : segments,
+                );
+              },
             ),
           ),
         ),
@@ -276,12 +289,14 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
                 CarbonIcon(widget.data.icon!, color: foreground),
                 const SizedBox(width: CarbonSpacing.spacing03),
               ],
-              Text(
-                widget.data.text!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: CarbonTypeStyles.bodyCompact01.copyWith(
-                  color: foreground,
+              Flexible(
+                child: Text(
+                  widget.data.text!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(
+                    color: foreground,
+                  ),
                 ),
               ),
             ],

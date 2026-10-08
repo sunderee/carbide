@@ -39,6 +39,117 @@ void main() {
     FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
   });
 
+  testWidgets('bounded text segments divide the full available width equally', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 600,
+          child: CarbonContentSwitcher(
+            switches: <CarbonSwitch>[
+              CarbonSwitch(text: 'First'),
+              CarbonSwitch(text: 'Second'),
+              CarbonSwitch(text: 'Third'),
+            ],
+          ),
+        ),
+      ),
+    );
+    final List<Semantics> segments = tester
+        .widgetList<Semantics>(
+          find.byWidgetPredicate(
+            (widget) => widget is Semantics && widget.properties.button == true,
+          ),
+        )
+        .toList();
+    expect(segments.length, 3);
+    for (final Semantics segment in segments) {
+      expect(tester.getSize(find.byWidget(segment)).width, closeTo(200, .01));
+    }
+    expect(
+      tester.getSize(find.byType(CarbonContentSwitcher)),
+      const Size(600, 40),
+    );
+  });
+
+  testWidgets(
+    'narrow equal segments retain full names with ellipsized labels',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const SizedBox(
+            width: 160,
+            child: CarbonContentSwitcher(
+              switches: <CarbonSwitch>[
+                CarbonSwitch(text: 'A long first section label'),
+                CarbonSwitch(text: 'Another long section label'),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getSize(find.byType(CarbonContentSwitcher)),
+        const Size(160, 40),
+      );
+      final List<Semantics> segments = tester
+          .widgetList<Semantics>(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is Semantics && widget.properties.button == true,
+            ),
+          )
+          .toList();
+      expect(segments.map((segment) => segment.properties.label), <String>[
+        'A long first section label',
+        'Another long section label',
+      ]);
+    },
+  );
+
+  testWidgets(
+    'unbounded text segments and icon-only controls retain intrinsic width',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonContentSwitcher(
+                switches: <CarbonSwitch>[
+                  CarbonSwitch(text: 'One'),
+                  CarbonSwitch(text: 'Two'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(
+        tester.getSize(find.byType(CarbonContentSwitcher)).width,
+        lessThan(300),
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(
+        _host(
+          const CarbonContentSwitcher(
+            switches: <CarbonSwitch>[
+              CarbonSwitch(icon: CarbonIcons.add, semanticLabel: 'Add'),
+              CarbonSwitch(icon: CarbonIcons.search, semanticLabel: 'Search'),
+            ],
+          ),
+        ),
+      );
+      expect(
+        tester.getSize(find.byType(CarbonContentSwitcher)).width,
+        lessThan(160),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   group('motion', () {
     testWidgets('selection transition tokens', (WidgetTester tester) async {
       await tester.pumpWidget(
