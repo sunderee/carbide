@@ -34,6 +34,37 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../breadcrumb/carbon_breadcrumb.dart';
+import '../button/carbon_button.dart';
+
+/// A named action in a [CarbonPageHeader]'s responsive action area.
+///
+/// The first action has priority. A null [onPressed] disables both its button
+/// and its overflow-menu row. Keep [id] stable across rebuilds and reordering.
+class CarbonPageHeaderAction {
+  /// Creates an action that can be shown as a button or a menu row.
+  const CarbonPageHeaderAction({
+    required this.id,
+    required this.label,
+    this.onPressed,
+    this.kind = CarbonButtonKind.primary,
+    this.icon,
+  });
+
+  /// The unique, stable identity of this action within the header.
+  final Object id;
+
+  /// The complete visible and accessible action name.
+  final String label;
+
+  /// The activation callback; null renders a disabled action.
+  final VoidCallback? onPressed;
+
+  /// The button treatment; destructive kinds also mark the menu row.
+  final CarbonButtonKind kind;
+
+  /// An optional button and menu-row icon.
+  final CarbonIconData? icon;
+}
 
 /// A page-level header band with a title, optional breadcrumb, description and
 /// tabs.
@@ -77,10 +108,13 @@ class CarbonPageHeader extends StatelessWidget {
     this.breadcrumbBorder = false,
     this.breadcrumbActions,
     this.pageActions,
+    this.actions,
+    this.actionsOverflowLabel = 'More page actions',
     this.tags = const <Widget>[],
     this.tabs,
     this.headingLevel = 1,
-  }) : assert(headingLevel >= 1 && headingLevel <= 6);
+  }) : assert(headingLevel >= 1 && headingLevel <= 6),
+       assert(pageActions == null || actions == null);
 
   /// The page title (`productive-heading-04`).
   final String title;
@@ -112,6 +146,17 @@ class CarbonPageHeader extends StatelessWidget {
 
   /// Trailing content of the title row (e.g. a primary button or menu).
   final Widget? pageActions;
+
+  /// Structured responsive actions, in priority and logical menu order.
+  ///
+  /// Mutually exclusive with [pageActions]. Below Carbon's `md` breakpoint,
+  /// the title and actions occupy separate rows. Fitting leading actions
+  /// stay visible; remaining actions use the existing Carbon overflow menu.
+  /// An Overlay host, such as `WidgetsApp`, is required to open that menu.
+  final List<CarbonPageHeaderAction>? actions;
+
+  /// The localized accessible name of the hidden-action menu trigger.
+  final String actionsOverflowLabel;
 
   /// Tags rendered after the body.
   final List<Widget> tags;
