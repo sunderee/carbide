@@ -16,6 +16,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../utils/modal_background_lock.dart';
+import '../../utils/overlay_semantics_anchor.dart';
 import '../../foundations/layout.dart';
 import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
@@ -62,6 +64,12 @@ enum CarbonModalSize {
 /// the dialog container slides down from −24px (`moderate-02` ×
 /// `entrance, expressive`). Under reduced motion
 /// (`MediaQueryData.disableAnimations`) the modal appears instantly.
+///
+/// Closing uses the expressive exit curve for the same moderate-02 duration.
+/// The surface remains mounted, with focus and semantics intact, until exit
+/// completes. Modal focus restores only after removal; reopening cancels exit.
+/// Reduced motion removes the surface immediately. Modal mode also blocks page
+/// wheel/touch gestures and pointer interaction while present.
 ///
 /// ```dart
 /// CarbonModal(
@@ -173,6 +181,7 @@ class _CarbonModalState extends State<CarbonModal> {
   final FocusScopeNode _scope = FocusScopeNode(debugLabel: 'CarbonModal');
   FocusNode? _restoreFocus;
   bool _entered = false;
+  Timer? _exitTimer;
 
   @override
   void initState() {
@@ -193,6 +202,7 @@ class _CarbonModalState extends State<CarbonModal> {
 
   @override
   void dispose() {
+    _exitTimer?.cancel();
     _scope.dispose();
     super.dispose();
   }
@@ -200,7 +210,13 @@ class _CarbonModalState extends State<CarbonModal> {
   void _sync() {
     void apply() {
       if (!mounted) return;
-      if (widget.open && !_overlay.isShowing) {
+      if (widget.open) {
+        _exitTimer?.cancel();
+        _exitTimer = null;
+        if (_overlay.isShowing) {
+          setState(() => _entered = true);
+          return;
+        }
         _restoreFocus = FocusManager.instance.primaryFocus;
         _overlay.show();
         // Mount hidden first so the entrance transition plays.
@@ -211,15 +227,17 @@ class _CarbonModalState extends State<CarbonModal> {
             _focusOnOpen();
           }
         });
-      } else if (!widget.open && _overlay.isShowing) {
-        _overlay.hide();
-        _entered = false;
-        final FocusNode? launcher = _restoreFocus;
-        _restoreFocus = null;
-        if (launcher?.context != null &&
-            launcher!.parent != null &&
-            launcher.canRequestFocus) {
-          launcher.requestFocus();
+      } else if (_overlay.isShowing) {
+        setState(() => _entered = false);
+        final Duration duration = carbonDuration(
+          context,
+          CarbonDuration.moderate02,
+        );
+        if (duration == Duration.zero) {
+          _finishClose();
+        } else {
+          _exitTimer?.cancel();
+          _exitTimer = Timer(duration, _finishClose);
         }
       }
     }
@@ -229,6 +247,33 @@ class _CarbonModalState extends State<CarbonModal> {
       WidgetsBinding.instance.addPostFrameCallback((_) => apply());
     } else {
       apply();
+    }
+  }
+
+  void _finishClose() {
+    _exitTimer?.cancel();
+    _exitTimer = null;
+    if (!mounted || widget.open || !_overlay.isShowing) return;
+
+    _overlay.hide();
+    setState(() {});
+
+    final FocusNode? launcher = _restoreFocus;
+    _restoreFocus = null;
+    if (launcher?.context != null &&
+        launcher!.parent != null &&
+        launcher.canRequestFocus) {
+      launcher.requestFocus();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!widget.open &&
+        _overlay.isShowing &&
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _finishClose());
     }
   }
 
@@ -276,7 +321,9 @@ class _CarbonModalState extends State<CarbonModal> {
     return OverlayPortal(
       controller: _overlay,
       overlayChildBuilder: _buildOverlay,
-      child: const SizedBox.shrink(),
+      child: _overlay.isShowing
+          ? const CarbonOverlaySemanticsAnchor()
+          : const SizedBox.shrink(),
     );
   }
 
@@ -292,74 +339,84 @@ class _CarbonModalState extends State<CarbonModal> {
     );
 
     return Positioned.fill(
-      child: Focus(
-        onKeyEvent: _onKey,
-        canRequestFocus: false,
-        child: FocusScope(
-          node: _scope,
-          autofocus: true,
-          child: AnimatedOpacity(
-            duration: duration,
-            curve: CarbonEasing.entranceExpressive,
-            opacity: _entered ? 1 : 0,
-            child: Stack(
-              children: <Widget>[
-                // The scrim.
-                Positioned.fill(
-                  child: ExcludeSemantics(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: widget.preventCloseOnClickOutside
-                          ? null
-                          : widget.onClose,
-                      child: ColoredBox(
-                        color: widget.aiLabel != null && !widget.aiRevert
-                            ? theme.aiOverlay
-                            : theme.overlay,
+      child: CarbonModalBackgroundLock(
+        child: Focus(
+          onKeyEvent: _onKey,
+          canRequestFocus: false,
+          child: FocusScope(
+            node: _scope,
+            autofocus: true,
+            child: AnimatedOpacity(
+              alwaysIncludeSemantics: true,
+              duration: duration,
+              curve: _entered
+                  ? CarbonEasing.entranceExpressive
+                  : CarbonEasing.exitExpressive,
+              opacity: _entered ? 1 : 0,
+              child: Stack(
+                children: <Widget>[
+                  // The scrim.
+                  Positioned.fill(
+                    child: ExcludeSemantics(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: widget.preventCloseOnClickOutside
+                            ? null
+                            : widget.onClose,
+                        child: ColoredBox(
+                          color: widget.aiLabel != null && !widget.aiRevert
+                              ? theme.aiOverlay
+                              : theme.overlay,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) =>
-                      Center(
-                        child: AnimatedSlide(
-                          duration: duration,
-                          curve: CarbonEasing.entranceExpressive,
-                          // transform: translate3d(0, -24px, 0) while hidden,
-                          // approximated as a fraction of the dialog height.
-                          offset: _entered
-                              ? Offset.zero
-                              : const Offset(0, -0.05),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: widget.size.width,
-                              maxHeight: constraints.maxHeight * 0.9,
-                            ),
-                            // Swallow taps so they do not reach the scrim.
-                            child: GestureDetector(
-                              onTap: () {},
-                              excludeFromSemantics: true,
-                              child: _Dialog(
-                                title: widget.title,
-                                label: widget.label,
-                                danger: widget.danger,
-                                passiveModal: widget.passiveModal,
-                                isFullWidth: widget.isFullWidth,
-                                aiLabel: widget.aiLabel,
-                                aiRevert: widget.aiRevert,
-                                closeLabel: widget.closeLabel,
-                                onClose: widget.onClose,
-                                primaryButton: widget.primaryButton,
-                                secondaryButton: widget.secondaryButton,
-                                child: widget.child,
+                  LayoutBuilder(
+                    builder:
+                        (
+                          BuildContext context,
+                          BoxConstraints constraints,
+                        ) => Center(
+                          child: AnimatedSlide(
+                            duration: duration,
+                            curve: _entered
+                                ? CarbonEasing.entranceExpressive
+                                : CarbonEasing.exitExpressive,
+                            // transform: translate3d(0, -24px, 0) while hidden,
+                            // approximated as a fraction of the dialog height.
+                            offset: _entered
+                                ? Offset.zero
+                                : const Offset(0, -0.05),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: widget.size.width,
+                                maxHeight: constraints.maxHeight * 0.9,
+                              ),
+                              // Swallow taps so they do not reach the scrim.
+                              child: GestureDetector(
+                                onTap: () {},
+                                excludeFromSemantics: true,
+                                child: _Dialog(
+                                  title: widget.title,
+                                  label: widget.label,
+                                  danger: widget.danger,
+                                  passiveModal: widget.passiveModal,
+                                  isFullWidth: widget.isFullWidth,
+                                  aiLabel: widget.aiLabel,
+                                  aiRevert: widget.aiRevert,
+                                  closeLabel: widget.closeLabel,
+                                  onClose: widget.onClose,
+                                  primaryButton: widget.primaryButton,
+                                  secondaryButton: widget.secondaryButton,
+                                  child: widget.child,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -25,6 +25,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../utils/modal_background_lock.dart';
+import '../../utils/overlay_semantics_anchor.dart';
 import '../../foundations/layout.dart';
 import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
@@ -57,6 +59,12 @@ import '../../utils/overlay_focus_repair.dart';
 /// backdrop appear instantly.
 ///
 /// Compose the slots inside [children]:
+///
+/// Closing uses the expressive exit curve for the same moderate-02 duration.
+/// The surface remains mounted, with focus and semantics intact, until exit
+/// completes. Modal focus restores only after removal; reopening cancels exit.
+/// Reduced motion removes the surface immediately. Modal mode also blocks page
+/// wheel/touch gestures and pointer interaction while present.
 ///
 /// ```dart
 /// CarbonDialog(
@@ -119,6 +127,7 @@ class _CarbonDialogState extends State<CarbonDialog> {
   bool Function()? _restoreNativeFocus;
   final OverlayFocusRepair _focusRepair = OverlayFocusRepair();
   bool _entered = false;
+  Timer? _exitTimer;
 
   @override
   void initState() {
@@ -149,6 +158,7 @@ class _CarbonDialogState extends State<CarbonDialog> {
 
   @override
   void dispose() {
+    _exitTimer?.cancel();
     _restoreNativeFocus = null;
     _focusRepair.dispose();
     _region.dispose();
@@ -159,7 +169,13 @@ class _CarbonDialogState extends State<CarbonDialog> {
   void _sync() {
     void apply() {
       if (!mounted) return;
-      if (widget.open && !_overlay.isShowing) {
+      if (widget.open) {
+        _exitTimer?.cancel();
+        _exitTimer = null;
+        if (_overlay.isShowing) {
+          setState(() => _entered = true);
+          return;
+        }
         _focusRepair.cancel();
         _restoreFocus = FocusManager.instance.primaryFocus;
         _restoreNativeFocus = widget.modal ? null : captureNativeControlFocus();
@@ -172,31 +188,17 @@ class _CarbonDialogState extends State<CarbonDialog> {
             _focusOnOpen();
           }
         });
-      } else if (!widget.open && _overlay.isShowing) {
-        final FocusNode? pageFocus = FocusManager.instance.primaryFocus;
-        final bool preservePage =
-            !widget.modal &&
-            pageFocus != null &&
-            !pageFocus.ancestors.contains(_region);
-        final bool Function()? pageNativeFocus = preservePage
-            ? captureNativeControlFocus()
-            : null;
-        _overlay.hide();
-        _entered = false;
-        final FocusNode? launcher = _restoreFocus;
-        _restoreFocus = null;
-        _restoreNativeFocus = null;
-        if (widget.modal &&
-            launcher?.context != null &&
-            launcher!.parent != null &&
-            launcher.canRequestFocus) {
-          launcher.requestFocus();
-        } else if (preservePage) {
-          _focusRepair.schedule(
-            pageFocus,
-            pageNativeFocus,
-            isCurrent: () => mounted && !widget.open && !widget.modal,
-          );
+      } else if (_overlay.isShowing) {
+        setState(() => _entered = false);
+        final Duration duration = carbonDuration(
+          context,
+          CarbonDuration.moderate02,
+        );
+        if (duration == Duration.zero) {
+          _finishClose();
+        } else {
+          _exitTimer?.cancel();
+          _exitTimer = Timer(duration, _finishClose);
         }
       }
     }
@@ -206,6 +208,49 @@ class _CarbonDialogState extends State<CarbonDialog> {
       WidgetsBinding.instance.addPostFrameCallback((_) => apply());
     } else {
       apply();
+    }
+  }
+
+  void _finishClose() {
+    _exitTimer?.cancel();
+    _exitTimer = null;
+    if (!mounted || widget.open || !_overlay.isShowing) return;
+
+    final FocusNode? pageFocus = FocusManager.instance.primaryFocus;
+    final bool preservePage =
+        !widget.modal &&
+        pageFocus != null &&
+        !pageFocus.ancestors.contains(_region);
+    final bool Function()? pageNativeFocus = preservePage
+        ? captureNativeControlFocus()
+        : null;
+    _overlay.hide();
+    setState(() {});
+
+    final FocusNode? launcher = _restoreFocus;
+    _restoreFocus = null;
+    _restoreNativeFocus = null;
+    if (widget.modal &&
+        launcher?.context != null &&
+        launcher!.parent != null &&
+        launcher.canRequestFocus) {
+      launcher.requestFocus();
+    } else if (preservePage) {
+      _focusRepair.schedule(
+        pageFocus,
+        pageNativeFocus,
+        isCurrent: () => mounted && !widget.open && !widget.modal,
+      );
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!widget.open &&
+        _overlay.isShowing &&
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _finishClose());
     }
   }
 
@@ -277,15 +322,18 @@ class _CarbonDialogState extends State<CarbonDialog> {
         return Center(
           child: AnimatedSlide(
             duration: duration,
-            // `_dialog.scss` `[open]`: transform $duration-moderate-02
-            // motion(entrance, expressive) — only the entrance plays here;
-            // closing unmounts the overlay instantly.
-            curve: CarbonEasing.entranceExpressive,
+            // `_dialog.scss`: moderate-02, expressive entrance/exit.
+            curve: _entered
+                ? CarbonEasing.entranceExpressive
+                : CarbonEasing.exitExpressive,
             // transform: translateY(-$spacing-06) while hidden.
             offset: _entered ? Offset.zero : const Offset(0, -0.05),
             child: AnimatedOpacity(
+              alwaysIncludeSemantics: true,
               duration: duration,
-              curve: CarbonEasing.entranceExpressive,
+              curve: _entered
+                  ? CarbonEasing.entranceExpressive
+                  : CarbonEasing.exitExpressive,
               opacity: _entered ? 1 : 0,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -346,32 +394,38 @@ class _CarbonDialogState extends State<CarbonDialog> {
     return Positioned.fill(
       // Escape cancels a modal dialog (the native cancel event); the key
       // handler must sit ABOVE the focus scope to see bubbled keys.
-      child: Focus(
-        focusNode: _region,
-        onKeyEvent: _onKey,
-        canRequestFocus: false,
-        child: FocusScope(
-          node: _scope,
-          autofocus: true,
-          child: Stack(
-            children: <Widget>[
-              // ::backdrop — the overlay scrim; no outside-tap dismissal
-              // (the native dialog element does not close on backdrop
-              // clicks).
-              Positioned.fill(
-                child: ExcludeSemantics(
-                  child: AnimatedOpacity(
-                    duration: carbonDuration(
-                      context,
-                      CarbonDuration.moderate02,
+      child: CarbonModalBackgroundLock(
+        child: Focus(
+          focusNode: _region,
+          onKeyEvent: _onKey,
+          canRequestFocus: false,
+          child: FocusScope(
+            node: _scope,
+            autofocus: true,
+            child: Stack(
+              children: <Widget>[
+                // ::backdrop — the overlay scrim; no outside-tap dismissal
+                // (the native dialog element does not close on backdrop
+                // clicks).
+                Positioned.fill(
+                  child: ExcludeSemantics(
+                    child: AnimatedOpacity(
+                      alwaysIncludeSemantics: true,
+                      duration: carbonDuration(
+                        context,
+                        CarbonDuration.moderate02,
+                      ),
+                      curve: _entered
+                          ? CarbonEasing.entranceExpressive
+                          : CarbonEasing.exitExpressive,
+                      opacity: _entered ? 1 : 0,
+                      child: ColoredBox(color: theme.overlay),
                     ),
-                    opacity: _entered ? 1 : 0,
-                    child: ColoredBox(color: theme.overlay),
                   ),
                 ),
-              ),
-              surface,
-            ],
+                surface,
+              ],
+            ),
           ),
         ),
       ),
@@ -383,7 +437,9 @@ class _CarbonDialogState extends State<CarbonDialog> {
     return OverlayPortal(
       controller: _overlay,
       overlayChildBuilder: _buildOverlay,
-      child: const SizedBox.shrink(),
+      child: _overlay.isShowing
+          ? CarbonOverlaySemanticsAnchor(modal: widget.modal)
+          : const SizedBox.shrink(),
     );
   }
 }

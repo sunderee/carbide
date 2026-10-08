@@ -90,12 +90,17 @@ CarbonModal(
 ## Behavior
 
 - **Focus.** Both components trap focus while open (modal case) and
-  restore it to the launcher on close. Initial focus should land on the
-  first input, not on the footer buttons.
+  restore it to the launcher after exit and removal, if the launcher is still
+  attached and focusable. A descendant autofocus request wins; otherwise the
+  first control (normally Close) receives focus. For a destructive action,
+  focus Cancel. Non-modal dialogs preserve page focus.
 - **Scrolling.** `CarbonModal` sizes come from `CarbonModalSize`; when
   content exceeds the max height the body scrolls while header and
   footer stay fixed. In `CarbonDialog`, the `CarbonDialogBody` slot owns
-  the scrollable middle row.
+  the scrollable middle row. A shared modal boundary consumes page wheel and
+  drag gestures, including when the overlay is inside a scrollable ancestor.
+  The body still scrolls; wheel events at its limit do not scroll the page.
+  Non-modal dialogs permit page scrolling and pointer interaction.
 - **Validation.** Validate before closing. Keep the dialog open on
   error, mark the field with `invalid` + `invalidText`, and surface
   server-side failures as a `CarbonInlineNotification` inside the body.
@@ -105,6 +110,26 @@ CarbonModal(
   is unavoidable, disable the primary action and show
   `CarbonInlineLoading`; for long operations close the dialog and report
   progress on the page instead.
+
+## Closing and presence
+
+Changing `open` to false starts a 240ms (`moderate-02`) opacity/slide exit using
+Carbon's expressive exit curve. The surface, modal focus trap, semantics and
+background interaction boundary remain present until removal. Focus stays on
+the dialog's current control throughout the visible exit; the modal launcher
+receives focus only after the portal is hidden. A non-modal dialog preserves any
+page control focused during exit. Reopening cancels pending removal and reverses
+the transition without mounting a second surface or capturing a new launcher.
+
+While present, an invisible 1×1px inline semantics anchor keeps the portal
+visible to accessibility traversal even in compact launcher layouts. Closed
+components retain their zero-sized inline placeholder.
+
+With `MediaQuery.disableAnimations`, removal is immediate on the next frame.
+Enabling reduced motion during an exit also removes it immediately. Disposing
+the component cancels pending removal. These behaviors follow the exit rules in
+Carbon v11.118.0 `_modal.scss` and `_dialog.scss`; the existing slide-distance
+approximation is retained.
 
 ## Content to avoid inside dialogs
 
