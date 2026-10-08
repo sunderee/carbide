@@ -568,7 +568,10 @@ class _MenuItemRow extends StatelessWidget {
       curve: CarbonEasing.standardProductive,
       constraints: BoxConstraints(minHeight: size.height),
       decoration: BoxDecoration(color: background),
-      padding: const EdgeInsets.symmetric(horizontal: CarbonSpacing.spacing05),
+      padding: const EdgeInsets.symmetric(
+        horizontal: CarbonSpacing.spacing05,
+        vertical: CarbonSpacing.spacing01,
+      ),
       child: Row(
         children: <Widget>[
           if (reserveLeading) ...<Widget>[

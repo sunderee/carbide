@@ -197,9 +197,12 @@ class _CarbonListBoxState extends State<CarbonListBox> {
               gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
               border: border,
             ),
+            // Preserve a clear inset focus band when text determines height.
             padding: const EdgeInsetsDirectional.only(
               start: CarbonSpacing.spacing05,
               end: CarbonSpacing.spacing04,
+              top: CarbonSpacing.spacing01,
+              bottom: CarbonSpacing.spacing01,
             ),
             child: Row(
               children: <Widget>[
@@ -453,16 +456,21 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: dividerColor)),
                 ),
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  heightFactor: 1,
-                  child: DefaultTextStyle.merge(
-                    style: CarbonTypeStyles.bodyCompact01.copyWith(
-                      color: textColor,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: CarbonSpacing.spacing01,
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    heightFactor: 1,
+                    child: DefaultTextStyle.merge(
+                      style: CarbonTypeStyles.bodyCompact01.copyWith(
+                        color: textColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      child: widget.child,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    child: widget.child,
                   ),
                 ),
               ),

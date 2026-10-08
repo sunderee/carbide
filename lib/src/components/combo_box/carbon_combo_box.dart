@@ -506,6 +506,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
               padding: const EdgeInsetsDirectional.only(
                 start: CarbonSpacing.spacing05,
                 end: CarbonSpacing.spacing04,
+                top: CarbonSpacing.spacing01,
+                bottom: CarbonSpacing.spacing01,
               ),
               child: Row(
                 children: <Widget>[

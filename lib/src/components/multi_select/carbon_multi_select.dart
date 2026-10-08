@@ -557,6 +557,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
               padding: const EdgeInsetsDirectional.only(
                 start: CarbonSpacing.spacing05,
                 end: CarbonSpacing.spacing04,
+                top: CarbonSpacing.spacing01,
+                bottom: CarbonSpacing.spacing01,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

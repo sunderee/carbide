@@ -35,6 +35,29 @@ Widget _host(double scale, Widget child) => Directionality(
 );
 
 void main() {
+  testWidgets('scaled focused field keeps its line inside the inset outline', (
+    tester,
+  ) async {
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+    await tester.pumpWidget(
+      _host(2, Builder(builder: scaledFieldSpecimens()['combo box']!)),
+    );
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    final Finder outline = find
+        .ancestor(
+          of: find.byType(EditableText),
+          matching: find.byType(CarbonFocusRing),
+        )
+        .first;
+    expect(tester.widget<CarbonFocusRing>(outline).visible, isTrue);
+    final Rect field = tester.getRect(outline);
+    final Rect line = tester.getRect(find.text('gypy'));
+    expect(line.top, greaterThanOrEqualTo(field.top + 2));
+    expect(line.bottom, lessThanOrEqualTo(field.bottom - 2));
+  });
   testWidgets('a fluid filterable multi-select retains its inside title', (
     tester,
   ) async {
