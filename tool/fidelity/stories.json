@@ -996,7 +996,7 @@
     {
       "component": "progress-indicator",
       "storyId": "components-progressindicator--default",
-      "threshold": 0.050715,
+      "threshold": 0.054817,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/ProgressIndicator/ProgressIndicator.stories.js",
@@ -1019,21 +1019,21 @@
         "platform": "Linux",
         "flutter": "3.47.6",
         "carbonReact": "1.118.0",
-        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "sourceCommit": "417b591c13ecf60401fec6cbc1285cb1b6bb7c19",
         "themes": {
-          "white": 0.040715,
-          "g10": 0.040006,
-          "g90": 0.035414,
-          "g100": 0.03778
+          "white": 0.044817,
+          "g10": 0.042943,
+          "g90": 0.040791,
+          "g100": 0.043335
         },
-        "maximum": 0.040715,
+        "maximum": 0.044817,
         "margin": 0.01
       },
-      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity.",
+      "rationale": "Four-theme Linux measurements at the corrected 128px step/88px label geometry plus 0.01 for rasterization and grid-edge rounding. The maximum is 0.044817, higher than the previous layout because Flutter reserves the supporting-text band while Carbon positions it outside its list box. This is a reviewed coarse drift budget, not pixel parity; geometry, names, state and activation are asserted separately.",
       "structural": {
         "size": [
           640,
-          44.3
+          44
         ],
         "sizeTolerance": 0.5,
         "rationale": "Five fixed 128px horizontal steps. Supporting labels grow the intrinsic band to 44.3px; the 0.5px allowance covers fractional line-height rounding. Label and glyph geometry is separately asserted."
