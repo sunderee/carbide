@@ -29,7 +29,12 @@ Future<void> _story(
                 child: Overlay(
                   initialEntries: <OverlayEntry>[
                     managedOverlayEntry(
-                      builder: (_) => fidelityBuilders[slug]!(),
+                      builder: (_) => slug == 'modal'
+                          ? fidelityBuilders[slug]!()
+                          : Align(
+                              alignment: Alignment.topLeft,
+                              child: fidelityBuilders[slug]!(),
+                            ),
                     ),
                   ],
                 ),
@@ -55,6 +60,34 @@ void main() {
     'all 33 curated components have one fixture',
     () => expect(fidelityBuilders.length, 33),
   );
+  testWidgets('tree fixture includes its visible label', (tester) async {
+    await _story(tester, 'tree-view', () {
+      expect(find.text('Tree View'), findsOneWidget);
+    });
+  });
+  testWidgets('tile fixture fills its story root width', (tester) async {
+    await _story(tester, 'tile', () {
+      expect(tester.getSize(find.byType(CarbonTile)).width, 1196);
+    });
+  });
+  testWidgets('overflow fixture uses the 40px default trigger', (tester) async {
+    await _story(tester, 'overflow-menu', () {
+      final CarbonOverflowMenu menu = tester.widget(
+        find.byType(CarbonOverflowMenu),
+      );
+      expect(menu.buttonSize, CarbonButtonSize.md);
+    });
+  });
+  testWidgets('horizontal progress fixture uses intrinsic content height', (
+    tester,
+  ) async {
+    await _story(tester, 'progress-indicator', () {
+      expect(
+        tester.getSize(find.byType(CarbonProgressIndicator)).height,
+        lessThan(100),
+      );
+    });
+  });
   testWidgets('Modal story uses Modal and its complete default form', (
     tester,
   ) async {
@@ -180,7 +213,8 @@ void main() {
   });
   test('ProgressIndicator fixture retains optional and invalid labels', () {
     final CarbonProgressIndicator progress =
-        fidelityBuilders['progress-indicator']!() as CarbonProgressIndicator;
+        (fidelityBuilders['progress-indicator']!() as IntrinsicHeight).child
+            as CarbonProgressIndicator;
     expect(progress.currentIndex, 1);
     expect(progress.steps[3].invalid, isTrue);
     expect(progress.steps[0].secondaryLabel, 'Optional label');

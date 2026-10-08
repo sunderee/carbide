@@ -63,12 +63,30 @@ fidelityBuilders = <String, Widget Function()>{
       helperText: 'Helper text',
     ),
   ),
-  'tree-view': () => const SizedBox(
+  'tree-view': () => SizedBox(
     width: 320,
-    child: CarbonTreeView(
-      label: 'Tree View',
-      initiallyExpandedIds: <Object>{'5', '5-3', '5-5', '7', '8'},
-      nodes: fidelityTreeNodes,
+    child: Builder(
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              'Tree View',
+              style: CarbonTypeStyles.label01.copyWith(
+                color: CarbonTheme.of(context).textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const CarbonTreeView(
+            label: 'Tree View',
+            initiallyExpandedIds: <Object>{'5', '5-3', '5-5', '7', '8'},
+            nodes: fidelityTreeNodes,
+          ),
+        ],
+      ),
     ),
   ),
   'data-table': () => CarbonDataTable(
@@ -248,19 +266,24 @@ fidelityBuilders = <String, Widget Function()>{
     value: 75,
     helperText: '75 MB of 100 MB',
   ),
-  'progress-indicator': () => const CarbonProgressIndicator(
-    currentIndex: 1,
-    steps: <CarbonProgressStep>[
-      CarbonProgressStep(label: 'First step', secondaryLabel: 'Optional label'),
-      CarbonProgressStep(label: 'Second step with tooltip'),
-      CarbonProgressStep(label: 'Third step with tooltip'),
-      CarbonProgressStep(
-        label: 'Fourth step',
-        secondaryLabel: 'Example invalid step',
-        invalid: true,
-      ),
-      CarbonProgressStep(label: 'Fifth step'),
-    ],
+  'progress-indicator': () => const IntrinsicHeight(
+    child: CarbonProgressIndicator(
+      currentIndex: 1,
+      steps: <CarbonProgressStep>[
+        CarbonProgressStep(
+          label: 'First step',
+          secondaryLabel: 'Optional label',
+        ),
+        CarbonProgressStep(label: 'Second step with tooltip'),
+        CarbonProgressStep(label: 'Third step with tooltip'),
+        CarbonProgressStep(
+          label: 'Fourth step',
+          secondaryLabel: 'Example invalid step',
+          invalid: true,
+        ),
+        CarbonProgressStep(label: 'Fifth step'),
+      ],
+    ),
   ),
   'breadcrumb': () => const CarbonBreadcrumb(
     items: <CarbonBreadcrumbItem>[
@@ -318,20 +341,24 @@ fidelityBuilders = <String, Widget Function()>{
       ),
     ],
   ),
-  'tile': () => const CarbonTile(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Default tile'),
-        SizedBox(height: 20),
-        CarbonLink(label: 'Link', onPressed: _noop),
-      ],
+  'tile': () => const SizedBox(
+    width: 1196,
+    child: CarbonTile(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Default tile'),
+          SizedBox(height: 20),
+          CarbonLink(label: 'Link', onPressed: _noop),
+        ],
+      ),
     ),
   ),
   'loading': () => const CarbonLoading(withOverlay: false),
   'inline-loading': () => const CarbonInlineLoading(description: 'Loading'),
   'overflow-menu': () => const CarbonOverflowMenu(
+    buttonSize: CarbonButtonSize.md,
     items: <CarbonMenuItem>[
       CarbonMenuItem(label: 'Stop app', onPressed: _noop),
       CarbonMenuItem(label: 'Restart app', onPressed: _noop),

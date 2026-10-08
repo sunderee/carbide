@@ -187,7 +187,7 @@
           "width": 1196,
           "height": 602
         },
-        "finding": "Restore complete nested hierarchy, five expanded branches and disabled Models."
+        "finding": "Restore the visible 12px/16px Tree View label and 26px header band, complete hierarchy, five expanded branches and disabled Models."
       }
     },
     {
@@ -483,7 +483,7 @@
           "width": 1196,
           "height": 28.2969
         },
-        "finding": "Restore optional/invalid labels and complete/current/invalid states. The story does not set a 640px host width; preserve its full root framing.",
+        "finding": "Restore optional/invalid labels and complete/current/invalid states in intrinsic-height content, without an arbitrary 640px host width.",
         "limitation": "The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity."
       }
     },
@@ -675,7 +675,7 @@
           "width": 1196,
           "height": 40
         },
-        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing.",
+        "finding": "Match the closed 40px default trigger and 16px vertical-overflow glyph; menu rows remain hidden.",
         "limitation": "Closed 16px glyph can fall between grid samples; verify trigger anatomy/dimensions/colour separately."
       }
     },
