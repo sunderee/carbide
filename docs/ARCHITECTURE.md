@@ -220,3 +220,9 @@ logical alignment, pinning and retained-scroll contracts.
 Builder option sources separate metadata lookup from a bounded sliver viewport.
 See [lazy option sources](lazy-options.md) for the builder, keyboard, filtering
 and semantics contracts; eager items retain their existing rendering mode.
+
+## Pagination policy
+
+Pagination combines bounded page choices, result-shrink clamping, measured
+responsive layouts and injectable formatter delegates. See [pagination input
+and layout policy](pagination.md) for validation and compatibility details.

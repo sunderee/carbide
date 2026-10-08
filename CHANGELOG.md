@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Validate pagination input, clamp stale pages after result changes, bound page
+  choices and avoid integer overflow. Reflow narrow/scaled bars while retaining
+  open control state and focus, and add injectable labels, numbering, range
+  formatting and active-option localization (#338).
+
 - Add itemBuilder/itemCount data sources to dropdown, select, combo box and
   multi-select, with bounded lazy row mounting, computed keyboard reveal,
   metadata-based search/disabled skipping and visible-option semantics.
