@@ -3,10 +3,13 @@
 // This file is part of the Carbide gallery and is licensed under the Apache
 // License, Version 2.0. See the LICENSE file in the project root.
 
+import 'dart:ui' show ViewFocusEvent, ViewFocusState, ViewFocusDirection;
+
 import 'package:carbide/carbide.dart';
 import 'package:carbide_gallery/src/catalog.dart';
 import 'package:carbide_gallery/src/registry.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -75,7 +78,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Edits: 1 · Downloads: 0'), findsOneWidget);
-      tester.view.physicalSize = const Size(390, 1000);
+      tester.view.physicalSize = const Size(320, 1000);
       await tester.pumpAndSettle();
       final Finder count = find.bySemanticsLabel(RegExp(r'^\d+ more tags$'));
       expect(count, findsOneWidget);
@@ -91,6 +94,42 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Dismiss Draft'));
       await tester.pumpAndSettle();
       expect(find.text('Tag views: 1 · Dismissals: 1'), findsOneWidget);
+      final SemanticsNode title = tester.getSemantics(
+        find.text('Quarterly report with a deliberately long title'),
+      );
+      tester.binding.handleViewFocusChanged(
+        ViewFocusEvent(
+          viewId: tester.view.viewId,
+          state: ViewFocusState.focused,
+          direction: ViewFocusDirection.undefined,
+        ),
+      );
+      tester.binding.platformDispatcher.onSemanticsActionEvent!(
+        SemanticsActionEvent(
+          type: SemanticsAction.focus,
+          viewId: tester.view.viewId,
+          nodeId: title.id,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Quarterly report with a deliberately long title'),
+        findsNWidgets(2),
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Quarterly report with a deliberately long title'),
+        findsOneWidget,
+      );
+      tester
+          .widgetList<CarbonToggle>(find.byType(CarbonToggle))
+          .singleWhere(
+            (CarbonToggle toggle) => toggle.labelText == 'Long title',
+          )
+          .onToggled!(false);
+      await tester.pumpAndSettle();
+      expect(find.text('Report'), findsOneWidget);
     } finally {
       handle.dispose();
     }

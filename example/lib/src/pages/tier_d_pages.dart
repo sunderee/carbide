@@ -365,6 +365,7 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
   int _tagDismissals = 0;
   bool _showDraft = true;
   bool _collapseTags = true;
+  bool _longTitle = true;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -373,6 +374,11 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
           'Resize to disclose hidden actions while preserving the title.',
       previewAlignment: Alignment.topLeft,
       controls: <Widget>[
+        boolKnob(
+          label: 'Long title',
+          value: _longTitle,
+          onChanged: (bool value) => setState(() => _longTitle = value),
+        ),
         boolKnob(
           label: 'Collapse tags',
           value: _collapseTags,
@@ -392,7 +398,9 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
           Text('Edits: $_edits · Downloads: $_downloads'),
           Text('Tag views: $_tagViews · Dismissals: $_tagDismissals'),
           CarbonPageHeader(
-            title: 'Quarterly report with a deliberately long title',
+            title: _longTitle
+                ? 'Quarterly report with a deliberately long title'
+                : 'Report',
             headingLevel: _headingLevel,
             subtitle: 'Finance',
             body: 'A summary of revenue and spend for the quarter.',

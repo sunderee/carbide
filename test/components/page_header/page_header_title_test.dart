@@ -33,6 +33,7 @@ Widget _host(
       child: CarbonTheme(
         data: CarbonThemeData.white,
         child: Overlay(
+          key: UniqueKey(),
           initialEntries: [
             managedOverlayEntry(
               builder: (_) => Align(
@@ -58,8 +59,9 @@ void _enter(WidgetTester tester) => tester.binding.handleViewFocusChanged(
 List<SemanticsData> _headings(WidgetTester tester) {
   final data = <SemanticsData>[];
   void visit(SemanticsNode node) {
-    if (node.getSemanticsData().headingLevel > 0)
+    if (node.getSemanticsData().headingLevel > 0) {
       data.add(node.getSemanticsData());
+    }
     node.visitChildren((child) {
       visit(child);
       return true;
@@ -73,6 +75,91 @@ List<SemanticsData> _headings(WidgetTester tester) {
 }
 
 void main() {
+  testWidgets(
+    'Escape dismisses a hovered title while another control keeps focus',
+    (WidgetTester tester) async {
+      final FocusNode other = FocusNode();
+      addTearDown(other.dispose);
+      await tester.pumpWidget(
+        _host(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const CarbonPageHeader(title: _long),
+              Focus(
+                focusNode: other,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+            ],
+          ),
+        ),
+      );
+      _enter(tester);
+      other.requestFocus();
+      await tester.pumpAndSettle();
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await mouse.addPointer(location: Offset.zero);
+      addTearDown(mouse.removePointer);
+      await mouse.moveTo(tester.getCenter(find.text(_long)));
+      await tester.pump(const Duration(milliseconds: 120));
+      await tester.pumpAndSettle();
+      expect(find.text(_long), findsNWidgets(2));
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text(_long), findsOneWidget);
+      expect(other.hasFocus, isTrue);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'very long title can scroll by keyboard while retaining heading focus',
+    (WidgetTester tester) async {
+      final FocusNode focus = FocusNode();
+      addTearDown(focus.dispose);
+      final String title = List<String>.filled(
+        30,
+        'Quarterly regional report',
+      ).join(' ');
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await tester.binding.setSurfaceSize(const Size(320, 300));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      try {
+        await tester.pumpWidget(
+          _host(
+            CarbonPageHeader(title: title, titleFocusNode: focus),
+            scale: 2,
+          ),
+        );
+        _enter(tester);
+        focus.requestFocus();
+        await tester.pumpAndSettle();
+        final ScrollableState scroll = tester.state<ScrollableState>(
+          find.byType(Scrollable),
+        );
+        expect(scroll.position.maxScrollExtent, greaterThan(0));
+        await tester.sendKeyEvent(LogicalKeyboardKey.end);
+        await tester.pumpAndSettle();
+        expect(scroll.position.pixels, scroll.position.maxScrollExtent);
+        await tester.sendKeyEvent(LogicalKeyboardKey.home);
+        await tester.pumpAndSettle();
+        expect(scroll.position.pixels, 0);
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+        expect(scroll.position.pixels, greaterThan(0));
+        expect(focus.hasFocus, isTrue);
+        expect(_headings(tester).single.label, title);
+        expect(tester.takeException(), isNull);
+      } finally {
+        handle.dispose();
+      }
+    },
+  );
+
   testWidgets('fitting title has no tooltip or extra focus stop', (
     tester,
   ) async {
