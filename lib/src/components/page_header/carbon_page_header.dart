@@ -130,6 +130,7 @@ class CarbonPageHeader extends StatelessWidget {
     this.tagsDisclosureLabel = 'Hidden tags',
     this.tabs,
     this.headingLevel = 1,
+    this.titleFocusNode,
   }) : assert(headingLevel >= 1 && headingLevel <= 6),
        assert(pageActions == null || actions == null);
 
@@ -141,6 +142,13 @@ class CarbonPageHeader extends StatelessWidget {
   /// Defaults to the page-level heading. Set a deeper level when composing
   /// the header inside an existing document hierarchy; styling stays fixed.
   final int headingLevel;
+
+  /// An optional caller-owned focus node for truncated-title disclosure.
+  ///
+  /// Fitting titles remain outside focus traversal. The complete title is
+  /// always the accessible heading name; focus reveals its visual tooltip
+  /// only while the title is ellipsized.
+  final FocusNode? titleFocusNode;
 
   /// An optional leading title icon.
   final CarbonIconData? icon;
