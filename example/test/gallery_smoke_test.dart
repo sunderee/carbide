@@ -5,11 +5,15 @@
 
 import 'package:carbide_gallery/src/gallery_app.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   testWidgets('boots to the overview with the shell chrome', (
     WidgetTester tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 

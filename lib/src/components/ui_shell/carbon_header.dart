@@ -24,10 +24,80 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
+import 'carbon_side_nav.dart';
 import '../menu/carbon_menu.dart';
 import '../popover/carbon_popover.dart';
 
-/// The UI Shell header bar (48px), a `banner` landmark.
+double _shellViewportWidth(BuildContext context, double available) {
+  final double viewport = MediaQuery.maybeSizeOf(context)?.width ?? 0;
+  if (viewport > 0) return viewport;
+  final view = View.maybeOf(context);
+  return view == null
+      ? available
+      : view.physicalSize.width / view.devicePixelRatio;
+}
+
+/// Header navigation rendered in the side nav below [CarbonBreakpoint.lg].
+///
+/// Compose the corresponding [CarbonSideNavLink] and [CarbonSideNavMenu]
+/// entries here, at the start of [CarbonSideNav.items]. The header's
+/// [CarbonHeader.navigation] is visible on the complementary wide viewport.
+class CarbonHeaderSideNavItems extends StatelessWidget {
+  /// Creates responsive primary navigation for a side nav.
+  const CarbonHeaderSideNavItems({
+    required this.items,
+    super.key,
+    this.hasDivider = false,
+  });
+
+  /// Primary links and menus, using the same destinations as the header.
+  final List<Widget> items;
+
+  /// Whether to separate primary navigation from the remaining side nav.
+  final bool hasDivider;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      if (_shellViewportWidth(context, constraints.maxWidth) >=
+              CarbonBreakpoint.lg.width ||
+          items.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing07),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: items,
+            ),
+            if (hasDivider)
+              PositionedDirectional(
+                start: CarbonSpacing.spacing05,
+                end: CarbonSpacing.spacing05,
+                bottom: -CarbonSpacing.spacing05,
+                child: ExcludeSemantics(
+                  child: SizedBox(
+                    height: 1,
+                    child: ColoredBox(
+                      color: CarbonTheme.of(context).borderSubtle00,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+/// The UI Shell header bar, with a 48px minimum height.
 ///
 /// ```dart
 /// CarbonHeader(
@@ -78,21 +148,42 @@ class CarbonHeader extends StatelessWidget {
           color: theme.background,
           border: Border(bottom: BorderSide(color: theme.borderSubtle00)),
         ),
-        child: SizedBox(
-          height: 48,
-          child: Row(
-            children: <Widget>[
-              ?menuButton,
-              name,
-              Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: navigation,
-                ),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final bool wide =
+                _shellViewportWidth(context, constraints.maxWidth) >=
+                CarbonBreakpoint.lg.width;
+            final double reserved =
+                (globalActions.length + (menuButton == null ? 0 : 1)) * 48;
+            final double nameWidth = (constraints.maxWidth - reserved).clamp(
+              0.0,
+              double.infinity,
+            );
+            return ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: Row(
+                children: <Widget>[
+                  ?menuButton,
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: nameWidth),
+                    child: name,
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: wide
+                          ? <Widget>[
+                              for (final Widget item in navigation)
+                                Flexible(child: item),
+                            ]
+                          : const <Widget>[],
+                    ),
+                  ),
+                  ...globalActions,
+                ],
               ),
-              ...globalActions,
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -129,6 +220,13 @@ class CarbonHeaderName extends StatefulWidget {
 
 class _CarbonHeaderNameState extends State<CarbonHeaderName> {
   bool _focused = false;
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (widget.onPressed != null &&
@@ -145,57 +243,74 @@ class _CarbonHeaderNameState extends State<CarbonHeaderName> {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final bool interactive = widget.onPressed != null;
-    return Semantics(
-      button: interactive,
-      label: widget.prefix != null
-          ? '${widget.prefix} ${widget.name}'
-          : widget.name,
-      onTap: widget.onPressed,
-      child: ExcludeSemantics(
-        child: MouseRegion(
-          cursor: interactive
-              ? SystemMouseCursors.click
-              : SystemMouseCursors.basic,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onPressed,
-            child: Focus(
-              canRequestFocus: interactive,
-              onKeyEvent: _onKey,
-              onFocusChange: (bool f) => setState(() => _focused = f),
-              child: CarbonFocusRing(
-                visible: _focused,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CarbonSpacing.spacing05,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      if (widget.prefix != null) ...<Widget>[
-                        Text(
+    final String label = widget.prefix != null
+        ? '${widget.prefix} ${widget.name}'
+        : widget.name;
+    final Widget visual = ExcludeSemantics(
+      child: MouseRegion(
+        cursor: interactive
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          child: Focus(
+            focusNode: _focus,
+            includeSemantics: false,
+            canRequestFocus: interactive,
+            onKeyEvent: _onKey,
+            onFocusChange: (bool f) => setState(() => _focused = f),
+            child: CarbonFocusRing(
+              visible: _focused,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CarbonSpacing.spacing05,
+                  vertical: CarbonSpacing.spacing04,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (widget.prefix != null) ...<Widget>[
+                      Flexible(
+                        child: Text(
                           widget.prefix!,
                           style: CarbonTypeStyles.bodyCompact01.copyWith(
                             color: theme.textPrimary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: CarbonSpacing.spacing02),
-                      ],
-                      Text(
+                      ),
+                      const SizedBox(width: CarbonSpacing.spacing02),
+                    ],
+                    Flexible(
+                      child: Text(
                         widget.name,
                         style: CarbonTypeStyles.bodyCompact01.copyWith(
                           color: theme.textPrimary,
                           fontWeight: FontWeight.w600,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
       ),
+    );
+    if (!interactive) return Semantics(label: label, child: visual);
+    return CarbonControlSemantics(
+      focusNode: _focus,
+      button: true,
+      state: CarbonControlState.interactive,
+      label: label,
+      readOnlyHint: '',
+      onActivate: widget.onPressed,
+      builder: (_) => visual,
     );
   }
 }
@@ -224,6 +339,13 @@ class CarbonHeaderMenuItem extends StatefulWidget {
 }
 
 class _CarbonHeaderMenuItemState extends State<CarbonHeaderMenuItem> {
+  final FocusNode _focus = FocusNode();
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
   bool _hovered = false;
   bool _focused = false;
 
@@ -241,12 +363,15 @@ class _CarbonHeaderMenuItemState extends State<CarbonHeaderMenuItem> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    return Semantics(
-      button: true,
+    return CarbonControlSemantics(
       selected: widget.selected,
+      button: true,
+      focusNode: _focus,
+      state: CarbonControlState.resolve(hasCallback: widget.onPressed != null),
       label: widget.label,
-      onTap: widget.onPressed,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: widget.onPressed,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hovered = true),
@@ -255,6 +380,9 @@ class _CarbonHeaderMenuItemState extends State<CarbonHeaderMenuItem> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onPressed,
             child: Focus(
+              focusNode: _focus,
+              includeSemantics: false,
+              canRequestFocus: widget.onPressed != null,
               onKeyEvent: _onKey,
               onFocusChange: (bool f) => setState(() => _focused = f),
               child: CarbonFocusRing(
@@ -274,16 +402,23 @@ class _CarbonHeaderMenuItemState extends State<CarbonHeaderMenuItem> {
                       ),
                     ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CarbonSpacing.spacing05,
-                    ),
-                    child: Center(
-                      widthFactor: 1,
-                      child: Text(
-                        widget.label,
-                        style: CarbonTypeStyles.bodyCompact01.copyWith(
-                          color: theme.textPrimary,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: CarbonSpacing.spacing05,
+                        vertical: CarbonSpacing.spacing04,
+                      ),
+                      child: Center(
+                        widthFactor: 1,
+                        heightFactor: 1,
+                        child: Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: CarbonTypeStyles.bodyCompact01.copyWith(
+                            color: theme.textPrimary,
+                          ),
                         ),
                       ),
                     ),
@@ -378,6 +513,13 @@ class CarbonHeaderGlobalAction extends StatefulWidget {
 }
 
 class _CarbonHeaderGlobalActionState extends State<CarbonHeaderGlobalAction> {
+  final FocusNode _focus = FocusNode();
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
   bool _hovered = false;
   bool _focused = false;
 
@@ -401,12 +543,15 @@ class _CarbonHeaderGlobalActionState extends State<CarbonHeaderGlobalAction> {
         ? theme.backgroundHover
         : const Color(0x00000000);
 
-    return Semantics(
-      button: true,
+    return CarbonControlSemantics(
       selected: widget.isActive,
+      button: true,
+      focusNode: _focus,
+      state: CarbonControlState.resolve(hasCallback: widget.onPressed != null),
       label: widget.label,
-      onTap: widget.onPressed,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: widget.onPressed,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hovered = true),
@@ -415,6 +560,9 @@ class _CarbonHeaderGlobalActionState extends State<CarbonHeaderGlobalAction> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onPressed,
             child: Focus(
+              focusNode: _focus,
+              includeSemantics: false,
+              canRequestFocus: widget.onPressed != null,
               onKeyEvent: _onKey,
               onFocusChange: (bool f) => setState(() => _focused = f),
               child: CarbonFocusRing(
@@ -488,6 +636,13 @@ class CarbonSkipToContent extends StatefulWidget {
 
 class _CarbonSkipToContentState extends State<CarbonSkipToContent> {
   bool _focused = false;
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is KeyDownEvent &&
@@ -502,12 +657,17 @@ class _CarbonSkipToContentState extends State<CarbonSkipToContent> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    return Semantics(
+    return CarbonControlSemantics(
       button: true,
+      focusNode: _focus,
+      state: CarbonControlState.interactive,
       label: widget.label,
-      onTap: widget.onPressed,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: widget.onPressed,
+      builder: (_) => ExcludeSemantics(
         child: Focus(
+          focusNode: _focus,
+          includeSemantics: false,
           onKeyEvent: _onKey,
           onFocusChange: (bool f) => setState(() => _focused = f),
           child: Offstage(

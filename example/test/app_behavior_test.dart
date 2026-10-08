@@ -4,13 +4,18 @@
 // Apache License, Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide_gallery/src/gallery_app.dart';
+import 'package:carbide/carbide.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   testWidgets('cycling the header theme action changes the active theme', (
     WidgetTester tester,
   ) async {
     final SemanticsHandle handle = tester.ensureSemantics();
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 
@@ -28,6 +33,9 @@ void main() {
   testWidgets('navigating the side nav opens a component page', (
     WidgetTester tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 
@@ -47,14 +55,20 @@ void main() {
   testWidgets('the menu button collapses the side nav to its rail', (
     WidgetTester tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Overview'), findsOneWidget);
+    expect(find.byType(CarbonSideNav), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Toggle navigation'));
     await tester.pumpAndSettle();
 
     // Collapsed: the rail hides its labels.
-    expect(find.text('Overview'), findsNothing);
+    expect(
+      tester.widget<CarbonSideNav>(find.byType(CarbonSideNav)).rail,
+      isTrue,
+    );
   });
 }

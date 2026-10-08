@@ -12,6 +12,8 @@
 // panel), the sliding HeaderPanel that hosts it, and the main Content region.
 
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/layout.dart';
@@ -21,6 +23,9 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
+import '../../utils/native_shell_content_focus.dart';
 
 /// A right-side panel under the header that slides open (0 → 256px), hosting a
 /// [CarbonSwitcher] or notification content.
@@ -59,9 +64,9 @@ class CarbonHeaderPanel extends StatelessWidget {
         width: open ? 256 : 0,
         decoration: BoxDecoration(
           color: layer.layer,
-          border: Border(
-            left: BorderSide(color: layer.borderSubtle),
-            right: BorderSide(color: layer.borderSubtle),
+          border: BorderDirectional(
+            start: BorderSide(color: layer.borderSubtle),
+            end: BorderSide(color: layer.borderSubtle),
           ),
         ),
         child: ClipRect(
@@ -124,6 +129,13 @@ class CarbonSwitcherItem extends StatefulWidget {
 }
 
 class _CarbonSwitcherItemState extends State<CarbonSwitcherItem> {
+  final FocusNode _focus = FocusNode();
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
   bool _hovered = false;
   bool _focused = false;
 
@@ -146,12 +158,15 @@ class _CarbonSwitcherItemState extends State<CarbonSwitcherItem> {
         ? theme.textPrimary
         : theme.textSecondary;
 
-    return Semantics(
-      button: true,
+    return CarbonControlSemantics(
       selected: widget.selected,
+      button: true,
+      focusNode: _focus,
+      state: CarbonControlState.resolve(hasCallback: widget.onPressed != null),
       label: widget.label,
-      onTap: widget.onPressed,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: widget.onPressed,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hovered = true),
@@ -160,6 +175,9 @@ class _CarbonSwitcherItemState extends State<CarbonSwitcherItem> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onPressed,
             child: Focus(
+              focusNode: _focus,
+              includeSemantics: false,
+              canRequestFocus: widget.onPressed != null,
               onKeyEvent: _onKey,
               onFocusChange: (bool f) => setState(() => _focused = f),
               child: CarbonFocusRing(
@@ -169,14 +187,16 @@ class _CarbonSwitcherItemState extends State<CarbonSwitcherItem> {
                   color: _hovered && !widget.selected
                       ? layer.layerHover
                       : const Color(0x00000000),
-                  child: SizedBox(
-                    height: 32,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 32),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: CarbonSpacing.spacing05,
+                        vertical: 6,
                       ),
                       child: Align(
                         alignment: AlignmentDirectional.centerStart,
+                        heightFactor: 1,
                         child: Text(
                           widget.label,
                           maxLines: 1,
@@ -221,12 +241,13 @@ class CarbonSwitcherDivider extends StatelessWidget {
 
 /// The main content region of the UI Shell — a `main` landmark for the page
 /// body beside the header and side navigation.
-class CarbonShellContent extends StatelessWidget {
+class CarbonShellContent extends StatefulWidget {
   /// Creates a shell content region.
   const CarbonShellContent({
     required this.child,
     super.key,
     this.label = 'Main content',
+    this.focusNode,
   });
 
   /// The page body.
@@ -235,15 +256,80 @@ class CarbonShellContent extends StatelessWidget {
   /// The accessible label for the region.
   final String label;
 
+  /// A borrowed skip-link destination. The caller owns and disposes it.
+  ///
+  /// Set `skipTraversal: true` for a destination reached programmatically
+  /// without adding a native Tab stop. Its focus/traversal policy is preserved.
+  final FocusNode? focusNode;
+
+  @override
+  State<CarbonShellContent> createState() => _CarbonShellContentState();
+}
+
+class _CarbonShellContentState extends State<CarbonShellContent> {
+  static int _nextIdentifier = 0;
+  final String _identifier = 'carbide-shell-content-${_nextIdentifier++}';
+  final FocusNode _fallback = FocusNode(
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+  FocusNode get _focus => widget.focusNode ?? _fallback;
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_changed);
+  }
+
+  @override
+  void didUpdateWidget(CarbonShellContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      (oldWidget.focusNode ?? _fallback).removeListener(_changed);
+      _focus.addListener(_changed);
+    }
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _focus.removeListener(_changed);
+    _fallback.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          syncNativeShellContentFocus(
+            _identifier,
+            focusable: _focus.canRequestFocus,
+            traversable: !_focus.skipTraversal,
+          );
+        }
+      });
+    }
     return Semantics(
+      role: SemanticsRole.main,
+      identifier: _identifier,
       container: true,
       explicitChildNodes: true,
-      label: label,
-      child: Padding(
-        padding: const EdgeInsets.all(CarbonSpacing.spacing05),
-        child: child,
+      label: widget.label,
+      focusable: _focus.canRequestFocus,
+      focused: _focus.canRequestFocus ? _focus.hasPrimaryFocus : null,
+      onFocus: _focus.canRequestFocus ? _focus.requestFocus : null,
+      child: Focus.withExternalFocusNode(
+        focusNode: _focus,
+        includeSemantics: false,
+        child: Padding(
+          padding: const EdgeInsets.all(CarbonSpacing.spacing05),
+          child: widget.child,
+        ),
       ),
     );
   }

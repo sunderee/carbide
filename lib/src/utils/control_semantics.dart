@@ -31,6 +31,7 @@ class CarbonControlSemantics extends StatefulWidget {
     this.button = false,
     this.value,
     this.expanded,
+    this.selected,
     this.activeOptionHint,
     this.checked,
     this.mixed = false,
@@ -65,6 +66,9 @@ class CarbonControlSemantics extends StatefulWidget {
 
   /// Whether a picker popup is open; omitted for non-picker controls.
   final bool? expanded;
+
+  /// Whether a navigation or action control represents the current choice.
+  final bool? selected;
 
   /// The keyboard-highlight announcement, separate from the selected value.
   final String? activeOptionHint;
@@ -151,6 +155,7 @@ class _CarbonControlSemanticsState extends State<CarbonControlSemantics> {
     button: widget.button,
     value: widget.value,
     expanded: widget.expanded,
+    selected: widget.selected,
     checked: widget.checked,
     mixed: widget.mixed,
     toggled: widget.toggled,

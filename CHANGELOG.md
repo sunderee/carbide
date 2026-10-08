@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make the gallery shell keyboard accessible with skip-to-main and home actions.
+  Move primary navigation between header and side nav at Carbon's lg breakpoint,
+  retain full-width mobile content, grow scaled shell labels and preserve
+  logical panel borders and native control focus (#330).
+
 - Collapse measured breadcrumb trails into an accessible overflow menu while
   keeping first/current anchors on one line. Localize names, preserve current
   page semantics, mirror RTL and restore hidden ancestor keyboard coverage.

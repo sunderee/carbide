@@ -130,7 +130,7 @@ jobs:
           test/components/breadcrumb test/components/link
           test/components/overflow_menu
           test/components/notification
-          test/components/page_header
+          test/components/page_header test/components/ui_shell
           test/components/content_switcher
           test/components/menu
           test/components/picker_family test/components/dropdown
@@ -223,6 +223,7 @@ jobs:
               drive_native --release --target=integration_test/picker_option_semantics_test.dart
               ;;
             preferences)
+              drive_native --release --target=integration_test/responsive_shell_test.dart
               drive_native --release --target=integration_test/page_header_heading_test.dart
               drive_native --release --target=integration_test/notification_policy_test.dart
               drive_native --release --target=integration_test/reduced_motion_test.dart

@@ -28,6 +28,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 
 /// Shared side-nav state read by its items.
 class _SideNavScope extends InheritedWidget {
@@ -293,6 +295,7 @@ class _NavRow extends StatefulWidget {
     required this.onTap,
     required this.indent,
     required this.trailing,
+    this.expanded,
   });
 
   final String label;
@@ -301,12 +304,20 @@ class _NavRow extends StatefulWidget {
   final VoidCallback? onTap;
   final double indent;
   final Widget? trailing;
+  final bool? expanded;
 
   @override
   State<_NavRow> createState() => _NavRowState();
 }
 
 class _NavRowState extends State<_NavRow> {
+  final FocusNode _focus = FocusNode();
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
   bool _hovered = false;
   bool _focused = false;
 
@@ -334,12 +345,16 @@ class _NavRowState extends State<_NavRow> {
         ? theme.backgroundHover
         : const Color(0x00000000);
 
-    return Semantics(
-      button: true,
+    return CarbonControlSemantics(
       selected: widget.current,
+      expanded: widget.expanded,
+      button: true,
+      focusNode: _focus,
+      state: CarbonControlState.resolve(hasCallback: widget.onTap != null),
       label: widget.label,
-      onTap: widget.onTap,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      onActivate: widget.onTap,
+      builder: (_) => ExcludeSemantics(
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hovered = true),
@@ -348,6 +363,9 @@ class _NavRowState extends State<_NavRow> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
             child: Focus(
+              focusNode: _focus,
+              includeSemantics: false,
+              canRequestFocus: widget.onTap != null,
               onKeyEvent: _onKey,
               onFocusChange: (bool f) => setState(() => _focused = f),
               child: CarbonFocusRing(
@@ -525,26 +543,23 @@ class _CarbonSideNavMenuState extends State<CarbonSideNavMenu> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Semantics(
-          button: true,
+        _NavRow(
           expanded: _open,
-          child: _NavRow(
-            label: widget.label,
-            icon: widget.icon,
-            current: false,
-            onTap: () => setState(() => _open = !_open),
-            indent: 0,
-            // Chevron per `_side-nav.scss` `__submenu-chevron > svg`:
-            // transform $duration-fast-02 (no easing token cited).
-            trailing: AnimatedRotation(
-              turns: _open ? 0.5 : 0,
-              duration: fast02,
-              curve: CarbonEasing.standardProductive,
-              child: CarbonIcon(
-                CarbonIcons.chevronDown,
-                size: 16,
-                color: theme.iconPrimary,
-              ),
+          label: widget.label,
+          icon: widget.icon,
+          current: false,
+          onTap: () => setState(() => _open = !_open),
+          indent: 0,
+          // Chevron per `_side-nav.scss` `__submenu-chevron > svg`:
+          // transform $duration-fast-02 (no easing token cited).
+          trailing: AnimatedRotation(
+            turns: _open ? 0.5 : 0,
+            duration: fast02,
+            curve: CarbonEasing.standardProductive,
+            child: CarbonIcon(
+              CarbonIcons.chevronDown,
+              size: 16,
+              color: theme.iconPrimary,
             ),
           ),
         ),
