@@ -18,6 +18,8 @@ import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
 
@@ -262,42 +264,58 @@ class _Step extends StatelessWidget {
             ),
           );
 
-    Widget body = ExcludeSemantics(child: content);
+    final String progressState = switch (state) {
+      _StepState.complete => 'Complete',
+      _StepState.current => 'Current',
+      _StepState.incomplete => 'Incomplete',
+      _StepState.invalid => 'Invalid',
+      _StepState.disabled => 'Disabled',
+    };
     if (onTap != null) {
-      body = CarbonInteraction(
-        onPressed: onTap,
-        builder: (BuildContext context, Set<WidgetState> states) =>
-            CarbonFocusRing(
-              visible: states.contains(WidgetState.focused),
-              inset: true,
-              child: ConstrainedBox(
-                // Interactive steps retain their glyph size but offer a full
-                // 48px pointer and assistive-technology activation region.
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                child: ExcludeSemantics(child: content),
-              ),
-            ),
+      return CarbonControlSemantics(
+        state: CarbonControlState.interactive,
+        label: step.label,
+        value: progressState,
+        activeOptionHint: step.secondaryLabel,
+        readOnlyHint: CarbonControlState.defaultReadOnlyHint,
+        selected: state == _StepState.current,
+        button: true,
+        onActivate: onTap,
+        builder: (FocusNode node) => Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          includeSemantics: false,
+          onFocusChange: (bool focused) {
+            if (focused) Scrollable.ensureVisible(context);
+          },
+          child: CarbonInteraction(
+            focusNode: node,
+            includeSemantics: false,
+            onPressed: onTap,
+            builder: (BuildContext context, Set<WidgetState> states) =>
+                CarbonFocusRing(
+                  visible: states.contains(WidgetState.focused),
+                  inset: true,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: ExcludeSemantics(child: content),
+                  ),
+                ),
+          ),
+        ),
       );
     }
-
-    return MergeSemantics(
-      child: Semantics(
-        container: true,
-        label: step.label,
-        hint: step.secondaryLabel,
-        value: switch (state) {
-          _StepState.complete => 'Complete',
-          _StepState.current => 'Current',
-          _StepState.incomplete => 'Incomplete',
-          _StepState.invalid => 'Invalid',
-          _StepState.disabled => 'Disabled',
-        },
-        onTap: onTap,
-        button: onTap != null,
-        selected: state == _StepState.current,
-        enabled: state != _StepState.disabled,
-        child: body,
-      ),
+    return Semantics(
+      container: true,
+      label: step.label,
+      hint: step.secondaryLabel,
+      value: progressState,
+      selected: state == _StepState.current,
+      enabled: state != _StepState.disabled,
+      child: ExcludeSemantics(child: content),
     );
   }
 }

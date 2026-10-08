@@ -18,7 +18,7 @@ void main() {
     try {
       await tester.pumpWidget(_host('progress-indicator'));
       final SemanticsNode confirm = tester.getSemantics(
-        find.bySemanticsLabel('Confirm'),
+        find.bySemanticsLabel('Confirm with a deliberately long name'),
       );
       tester.binding.platformDispatcher.onSemanticsActionEvent!(
         SemanticsActionEvent(
@@ -52,7 +52,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester
-            .getSemantics(find.bySemanticsLabel('Confirm'))
+            .getSemantics(
+              find.bySemanticsLabel('Confirm with a deliberately long name'),
+            )
             .getSemanticsData()
             .hasAction(SemanticsAction.tap),
         isFalse,

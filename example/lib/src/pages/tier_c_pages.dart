@@ -1037,7 +1037,7 @@ class _ProgressIndicatorPageState extends State<_ProgressIndicatorPage> {
           label: 'Text scale',
           value: _scale,
           options: const <double>[1, 1.3, 2],
-          labelOf: (double value) => '${value}×',
+          labelOf: (double value) => '$value×',
           onChanged: (double value) => setState(() => _scale = value),
         ),
         boolKnob(

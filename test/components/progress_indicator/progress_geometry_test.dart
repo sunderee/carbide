@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.
 import 'dart:ui' show ViewFocusEvent, ViewFocusState, ViewFocusDirection;
 
+import 'package:flutter/semantics.dart'
+    show SemanticsAction, SemanticsActionEvent;
+
 import 'package:carbide/carbide.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,7 +36,10 @@ Widget host(
           data: CarbonThemeData.white,
           child: Align(
             alignment: Alignment.topLeft,
-            child: SizedBox(width: width, child: child),
+            child: SizedBox(
+              width: width,
+              child: SingleChildScrollView(child: child),
+            ),
           ),
         ),
       ),
@@ -42,6 +47,58 @@ Widget host(
   ),
 );
 void main() {
+  for (final direction in TextDirection.values) {
+    testWidgets('AT focus reveals the whole narrow step $direction', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          host(
+            CarbonProgressIndicator(
+              steps: steps,
+              currentIndex: 1,
+              interactive: true,
+              onStepSelected: (_) {},
+            ),
+            width: 160,
+            direction: direction,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleViewFocusChanged(
+          ViewFocusEvent(
+            viewId: tester.view.viewId,
+            state: ViewFocusState.focused,
+            direction: ViewFocusDirection.undefined,
+          ),
+        );
+        final target = find.bySemanticsLabel(steps[3].label);
+        final node = tester.getSemantics(target);
+        expect(
+          node.getSemanticsData().hasAction(SemanticsAction.focus),
+          isTrue,
+        );
+        tester.binding.platformDispatcher.onSemanticsActionEvent!(
+          SemanticsActionEvent(
+            type: SemanticsAction.focus,
+            viewId: tester.view.viewId,
+            nodeId: node.id,
+          ),
+        );
+        await tester.pumpAndSettle();
+        final rect = tester.getRect(target);
+        expect(rect.left, greaterThanOrEqualTo(-.01));
+        expect(rect.right, lessThanOrEqualTo(160.01));
+        expect(
+          Focus.of(tester.element(find.text(steps[3].label))).hasFocus,
+          isTrue,
+        );
+      } finally {
+        handle.dispose();
+      }
+    });
+  }
   testWidgets(
     'horizontal step grid is 128px with 88px labels beside 16px glyphs',
     (tester) async {
@@ -108,8 +165,8 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
-  for (final vertical in [false, true])
-    for (final direction in TextDirection.values)
+  for (final vertical in [false, true]) {
+    for (final direction in TextDirection.values) {
       for (final scale in [1.0, 1.3, 2.0]) {
         testWidgets('narrow progress usable $vertical/$direction/$scale', (
           tester,
@@ -162,7 +219,9 @@ void main() {
           }
         });
       }
-  for (final vertical in [false, true])
+    }
+  }
+  for (final vertical in [false, true]) {
     for (final scale in [1.0, 2.0]) {
       testWidgets('golden progress geometry $vertical/$scale', (tester) async {
         await expectThemeGoldens(
@@ -175,15 +234,18 @@ void main() {
           mediaQuery: MediaQueryData(textScaler: TextScaler.linear(scale)),
           builder: (_) => Align(
             alignment: Alignment.topLeft,
-            child: CarbonProgressIndicator(
-              steps: steps,
-              currentIndex: 1,
-              vertical: vertical,
-              interactive: true,
-              onStepSelected: (_) {},
+            child: SingleChildScrollView(
+              child: CarbonProgressIndicator(
+                steps: steps,
+                currentIndex: 1,
+                vertical: vertical,
+                interactive: true,
+                onStepSelected: (_) {},
+              ),
             ),
           ),
         );
       });
     }
+  }
 }
