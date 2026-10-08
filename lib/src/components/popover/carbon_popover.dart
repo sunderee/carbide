@@ -24,6 +24,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../theme/carbon_layer.dart';
+import '../../utils/anchored_overlay.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 
@@ -204,6 +205,7 @@ class _CarbonPopoverState extends State<CarbonPopover> {
 
   // The resolved alignment after any autoAlign flip.
   late CarbonPopoverAlignment _resolved = widget.align;
+  Offset? _caretTarget;
 
   @override
   void initState() {
@@ -233,9 +235,6 @@ class _CarbonPopoverState extends State<CarbonPopover> {
       if (!mounted || widget.open == _overlay.isShowing) return;
       if (widget.open) {
         _overlay.show();
-        if (widget.autoAlign) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => _maybeFlip());
-        }
       } else {
         _overlay.hide();
       }
@@ -252,36 +251,48 @@ class _CarbonPopoverState extends State<CarbonPopover> {
   /// The gap between trigger and surface: present only with a caret.
   double get _gap => widget.caret ? 10 : 0;
 
-  /// Flips [_resolved] to the opposite side when the surface overflows the
-  /// viewport on its preferred side.
-  void _maybeFlip() {
-    if (!mounted || !_overlay.isShowing) return;
-    final RenderBox? surface =
-        _surfaceKey.currentContext?.findRenderObject() as RenderBox?;
-    if (surface == null || !surface.hasSize) return;
-    final Offset topLeft = surface.localToGlobal(Offset.zero);
-    final Size size = surface.size;
-    final Size screen = MediaQuery.sizeOf(context);
-    final bool overflows = switch (_resolved) {
-      _ when _resolved.isVertical && _isTopSide(_resolved) => topLeft.dy < 0,
-      _ when _resolved.isVertical => topLeft.dy + size.height > screen.height,
-      _ when _isLeftSide(_resolved) => topLeft.dx < 0,
-      _ => topLeft.dx + size.width > screen.width,
-    };
-    if (overflows) setState(() => _resolved = _resolved.flipped);
+  static CarbonOverlaySide _sideFor(CarbonPopoverAlignment align) =>
+      switch (align) {
+        CarbonPopoverAlignment.top ||
+        CarbonPopoverAlignment.topStart ||
+        CarbonPopoverAlignment.topEnd => CarbonOverlaySide.top,
+        CarbonPopoverAlignment.bottom ||
+        CarbonPopoverAlignment.bottomStart ||
+        CarbonPopoverAlignment.bottomEnd => CarbonOverlaySide.bottom,
+        CarbonPopoverAlignment.left ||
+        CarbonPopoverAlignment.leftStart ||
+        CarbonPopoverAlignment.leftEnd => CarbonOverlaySide.left,
+        _ => CarbonOverlaySide.right,
+      };
+
+  static CarbonOverlayAlignment _alignmentFor(CarbonPopoverAlignment align) =>
+      switch (align) {
+        CarbonPopoverAlignment.topStart ||
+        CarbonPopoverAlignment.bottomStart ||
+        CarbonPopoverAlignment.leftStart ||
+        CarbonPopoverAlignment.rightStart => CarbonOverlayAlignment.start,
+        CarbonPopoverAlignment.topEnd ||
+        CarbonPopoverAlignment.bottomEnd ||
+        CarbonPopoverAlignment.leftEnd ||
+        CarbonPopoverAlignment.rightEnd => CarbonOverlayAlignment.end,
+        _ => CarbonOverlayAlignment.center,
+      };
+
+  void _placed(CarbonOverlaySide side, Offset target) {
+    final CarbonPopoverAlignment resolved = side == _sideFor(widget.align)
+        ? widget.align
+        : widget.align.flipped;
+    if (_resolved == resolved && _caretTarget == target) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.open) return;
+      if (_resolved == resolved && _caretTarget == target) return;
+      setState(() {
+        _resolved = resolved;
+        _caretTarget = target;
+      });
+    });
+    WidgetsBinding.instance.scheduleFrame();
   }
-
-  static bool _isTopSide(CarbonPopoverAlignment a) =>
-      a == CarbonPopoverAlignment.top ||
-      a == CarbonPopoverAlignment.topStart ||
-      a == CarbonPopoverAlignment.topEnd;
-
-  static bool _isLeftSide(CarbonPopoverAlignment a) =>
-      a == CarbonPopoverAlignment.left ||
-      a == CarbonPopoverAlignment.leftStart ||
-      a == CarbonPopoverAlignment.leftEnd;
-
-  final GlobalKey _surfaceKey = GlobalKey();
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is KeyDownEvent &&
@@ -322,12 +333,11 @@ class _CarbonPopoverState extends State<CarbonPopover> {
         : theme.textPrimary;
     final bool hasBorder = widget.border || widget.surfaceBorderColor != null;
 
-    final _Anchors anchors = _anchorsFor(_resolved, dir, _gap);
-
     Widget surface = DefaultTextStyle.merge(
       style: TextStyle(color: textColor),
       child: _Surface(
         align: _resolved,
+        caretTarget: widget.autoAlign ? _caretTarget : null,
         caret: widget.caret,
         border: hasBorder,
         dropShadow: widget.dropShadow,
@@ -344,24 +354,18 @@ class _CarbonPopoverState extends State<CarbonPopover> {
       onTapOutside: (_) {
         if (_overlay.isShowing) widget.onRequestClose?.call();
       },
-      child: KeyedSubtree(key: _surfaceKey, child: surface),
+      child: surface,
     );
 
-    // Pinning left/top (with width/height null) marks the child positioned, so
-    // the theatre hands it loose constraints and the surface shrink-wraps its
-    // content; a non-positioned overlay child is forced to the overlay's full
-    // size. The FollowerLayer overrides this origin with the leader's position.
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: CompositedTransformFollower(
-        link: _link,
-        targetAnchor: anchors.target,
-        followerAnchor: anchors.follower,
-        offset: anchors.offset,
-        showWhenUnlinked: false,
-        child: surface,
-      ),
+    return CarbonAnchoredOverlay(
+      link: _link,
+      side: _sideFor(widget.align),
+      alignment: _alignmentFor(widget.align),
+      gap: _gap,
+      automatic: widget.autoAlign,
+      clamp: widget.autoAlign,
+      onPlacement: widget.autoAlign ? _placed : null,
+      child: surface,
     );
   }
 
@@ -370,99 +374,13 @@ class _CarbonPopoverState extends State<CarbonPopover> {
         _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     return box != null && box.hasSize ? box.size : null;
   }
-
-  static _Anchors _anchorsFor(
-    CarbonPopoverAlignment align,
-    TextDirection dir,
-    double gap,
-  ) {
-    // Resolve directional "start"/"end" to physical left/right for the
-    // horizontal cross axis (top/bottom placements).
-    final bool ltr = dir == TextDirection.ltr;
-    Alignment startX(Alignment l, Alignment r) => ltr ? l : r;
-    Alignment endX(Alignment l, Alignment r) => ltr ? r : l;
-
-    return switch (align) {
-      // Bottom: surface below, top edge meets trigger bottom edge.
-      CarbonPopoverAlignment.bottom => _Anchors(
-        Alignment.bottomCenter,
-        Alignment.topCenter,
-        Offset(0, gap),
-      ),
-      CarbonPopoverAlignment.bottomStart => _Anchors(
-        startX(Alignment.bottomLeft, Alignment.bottomRight),
-        startX(Alignment.topLeft, Alignment.topRight),
-        Offset(0, gap),
-      ),
-      CarbonPopoverAlignment.bottomEnd => _Anchors(
-        endX(Alignment.bottomLeft, Alignment.bottomRight),
-        endX(Alignment.topLeft, Alignment.topRight),
-        Offset(0, gap),
-      ),
-      // Top: surface above, bottom edge meets trigger top edge.
-      CarbonPopoverAlignment.top => _Anchors(
-        Alignment.topCenter,
-        Alignment.bottomCenter,
-        Offset(0, -gap),
-      ),
-      CarbonPopoverAlignment.topStart => _Anchors(
-        startX(Alignment.topLeft, Alignment.topRight),
-        startX(Alignment.bottomLeft, Alignment.bottomRight),
-        Offset(0, -gap),
-      ),
-      CarbonPopoverAlignment.topEnd => _Anchors(
-        endX(Alignment.topLeft, Alignment.topRight),
-        endX(Alignment.bottomLeft, Alignment.bottomRight),
-        Offset(0, -gap),
-      ),
-      // Right: surface to the right, left edge meets trigger right edge.
-      CarbonPopoverAlignment.right => _Anchors(
-        Alignment.centerRight,
-        Alignment.centerLeft,
-        Offset(gap, 0),
-      ),
-      CarbonPopoverAlignment.rightStart => _Anchors(
-        Alignment.topRight,
-        Alignment.topLeft,
-        Offset(gap, 0),
-      ),
-      CarbonPopoverAlignment.rightEnd => _Anchors(
-        Alignment.bottomRight,
-        Alignment.bottomLeft,
-        Offset(gap, 0),
-      ),
-      // Left: surface to the left, right edge meets trigger left edge.
-      CarbonPopoverAlignment.left => _Anchors(
-        Alignment.centerLeft,
-        Alignment.centerRight,
-        Offset(-gap, 0),
-      ),
-      CarbonPopoverAlignment.leftStart => _Anchors(
-        Alignment.topLeft,
-        Alignment.topRight,
-        Offset(-gap, 0),
-      ),
-      CarbonPopoverAlignment.leftEnd => _Anchors(
-        Alignment.bottomLeft,
-        Alignment.bottomRight,
-        Offset(-gap, 0),
-      ),
-    };
-  }
-}
-
-/// The resolved anchor pair and offset handed to [CompositedTransformFollower].
-class _Anchors {
-  const _Anchors(this.target, this.follower, this.offset);
-  final Alignment target;
-  final Alignment follower;
-  final Offset offset;
 }
 
 /// The popover content box with its optional caret and chrome.
 class _Surface extends StatelessWidget {
   const _Surface({
     required this.align,
+    required this.caretTarget,
     required this.caret,
     required this.border,
     required this.dropShadow,
@@ -474,6 +392,7 @@ class _Surface extends StatelessWidget {
   });
 
   final CarbonPopoverAlignment align;
+  final Offset? caretTarget;
   final bool caret;
   final bool border;
   final bool dropShadow;
@@ -518,7 +437,57 @@ class _Surface extends StatelessWidget {
 
     return Stack(
       clipBehavior: Clip.none,
-      children: <Widget>[box, _caret(context)],
+      children: <Widget>[
+        box,
+        if (caretTarget != null)
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraints) =>
+                  _positionedCaret(context, constraints.biggest),
+            ),
+          )
+        else
+          _caret(context),
+      ],
+    );
+  }
+
+  Widget _positionedCaret(BuildContext context, Size size) {
+    final bool vertical = align.isVertical;
+    final double extent = vertical ? size.width : size.height;
+    final double center = (vertical ? caretTarget!.dx : caretTarget!.dy).clamp(
+      _caretCross / 2,
+      extent < _caretCross ? _caretCross / 2 : extent - _caretCross / 2,
+    );
+    final _CaretDirection direction = _caretDirection;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: vertical
+              ? center - _caretCross / 2
+              : direction == _CaretDirection.left
+              ? -_caretMain
+              : null,
+          right: direction == _CaretDirection.right ? -_caretMain : null,
+          top: !vertical
+              ? center - _caretCross / 2
+              : direction == _CaretDirection.up
+              ? -_caretMain
+              : null,
+          bottom: direction == _CaretDirection.down ? -_caretMain : null,
+          child: CustomPaint(
+            size: vertical
+                ? const Size(_caretCross, _caretMain)
+                : const Size(_caretMain, _caretCross),
+            painter: _CaretPainter(
+              direction: direction,
+              color: background,
+              borderColor: border ? borderColor : null,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

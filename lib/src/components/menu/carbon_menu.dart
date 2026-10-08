@@ -24,6 +24,8 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/anchored_overlay.dart';
+import '../../utils/scroll_into_view.dart';
 import '../../utils/menu_shadow.dart';
 import '../../utils/typeahead.dart';
 import '../../utils/control_semantics.dart';
@@ -224,6 +226,11 @@ class _CarbonMenuState extends State<CarbonMenu> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final CarbonThemeData theme = CarbonTheme.of(context);
     final bool reserveLeading = _reservesLeading(widget.children);
+    final Widget rows = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: widget.children,
+    );
 
     return Focus(
       focusNode: _key,
@@ -256,11 +263,9 @@ class _CarbonMenuState extends State<CarbonMenu> {
                 style: CarbonTypeStyles.bodyCompact01.copyWith(
                   color: theme.textSecondary,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: widget.children,
-                ),
+                child: isCarbonOverlaySurface(context)
+                    ? SingleChildScrollView(child: rows)
+                    : rows,
               ),
             ),
           ),
@@ -465,7 +470,10 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
           canRequestFocus: enabled,
           onKeyEvent: _onKey,
           onFocusChange: (bool f) => setState(() => _focused = f),
-          child: CarbonFocusRing(visible: _focused, inset: true, child: row),
+          child: CarbonScrollIntoView(
+            active: _focused && isCarbonOverlaySurface(context),
+            child: CarbonFocusRing(visible: _focused, inset: true, child: row),
+          ),
         ),
       ),
     );
@@ -488,47 +496,36 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
       link: _link,
       child: OverlayPortal(
         controller: _submenu,
-        overlayChildBuilder: (BuildContext context) => Positioned(
-          left: 0,
-          top: 0,
-          child: CompositedTransformFollower(
-            link: _link,
-            // Submenus open toward the end side (follower anchors are
-            // physical-only, so resolve against the ambient direction).
-            targetAnchor: Directionality.of(context) == TextDirection.rtl
-                ? Alignment.topLeft
-                : Alignment.topRight,
-            followerAnchor: Directionality.of(context) == TextDirection.rtl
-                ? Alignment.topRight
-                : Alignment.topLeft,
-            child: Focus(
-              skipTraversal: true,
-              canRequestFocus: false,
-              // The collapse arrow (Left in LTR, Right in RTL) anywhere in
-              // the submenu closes it and returns focus to the parent item
-              // (the submenu owns focus once open).
-              onKeyEvent: (FocusNode node, KeyEvent event) {
-                final LogicalKeyboardKey collapseKey =
-                    Directionality.of(context) == TextDirection.rtl
-                    ? LogicalKeyboardKey.arrowRight
-                    : LogicalKeyboardKey.arrowLeft;
-                if (event is KeyDownEvent && event.logicalKey == collapseKey) {
+        overlayChildBuilder: (BuildContext context) => CarbonAnchoredOverlay(
+          link: _link,
+          side: CarbonOverlaySide.end,
+          child: Focus(
+            skipTraversal: true,
+            canRequestFocus: false,
+            // The collapse arrow (Left in LTR, Right in RTL) anywhere in
+            // the submenu closes it and returns focus to the parent item
+            // (the submenu owns focus once open).
+            onKeyEvent: (FocusNode node, KeyEvent event) {
+              final LogicalKeyboardKey collapseKey =
+                  Directionality.of(context) == TextDirection.rtl
+                  ? LogicalKeyboardKey.arrowRight
+                  : LogicalKeyboardKey.arrowLeft;
+              if (event is KeyDownEvent && event.logicalKey == collapseKey) {
+                _submenu.hide();
+                _node.requestFocus();
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: TapRegion(
+              onTapOutside: (_) => _submenu.hide(),
+              child: CarbonMenu(
+                size: scope.size,
+                onClose: () {
                   _submenu.hide();
-                  _node.requestFocus();
-                  return KeyEventResult.handled;
-                }
-                return KeyEventResult.ignored;
-              },
-              child: TapRegion(
-                onTapOutside: (_) => _submenu.hide(),
-                child: CarbonMenu(
-                  size: scope.size,
-                  onClose: () {
-                    _submenu.hide();
-                    scope.onClose?.call();
-                  },
-                  children: widget.submenu!,
-                ),
+                  scope.onClose?.call();
+                },
+                children: widget.submenu!,
               ),
             ),
           ),

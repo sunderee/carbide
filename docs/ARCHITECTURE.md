@@ -208,3 +208,9 @@ The upstream sources used to port from live as submodules under
 - `documentation/plex` — the IBM Plex font sources.
 - `documentation/carbon-icons`, `documentation/carbon-design-kit` — legacy
   icons and the Figma kit.
+
+## Anchored overlay placement
+
+Picker and menu surfaces share composition-time viewport geometry and bounded
+constraints. See [placement and side overrides](overlay-placement.md) for the
+logical alignment, pinning and retained-scroll contracts.

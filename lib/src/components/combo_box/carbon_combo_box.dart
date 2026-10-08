@@ -21,6 +21,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/anchored_overlay.dart';
 import '../../utils/picker_overlay.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
@@ -72,6 +73,7 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.placeholder,
     this.helperText,
     this.size = CarbonFieldSize.md,
+    this.menuSide,
     this.disabled = false,
     this.readOnly = false,
     this.readOnlyHint = CarbonControlState.defaultReadOnlyHint,
@@ -111,6 +113,10 @@ class CarbonComboBox<T> extends StatefulWidget {
 
   /// The field size.
   final CarbonFieldSize size;
+
+  /// Pins the options to a side. Null prefers below and adapts to the viewport.
+  /// Logical [CarbonOverlaySide.start] and [CarbonOverlaySide.end] follow RTL.
+  final CarbonOverlaySide? menuSide;
 
   /// Whether the combo box is disabled.
   final bool disabled;
@@ -592,14 +598,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       for (int i = 0; i < items.length; i++) _menuRow(items[i], i),
     ];
 
-    return Positioned.directional(
-      textDirection: Directionality.of(context),
-      width: _triggerWidth,
-      child: CompositedTransformFollower(
-        link: _link,
-        targetAnchor: Alignment.bottomLeft,
-        followerAnchor: Alignment.topLeft,
-        showWhenUnlinked: false,
+    return CarbonAnchoredOverlay(
+      link: _link,
+      side: widget.menuSide ?? CarbonOverlaySide.bottom,
+      automatic: widget.menuSide == null,
+      child: SizedBox(
+        width: _triggerWidth,
         child: TapRegion(
           groupId: this,
           onTapOutside: (_) => _close(),

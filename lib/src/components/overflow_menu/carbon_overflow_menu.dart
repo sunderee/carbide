@@ -19,6 +19,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../icons/carbon_icons.dart';
+import '../../utils/anchored_overlay.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../button/carbon_button.dart';
@@ -56,6 +57,7 @@ class CarbonOverflowMenu extends StatelessWidget {
     this.size = CarbonMenuSize.sm,
     this.buttonSize = CarbonButtonSize.sm,
     this.menuAlignment = CarbonMenuAlignment.end,
+    this.menuSide,
     this.iconDescription = 'Options',
     this.triggerBuilder,
   });
@@ -71,6 +73,9 @@ class CarbonOverflowMenu extends StatelessWidget {
 
   /// Which edge the menu aligns to.
   final CarbonMenuAlignment menuAlignment;
+
+  /// Pins the menu to a side. Null prefers below and adapts to the viewport.
+  final CarbonOverlaySide? menuSide;
 
   /// The accessible label for the trigger.
   final String iconDescription;
@@ -89,6 +94,7 @@ class CarbonOverflowMenu extends StatelessWidget {
       items: items,
       menuSize: size,
       menuAlignment: menuAlignment,
+      menuSide: menuSide,
       triggerBuilder:
           triggerBuilder ??
           (BuildContext context, bool open, VoidCallback toggle) =>
@@ -115,6 +121,7 @@ class CarbonMenuButton extends StatelessWidget {
     this.size = CarbonButtonSize.lg,
     this.menuSize = CarbonMenuSize.sm,
     this.menuAlignment = CarbonMenuAlignment.start,
+    this.menuSide,
   });
 
   /// The button label.
@@ -135,12 +142,16 @@ class CarbonMenuButton extends StatelessWidget {
   /// Which edge the menu aligns to.
   final CarbonMenuAlignment menuAlignment;
 
+  /// Pins the menu to a side. Null prefers below and adapts to the viewport.
+  final CarbonOverlaySide? menuSide;
+
   @override
   Widget build(BuildContext context) {
     return _AnchoredMenu(
       items: items,
       menuSize: menuSize,
       menuAlignment: menuAlignment,
+      menuSide: menuSide,
       triggerBuilder: (BuildContext context, bool open, VoidCallback toggle) =>
           CarbonButton(
             label: label,
@@ -166,6 +177,7 @@ class CarbonComboButton extends StatelessWidget {
     this.size = CarbonButtonSize.lg,
     this.menuSize = CarbonMenuSize.sm,
     this.menuAlignment = CarbonMenuAlignment.end,
+    this.menuSide,
     this.menuLabel = 'Additional actions',
   });
 
@@ -190,6 +202,9 @@ class CarbonComboButton extends StatelessWidget {
   /// Which edge the menu aligns to.
   final CarbonMenuAlignment menuAlignment;
 
+  /// Pins the menu to a side. Null prefers below and adapts to the viewport.
+  final CarbonOverlaySide? menuSide;
+
   /// The accessible label for the chevron trigger.
   final String menuLabel;
 
@@ -212,6 +227,7 @@ class CarbonComboButton extends StatelessWidget {
             items: items,
             menuSize: menuSize,
             menuAlignment: menuAlignment,
+            menuSide: menuSide,
             triggerBuilder:
                 (BuildContext context, bool open, VoidCallback toggle) =>
                     CarbonButton.iconOnly(
@@ -237,12 +253,16 @@ class _AnchoredMenu extends StatefulWidget {
     required this.items,
     required this.menuSize,
     required this.menuAlignment,
+    required this.menuSide,
     required this.triggerBuilder,
   });
 
   final List<Widget> items;
   final CarbonMenuSize menuSize;
   final CarbonMenuAlignment menuAlignment;
+
+  /// Pins the menu to a side. Null prefers below and adapts to the viewport.
+  final CarbonOverlaySide? menuSide;
   final Widget Function(BuildContext context, bool open, VoidCallback toggle)
   triggerBuilder;
 
@@ -285,29 +305,20 @@ class _AnchoredMenuState extends State<_AnchoredMenu> {
   }
 
   Widget _buildMenu(BuildContext context) {
-    // CarbonMenuAlignment is logical (start/end), so resolve it against the
-    // ambient direction (follower anchors are physical-only).
-    final bool physicalRight =
-        (widget.menuAlignment == CarbonMenuAlignment.end) ^
-        (Directionality.of(context) == TextDirection.rtl);
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: CompositedTransformFollower(
-        link: _link,
-        targetAnchor: physicalRight
-            ? Alignment.bottomRight
-            : Alignment.bottomLeft,
-        followerAnchor: physicalRight ? Alignment.topRight : Alignment.topLeft,
-        showWhenUnlinked: false,
-        child: TapRegion(
-          groupId: _group,
-          onTapOutside: (_) => _close(),
-          child: CarbonMenu(
-            size: widget.menuSize,
-            onClose: _close,
-            children: widget.items,
-          ),
+    return CarbonAnchoredOverlay(
+      link: _link,
+      side: widget.menuSide ?? CarbonOverlaySide.bottom,
+      automatic: widget.menuSide == null,
+      alignment: widget.menuAlignment == CarbonMenuAlignment.end
+          ? CarbonOverlayAlignment.end
+          : CarbonOverlayAlignment.start,
+      child: TapRegion(
+        groupId: _group,
+        onTapOutside: (_) => _close(),
+        child: CarbonMenu(
+          size: widget.menuSize,
+          onClose: _close,
+          children: widget.items,
         ),
       ),
     );
