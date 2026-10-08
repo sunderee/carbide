@@ -262,6 +262,12 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
                       selected: i == _current,
                       isFirst: i == 0,
                       focusNode: _nodes[i],
+                      revealSelected:
+                          expand &&
+                          minimumWidth * widget.switches.length >
+                              constraints.maxWidth,
+                      hasFocusedSegment: () =>
+                          _nodes.any((node) => node.hasPrimaryFocus),
                       onKey: _onKey,
                       onTap: () => _select(i),
                     ),
@@ -300,6 +306,8 @@ class _SwitchSegment extends StatefulWidget {
     required this.selected,
     required this.isFirst,
     required this.focusNode,
+    required this.revealSelected,
+    required this.hasFocusedSegment,
     required this.onKey,
     required this.onTap,
   });
@@ -309,6 +317,8 @@ class _SwitchSegment extends StatefulWidget {
   final bool selected;
   final bool isFirst;
   final FocusNode focusNode;
+  final bool revealSelected;
+  final bool Function() hasFocusedSegment;
   final KeyEventResult Function(FocusNode, KeyEvent) onKey;
   final VoidCallback onTap;
 
@@ -321,6 +331,34 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
   bool _focused = false;
 
   @override
+  void initState() {
+    super.initState();
+    _revealSelection();
+  }
+
+  void _revealSelection() {
+    if (!widget.revealSelected || !widget.selected) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          !widget.revealSelected ||
+          !widget.selected ||
+          widget.hasFocusedSegment()) {
+        return;
+      }
+      // Selection changes scroll this group only; an editor or another
+      // component keeps its focus and the containing page keeps its position.
+      final ScrollableState? scroll = Scrollable.maybeOf(
+        context,
+        axis: Axis.horizontal,
+      );
+      final RenderObject? target = context.findRenderObject();
+      if (scroll != null && target != null) {
+        scroll.position.ensureVisible(target);
+      }
+    });
+  }
+
+  @override
   void didUpdateWidget(_SwitchSegment oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.focusNode.hasPrimaryFocus) {
@@ -329,6 +367,8 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
           Scrollable.ensureVisible(context);
         }
       });
+    } else {
+      _revealSelection();
     }
   }
 

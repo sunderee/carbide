@@ -65,6 +65,8 @@ plus 32 px horizontal padding, its divider, and 24 px when an icon accompanies
 text. If the host cannot fit that minimum for every segment, the same group
 scrolls horizontally. Complete accessible names remain available, and keyboard
 or accessibility focus reveals the whole segment. Density height grows by the
-extra scaled text line; fitting unscaled and intrinsic icon-only layouts retain
+extra scaled text line; initial and externally controlled selection reveal the
+current choice within the group without moving editor focus or page scroll.
+Fitting unscaled and intrinsic icon-only layouts retain
 their existing geometry. In particularly constrained layouts, applications can
 also choose explicitly named icon-only switches for their view model.

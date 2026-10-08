@@ -40,6 +40,70 @@ Widget host(
   ),
 );
 void main() {
+  for (final direction in TextDirection.values) {
+    testWidgets(
+      'initial and external selection reveal without stealing focus $direction',
+      (tester) async {
+        final handle = tester.ensureSemantics();
+        final editorFocus = FocusNode();
+        try {
+          var selected = 2;
+          late StateSetter update;
+          await tester.pumpWidget(
+            host(
+              StatefulBuilder(
+                builder: (_, set) {
+                  update = set;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      CarbonTextInput(
+                        labelText: 'Keep editing',
+                        focusNode: editorFocus,
+                      ),
+                      CarbonContentSwitcher(
+                        switches: switches,
+                        selectedIndex: selected,
+                        onChanged: (i) => set(() => selected = i),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              width: 160,
+              direction: direction,
+            ),
+          );
+          await tester.pumpAndSettle();
+          void visible(String label) {
+            final rect = tester.getRect(find.bySemanticsLabel(label));
+            expect(rect.left, greaterThanOrEqualTo(-.1));
+            expect(rect.right, lessThanOrEqualTo(160.1));
+          }
+
+          visible('Third segment');
+          tester.binding.handleViewFocusChanged(
+            ViewFocusEvent(
+              viewId: tester.view.viewId,
+              state: ViewFocusState.focused,
+              direction: ViewFocusDirection.undefined,
+            ),
+          );
+          editorFocus.requestFocus();
+          await tester.pumpAndSettle();
+          update(() => selected = 0);
+          await tester.pumpAndSettle();
+          visible('First segment');
+          expect(editorFocus.hasPrimaryFocus, isTrue);
+          expect(tester.takeException(), isNull);
+        } finally {
+          await tester.pumpWidget(const SizedBox.shrink());
+          handle.dispose();
+          editorFocus.dispose();
+        }
+      },
+    );
+  }
   testWidgets(
     'fitting default preserves equal full-width segments and density',
     (tester) async {
