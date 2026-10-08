@@ -160,6 +160,8 @@ void main() {
         expect(calls, List<int>.filled(9, 0));
         // Carbon's xs/sm/md bands intentionally stay below 48dp; lg/xl must
         // meet the complete target guideline (_data-table.scss size tokens).
+        // Carbon xs/sm/md bands are 24/32/40px; lg/xl retain the 48dp gate.
+        // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/data-table/_data-table.scss
         await expectA11y(tester, tapTargets: size.height >= 48);
       });
     }
@@ -496,6 +498,8 @@ void main() {
           _label(tester, 'Name').rect.height,
           greaterThanOrEqualTo(tester.getSize(find.text('Name')).height),
         );
+        // Carbon xs/sm/md bands use 24/32/40px; lg/xl retain the full gate.
+        // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/data-table/_data-table.scss
         await expectA11y(tester, tapTargets: size.height >= 48);
       });
     }

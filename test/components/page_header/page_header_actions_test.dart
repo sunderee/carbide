@@ -317,6 +317,7 @@ void main() {
             expect(disabled.disabled, isTrue);
             // Carbon's md action button is 40px and sm menu rows are 32px:
             // styles/scss/components/{button,menu}/_*.scss.
+            // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/menu/_menu.scss
             await expectA11y(tester, tapTargets: false);
             await tester.sendKeyEvent(LogicalKeyboardKey.keyD, character: 'd');
             await tester.sendKeyEvent(LogicalKeyboardKey.enter);

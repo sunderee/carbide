@@ -273,6 +273,7 @@ void main() {
       // documentation/carbon/packages/styles/scss/components/
       // overflow-menu/_overflow-menu.scss) and the open menu rows 32px
       // (`_menu.scss` `block-size: 2rem`), so 48dp is unattainable.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/overflow-menu/_overflow-menu.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

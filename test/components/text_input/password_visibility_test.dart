@@ -436,6 +436,7 @@ void main() {
           );
           // _text-input.scss: the button fills field height with aspect-ratio: 1.
           // Carbon's sm/md densities deliberately use 32/40px targets; lg is 48px.
+          // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/text-input/_text-input.scss
           await expectA11y(tester, tapTargets: size == CarbonFieldSize.lg);
         } finally {
           await tester.pumpWidget(const SizedBox.shrink());

@@ -540,6 +540,7 @@ void main() {
       // 48dp by styles/scss/components/tag/_tag.scss (heights xs/sm 18px,
       // md 24px, lg 32px; the dismiss button matches the tag height), so
       // the Android guideline is unattainable at Carbon's sizes.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/tag/_tag.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

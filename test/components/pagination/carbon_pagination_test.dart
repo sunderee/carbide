@@ -173,12 +173,7 @@ void main() {
           ),
         ),
       );
-      // TODO(#226): tap targets are off — the two pickers render 32px tall
-      // (CarbonFieldSize.sm), while documentation/carbon/packages/styles/
-      // scss/components/pagination/_pagination.scss stretches
-      // `.cds--select-input` to `block-size: 100%` of the 48px bar.
-      // Re-enable once the pickers fill the bar height.
-      await expectA11y(tester, tapTargets: false);
+      await expectA11y(tester);
       handle.dispose();
     });
   });
@@ -344,14 +339,18 @@ void main() {
           initialEntries: <OverlayEntry>[
             managedOverlayEntry(
               builder: (BuildContext context) => Center(
-                child: SizedBox(
-                  width: 760,
-                  child: CarbonPagination(
-                    page: 1,
-                    pageSize: 10,
-                    totalItems: 95,
-                    onPageChanged: (_) {},
-                    onPageSizeChanged: (_) {},
+                // Ahem can force the responsive stack in Chrome. Admit its
+                // natural height; VM/Plex keeps the same centered 48px band.
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: 760,
+                    child: CarbonPagination(
+                      page: 1,
+                      pageSize: 10,
+                      totalItems: 95,
+                      onPageChanged: (_) {},
+                      onPageSizeChanged: (_) {},
+                    ),
                   ),
                 ),
               ),
