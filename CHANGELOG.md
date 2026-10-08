@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Give `CarbonFluidTextStyle` value equality and order-independent hashing for
+  breakpoint overrides. Add `copyWith` for deriving a base or replacing the
+  override map without reconstructing the cascade (#333).
+
 - Expose structural semantics for nested Carbon lists and document the static
   tag/code-snippet accessibility policy (#318).
 
