@@ -321,6 +321,8 @@ class CarbonListBoxMenu extends StatelessWidget {
     this.size = CarbonFieldSize.md,
     this.fluidRows = false,
     super.key,
+    // Lazy callers require a builder; eager constructor storage is nullable.
+    // ignore: prefer_initializing_formals
   }) : itemBuilder = itemBuilder,
        children = const <Widget>[],
        assert(itemCount >= 0),
