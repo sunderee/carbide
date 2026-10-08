@@ -91,6 +91,25 @@ void main() {
       );
     }, width: 2400);
   });
+  testWidgets('notification fixture retains the default dismissal control', (
+    tester,
+  ) async {
+    await _story(tester, 'notification', () {
+      final CarbonInlineNotification bar = tester.widget(
+        find.byType(CarbonInlineNotification),
+      );
+      expect(bar.onClose, isNotNull);
+      expect(find.text('Notification title'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics &&
+              widget.properties.label == 'Close notification',
+        ),
+        findsOneWidget,
+      );
+    });
+  });
   testWidgets('Modal story uses Modal and its complete default form', (
     tester,
   ) async {

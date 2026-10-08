@@ -122,6 +122,7 @@ fidelityBuilders = <String, Widget Function()>{
       kind: CarbonNotificationKind.error,
       title: 'Notification title',
       subtitle: 'Subtitle text goes here',
+      onClose: _noop,
     ),
   ),
   'dropdown': () => SizedBox(
