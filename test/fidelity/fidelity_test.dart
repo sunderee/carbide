@@ -5,18 +5,18 @@
 //
 // Upstream fidelity check (epic W3). For each component that has both a
 // committed Carbon Storybook reference (test/fidelity/references/<c>/<theme>.png,
-// captured by tool/fidelity/) and a Carbide builder below, this renders the
+// captured by tool/fidelity/) and a shared Carbide fixture, this renders the
 // Carbide equivalent and writes a side-by-side comparison image
 // (Carbon | Carbide) to test/fidelity/comparisons/ for human review on every PR.
 //
 // It is deliberately NOT a strict pixel gate: Carbon renders in Chromium and
 // Carbide in Flutter, so exact pixels can never match. The committed references
 // are real upstream ground truth; the side-by-side is the review surface; the
-// hard assertions are (a) Carbide renders something non-trivial and (b) the
-// coarse luminance-grid diff stays within the story's committed `threshold`
-// (#230) — a soft drift gate, per-component and deliberately lax, because the
-// value is drift *detection* across renderers, not pixel identity. Stories
-// without a threshold print a `FIDELITY-SCORE` bootstrap line instead.
+// assertions reject blank renders, drift beyond measured per-story budgets,
+// changed control dimensions, incorrect token fills and default-state changes.
+// The metric remains a 24x24 luminance grid; it cannot establish pixel identity
+// or complete variant coverage. Scores and actual sizes are always emitted for
+// reviewed Linux calibration, with rationales recorded in stories.json.
 //
 // Reference freshness (#230): the manifest stamps the @carbon/react version
 // the live Storybook ran at capture; a check below warns when the submodule
@@ -326,7 +326,7 @@ void main() {
           reason: '$component ($themeSlug) rendered blank/flat',
         );
 
-        // The soft drift gate (#230): the committed per-story threshold
+        // The drift gate: the measured per-story threshold
         // bounds the coarse diff. No threshold yet → bootstrap line for
         // harvesting one (score + margin goes into stories.json).
         final double? threshold = _thresholds[component];
