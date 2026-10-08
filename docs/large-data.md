@@ -39,6 +39,7 @@ CarbonDataTable(
   virtualized: true,
   viewportHeight: 320,
   stickyHeader: true,
+  selection: CarbonTableSelection.multi,
   selectedRowIds: selectedIds,
   onSelectedRowIdsChanged: updateSelection,
 )
