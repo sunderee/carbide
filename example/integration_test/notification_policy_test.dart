@@ -6,7 +6,6 @@
 import 'dart:js_interop';
 
 import 'package:carbide/carbide.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,10 +59,14 @@ void main() {
               _document.querySelectorAll('[role="alertdialog"]').length,
               0,
             );
-            final SemanticsNode callout = tester.getSemantics(
-              find.byType(CarbonCallout),
+            await tester.ensureVisible(find.byType(CarbonCallout));
+            await _settle(tester);
+            expect(
+              _staticNote().closest(
+                '[role="status"], [role="alert"], [aria-live]',
+              ),
+              isNull,
             );
-            expect(callout.flagsCollection.isLiveRegion, isFalse);
             key.currentState!.editorFocus.requestFocus();
             await _settle(tester);
             key.currentState!.update();
@@ -141,6 +144,17 @@ _Element _message(String prefix) {
   throw StateError('No notification named $prefix');
 }
 
+_Element _staticNote() {
+  final _NodeList nodes = _document.querySelectorAll('flt-semantics');
+  for (int i = 0; i < nodes.length; i++) {
+    final _Element node = nodes.item(i)!;
+    if (node.textContent?.trim() == 'Static note') {
+      return node;
+    }
+  }
+  throw StateError('No native static note');
+}
+
 @JS('document')
 external _Document get _document;
 
@@ -155,6 +169,7 @@ extension type _NodeList(JSObject _) implements JSObject {
 }
 
 extension type _Element(JSObject _) implements JSObject {
+  external _Element? closest(String selector);
   external String? getAttribute(String name);
   external String? get textContent;
   external String get tagName;
