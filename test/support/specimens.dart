@@ -92,6 +92,79 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
       ],
     ),
   ),
+  'combo box': (_) => SizedBox(
+    width: 280,
+    child: CarbonComboBox<int>(
+      titleText: 'City',
+      placeholder: 'Choose a city',
+      items: const <CarbonComboBoxItem<int>>[
+        CarbonComboBoxItem<int>(value: 0, label: 'Berlin'),
+        CarbonComboBoxItem<int>(value: 1, label: 'Tallinn'),
+      ],
+      onChanged: (int? _) {},
+    ),
+  ),
+  'multi select': (_) => SizedBox(
+    width: 320,
+    child: CarbonMultiSelect<int>(
+      titleText: 'Cities',
+      label: 'Choose cities',
+      selectedValues: const <int>{0, 1},
+      items: const <CarbonMultiSelectItem<int>>[
+        CarbonMultiSelectItem<int>(value: 0, label: 'Berlin'),
+        CarbonMultiSelectItem<int>(value: 1, label: 'Tallinn'),
+      ],
+      onChanged: (Set<int> _) {},
+    ),
+  ),
+  'filterable multi select': (_) => SizedBox(
+    width: 320,
+    child: CarbonMultiSelect<int>(
+      titleText: 'Cities',
+      label: 'Find a city',
+      filterable: true,
+      items: const <CarbonMultiSelectItem<int>>[
+        CarbonMultiSelectItem<int>(value: 0, label: 'Berlin'),
+        CarbonMultiSelectItem<int>(value: 1, label: 'Tallinn'),
+      ],
+      onChanged: (Set<int> _) {},
+    ),
+  ),
+  'time picker': (_) => SizedBox(
+    width: 320,
+    child: CarbonTimePicker(
+      labelText: 'Time',
+      initialValue: '12:00',
+      children: <Widget>[
+        CarbonTimePickerSelect<String>(
+          labelText: 'AM/PM',
+          width: 120,
+          value: 'AM',
+          onChanged: (String? _) {},
+          items: const <CarbonSelectItem<String>>[
+            CarbonSelectItem<String>(value: 'AM', label: 'AM'),
+            CarbonSelectItem<String>(value: 'PM', label: 'PM'),
+          ],
+        ),
+      ],
+    ),
+  ),
+  'list box': (_) => const SizedBox(
+    width: 280,
+    child: CarbonListBox(child: Text('Selected option')),
+  ),
+  'list box selection count': (_) =>
+      CarbonListBoxSelectionCount(count: 12, onClear: () {}),
+  'menu': (_) => SizedBox(
+    width: 280,
+    child: CarbonMenu(
+      autofocus: false,
+      children: <Widget>[
+        CarbonMenuItem(label: 'Open document', onPressed: () {}),
+        CarbonMenuItem(label: 'Close document', onPressed: () {}),
+      ],
+    ),
+  ),
   'search': (_) =>
       const SizedBox(width: 280, child: CarbonSearch(placeholder: 'Find')),
   'checkbox': (_) => const CarbonCheckbox(label: 'Subscribe', value: true),

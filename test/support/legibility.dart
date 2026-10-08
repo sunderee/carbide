@@ -9,6 +9,7 @@
 // into an unreadable sliver (and a self-referential golden will happily lock
 // that in). These helpers close that gap.
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -66,7 +67,7 @@ void expectFitsWithin(
   );
 }
 
-/// Asserts every visible [Text] in the tree renders at least one full line
+/// Asserts every visible [Text] and [EditableText] renders at least one full line
 /// box at [scale] — the text-scaling analogue of [expectTextNotClipped].
 ///
 /// Texts that opt into ellipsis/fade with `maxLines` still keep their first
@@ -87,9 +88,29 @@ void expectNoClippedTextAtScale(
     if (rendered == Size.zero) {
       continue;
     }
-    final TextStyle? style = text.style;
-    final double fontSize = style?.fontSize ?? 14;
-    final double lineHeight = fontSize * (style?.height ?? 1.0) * scale;
+    // Resolve inherited styles, actual fonts and the effective scaler rather
+    // than assuming an unstyled Text has a 14px/1.0 line box. That assumption
+    // misses the list-box value inherited from DefaultTextStyle.
+    final RenderParagraph paragraph = tester.renderObject<RenderParagraph>(
+      find
+          .descendant(
+            of: find.byElementPredicate(
+              (Element candidate) => candidate == element,
+            ),
+            matching: find.byType(RichText),
+          )
+          .first,
+    );
+    final TextPainter painter = TextPainter(
+      text: paragraph.text,
+      textDirection: paragraph.textDirection,
+      textScaler: paragraph.textScaler,
+      strutStyle: paragraph.strutStyle,
+      textHeightBehavior: paragraph.textHeightBehavior,
+      maxLines: 1,
+    )..layout();
+    final double lineHeight = painter.preferredLineHeight;
+    painter.dispose();
     expect(
       rendered.height,
       greaterThanOrEqualTo(lineHeight - slack),
@@ -97,6 +118,24 @@ void expectNoClippedTextAtScale(
           'Text "$data" is clipped at ${scale}x scale: rendered '
           '${rendered.height.toStringAsFixed(2)}px tall but one scaled line '
           'needs ${lineHeight.toStringAsFixed(2)}px.',
+    );
+  }
+  // Editors can retain all their text and scroll internally while a fixed
+  // ancestor clips a whole line vertically. Text-only sweeps miss this case.
+  for (final Element element in find.byType(EditableText).evaluate()) {
+    final EditableTextState state =
+        (element as StatefulElement).state as EditableTextState;
+    final RenderEditable editable = state.renderEditable;
+    if (editable.size == Size.zero) {
+      continue;
+    }
+    expect(
+      editable.size.height,
+      greaterThanOrEqualTo(editable.preferredLineHeight - slack),
+      reason:
+          'EditableText is clipped at ${scale}x scale: rendered '
+          '${editable.size.height.toStringAsFixed(2)}px tall but one scaled '
+          'line needs ${editable.preferredLineHeight.toStringAsFixed(2)}px.',
     );
   }
 }
