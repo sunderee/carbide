@@ -36,7 +36,12 @@ void main() {
                 color: CarbonTheme.of(context).layerAccent01,
                 child: Padding(
                   padding: const EdgeInsets.all(8),
-                  child: Text('Col ${i + 1}'),
+                  child: Text(
+                    'Col ${i + 1}',
+                    style: CarbonTypeStyles.body01.copyWith(
+                      color: CarbonTheme.of(context).textPrimary,
+                    ),
+                  ),
                 ),
               ),
             ),
