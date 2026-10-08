@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Generate status and low-contrast content-switcher tokens, honor custom status
+  colors in indicators, and publish the token coverage contract. Add viewport
+  spacing tokens and fixed expressive heading styles; preserve existing custom
+  theme constructors and exact nullable-outline interpolation endpoints (#331).
+
 - Give `CarbonFluidTextStyle` value equality and order-independent hashing for
   breakpoint overrides. Add `copyWith` for deriving a base or replacing the
   override map without reconstructing the cascade (#333).

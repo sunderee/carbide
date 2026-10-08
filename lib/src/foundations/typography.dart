@@ -267,6 +267,24 @@ abstract final class CarbonTypeStyles {
     letterSpacing: 0,
   );
 
+  /// The `expressiveHeading01` type style.
+  static const TextStyle expressiveHeading01 = TextStyle(
+    fontFamily: CarbonFontFamily.sans,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 1.25,
+    letterSpacing: 0.16,
+  );
+
+  /// The `expressiveHeading02` type style.
+  static const TextStyle expressiveHeading02 = TextStyle(
+    fontFamily: CarbonFontFamily.sans,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    height: 1.5,
+    letterSpacing: 0,
+  );
+
   /// The `bodyCompact01` type style (an alias of [bodyShort01]).
   static const TextStyle bodyCompact01 = bodyShort01;
 

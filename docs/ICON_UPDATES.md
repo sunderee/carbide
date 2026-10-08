@@ -22,6 +22,7 @@ the gitlink — no submodule checkout needed).
    python3 tool/generate_carbon_colors.py
    python3 tool/generate_carbon_type.py
    python3 tool/generate_carbon_fluid_type.py
+   python3 tool/generate_carbon_layout.py
    python3 tool/generate_carbon_themes.py
    python3 tool/test_carbon_generation.py
    python3 tool/generate_carbon_icons.py        # data + lockfile + diff report

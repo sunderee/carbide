@@ -7,8 +7,8 @@
 // (@carbon/layout). See the NOTICE file for attribution.
 //
 // Carbon expresses these as rem (1rem = 16px base); they are given here in
-// logical pixels. `fluidSpacing` (viewport-relative, vw) and the deprecated
-// `layout01`–`layout07` tokens are intentionally omitted.
+// logical pixels. Viewport-relative spacing is generated in fluid_spacing.dart;
+// the deprecated `layout01`–`layout07` tokens are intentionally omitted.
 
 import 'package:flutter/foundation.dart' show immutable;
 

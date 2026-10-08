@@ -37,6 +37,80 @@ final text = theme.textPrimary;   // primary text color
 Use `CarbonTheme.maybeOf(context)` when a theme may be absent. The full token
 set is documented on `CarbonThemeData` in the API reference.
 
+## Token coverage contract
+
+This contract follows the pinned Carbon **v11.118.0** source. “Complete” means
+the family's token values are available and tested; component behaviors and
+CSS helpers have separate parity requirements. A missing token outside a
+complete family is a documented boundary rather than an implicit promise.
+
+| Upstream family | Coverage | Public surface and boundary |
+| --- | --- | --- |
+| Color palette, including hover swatches and palette aliases | Complete | Generated `CarbonColors`; 246 named colors. |
+| Background, layer and layer-accent, field, border | Complete | Generated `CarbonThemeData`, including every contextual layer level. |
+| Text, link, icon, support and focus | Complete | Generated semantic colors, including inverse and disabled values. |
+| Interactive, highlight, overlay, shadow, skeleton, toggle | Complete | Generated `CarbonThemeData`; alpha values remain floating point. |
+| Button | Complete | All 15 component color tokens. |
+| Tag | Complete | All 40 component color tokens, including borders and warm/cool gray. |
+| Notification | Complete | All 10 component color tokens. |
+| AI aura, border, overlay, popover and skeleton | Complete | All 21 theme tokens used by the shipped AI decorators. |
+| Status indicators | Complete | All 10 DTCG tokens, including accessibility background and optional outlines. |
+| Content switcher | Complete | All three low-contrast component tokens. The low-contrast widget variant is [separate follow-up work](https://github.com/sunderee/carbide/issues/384); token availability does not imply variant support. |
+| Chat | Partial | Six chat-button tokens are generated. The 15 avatar, bubble, header, prompt and shell tokens await chat components that consume them. |
+| Syntax highlighting | Out of scope | The 88 syntax tokens are not exposed. Code snippets currently render plain text; highlighted-code support needs its own scope. |
+| Font families | Partial | Sans, mono and serif descriptors are available. `sansCondensed` and `sansHebrew` need their own font bundling and typography scope. Bundled fonts cover the weights used by ported styles rather than the entire Plex catalog. |
+| Font weights and type scale | Complete | The three Carbon weights and all 23 scale steps. |
+| Fixed typography | Complete | 25 fixed styles, including `expressiveHeading01`/`02`, plus 11 named aliases. |
+| Responsive typography | Complete | 13 base/breakpoint cascades and 11 fluid aliases in `CarbonFluidTypeStyles`. `resolve` selects cascade steps; continuous CSS interpolation is not implied. |
+| Fixed spacing, container sizes, control sizes and icon sizes | Complete | `CarbonSpacing`, `CarbonContainerSize`, `CarbonSize`, `CarbonIconSize`; values have upstream locks. |
+| Fluid spacing | Complete | Four generated viewport tokens in `CarbonFluidSpacing`; resolve against a finite viewport width. |
+| Grid breakpoints, margins and gutter values | Complete | `CarbonBreakpoint` and grid geometry constants. Grid behaviors, including the narrow column hang, are tracked separately. |
+| Border radius | Out of scope | No public radius-token family or configurable v12 radius mode. Existing component-specific radii follow their cited v11 SCSS. |
+| Deprecated `layout-01`–`layout-07` aliases | Out of scope | Use the supported spacing scale instead of adding deprecated layout names. |
+| Motion durations and easing values | Complete | Six duration tokens and six productive/expressive curves. Upstream surface-dependent motion helpers and CSS transition mixins are separate APIs. |
+| Legacy v10 theme aliases | Out of scope | The package exposes current v11 semantic names rather than a second deprecated theme API. |
+
+Theme colors come from `themes/src/dtcg/themes.json` and its five component
+files (`button`, `tag`, `notification`, `status`, `content-switcher`). Fixed and
+responsive type generators read `type/src/styles.ts`; the fluid-spacing
+generator reads `layout/src/dtcg/layout.json`. Each emits value locks alongside
+its Dart data. New token families are generated from the reference source,
+with source-format regression fixtures that also run without the submodules.
+
+### Component token overrides
+
+Indicators read the generated status tokens, so custom theme colors are applied
+to the icon or shape while the caller's status label remains readable:
+
+```dart
+final custom = CarbonThemeData.gray100.copyWith(
+  statusBlue: CarbonColors.cyan40,
+  statusGreen: CarbonColors.teal40,
+);
+```
+
+`statusOrangeOutline` and `statusYellowOutline` are `null` on the built-in dark
+themes because Carbon does not define those outlines there. The existing
+`copyWith` convention remains: a null argument retains its current value. Pass
+a transparent color to suppress a light outline. Theme interpolation preserves
+exact endpoints, including an absent outline, and blends colors in between.
+
+New status/content-switcher constructor parameters are optional. Existing raw
+custom-theme declarations remain valid; omitted component colors use generated
+light/dark defaults based on `brightness`. Built-in themes supply all their
+values explicitly. Custom themes must still verify their own contrast pairs.
+
+### Viewport spacing
+
+```dart
+final viewportWidth = MediaQuery.sizeOf(context).width;
+final gap = CarbonFluidSpacing.spacing02.resolve(viewportWidth); // 2vw
+```
+
+The four values represent 0, 2, 5 and 10 percent of viewport width. They do not
+measure a parent column. Negative, infinite or NaN widths are rejected; finite
+large widths resolve without overflowing an intermediate multiplication.
+
 ## Increased-contrast accessibility
 
 `CarbonTheme.of(context)` and `maybeOf` read the nearest

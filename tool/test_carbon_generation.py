@@ -9,7 +9,8 @@ from unittest.mock import patch
 
 from carbon_svg import extract
 from generate_carbon_colors import parse
-from generate_carbon_themes import flatten_tokens, resolve_token
+from generate_carbon_layout import NAMES, parse as parse_fluid_spacing
+from generate_carbon_themes import build, component_defaults, constant_color, flatten_tokens, resolve_token
 from generate_carbon_type import normalize_styles, style
 
 
@@ -18,6 +19,55 @@ def token(value, **extensions):
 
 
 class ThemeGenerationTest(unittest.TestCase):
+    def test_const_alpha_defaults_keep_exact_palette_channels(self):
+        with patch("generate_carbon_themes.parse_colors", return_value=[("gray50", "0xFF8D8D8D")]):
+            code = constant_color("_alpha(CarbonColors.gray50, 0.12)")
+        self.assertEqual(code, "const Color.from(alpha: 0.12, red: 141 / 255, green: 141 / 255, blue: 141 / 255)")
+        self.assertEqual(constant_color("null"), "null")
+        with self.assertRaisesRegex(ValueError, "unsupported const color"):
+            constant_color("_alpha(_alpha(CarbonColors.gray50, 0.12), 0.5)")
+
+    def test_compatibility_defaults_reject_theme_divergence(self):
+        values = {theme: {"statusBlue": "CarbonColors.blue70"} for theme in ("white", "gray10", "gray90", "gray100")}
+        self.assertEqual(component_defaults(values, "statusBlue"), ("CarbonColors.blue70", "CarbonColors.blue70"))
+        values["gray10"]["statusBlue"] = "CarbonColors.blue50"
+        with self.assertRaisesRegex(ValueError, "light compatibility defaults differ"):
+            component_defaults(values, "statusBlue")
+        values["gray10"]["statusBlue"] = values["white"]["statusBlue"]
+        values["gray90"]["statusBlue"] = "CarbonColors.blue50"
+        with self.assertRaisesRegex(ValueError, "dark compatibility defaults differ"):
+            component_defaults(values, "statusBlue")
+
+    def test_dark_status_outlines_preserve_upstream_absence(self):
+        tokens = {"status.orange-outline": token("#000000"), "status.yellow-outline": token("#000000")}
+        for path in tokens:
+            for theme in ("g90", "g100"):
+                with self.subTest(path=path, theme=theme):
+                    self.assertEqual(resolve_token(path, theme, tokens, {}), "null")
+        with self.assertRaisesRegex(ValueError, "missing g90"):
+            resolve_token("status.red", "g90", {"status.red": token("#000000")}, {})
+
+    def test_component_sources_load_status_and_content_switcher(self):
+        def themed(hex_value):
+            return {"$extensions": {"carbon.themes": {theme: hex_value for theme in ("white", "g10", "g90", "g100")}}}
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            dtcg = root / "dtcg"
+            components = dtcg / "components"
+            components.mkdir(parents=True)
+            (dtcg / "themes.json").write_text("{}")
+            for group in ("button", "tag", "notification"):
+                (components / (group + ".json")).write_text("{}")
+            (components / "status.json").write_text(json.dumps({"status": {"blue": themed("#123456")}}))
+            (components / "content-switcher.json").write_text(json.dumps({"content-switcher": {"selected": themed("#654321")}}))
+            with patch("generate_carbon_themes.THEME_DIR", root), patch("generate_carbon_themes.PORTED_TOKENS", ["statusBlue", "contentSwitcherSelected"]), patch("generate_carbon_themes.parse_colors", return_value=[]):
+                order, brightness, resolved = build()
+        self.assertEqual(order, ["statusBlue", "contentSwitcherSelected"])
+        self.assertEqual(brightness["gray100"], "dark")
+        self.assertEqual(resolved["white"]["statusBlue"], "const Color(0xFF123456)")
+        self.assertEqual(resolved["gray100"]["contentSwitcherSelected"], "const Color(0xFF654321)")
+
     def test_dual_role_tokens_and_nested_palette_aliases(self):
         root = {"background": {**token("{white.default}"), "hover": token("{gray.50}")}}
         tokens = flatten_tokens(root)
@@ -48,6 +98,33 @@ class ThemeGenerationTest(unittest.TestCase):
 
 
 class UpstreamGenerationTest(unittest.TestCase):
+    def test_fluid_spacing_dimensions_ignore_metadata_and_preserve_percentages(self):
+        data = {"fluid-spacing": {"$description": "Viewport spacing", **{name: {"$type": "dimension", "$value": value} for name, value in zip(NAMES, ("0", "2vw", "5vw", "10vw"))}}}
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "layout.json"
+            source.write_text(json.dumps(data))
+            self.assertEqual(parse_fluid_spacing(source), {"spacing01": 0.0, "spacing02": 2.0, "spacing03": 5.0, "spacing04": 10.0})
+
+    def test_fluid_spacing_rejects_other_units_and_scope_changes(self):
+        data = {"fluid-spacing": {name: {"$type": "dimension", "$value": "0"} for name in NAMES}}
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "layout.json"
+            for value in ("2px", "2%", "-1vw", "bad", None):
+                with self.subTest(value=value):
+                    data["fluid-spacing"][NAMES[0]]["$value"] = value
+                    source.write_text(json.dumps(data))
+                    with self.assertRaisesRegex(ValueError, "unsupported viewport dimension"):
+                        parse_fluid_spacing(source)
+            data["fluid-spacing"][NAMES[0]]["$value"] = "0"
+            data["fluid-spacing"][NAMES[0]]["$type"] = "color"
+            source.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, "expected dimension"):
+                parse_fluid_spacing(source)
+            del data["fluid-spacing"][NAMES[0]]
+            source.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, "fluid spacing family changed"):
+                parse_fluid_spacing(source)
+
     def test_palette_preserves_public_aliases_and_real_values(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "colors.json"

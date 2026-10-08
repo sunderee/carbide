@@ -64,7 +64,7 @@ void main() {
     });
   });
 
-  group('component tokens (hand-sourced from component-tokens/*.ts)', () {
+  group('component tokens (generated from Carbon DTCG sources)', () {
     test('button tokens fold into every theme', () {
       for (final CarbonThemeData theme in <CarbonThemeData>[
         CarbonThemeData.white,

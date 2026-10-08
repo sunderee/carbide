@@ -14,7 +14,6 @@
 
 import 'package:flutter/widgets.dart';
 
-import '../../foundations/colors.dart';
 import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
@@ -23,8 +22,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 
-/// Carbon's status colour palette (component-tokens/status). Light themes use
-/// the 60/50/70 steps; dark themes step down for contrast.
+/// Carbon's generated status tokens, including consumer theme overrides.
 enum _Status {
   red,
   orange,
@@ -35,15 +33,14 @@ enum _Status {
   gray;
 
   Color resolve(CarbonThemeData theme) {
-    final bool light = theme.brightness == Brightness.light;
     return switch (this) {
-      _Status.red => light ? CarbonColors.red60 : CarbonColors.red50,
-      _Status.orange => CarbonColors.orange40,
-      _Status.yellow => CarbonColors.yellow30,
-      _Status.purple => light ? CarbonColors.purple60 : CarbonColors.purple50,
-      _Status.green => light ? CarbonColors.green50 : CarbonColors.green40,
-      _Status.blue => light ? CarbonColors.blue70 : CarbonColors.blue50,
-      _Status.gray => light ? CarbonColors.gray60 : CarbonColors.gray50,
+      _Status.red => theme.statusRed,
+      _Status.orange => theme.statusOrange,
+      _Status.yellow => theme.statusYellow,
+      _Status.purple => theme.statusPurple,
+      _Status.green => theme.statusGreen,
+      _Status.blue => theme.statusBlue,
+      _Status.gray => theme.statusGray,
     };
   }
 }

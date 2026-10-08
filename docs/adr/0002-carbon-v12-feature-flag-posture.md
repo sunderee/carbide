@@ -60,9 +60,15 @@ drive most of the decisions:
 
 ### Per-flag decisions (registry @ v11.111.0)
 
+The v11.118.0 source review for #331 also records `enable-v12-release` below.
+It remains disabled upstream. Its new button-radius fallback and other visual
+changes follow the same deferred migration policy; Carbide does not expose a
+v12 radius mode or a public border-radius token family yet.
+
 | Flag | Decision |
 |---|---|
 | `enable-v11-release` | Baseline (enabled upstream) |
+| `enable-v12-release` | Defer the next-major visual defaults, including button radius, to the coordinated v12 migration |
 | `enable-css-custom-properties` | N/A — web mechanics |
 | `enable-css-grid` | N/A — web mechanics |
 | `enable-v12-overflowmenu` | **Adopted** (already) |

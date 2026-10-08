@@ -23,6 +23,10 @@ import '../foundations/colors.dart';
 @immutable
 class CarbonThemeData {
   /// Creates a theme from an explicit set of semantic tokens.
+  ///
+  /// Status and content-switcher tokens default to the upstream light
+  /// or dark palette for [brightness] when omitted. All built-in
+  /// themes explicitly supply their generated values.
   const CarbonThemeData({
     required this.brightness,
     required this.background,
@@ -221,7 +225,95 @@ class CarbonThemeData {
     required this.chatButtonActive,
     required this.chatButtonSelected,
     required this.chatButtonTextSelected,
-  });
+    Color? statusAccessibilityBackground,
+    Color? statusRed,
+    Color? statusOrange,
+    Color? statusOrangeOutline,
+    Color? statusYellow,
+    Color? statusYellowOutline,
+    Color? statusPurple,
+    Color? statusGreen,
+    Color? statusBlue,
+    Color? statusGray,
+    Color? contentSwitcherSelected,
+    Color? contentSwitcherBackground,
+    Color? contentSwitcherBackgroundHover,
+  }) : statusAccessibilityBackground =
+           statusAccessibilityBackground ??
+           (brightness == Brightness.dark
+               ? CarbonColors.gray100
+               : CarbonColors.white),
+       statusRed =
+           statusRed ??
+           (brightness == Brightness.dark
+               ? CarbonColors.red50
+               : CarbonColors.red60),
+       statusOrange =
+           statusOrange ??
+           (brightness == Brightness.dark
+               ? CarbonColors.orange40
+               : CarbonColors.orange40),
+       statusOrangeOutline =
+           statusOrangeOutline ??
+           (brightness == Brightness.dark ? null : CarbonColors.orange60),
+       statusYellow =
+           statusYellow ??
+           (brightness == Brightness.dark
+               ? CarbonColors.yellow30
+               : CarbonColors.yellow30),
+       statusYellowOutline =
+           statusYellowOutline ??
+           (brightness == Brightness.dark ? null : CarbonColors.yellow60),
+       statusPurple =
+           statusPurple ??
+           (brightness == Brightness.dark
+               ? CarbonColors.purple50
+               : CarbonColors.purple60),
+       statusGreen =
+           statusGreen ??
+           (brightness == Brightness.dark
+               ? CarbonColors.green40
+               : CarbonColors.green50),
+       statusBlue =
+           statusBlue ??
+           (brightness == Brightness.dark
+               ? CarbonColors.blue50
+               : CarbonColors.blue70),
+       statusGray =
+           statusGray ??
+           (brightness == Brightness.dark
+               ? CarbonColors.gray50
+               : CarbonColors.gray60),
+       contentSwitcherSelected =
+           contentSwitcherSelected ??
+           (brightness == Brightness.dark
+               ? const Color.from(
+                   alpha: 0.24,
+                   red: 141 / 255,
+                   green: 141 / 255,
+                   blue: 141 / 255,
+                 )
+               : CarbonColors.white),
+       contentSwitcherBackground =
+           contentSwitcherBackground ??
+           (brightness == Brightness.dark
+               ? const Color.from(
+                   alpha: 0.0,
+                   red: 0 / 255,
+                   green: 0 / 255,
+                   blue: 0 / 255,
+                 )
+               : CarbonColors.gray20),
+       contentSwitcherBackgroundHover =
+           contentSwitcherBackgroundHover ??
+           (brightness == Brightness.dark
+               ? const Color.from(
+                   alpha: 0.12,
+                   red: 141 / 255,
+                   green: 141 / 255,
+                   blue: 141 / 255,
+                 )
+               : CarbonColors.gray20Hover);
 
   /// Whether this is a light or dark theme.
   final Brightness brightness;
@@ -814,6 +906,49 @@ class CarbonThemeData {
   /// The `chatButtonTextSelected` token.
   final Color chatButtonTextSelected;
 
+  /// The `statusAccessibilityBackground` token.
+  final Color statusAccessibilityBackground;
+
+  /// The `statusRed` token.
+  final Color statusRed;
+
+  /// The `statusOrange` token.
+  final Color statusOrange;
+
+  /// The `statusOrangeOutline` token.
+  ///
+  /// Null on the built-in dark themes, which omit this outline.
+  final Color? statusOrangeOutline;
+
+  /// The `statusYellow` token.
+  final Color statusYellow;
+
+  /// The `statusYellowOutline` token.
+  ///
+  /// Null on the built-in dark themes, which omit this outline.
+  final Color? statusYellowOutline;
+
+  /// The `statusPurple` token.
+  final Color statusPurple;
+
+  /// The `statusGreen` token.
+  final Color statusGreen;
+
+  /// The `statusBlue` token.
+  final Color statusBlue;
+
+  /// The `statusGray` token.
+  final Color statusGray;
+
+  /// The `contentSwitcherSelected` token.
+  final Color contentSwitcherSelected;
+
+  /// The `contentSwitcherBackground` token.
+  final Color contentSwitcherBackground;
+
+  /// The `contentSwitcherBackgroundHover` token.
+  final Color contentSwitcherBackgroundHover;
+
   /// The White theme.
   static final CarbonThemeData white = CarbonThemeData(
     brightness: Brightness.light,
@@ -1016,6 +1151,19 @@ class CarbonThemeData {
     chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
     chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
     chatButtonTextSelected: CarbonColors.gray70,
+    statusAccessibilityBackground: CarbonColors.white,
+    statusRed: CarbonColors.red60,
+    statusOrange: CarbonColors.orange40,
+    statusOrangeOutline: CarbonColors.orange60,
+    statusYellow: CarbonColors.yellow30,
+    statusYellowOutline: CarbonColors.yellow60,
+    statusPurple: CarbonColors.purple60,
+    statusGreen: CarbonColors.green50,
+    statusBlue: CarbonColors.blue70,
+    statusGray: CarbonColors.gray60,
+    contentSwitcherSelected: CarbonColors.white,
+    contentSwitcherBackground: CarbonColors.gray20,
+    contentSwitcherBackgroundHover: CarbonColors.gray20Hover,
   );
 
   /// The Gray 10 theme.
@@ -1220,6 +1368,19 @@ class CarbonThemeData {
     chatButtonActive: _alpha(CarbonColors.gray50, 0.5),
     chatButtonSelected: _alpha(CarbonColors.gray50, 0.2),
     chatButtonTextSelected: CarbonColors.gray70,
+    statusAccessibilityBackground: CarbonColors.white,
+    statusRed: CarbonColors.red60,
+    statusOrange: CarbonColors.orange40,
+    statusOrangeOutline: CarbonColors.orange60,
+    statusYellow: CarbonColors.yellow30,
+    statusYellowOutline: CarbonColors.yellow60,
+    statusPurple: CarbonColors.purple60,
+    statusGreen: CarbonColors.green50,
+    statusBlue: CarbonColors.blue70,
+    statusGray: CarbonColors.gray60,
+    contentSwitcherSelected: CarbonColors.white,
+    contentSwitcherBackground: CarbonColors.gray20,
+    contentSwitcherBackgroundHover: CarbonColors.gray20Hover,
   );
 
   /// The Gray 90 theme.
@@ -1421,6 +1582,19 @@ class CarbonThemeData {
     chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
     chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
     chatButtonTextSelected: CarbonColors.gray30,
+    statusAccessibilityBackground: CarbonColors.gray100,
+    statusRed: CarbonColors.red50,
+    statusOrange: CarbonColors.orange40,
+    statusOrangeOutline: null,
+    statusYellow: CarbonColors.yellow30,
+    statusYellowOutline: null,
+    statusPurple: CarbonColors.purple50,
+    statusGreen: CarbonColors.green40,
+    statusBlue: CarbonColors.blue50,
+    statusGray: CarbonColors.gray50,
+    contentSwitcherSelected: _alpha(CarbonColors.gray50, 0.24),
+    contentSwitcherBackground: _alpha(CarbonColors.black, 0.0),
+    contentSwitcherBackgroundHover: _alpha(CarbonColors.gray50, 0.12),
   );
 
   /// The Gray 100 theme.
@@ -1622,6 +1796,19 @@ class CarbonThemeData {
     chatButtonActive: _alpha(CarbonColors.gray50, 0.4),
     chatButtonSelected: _alpha(CarbonColors.gray50, 0.24),
     chatButtonTextSelected: CarbonColors.gray30,
+    statusAccessibilityBackground: CarbonColors.gray100,
+    statusRed: CarbonColors.red50,
+    statusOrange: CarbonColors.orange40,
+    statusOrangeOutline: null,
+    statusYellow: CarbonColors.yellow30,
+    statusYellowOutline: null,
+    statusPurple: CarbonColors.purple50,
+    statusGreen: CarbonColors.green40,
+    statusBlue: CarbonColors.blue50,
+    statusGray: CarbonColors.gray50,
+    contentSwitcherSelected: _alpha(CarbonColors.gray50, 0.24),
+    contentSwitcherBackground: _alpha(CarbonColors.black, 0.0),
+    contentSwitcherBackgroundHover: _alpha(CarbonColors.gray50, 0.12),
   );
 
   /// Derives stronger boundaries, focus indicators and inactive labels.
@@ -1687,6 +1874,9 @@ class CarbonThemeData {
       Expando<CarbonThemeData>('Carbon high-contrast themes');
 
   /// A copy of this theme with the given tokens replaced.
+  ///
+  /// Null arguments retain their current values, including nullable status
+  /// outlines. Pass a transparent color to suppress an existing outline.
   CarbonThemeData copyWith({
     Brightness? brightness,
     Color? background,
@@ -1885,6 +2075,19 @@ class CarbonThemeData {
     Color? chatButtonActive,
     Color? chatButtonSelected,
     Color? chatButtonTextSelected,
+    Color? statusAccessibilityBackground,
+    Color? statusRed,
+    Color? statusOrange,
+    Color? statusOrangeOutline,
+    Color? statusYellow,
+    Color? statusYellowOutline,
+    Color? statusPurple,
+    Color? statusGreen,
+    Color? statusBlue,
+    Color? statusGray,
+    Color? contentSwitcherSelected,
+    Color? contentSwitcherBackground,
+    Color? contentSwitcherBackgroundHover,
   }) {
     return CarbonThemeData(
       brightness: brightness ?? this.brightness,
@@ -2120,6 +2323,23 @@ class CarbonThemeData {
       chatButtonSelected: chatButtonSelected ?? this.chatButtonSelected,
       chatButtonTextSelected:
           chatButtonTextSelected ?? this.chatButtonTextSelected,
+      statusAccessibilityBackground:
+          statusAccessibilityBackground ?? this.statusAccessibilityBackground,
+      statusRed: statusRed ?? this.statusRed,
+      statusOrange: statusOrange ?? this.statusOrange,
+      statusOrangeOutline: statusOrangeOutline ?? this.statusOrangeOutline,
+      statusYellow: statusYellow ?? this.statusYellow,
+      statusYellowOutline: statusYellowOutline ?? this.statusYellowOutline,
+      statusPurple: statusPurple ?? this.statusPurple,
+      statusGreen: statusGreen ?? this.statusGreen,
+      statusBlue: statusBlue ?? this.statusBlue,
+      statusGray: statusGray ?? this.statusGray,
+      contentSwitcherSelected:
+          contentSwitcherSelected ?? this.contentSwitcherSelected,
+      contentSwitcherBackground:
+          contentSwitcherBackground ?? this.contentSwitcherBackground,
+      contentSwitcherBackgroundHover:
+          contentSwitcherBackgroundHover ?? this.contentSwitcherBackgroundHover,
     );
   }
 
@@ -2127,6 +2347,8 @@ class CarbonThemeData {
   ///
   /// [brightness] snaps to [b] from the midpoint.
   static CarbonThemeData lerp(CarbonThemeData a, CarbonThemeData b, double t) {
+    if (t == 0) return a;
+    if (t == 1) return b;
     return CarbonThemeData(
       brightness: t < 0.5 ? a.brightness : b.brightness,
       background: Color.lerp(a.background, b.background, t)!,
@@ -2637,6 +2859,43 @@ class CarbonThemeData {
         b.chatButtonTextSelected,
         t,
       )!,
+      statusAccessibilityBackground: Color.lerp(
+        a.statusAccessibilityBackground,
+        b.statusAccessibilityBackground,
+        t,
+      )!,
+      statusRed: Color.lerp(a.statusRed, b.statusRed, t)!,
+      statusOrange: Color.lerp(a.statusOrange, b.statusOrange, t)!,
+      statusOrangeOutline: Color.lerp(
+        a.statusOrangeOutline,
+        b.statusOrangeOutline,
+        t,
+      ),
+      statusYellow: Color.lerp(a.statusYellow, b.statusYellow, t)!,
+      statusYellowOutline: Color.lerp(
+        a.statusYellowOutline,
+        b.statusYellowOutline,
+        t,
+      ),
+      statusPurple: Color.lerp(a.statusPurple, b.statusPurple, t)!,
+      statusGreen: Color.lerp(a.statusGreen, b.statusGreen, t)!,
+      statusBlue: Color.lerp(a.statusBlue, b.statusBlue, t)!,
+      statusGray: Color.lerp(a.statusGray, b.statusGray, t)!,
+      contentSwitcherSelected: Color.lerp(
+        a.contentSwitcherSelected,
+        b.contentSwitcherSelected,
+        t,
+      )!,
+      contentSwitcherBackground: Color.lerp(
+        a.contentSwitcherBackground,
+        b.contentSwitcherBackground,
+        t,
+      )!,
+      contentSwitcherBackgroundHover: Color.lerp(
+        a.contentSwitcherBackgroundHover,
+        b.contentSwitcherBackgroundHover,
+        t,
+      )!,
     );
   }
 
@@ -2849,7 +3108,20 @@ class CarbonThemeData {
         other.chatButtonTextHover == chatButtonTextHover &&
         other.chatButtonActive == chatButtonActive &&
         other.chatButtonSelected == chatButtonSelected &&
-        other.chatButtonTextSelected == chatButtonTextSelected;
+        other.chatButtonTextSelected == chatButtonTextSelected &&
+        other.statusAccessibilityBackground == statusAccessibilityBackground &&
+        other.statusRed == statusRed &&
+        other.statusOrange == statusOrange &&
+        other.statusOrangeOutline == statusOrangeOutline &&
+        other.statusYellow == statusYellow &&
+        other.statusYellowOutline == statusYellowOutline &&
+        other.statusPurple == statusPurple &&
+        other.statusGreen == statusGreen &&
+        other.statusBlue == statusBlue &&
+        other.statusGray == statusGray &&
+        other.contentSwitcherSelected == contentSwitcherSelected &&
+        other.contentSwitcherBackground == contentSwitcherBackground &&
+        other.contentSwitcherBackgroundHover == contentSwitcherBackgroundHover;
   }
 
   @override
@@ -3051,6 +3323,19 @@ class CarbonThemeData {
     chatButtonActive,
     chatButtonSelected,
     chatButtonTextSelected,
+    statusAccessibilityBackground,
+    statusRed,
+    statusOrange,
+    statusOrangeOutline,
+    statusYellow,
+    statusYellowOutline,
+    statusPurple,
+    statusGreen,
+    statusBlue,
+    statusGray,
+    contentSwitcherSelected,
+    contentSwitcherBackground,
+    contentSwitcherBackgroundHover,
   ]);
 }
 
