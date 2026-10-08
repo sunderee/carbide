@@ -121,6 +121,8 @@ jobs:
           test/components/time_picker
           test/components/grid
           test/components/tabs
+          test/components/breadcrumb test/components/link
+          test/components/overflow_menu
           test/components/content_switcher
           test/components/menu
           test/components/picker_family test/components/dropdown
@@ -175,6 +177,7 @@ jobs:
           }
           case "$NATIVE_TEST_GROUP" in
             gallery)
+              drive_native --release --target=integration_test/breadcrumb_overflow_test.dart
               drive_native --release --target=integration_test/tabs_overflow_test.dart
               drive_native --release --target=integration_test/grid_gutters_test.dart
               drive_native --target=integration_test/gallery_smoke_test.dart

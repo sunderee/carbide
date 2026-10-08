@@ -57,6 +57,7 @@ class CarbonOverflowMenu extends StatelessWidget {
     this.buttonSize = CarbonButtonSize.sm,
     this.menuAlignment = CarbonMenuAlignment.end,
     this.iconDescription = 'Options',
+    this.triggerBuilder,
   });
 
   /// The menu rows.
@@ -74,21 +75,31 @@ class CarbonOverflowMenu extends StatelessWidget {
   /// The accessible label for the trigger.
   final String iconDescription;
 
+  /// Builds an optional custom trigger from its open state and toggle action.
+  ///
+  /// Supply a named, focusable button that calls the toggle action. The menu
+  /// retains its existing anchoring, keyboard navigation and focus return.
+  /// Breadcrumbs use this to render Carbon's compact horizontal ellipsis.
+  final Widget Function(BuildContext context, bool open, VoidCallback toggle)?
+  triggerBuilder;
+
   @override
   Widget build(BuildContext context) {
     return _AnchoredMenu(
       items: items,
       menuSize: size,
       menuAlignment: menuAlignment,
-      triggerBuilder: (BuildContext context, bool open, VoidCallback toggle) =>
-          CarbonButton.iconOnly(
-            icon: CarbonIcons.overflowMenuVertical,
-            iconDescription: iconDescription,
-            kind: CarbonButtonKind.ghost,
-            size: buttonSize,
-            isSelected: open,
-            onPressed: toggle,
-          ),
+      triggerBuilder:
+          triggerBuilder ??
+          (BuildContext context, bool open, VoidCallback toggle) =>
+              CarbonButton.iconOnly(
+                icon: CarbonIcons.overflowMenuVertical,
+                iconDescription: iconDescription,
+                kind: CarbonButtonKind.ghost,
+                size: buttonSize,
+                isSelected: open,
+                onPressed: toggle,
+              ),
     );
   }
 }

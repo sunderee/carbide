@@ -19,6 +19,16 @@ Widget _host(Widget child) => Directionality(
   ),
 );
 
+Widget _appHost(Widget child) => WidgetsApp(
+  color: const Color(0xFFFFFFFF),
+  pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
+      PageRouteBuilder<T>(
+        settings: settings,
+        pageBuilder: (BuildContext context, _, _) => builder(context),
+      ),
+  home: _host(child),
+);
+
 void main() {
   final CarbonThemeData theme = CarbonThemeData.white;
 
@@ -147,13 +157,19 @@ void main() {
         // Spec shape: a truncated breadcrumb collapses the middle crumbs
         // behind an ellipsis CarbonOverflowMenu trigger in the tab order.
         await tester.pumpWidget(
-          _host(
-            CarbonBreadcrumb(
-              items: <CarbonBreadcrumbItem>[
-                for (int i = 0; i < 6; i++)
-                  CarbonBreadcrumbItem(label: 'Level $i', onPressed: () {}),
-                const CarbonBreadcrumbItem(label: 'Here', isCurrentPage: true),
-              ],
+          _appHost(
+            SizedBox(
+              width: 240,
+              child: CarbonBreadcrumb(
+                items: <CarbonBreadcrumbItem>[
+                  for (int i = 0; i < 6; i++)
+                    CarbonBreadcrumbItem(label: 'Level $i', onPressed: () {}),
+                  const CarbonBreadcrumbItem(
+                    label: 'Here',
+                    isCurrentPage: true,
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -162,7 +178,16 @@ void main() {
           matching: find.byType(CarbonOverflowMenu),
         );
         expect(ellipsisTrigger, findsOneWidget);
-        final FocusNode trigger = Focus.of(tester.element(ellipsisTrigger));
+        final FocusNode trigger = Focus.of(
+          tester.element(
+            find
+                .descendant(
+                  of: ellipsisTrigger,
+                  matching: find.byType(CarbonIcon),
+                )
+                .first,
+          ),
+        );
         trigger.requestFocus();
         await tester.pump();
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
@@ -173,12 +198,6 @@ void main() {
         expect(find.byType(CarbonMenu), findsNothing);
         expect(trigger.hasPrimaryFocus, isTrue);
       },
-      // TODO(#231): CarbonBreadcrumb has no ellipsis ("...") overflow
-      // trigger — collapsing truncated crumbs into a CarbonOverflowMenu is
-      // an unimplemented follow-up (see the note in
-      // lib/src/components/breadcrumb/carbon_breadcrumb.dart). Re-enable
-      // once the truncated breadcrumb renders the ellipsis trigger.
-      skip: true,
     );
   });
 

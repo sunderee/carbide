@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Collapse measured breadcrumb trails into an accessible overflow menu while
+  keeping first/current anchors on one line. Localize names, preserve current
+  page semantics, mirror RTL and restore hidden ancestor keyboard coverage.
+  Expose callback links correctly in native web accessibility (#320).
+
 - Make horizontal tabs scroll with logical edge controls and shared vertical
   overflow/reveal logic. Support automatic/manual activation, preserve roving
   focus independently of selection and expose tab/list/panel roles and panel
