@@ -137,8 +137,43 @@ class CarbonPageHeader extends StatelessWidget {
     this.tabs,
     this.headingLevel = 1,
     this.titleFocusNode,
+    this.hero,
+    this.heroAspectRatio,
+    this.heroDecorative = false,
+    this.heroLabel,
   }) : assert(headingLevel >= 1 && headingLevel <= 6),
-       assert(pageActions == null || actions == null);
+       assert(pageActions == null || actions == null),
+       assert(
+         heroAspectRatio == null ||
+             (heroAspectRatio > 0 && heroAspectRatio < double.infinity),
+       ),
+       assert(!heroDecorative || heroLabel == null);
+
+  /// An optional image or custom content alongside the text band.
+  ///
+  /// At 672px and above, text and hero use equal columns; narrower headers
+  /// stack the hero after the text. The child fills a clipped aspect-ratio
+  /// box with 16px gutters. Images choose their own fit, such as BoxFit.cover.
+  /// Custom state and caller-owned controllers survive responsive reflow.
+  final Widget? hero;
+
+  /// The positive, finite hero ratio, overriding the responsive default.
+  ///
+  /// Defaults to 2:1 from a header width of 1056px, and 3:2 below it.
+  final double? heroAspectRatio;
+
+  /// Whether to omit decorative hero content from semantics and focus.
+  ///
+  /// Mutually exclusive with [heroLabel]. Keep this false for interactive
+  /// custom content; by default, the child retains its own semantics.
+  final bool heroDecorative;
+
+  /// The informative image name, replacing the hero child's semantics.
+  ///
+  /// Leave null to preserve an Image's semanticLabel or a custom child's
+  /// controls and accessible names. Interactive content must supply its own
+  /// semantics rather than use this whole-image label.
+  final String? heroLabel;
 
   /// The page title (`productive-heading-04`).
   final String title;
