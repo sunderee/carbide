@@ -33,6 +33,7 @@ void main() {
           final SemanticsHandle semantics = tester.ensureSemantics();
           final GlobalKey<NotificationFixtureState> key =
               GlobalKey<NotificationFixtureState>();
+          String stage = 'mount';
           try {
             await tester.pumpWidget(
               notificationHost(
@@ -44,6 +45,7 @@ void main() {
               ),
             );
             await _settle(tester);
+            stage = 'initial native roles';
             expect(_message('Inline 0').getAttribute('role'), 'status');
             expect(_message('Toast 0').getAttribute('role'), 'alert');
             expect(
@@ -59,6 +61,7 @@ void main() {
               _document.querySelectorAll('[role="alertdialog"]').length,
               0,
             );
+            stage = 'static callout';
             await tester.ensureVisible(find.byType(CarbonCallout));
             await _settle(tester);
             expect(
@@ -67,8 +70,10 @@ void main() {
               ),
               isNull,
             );
+            stage = 'editor focus';
             key.currentState!.editorFocus.requestFocus();
             await _settle(tester);
+            stage = 'live update';
             key.currentState!.update();
             await _settle(tester);
             expect(key.currentState!.editorFocus.hasPrimaryFocus, isTrue);
@@ -79,6 +84,7 @@ void main() {
               contains('Retry operation'),
             );
             final Finder action = find.text('Retry operation');
+            stage = 'action layout';
             await tester.ensureVisible(action);
             await _settle(tester);
             expect(
@@ -92,21 +98,30 @@ void main() {
               ),
             );
             await tester.tap(action);
+            stage = 'action pointer';
             await _settle(tester);
             expect(key.currentState!.actions, 1);
             await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+            stage = 'action Enter';
             await _settle(tester);
             expect(key.currentState!.actions, 2);
             await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+            stage = 'action Tab';
             await _settle(tester);
             expect(
               _document.activeElement?.textContent?.trim(),
               'Close notification',
             );
             await tester.sendKeyEvent(LogicalKeyboardKey.space);
+            stage = 'close Space';
             await _settle(tester);
             expect(key.currentState!.closes, 1);
             expect(tester.takeException(), isNull);
+          } catch (error, stack) {
+            Error.throwWithStackTrace(
+              StateError('Notification $stage: $error'),
+              stack,
+            );
           } finally {
             await tester.pumpWidget(const SizedBox.shrink());
             await _settle(tester);
