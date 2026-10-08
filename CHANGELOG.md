@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Measure icon/pictogram path-cache retention and parsing costs, document the
+  retained process-lifetime cache policy, and verify value keys, winding rules
+  and transformed cached renders. Add a reproducible opt-in benchmark (#340).
+
 - Calibrate the 33-story coarse fidelity gate from measured Linux theme scores
   with recorded margins and rationales. Lock actual control sizes, semantic
   token fills and default states, and prove colour/spacing regression rejection

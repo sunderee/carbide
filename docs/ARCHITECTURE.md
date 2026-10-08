@@ -86,7 +86,7 @@ direct translations carry an attribution header pointing to `NOTICE`.
 
 ## Icons
 
-All 2,673 Carbon icons are generated as const Dart data by
+All 2,775 Carbon icons are generated as const Dart data by
 `tool/generate_carbon_icons.py` (decision and empirical fidelity validation in
 ADR 0001): each icon is SVG path data plus fill rule and optional transform,
 parsed at runtime by `lib/src/icons/svg_path_parser.dart` and painted with a
@@ -98,6 +98,38 @@ the `CarbonIcons` index references them one const per icon, so unused icons
 tree-shake to zero bytes. A Carbon submodule bump is a
 regenerate-and-review-the-diff operation, verified per PR against
 upstream-derived rasters (see the fidelity sweep).
+
+### Icon path cache policy
+
+`CarbonIconPainter` retains parsed paths for the lifetime of its Dart isolate,
+keyed by the value of the path data, winding rule and transform. Icons and the
+1,576 pictograms share the cache; repeated shapes and separately constructed
+equal definitions reuse entries. Colour and render size do not create entries.
+Unused const artwork is tree-shaken, and an entry is allocated only when its
+shape is painted. The cache has no eviction or automatic clearing.
+
+This policy is retained after measuring 100, 1,000 and the full current
+registries (#340). At Carbon v11.118.0, all icon variants have 6,583 unique
+shapes and all pictograms have 1,682. Separate full-registry measurements retain
+512,496 and 129,792 additional Dart heap bytes in the cache, respectively. The
+VM also accounts for native objects, but that accounting excludes some engine
+allocations; neither number is a total native-memory estimate. Whole-process
+post-GC RSS growth is recorded alongside these figures in the PR, including
+its JIT/allocator overhead. Avoiding repeated SVG parsing is useful for ordinary
+small working sets and for scrolling back through an explorer.
+
+The generated registry bounds the set of standard shapes. Custom artwork is
+supported too, so applications generating indefinitely many distinct path
+strings do not have that bound. Reuse a finite set of immutable definitions;
+changing a matrix list after using its shape as a key violates its immutable
+value contract. Re-measure full-registry exploration on the target engine when
+choosing an application's memory budget. These observations do not establish a
+portable byte budget for Skia, CanvasKit or Skwasm.
+
+The reproducible [measurement harness](../test/benchmarks/README.md) reports
+cache retention, process memory, cold/cached paint and parser-only reparse cost.
+It is separate from CI's deterministic shape-key and paint regressions, and
+does not add diagnostic hooks to the library.
 
 ## Theme infrastructure (no Material)
 

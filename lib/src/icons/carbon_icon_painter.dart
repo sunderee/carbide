@@ -20,6 +20,9 @@ import 'svg_path_parser.dart';
 ///
 /// Shapes are parsed once and cached: parsed [ui.Path]s (with their fill rule
 /// and transform applied) are memoized per value-equal [CarbonIconShape].
+/// Entries live for the Dart isolate's lifetime, shared by icons and pictograms,
+/// with no eviction. Size and colour changes reuse the same parsed paths. See
+/// [the measured cache policy](https://github.com/sunderee/carbide/blob/master/docs/ARCHITECTURE.md#icon-path-cache-policy).
 /// The artwork is scaled uniformly to fit the paint size and centered, which
 /// is a no-op for the square sized artwork and letterboxes the few
 /// rectangular glyph assets.
