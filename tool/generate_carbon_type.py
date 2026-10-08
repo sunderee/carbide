@@ -115,8 +115,7 @@ def dart_style(s: dict[str, object]) -> str:
     family = "CarbonFontFamily.mono" if s["family"] == "mono" else "CarbonFontFamily.sans"
     return (
         "TextStyle(\n"
-        f"    fontFamily: {family},\n"
-        "    package: CarbonFontFamily.package,\n"
+        f"    fontFamily: 'packages/${{CarbonFontFamily.package}}/${{{family}}}',\n"
         f"    fontSize: {s['size']},\n"
         f"    fontWeight: FontWeight.w{s['weight']},\n"
         f"    height: {s['height']},\n"

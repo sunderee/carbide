@@ -3,8 +3,12 @@
 Carbide bundles seven IBM Plex font files: Sans Light/Regular/SemiBold, Mono
 Regular/SemiBold and Serif Light/Regular. Flutter registers dependency fonts
 under `packages/carbide/` in the consuming application's font manifest.
-Built-in fixed and fluid styles supply `package: CarbonFontFamily.package`;
-handwritten AI-label and pagination-nav styles do the same.
+Built-in fixed and fluid styles use the fully qualified family name;
+handwritten AI-label and pagination-nav styles do the same. The package prefix
+is part of `fontFamily`, so inheriting application fallback families or changing
+the family with `copyWith` does not add `packages/carbide/` to those other fonts.
+Flutter's `TextStyle.package` also qualifies fallback families, so using it on
+shared styles would break application fonts used for additional scripts.
 
 The family descriptors retain their plain names. For a custom style, use both
 the descriptor and its package:

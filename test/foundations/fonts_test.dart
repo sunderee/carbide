@@ -25,6 +25,32 @@ void main() {
     await loadCarbidePlexFonts();
   });
 
+  test(
+    'built-in styles preserve application fallback and override families',
+    () {
+      for (final TextStyle style in <TextStyle>[
+        CarbonTypeStyles.body01,
+        CarbonTypeStyles.code01,
+        CarbonFluidTypeStyles.display01.base,
+      ]) {
+        final TextStyle merged = const TextStyle(
+          fontFamilyFallback: <String>[
+            'Application Japanese',
+            'Application Arabic',
+          ],
+        ).merge(style);
+        expect(merged.fontFamilyFallback, <String>[
+          'Application Japanese',
+          'Application Arabic',
+        ]);
+        expect(
+          style.copyWith(fontFamily: 'Application Font').fontFamily,
+          'Application Font',
+        );
+      }
+    },
+  );
+
   testWidgets('text renders in the bundled Plex families', (
     WidgetTester tester,
   ) async {

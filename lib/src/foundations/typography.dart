@@ -62,8 +62,7 @@ abstract final class CarbonTypeScale {
 abstract final class CarbonTypeStyles {
   /// The `caption01` type style.
   static const TextStyle caption01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.33333,
@@ -72,8 +71,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `caption02` type style.
   static const TextStyle caption02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -82,8 +80,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `label01` type style.
   static const TextStyle label01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.33333,
@@ -92,8 +89,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `label02` type style.
   static const TextStyle label02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -102,8 +98,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `helperText01` type style.
   static const TextStyle helperText01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.33333,
@@ -112,8 +107,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `helperText02` type style.
   static const TextStyle helperText02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -122,8 +116,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `legal01` type style.
   static const TextStyle legal01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.33333,
@@ -132,8 +125,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `legal02` type style.
   static const TextStyle legal02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -142,8 +134,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `code01` type style.
   static const TextStyle code01 = TextStyle(
-    fontFamily: CarbonFontFamily.mono,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.mono}',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.33333,
@@ -152,8 +143,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `code02` type style.
   static const TextStyle code02 = TextStyle(
-    fontFamily: CarbonFontFamily.mono,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.mono}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.42857,
@@ -162,8 +152,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `bodyShort01` type style.
   static const TextStyle bodyShort01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -172,8 +161,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `bodyShort02` type style.
   static const TextStyle bodyShort02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.375,
@@ -182,8 +170,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `bodyLong01` type style.
   static const TextStyle bodyLong01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.42857,
@@ -192,8 +179,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `bodyLong02` type style.
   static const TextStyle bodyLong02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
@@ -202,8 +188,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `heading01` type style.
   static const TextStyle heading01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.42857,
@@ -212,8 +197,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `heading02` type style.
   static const TextStyle heading02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 16,
     fontWeight: FontWeight.w600,
     height: 1.5,
@@ -222,8 +206,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading01` type style.
   static const TextStyle productiveHeading01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.28572,
@@ -232,8 +215,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading02` type style.
   static const TextStyle productiveHeading02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 16,
     fontWeight: FontWeight.w600,
     height: 1.375,
@@ -242,8 +224,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading03` type style.
   static const TextStyle productiveHeading03 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 20,
     fontWeight: FontWeight.w400,
     height: 1.4,
@@ -252,8 +233,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading04` type style.
   static const TextStyle productiveHeading04 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 28,
     fontWeight: FontWeight.w400,
     height: 1.28572,
@@ -262,8 +242,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading05` type style.
   static const TextStyle productiveHeading05 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 32,
     fontWeight: FontWeight.w400,
     height: 1.25,
@@ -272,8 +251,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading06` type style.
   static const TextStyle productiveHeading06 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 42,
     fontWeight: FontWeight.w300,
     height: 1.199,
@@ -282,8 +260,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `productiveHeading07` type style.
   static const TextStyle productiveHeading07 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 54,
     fontWeight: FontWeight.w300,
     height: 1.199,
@@ -292,8 +269,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `expressiveHeading01` type style.
   static const TextStyle expressiveHeading01 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.25,
@@ -302,8 +278,7 @@ abstract final class CarbonTypeStyles {
 
   /// The `expressiveHeading02` type style.
   static const TextStyle expressiveHeading02 = TextStyle(
-    fontFamily: CarbonFontFamily.sans,
-    package: CarbonFontFamily.package,
+    fontFamily: 'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
     fontSize: 16,
     fontWeight: FontWeight.w600,
     height: 1.5,

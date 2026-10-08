@@ -20,8 +20,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading01` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading01 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 14,
       fontWeight: FontWeight.w600,
       height: 1.25,
@@ -32,8 +32,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading02` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading02 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 16,
       fontWeight: FontWeight.w600,
       height: 1.5,
@@ -44,8 +44,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading03` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading03 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 20,
       fontWeight: FontWeight.w400,
       height: 1.4,
@@ -60,8 +60,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading04` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading04 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 28,
       fontWeight: FontWeight.w400,
       height: 1.28572,
@@ -76,8 +76,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading05` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading05 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 32,
       fontWeight: FontWeight.w400,
       height: 1.25,
@@ -99,8 +99,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `expressiveHeading06` fluid type style.
   static const CarbonFluidTextStyle expressiveHeading06 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 32,
       fontWeight: FontWeight.w600,
       height: 1.25,
@@ -137,8 +137,8 @@ abstract final class CarbonFluidTypeStyles {
   static const CarbonFluidTextStyle expressiveParagraph01 =
       CarbonFluidTextStyle(
         base: TextStyle(
-          fontFamily: CarbonFontFamily.sans,
-          package: CarbonFontFamily.package,
+          fontFamily:
+              'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
           fontSize: 24,
           fontWeight: FontWeight.w300,
           height: 1.334,
@@ -153,8 +153,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `quotation01` fluid type style.
   static const CarbonFluidTextStyle quotation01 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.serif,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
       fontSize: 20,
       fontWeight: FontWeight.w400,
       height: 1.3,
@@ -190,8 +190,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `quotation02` fluid type style.
   static const CarbonFluidTextStyle quotation02 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.serif,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
       fontSize: 32,
       fontWeight: FontWeight.w300,
       height: 1.25,
@@ -208,8 +208,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `display01` fluid type style.
   static const CarbonFluidTextStyle display01 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 42,
       fontWeight: FontWeight.w300,
       height: 1.19,
@@ -226,8 +226,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `display02` fluid type style.
   static const CarbonFluidTextStyle display02 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 42,
       fontWeight: FontWeight.w600,
       height: 1.19,
@@ -244,8 +244,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `display03` fluid type style.
   static const CarbonFluidTextStyle display03 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 42,
       fontWeight: FontWeight.w300,
       height: 1.19,
@@ -262,8 +262,8 @@ abstract final class CarbonFluidTypeStyles {
   /// The `display04` fluid type style.
   static const CarbonFluidTextStyle display04 = CarbonFluidTextStyle(
     base: TextStyle(
-      fontFamily: CarbonFontFamily.sans,
-      package: CarbonFontFamily.package,
+      fontFamily:
+          'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
       fontSize: 42,
       fontWeight: FontWeight.w300,
       height: 1.19,
