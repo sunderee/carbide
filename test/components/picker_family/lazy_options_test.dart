@@ -266,6 +266,34 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+  testWidgets(
+    'mixed-script lazy labels keep their complete scaled line boxes',
+    (tester) async {
+      final FocusNode focus = FocusNode();
+      addTearDown(focus.dispose);
+      addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+      await tester.pumpWidget(
+        _host(
+          CarbonDropdown<int>(
+            titleText: 'Languages',
+            focusNode: focus,
+            size: CarbonFieldSize.sm,
+            itemCount: 1000,
+            itemBuilder: (index) => CarbonDropdownItem<int>(
+              value: index,
+              label: '日本語 हिन्दी العربية gypy $index',
+            ),
+            onChanged: (_) {},
+          ),
+          TextDirection.rtl,
+          2,
+        ),
+      );
+      await _open(tester, focus);
+      expect(_options.evaluate().length, lessThanOrEqualTo(12));
+      expectNoClippedTextAtScale(tester, 2);
+    },
+  );
   for (final _Kind kind in <_Kind>[_Kind.dropdown, _Kind.select, _Kind.combo]) {
     testWidgets('$kind opens a fresh-model preselection below the fold', (
       tester,
