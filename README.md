@@ -143,8 +143,10 @@ code snippets and application-supplied context.
 - **Tested to a high bar.** Nothing ships without tests: each token group and
   component lands with state-matrix widget tests, golden tests against the
   Carbon spec, and semantics/accessibility tests. Every public API is
-  documented (enforced in CI), and every component is rendered beside its Carbon
-  Storybook reference for upstream-fidelity review.
+  documented (enforced in CI), and 33 curated default stories are rendered beside committed Carbon
+  Storybook references. Their 24×24 luminance-grid comparisons are a coarse
+  drift gate, strengthened by control-size, token-colour and state assertions.
+  They do not establish pixel identity or cover every component variant.
 
 ## Principles
 

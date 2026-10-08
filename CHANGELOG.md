@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Calibrate the 33-story coarse fidelity gate from measured Linux theme scores
+  with recorded margins and rationales. Lock actual control sizes, semantic
+  token fills and default states, and prove colour/spacing regression rejection
+  with permanent render mutations. Describe the gate's scope accurately (#325).
+
 - Audit all 33 upstream fidelity fixtures against their pinned stories. Use the
   complete Modal and icon Tooltip compositions, correct default copy, variants,
   counts, selection and story framing, and emit full modal review artifacts.

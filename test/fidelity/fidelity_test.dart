@@ -35,6 +35,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/overlay_entries.dart';
 import 'support/fixtures.dart';
+import 'support/structural.dart';
+
+const String _mutation = String.fromEnvironment('FIDELITY_MUTATION');
 
 const String _refDir = 'test/fidelity/references';
 const String _outDir = 'test/fidelity/comparisons';
@@ -118,6 +121,145 @@ void main() {
     expect(captured, greaterThan(0));
   });
 
+  for (final String mutation in <String>['button-color', 'button-spacing']) {
+    testWidgets('promoted Button gate rejects $mutation', (tester) async {
+      final (ui.Image image, Size size) = await _renderCarbide(
+        tester,
+        CarbonThemeData.white,
+        'button',
+        'white',
+        fidelityBuilders['button']!(),
+        mutation: mutation,
+      );
+      try {
+        await expectLater(
+          checkFidelityStructure(
+            tester,
+            'button',
+            CarbonThemeData.white,
+            size,
+            image,
+            _stories['button']!['structural'] as Map<String, dynamic>,
+          ),
+          throwsA(
+            isA<TestFailure>().having(
+              (error) => error.message,
+              'reason',
+              contains(
+                mutation == 'button-color'
+                    ? 'token colour'
+                    : 'structural width',
+              ),
+            ),
+          ),
+        );
+      } finally {
+        image.dispose();
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    });
+  }
+
+  testWidgets('promoted Button disabled state paints its disabled token', (
+    tester,
+  ) async {
+    final SemanticsHandle semantics = tester.ensureSemantics();
+    final (ui.Image image, Size size) = await _renderCarbide(
+      tester,
+      CarbonThemeData.white,
+      'button',
+      'white',
+      const IntrinsicWidth(child: CarbonButton(label: 'Button')),
+    );
+    try {
+      expect(size.height, 48);
+      expect(
+        await _pixelRgb(tester, image, const Offset(5, 24)),
+        CarbonThemeData.white.buttonDisabled.toARGB32() & 0xffffff,
+      );
+      expect(
+        tester
+            .getSemantics(find.byType(CarbonButton))
+            .getSemanticsData()
+            .flagsCollection
+            .isEnabled
+            .name,
+        'isFalse',
+      );
+    } finally {
+      image.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+      semantics.dispose();
+    }
+  });
+  testWidgets('promoted Button focused state paints its focus ring', (
+    tester,
+  ) async {
+    final SemanticsHandle semantics = tester.ensureSemantics();
+    final FocusNode focus = FocusNode();
+    final FocusHighlightStrategy previous =
+        FocusManager.instance.highlightStrategy;
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    final (ui.Image image, Size size) = await _renderCarbide(
+      tester,
+      CarbonThemeData.white,
+      'button',
+      'white',
+      IntrinsicWidth(
+        child: CarbonButton(
+          label: 'Button',
+          onPressed: () {},
+          focusNode: focus,
+          autofocus: true,
+        ),
+      ),
+    );
+    try {
+      expect(size.height, 48);
+      expect(focus.hasPrimaryFocus, isTrue);
+      expect(
+        await _pixelRgb(tester, image, const Offset(3, 24)),
+        CarbonThemeData.white.background.toARGB32() & 0xffffff,
+      );
+    } finally {
+      image.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+      focus.dispose();
+      semantics.dispose();
+      FocusManager.instance.highlightStrategy = previous;
+    }
+  });
+  testWidgets('promoted text input invalid state paints its error border', (
+    tester,
+  ) async {
+    final (ui.Image image, Size size) = await _renderCarbide(
+      tester,
+      CarbonThemeData.white,
+      'text-input',
+      'white',
+      const SizedBox(
+        width: 300,
+        child: CarbonTextInput(
+          labelText: 'Label text',
+          invalid: true,
+          invalidText: 'Invalid value',
+        ),
+      ),
+    );
+    try {
+      expect(size.width, 300);
+      expect(find.text('Invalid value'), findsOneWidget);
+      expect(
+        await _pixelRgb(tester, image, const Offset(0, 30)),
+        CarbonThemeData.white.supportError.toARGB32() & 0xffffff,
+      );
+    } finally {
+      image.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
+  });
+
   for (final MapEntry<String, Widget Function()> entry
       in fidelityBuilders.entries) {
     final String component = entry.key;
@@ -131,12 +273,13 @@ void main() {
           return;
         }
 
-        final ui.Image carbide = await _renderCarbide(
+        final (ui.Image carbide, Size controlSize) = await _renderCarbide(
           tester,
           _themes[themeSlug]!(),
           component,
           themeSlug,
           entry.value(),
+          mutation: component == 'button' ? _mutation : '',
         );
         final _Grid carbideGrid = await _luminanceGrid(tester, carbide);
 
@@ -161,6 +304,14 @@ void main() {
           tester,
           comparison,
           '$_outDir/${component}_$themeSlug.png',
+        );
+        await checkFidelityStructure(
+          tester,
+          component,
+          _themes[themeSlug]!(),
+          controlSize,
+          carbide,
+          _stories[component]!['structural'] as Map<String, dynamic>,
         );
         comparison.dispose();
         reference.dispose();
@@ -202,13 +353,23 @@ void main() {
 }
 
 /// Renders [child] under [theme] and rasterizes it at 2x.
-Future<ui.Image> _renderCarbide(
+Future<(ui.Image, Size)> _renderCarbide(
   WidgetTester tester,
   CarbonThemeData theme,
   String component,
   String themeSlug,
-  Widget child,
-) async {
+  Widget child, {
+  String mutation = '',
+}) async {
+  if (mutation == 'button-spacing') {
+    child = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: child,
+    );
+  }
+  final CarbonThemeData renderTheme = mutation == 'button-color'
+      ? theme.copyWith(buttonPrimary: const Color(0xffda1e28))
+      : theme;
   final GlobalKey key = GlobalKey();
   final GlobalKey scene = GlobalKey();
   final Map<String, dynamic> fixture =
@@ -247,7 +408,7 @@ Future<ui.Image> _renderCarbide(
       child: MediaQuery(
         data: MediaQueryData(size: viewport),
         child: CarbonTheme(
-          data: theme,
+          data: renderTheme,
           child: DefaultTextStyle(
             style: CarbonTypeStyles.body02.copyWith(color: theme.textPrimary),
             child: RepaintBoundary(
@@ -285,13 +446,17 @@ Future<ui.Image> _renderCarbide(
   );
   await tester.pump(const Duration(milliseconds: 16));
   await tester.pump(const Duration(milliseconds: 300));
+  final Size controlSize = fidelityControlSize(tester, component, child);
+  debugPrint(
+    'FIDELITY-SIZE $component $themeSlug ${controlSize.width.toStringAsFixed(6)} ${controlSize.height.toStringAsFixed(6)}',
+  );
   final RenderRepaintBoundary boundary =
       (component == 'modal' ? scene : key).currentContext!.findRenderObject()!
           as RenderRepaintBoundary;
   final ui.Image rendered = (await tester.runAsync<ui.Image>(
     () => boundary.toImage(pixelRatio: 2),
   ))!;
-  if (component != 'modal') return rendered;
+  if (component != 'modal') return (rendered, controlSize);
   // Storybook screenshots #storybook-root, a 48px launcher-sized rectangle,
   // even though its open modal paints across the viewport. Keep that original
   // crop; also retain the full scene so humans can inspect the complete form.
@@ -315,7 +480,7 @@ Future<ui.Image> _renderCarbide(
   );
   picture.dispose();
   rendered.dispose();
-  return cropped;
+  return (cropped, controlSize);
 }
 
 Future<ui.Image> _decodePng(WidgetTester tester, Uint8List bytes) async {
@@ -493,3 +658,14 @@ Future<void> _writePng(WidgetTester tester, ui.Image image, String path) async {
 }
 
 String _pct(double v) => '${(v * 100).toStringAsFixed(1)}%';
+
+Future<int> _pixelRgb(WidgetTester tester, ui.Image image, Offset point) async {
+  final ByteData data = (await tester.runAsync<ByteData?>(
+    () => image.toByteData(format: ui.ImageByteFormat.rawRgba),
+  ))!;
+  final int index =
+      ((point.dy * 2).round() * image.width + (point.dx * 2).round()) * 4;
+  return (data.getUint8(index) << 16) |
+      (data.getUint8(index + 1) << 8) |
+      data.getUint8(index + 2);
+}

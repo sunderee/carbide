@@ -39,11 +39,19 @@ same `component` slug) and writes a side-by-side
 `Carbon | Carbide` image to `test/fidelity/comparisons/<component>_<theme>.png`.
 CI uploads those as an artifact on every PR.
 
-**This is not a strict pixel gate.** Carbon renders in Chromium and Carbide in
-Flutter, so exact pixels can never match. The only hard assertion is that the
-Carbide render is non-blank/non-flat (a reliable cross-renderer sanity check); a
-coarse, framing-tolerant difference score is shown on each comparison for
-context, and a human reviews the side-by-side.
+**This is a coarse drift gate over 33 curated default stories.** The metric is
+mean absolute luminance difference on a 24×24 grid, not SSIM or pixel identity.
+Each entry records all four measured Linux scores, their maximum, a stated
+margin and a machine-readable rationale. Every rendered control also has a
+size budget, and important controls have exact semantic-token colour and state
+checks. Additional render tests cover focused/disabled Button chrome and an
+invalid text-input border. Those checks protect small controls that the grid can dilute or miss.
+
+The gate guards the reviewed default compositions. It does not compare every
+variant or establish complete Carbon parity. Known geometry differences and
+limited reference crops remain explicit beside the corresponding baseline.
+Other variants rely on the package's state matrices, spec locks, golden tests
+and browser contracts until additional upstream stories are promoted.
 
 ## Matching fixtures
 
@@ -81,9 +89,8 @@ explicit so nobody mistakes golden-only coverage for an upstream gate:
    run. The strongest guarantee in the repo.
 2. **Threshold-gated (components in `stories.json`)** — rendered beside a
    committed Carbon Storybook screenshot; the coarse luminance-grid diff
-   must stay within the story's committed `threshold`. Deliberately lax
-   (Chromium vs Flutter text rendering, framing differences): the gate
-   detects *drift*, not pixel identity. Bootstrap flow: add the story +
+   must stay within the story's committed `threshold`. Measured budgets plus size/colour/state checks detect drift across
+   renderers; they do not establish pixel identity. Bootstrap flow: add the story +
    builder with no threshold, run the suite, read the `FIDELITY-SCORE`
    lines, commit `max(per-theme score) + margin` as the threshold, and
    ratchet it down as fidelity improves.
@@ -97,3 +104,19 @@ the live Storybook ran at capture; the fidelity suite warns when the
 submodule pin drifts ≥2 minors ahead. Re-capture on submodule bumps
 (the references currently target @carbon/react 1.118.0, matching the
 v11.118.0 pin).
+
+## Proving regression rejection
+
+The suite contains permanent tests that render the promoted Button with a red
+primary fill or an additional 64px of horizontal spacing, then require the
+same colour/size checks to reject it. To see the affected story fail directly:
+
+```sh
+flutter test test/fidelity/fidelity_test.dart --plain-name 'fidelity: button' \
+  --dart-define=FIDELITY_MUTATION=button-color
+flutter test test/fidelity/fidelity_test.dart --plain-name 'fidelity: button' \
+  --dart-define=FIDELITY_MUTATION=button-spacing
+```
+
+Both commands intentionally fail; normal runs omit the mutation define.
+Neither command changes production source or upstream reference images.

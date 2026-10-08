@@ -4,7 +4,7 @@
     {
       "component": "button",
       "storyId": "components-button--default",
-      "threshold": 0.64,
+      "threshold": 0.010317,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Button/Button.stories.js",
@@ -20,12 +20,36 @@
           "height": 48
         },
         "finding": "Match the content-sized inline button in the full-width Storybook root with IntrinsicWidth, preserving default primary/lg label and action."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.000317,
+          "g10": 0.000317,
+          "g90": 0.000317,
+          "g100": 0.000317
+        },
+        "maximum": 0.000317,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          123.491982,
+          48.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "tag",
       "storyId": "components-tag--read-only",
-      "threshold": 0.21,
+      "threshold": 0.045477,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Tag/Tag.stories.js",
@@ -41,12 +65,36 @@
           "height": 24
         },
         "finding": "Correct twelve read-only tag variants, 4px gaps and long red label."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.034052,
+          "g10": 0.033803,
+          "g90": 0.035124,
+          "g100": 0.035477
+        },
+        "maximum": 0.035477,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1158.399849,
+          24.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "checkbox",
       "storyId": "components-checkbox--default",
-      "threshold": 0.3,
+      "threshold": 0.01881,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Checkbox/Checkbox.stories.js",
@@ -62,12 +110,36 @@
           "height": 89.9844
         },
         "finding": "Correct grouped legend/helper and two unchecked rows."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.007636,
+          "g10": 0.007264,
+          "g90": 0.008298,
+          "g100": 0.00881
+        },
+        "maximum": 0.00881,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          122.160004,
+          90.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "toggle",
       "storyId": "components-toggle--default",
-      "threshold": 0.28,
+      "threshold": 0.012546,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Toggle/Toggle.stories.js",
@@ -83,12 +155,36 @@
           "height": 57.9844
         },
         "finding": "Correct default Label and on state."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.002302,
+          "g10": 0.002152,
+          "g90": 0.002307,
+          "g100": 0.002546
+        },
+        "maximum": 0.002546,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          74.183998,
+          48.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "text-input",
       "storyId": "components-textinput--default",
-      "threshold": 0.12,
+      "threshold": 0.010825,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/TextInput/TextInput.stories.js",
@@ -104,12 +200,36 @@
           "height": 83.9844
         },
         "finding": "Correct 300px width, label and helper; counter remains disabled."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.000618,
+          "g10": 0.000586,
+          "g90": 0.000799,
+          "g100": 0.000825
+        },
+        "maximum": 0.000825,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          300.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "dropdown",
       "storyId": "components-dropdown--default",
-      "threshold": 0.1,
+      "threshold": 0.012355,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Dropdown/Dropdown.stories.js",
@@ -125,12 +245,36 @@
           "height": 85.9844
         },
         "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.002275,
+          "g10": 0.002355,
+          "g90": 0.001914,
+          "g100": 0.001988
+        },
+        "maximum": 0.002355,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          400.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "tabs",
       "storyId": "components-tabs--default",
-      "threshold": 0.13,
+      "threshold": 0.022549,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Tabs/Tabs.stories.js",
@@ -146,12 +290,36 @@
           "height": 88
         },
         "finding": "Match full-width root and four labels/panels; first selected."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.012312,
+          "g10": 0.012508,
+          "g90": 0.012072,
+          "g100": 0.012549
+        },
+        "maximum": 0.012549,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          88.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "accordion",
       "storyId": "components-accordion--default",
-      "threshold": 0.09,
+      "threshold": 0.024947,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Accordion/Accordion.stories.tsx",
@@ -167,12 +335,36 @@
           "height": 165
         },
         "finding": "Match full-width collapsed four-row story."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.011722,
+          "g10": 0.014757,
+          "g90": 0.014947,
+          "g100": 0.013403
+        },
+        "maximum": 0.014947,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          160.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "tree-view",
       "storyId": "components-treeview--default",
-      "threshold": 0.14,
+      "threshold": 0.011947,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/TreeView/Treeview.stories.js",
@@ -188,12 +380,36 @@
           "height": 602
         },
         "finding": "Restore the visible 12px/16px Tree View label and 26px header band, complete hierarchy, five expanded branches and disabled Models."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001837,
+          "g10": 0.001947,
+          "g90": 0.001704,
+          "g100": 0.001929
+        },
+        "maximum": 0.001947,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          320.0,
+          602.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "multiselect",
       "storyId": "components-multiselect--default",
-      "threshold": 0.11,
+      "threshold": 0.011337,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/MultiSelect/MultiSelect.stories.js",
@@ -209,12 +425,36 @@
           "height": 85.9844
         },
         "finding": "Correct 300px width and empty initial selection."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001316,
+          "g10": 0.001332,
+          "g90": 0.001318,
+          "g100": 0.001337
+        },
+        "maximum": 0.001337,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          300.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "data-table",
       "storyId": "components-datatable-basic--default",
-      "threshold": 0.1,
+      "threshold": 0.028422,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/DataTable/stories/DataTable-basic.stories.js",
@@ -230,12 +470,36 @@
           "height": 384.5
         },
         "finding": "Correct five columns, seven rows and complete cell data."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.016796,
+          "g10": 0.018422,
+          "g90": 0.016258,
+          "g100": 0.017085
+        },
+        "maximum": 0.018422,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          391.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "notification",
       "storyId": "components-notifications-inline--default",
-      "threshold": 0.44,
+      "threshold": 0.014402,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Notification/stories/InlineNotification.stories.js",
@@ -251,12 +515,36 @@
           "height": 48
         },
         "finding": "Match 736px error bar and exact subtitle; dismiss control present."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.004402,
+          "g10": 0.004402,
+          "g90": 0.002938,
+          "g100": 0.002938
+        },
+        "maximum": 0.004402,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          736.0,
+          48.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "search",
       "storyId": "components-search--default",
-      "threshold": 0.1,
+      "threshold": 0.010414,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Search/Search.stories.js",
@@ -272,12 +560,36 @@
           "height": 40
         },
         "finding": "Correct 800px width and Placeholder text."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.000395,
+          "g10": 0.000414,
+          "g90": 0.000253,
+          "g100": 0.000274
+        },
+        "maximum": 0.000414,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          800.0,
+          40.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "number-input",
       "storyId": "components-numberinput--default",
-      "threshold": 0.09,
+      "threshold": 0.011407,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/NumberInput/NumberInput.stories.js",
@@ -293,12 +605,36 @@
           "height": 83.9844
         },
         "finding": "Use full root width, value50 and exact helper punctuation."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001231,
+          "g10": 0.001154,
+          "g90": 0.00135,
+          "g100": 0.001407
+        },
+        "maximum": 0.001407,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "select",
       "storyId": "components-select--default",
-      "threshold": 0.1,
+      "threshold": 0.012212,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Select/Select.stories.js",
@@ -314,12 +650,36 @@
           "height": 83.9844
         },
         "finding": "Correct Deployment region placeholder, five options and helper."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001597,
+          "g10": 0.00151,
+          "g90": 0.002212,
+          "g100": 0.002116
+        },
+        "maximum": 0.002212,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          400.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "combo-box",
       "storyId": "components-combobox--default",
-      "threshold": 0.12,
+      "threshold": 0.011176,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/ComboBox/ComboBox.stories.js",
@@ -335,12 +695,36 @@
           "height": 85.9844
         },
         "finding": "Correct 300px Label/helper/Filter... empty combobox."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.000967,
+          "g10": 0.00098,
+          "g90": 0.001163,
+          "g100": 0.001176
+        },
+        "maximum": 0.001176,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          300.0,
+          84.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "date-picker",
       "storyId": "components-datepicker--default",
-      "threshold": 0.12,
+      "threshold": 0.011238,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/DatePicker/DatePicker.stories.js",
@@ -356,12 +740,36 @@
           "height": 64
         },
         "finding": "Correct 288px calendar input; closed, empty state."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001053,
+          "g10": 0.001052,
+          "g90": 0.001126,
+          "g100": 0.001238
+        },
+        "maximum": 0.001238,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          288.0,
+          64.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "radio-button",
       "storyId": "components-radiobutton--default",
-      "threshold": 0.18,
+      "threshold": 0.025437,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/RadioButton/RadioButton.stories.js",
@@ -377,12 +785,36 @@
           "height": 66.9844
         },
         "finding": "Correct horizontal group, second selection, legend and helper."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.014097,
+          "g10": 0.013396,
+          "g90": 0.014407,
+          "g100": 0.015437
+        },
+        "maximum": 0.015437,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          468.95591,
+          62.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "slider",
       "storyId": "components-slider--default",
-      "threshold": 0.1,
+      "threshold": 0.012957,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Slider/Slider.stories.js",
@@ -398,12 +830,36 @@
           "height": 64
         },
         "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.002957,
+          "g10": 0.002923,
+          "g90": 0.002473,
+          "g100": 0.002627
+        },
+        "maximum": 0.002957,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          400.0,
+          64.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "modal",
       "storyId": "components-modal--default",
-      "threshold": 0.44,
+      "threshold": 0.160002,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Modal/Modal.stories.js",
@@ -420,12 +876,36 @@
         },
         "finding": "Replace Dialog with complete open large Modal, form and footer. Preserve original launcher-root crop and additionally emit full scene for anatomy review.",
         "limitation": "The existing reference crops only the launcher-sized 48px root across the open modal. Its body/footer need structural assertions and full-scene review. Existing max-height/layout differences remain visible."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.137496,
+          "g10": 0.150002,
+          "g90": 0.054249,
+          "g100": 0.044577
+        },
+        "maximum": 0.150002,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. The existing reference crops only the launcher-sized 48px root across the open modal. Its body/footer need structural assertions and full-scene review. Existing max-height/layout differences remain visible.",
+      "structural": {
+        "size": [
+          768.0,
+          648.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "tooltip",
       "storyId": "components-tooltip--default",
-      "threshold": 0.24,
+      "threshold": 0.01,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Tooltip/Tooltip.stories.js",
@@ -442,12 +922,36 @@
         },
         "finding": "Replace underlined URL term with closed Options tooltip and 16px vertical-overflow icon, centered in the 1280x282 decorator.",
         "limitation": "A closed 16px icon is extremely diluted by the large decorator and can fall between grid samples; anatomy/dimension/colour guards are essential."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.0,
+          "g10": 0.0,
+          "g90": 0.0,
+          "g100": 0.0
+        },
+        "maximum": 0.0,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. A closed 16px icon is extremely diluted by the large decorator and can fall between grid samples; anatomy/dimension/colour guards are essential.",
+      "structural": {
+        "size": [
+          16.0,
+          16.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "progress-bar",
       "storyId": "components-progressbar--default",
-      "threshold": 0.22,
+      "threshold": 0.01202,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/ProgressBar/ProgressBar.stories.js",
@@ -463,12 +967,36 @@
           "height": 57.9844
         },
         "finding": "Correct Uploading files label, 75% and helper, full root width."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001667,
+          "g10": 0.001572,
+          "g90": 0.001854,
+          "g100": 0.00202
+        },
+        "maximum": 0.00202,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          58.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "progress-indicator",
       "storyId": "components-progressindicator--default",
-      "threshold": 0.1,
+      "threshold": 0.050715,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/ProgressIndicator/ProgressIndicator.stories.js",
@@ -485,12 +1013,36 @@
         },
         "finding": "Restore optional/invalid labels and complete/current/invalid states in intrinsic-height content, without an arbitrary 640px host width.",
         "limitation": "The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.040715,
+          "g10": 0.040006,
+          "g90": 0.035414,
+          "g100": 0.03778
+        },
+        "maximum": 0.040715,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity.",
+      "structural": {
+        "size": [
+          627.76796,
+          58.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "breadcrumb",
       "storyId": "components-breadcrumb--default",
-      "threshold": 0.16,
+      "threshold": 0.016453,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Breadcrumb/Breadcrumb.stories.js",
@@ -506,12 +1058,36 @@
           "height": 18
         },
         "finding": "Restore fourth linked breadcrumb."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.005629,
+          "g10": 0.005275,
+          "g90": 0.005757,
+          "g100": 0.006453
+        },
+        "maximum": 0.006453,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          430.925922,
+          18.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "pagination",
       "storyId": "components-pagination--default",
-      "threshold": 0.12,
+      "threshold": 0.044477,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Pagination/Pagination.stories.js",
@@ -527,12 +1103,36 @@
           "height": 56
         },
         "finding": "Correct 800px max width, 16px top margin, page sizes10..50, page1/103items."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.025784,
+          "g10": 0.025666,
+          "g90": 0.034477,
+          "g100": 0.031173
+        },
+        "maximum": 0.034477,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          800.0,
+          64.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "code-snippet",
       "storyId": "components-codesnippet--singleline",
-      "threshold": 0.13,
+      "threshold": 0.027161,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/CodeSnippet/CodeSnippet.stories.js",
@@ -548,12 +1148,36 @@
           "height": 40
         },
         "finding": "Correct complete single-line command and 768px framed control."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.014555,
+          "g10": 0.015272,
+          "g90": 0.015577,
+          "g100": 0.017161
+        },
+        "maximum": 0.017161,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          768.0,
+          40.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "content-switcher",
       "storyId": "components-contentswitcher--default",
-      "threshold": 0.13,
+      "threshold": 0.029092,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/ContentSwitcher/ContentSwitcher.stories.js",
@@ -569,12 +1193,36 @@
           "height": 40
         },
         "finding": "Match full-width three text segments, first selected. Audit exposed intrinsic-only segment sizing; bounded text controls now divide width equally, while icon-only/unbounded controls retain intrinsic sizing."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.019092,
+          "g10": 0.018414,
+          "g90": 0.017714,
+          "g100": 0.018823
+        },
+        "maximum": 0.019092,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          40.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "structured-list",
       "storyId": "components-structuredlist--default",
-      "threshold": 0.11,
+      "threshold": 0.045166,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/StructuredList/StructuredList.stories.js",
@@ -590,12 +1238,36 @@
           "height": 164.9688
         },
         "finding": "Correct Service/Status/Description headings and complete two-row copy."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.031942,
+          "g10": 0.032499,
+          "g90": 0.035166,
+          "g100": 0.034963
+        },
+        "maximum": 0.035166,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          132.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "tile",
       "storyId": "components-tile--default",
-      "threshold": 0.08,
+      "threshold": 0.010402,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Tile/Tile.stories.js",
@@ -611,12 +1283,36 @@
           "height": 86
         },
         "finding": "Restore second-line Link in full-width default Tile."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.00036,
+          "g10": 0.000381,
+          "g90": 0.000359,
+          "g100": 0.000402
+        },
+        "maximum": 0.000402,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          1196.0,
+          88.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "loading",
       "storyId": "components-loading--default",
-      "threshold": 0.21,
+      "threshold": 0.016067,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Loading/Loading.stories.js",
@@ -633,12 +1329,36 @@
         },
         "finding": "Match inline 88px active spinner, no overlay; animation remains phase-sensitive.",
         "limitation": "Capture timing determines essential spinner rotation; compare with a documented animation margin."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.006067,
+          "g10": 0.005656,
+          "g90": 0.00345,
+          "g100": 0.004345
+        },
+        "maximum": 0.006067,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. Capture timing determines essential spinner rotation; compare with a documented animation margin.",
+      "structural": {
+        "size": [
+          88.0,
+          88.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "inline-loading",
       "storyId": "components-inlineloading--default",
-      "threshold": 0.14,
+      "threshold": 0.011603,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/InlineLoading/InlineLoading.stories.js",
@@ -655,12 +1375,36 @@
         },
         "finding": "Correct Loading text and active32px state.",
         "limitation": "Capture timing determines essential spinner rotation; compare with a documented animation margin."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.001603,
+          "g10": 0.001547,
+          "g90": 0.001423,
+          "g100": 0.001466
+        },
+        "maximum": 0.001603,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. Capture timing determines essential spinner rotation; compare with a documented animation margin.",
+      "structural": {
+        "size": [
+          74.273991,
+          32.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "overflow-menu",
       "storyId": "components-overflowmenu--default",
-      "threshold": 0.07,
+      "threshold": 0.01,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js",
@@ -677,12 +1421,36 @@
         },
         "finding": "Match the closed 40px default trigger and 16px vertical-overflow glyph; menu rows remain hidden.",
         "limitation": "Closed 16px glyph can fall between grid samples; verify trigger anatomy/dimensions/colour separately."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.0,
+          "g10": 0.0,
+          "g90": 0.0,
+          "g100": 0.0
+        },
+        "maximum": 0.0,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. Closed 16px glyph can fall between grid samples; verify trigger anatomy/dimensions/colour separately.",
+      "structural": {
+        "size": [
+          40.0,
+          40.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     },
     {
       "component": "link",
       "storyId": "components-link--default",
-      "threshold": 0.18,
+      "threshold": 0.010291,
       "fixture": {
         "carbonTag": "v11.118.0",
         "source": "documentation/carbon/packages/react/src/components/Link/Link.stories.js",
@@ -698,6 +1466,30 @@
           "height": 18
         },
         "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+      },
+      "baseline": {
+        "algorithm": "mean-absolute-24x24-luminance",
+        "platform": "Linux",
+        "flutter": "3.47.6",
+        "carbonReact": "1.118.0",
+        "sourceCommit": "2b8309654102db27f0cfcb8c21327369d59ca1ad",
+        "themes": {
+          "white": 0.000291,
+          "g10": 0.000273,
+          "g90": 0.000214,
+          "g100": 0.000242
+        },
+        "maximum": 0.000291,
+        "margin": 0.01
+      },
+      "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity.",
+      "structural": {
+        "size": [
+          26.484009,
+          18.0
+        ],
+        "sizeTolerance": 3,
+        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
       }
     }
   ]
