@@ -25,6 +25,7 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/menu_shadow.dart';
+import '../../utils/typeahead.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 
@@ -204,11 +205,12 @@ class _CarbonMenuState extends State<CarbonMenu> {
     }
 
     // Type-ahead: jump to the next item whose label starts with the character.
-    final String? ch = event.character?.toLowerCase();
-    if (ch != null && ch.length == 1 && RegExp(r'[a-z0-9]').hasMatch(ch)) {
+    final String? character = event.character;
+    if (isCarbonTypeaheadCharacter(character)) {
+      final String ch = carbonTypeaheadKey(character!);
       for (int offset = 1; offset <= items.length; offset++) {
         final int i = (current + offset) % items.length;
-        if (items[i].label.toLowerCase().startsWith(ch)) {
+        if (carbonTypeaheadKey(items[i].label).startsWith(ch)) {
           items[i].node.requestFocus();
           return KeyEventResult.handled;
         }

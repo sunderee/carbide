@@ -15,6 +15,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../utils/typeahead.dart';
+
 import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
@@ -355,15 +357,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         }
         return KeyEventResult.ignored;
     }
-    final String? ch = event.character;
-    if (ch != null && ch.trim().isNotEmpty) {
+    final String? character = event.character;
+    if (character != null && character.trim().isNotEmpty) {
+      final String ch = carbonTypeaheadKey(character);
       final int start = _highlighted + 1;
       for (int i = 0; i < widget.items.length; i++) {
         final int idx = (start + i) % widget.items.length;
         if (!widget.items[idx].disabled &&
-            widget.items[idx].label.toLowerCase().startsWith(
-              ch.toLowerCase(),
-            )) {
+            carbonTypeaheadKey(widget.items[idx].label).startsWith(ch)) {
           if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;

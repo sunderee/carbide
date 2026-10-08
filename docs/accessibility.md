@@ -50,6 +50,30 @@ attribute for these widgets. The hierarchy and direct child counts are present;
 the exact spoken count, position or depth depends on the browser and assistive
 technology. Carbide does not promise a particular announcement.
 
+## Keyboard typeahead
+
+Menu typeahead accepts one Unicode letter or number grapheme, including
+supplementary characters such as Deseret letters and a letter with combining
+marks. It searches after the current item, skips disabled rows and wraps around.
+Repeated characters cycle through matching labels. Overflow, menu-button and
+context-menu consumers inherit this behavior from `CarbonMenu`.
+
+Menu, Select and Dropdown compare Unicode lowercase prefixes with a limited
+Latin-1 fold: accents and stroked letters match ASCII (`e` matches `Éditer`,
+`u` matches `Über`), and `æ`, `þ`, `ß` expand to `ae`, `th`, `ss`. Combining
+marks U+0300–036F are removed from Latin-base graphemes, so composed `É` and
+decomposed `E` plus an acute accent match consistently. Other scripts and
+extended Latin letters retain their marks after lowercasing: for example,
+`ć` remains distinct from `c`. This policy does not provide full NFD
+normalization, full Unicode case folding or locale-specific collation.
+Visible and accessible labels retain their original spelling.
+
+Each keystroke searches independently; there is no prefix buffer or timeout.
+Select and Dropdown also retain their existing support for a multi-character
+`KeyEvent.character` prefix and punctuation. Menu retains letter/number-only
+single-character cycling. Editable ComboBox and MultiSelect use their text
+query filters; this navigation policy does not change those filters.
+
 ## Code snippets
 
 Single- and multi-line snippets expose their code text. Copy and expand

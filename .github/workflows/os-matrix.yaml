@@ -119,6 +119,7 @@ jobs:
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
           test/components/content_switcher
+          test/components/menu
           test/components/picker_family test/components/dropdown
           test/components/select test/components/combo_box
           test/components/multi_select test/components/search
@@ -195,6 +196,7 @@ jobs:
               drive_native --release --target=integration_test/binary_control_state_test.dart
               drive_native --release --target=integration_test/password_visibility_test.dart
               drive_native --release --target=integration_test/content_switcher_names_test.dart
+              drive_native --release --target=integration_test/unicode_typeahead_test.dart
               ;;
             pickers)
               drive_native --release --target=integration_test/read_only_picker_test.dart
