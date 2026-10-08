@@ -35,20 +35,7 @@ import '../../utils/control_state.dart';
 import '../../utils/native_control_focus.dart';
 import '../form/carbon_form.dart';
 import '../popover/carbon_popover.dart';
-
-const List<String> _months = <String>[
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December', //
-];
-const List<String> _weekdays = <String>[
-  'Su',
-  'Mo',
-  'Tu',
-  'We',
-  'Th',
-  'Fr',
-  'Sa',
-];
+import 'date_picker_localizations.dart';
 
 DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -99,10 +86,16 @@ class CarbonDateRange {
 /// and focused day. Bounds changes clamp the current navigation. An unchanged
 /// selected date preserves in-progress keyboard navigation, including when
 /// its time of day changes. Focused-day semantics are separate from selection.
+///
+/// [localizations] supplies calendar labels and week order. Horizontal arrows
+/// follow the visible date order: Right advances in LTR and Left advances in
+/// RTL. Vertical arrows and PageUp/PageDown keep chronological week/month
+/// movement. Month chevrons mirror with the ambient directionality.
 class CarbonCalendar extends StatefulWidget {
   /// Creates a calendar.
   const CarbonCalendar({
     super.key,
+    this.localizations = CarbonDatePickerLocalizations.enUS,
     this.value,
     this.onChanged,
     this.range,
@@ -121,6 +114,9 @@ class CarbonCalendar extends StatefulWidget {
          'range requires onRangeChanged.',
        ),
        assert(value == null || onChanged != null, 'value requires onChanged.');
+
+  /// Calendar labels, week start and date formatting.
+  final CarbonDatePickerLocalizations localizations;
 
   /// The selected date (single mode).
   final DateTime? value;
@@ -294,10 +290,10 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
     }
     switch (event.logicalKey) {
       case LogicalKeyboardKey.arrowRight:
-        _moveFocus(1);
+        _moveFocus(Directionality.of(context) == TextDirection.rtl ? -1 : 1);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
-        _moveFocus(-1);
+        _moveFocus(Directionality.of(context) == TextDirection.rtl ? 1 : -1);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
         _moveFocus(7);
@@ -328,8 +324,19 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final CarbonDatePickerLocalizations labels = widget.localizations;
+    if (labels.monthNames.length != 12 || labels.weekdayNames.length != 7) {
+      throw ArgumentError(
+        'Calendar localization requires twelve month names and seven weekday names.',
+      );
+    }
+    final TextDirection direction = Directionality.of(context);
     final DateTime today = _dayOnly(DateTime.now());
-    final int firstWeekday = DateTime(_month.year, _month.month).weekday % 7;
+    final int firstWeekday =
+        (DateTime(_month.year, _month.month).weekday -
+            labels.firstDayOfWeek +
+            7) %
+        7;
     final int daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
 
     return ColoredBox(
@@ -343,14 +350,17 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
             Row(
               children: <Widget>[
                 _NavArrow(
-                  icon: CarbonIcons.chevronLeft,
-                  label: 'Previous month',
+                  icon: direction == TextDirection.ltr
+                      ? CarbonIcons.chevronLeft
+                      : CarbonIcons.chevronRight,
+                  label: labels.previousMonthLabel,
                   onTap: _canStep(-1) ? () => _step(-1) : null,
                 ),
                 Expanded(
                   child: Center(
                     child: Text(
-                      '${_months[_month.month - 1]} ${_month.year}',
+                      labels.formatMonthYear(_month),
+                      locale: labels.locale,
                       style: CarbonTypeStyles.headingCompact01.copyWith(
                         color: theme.textPrimary,
                       ),
@@ -358,8 +368,10 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
                   ),
                 ),
                 _NavArrow(
-                  icon: CarbonIcons.chevronRight,
-                  label: 'Next month',
+                  icon: direction == TextDirection.ltr
+                      ? CarbonIcons.chevronRight
+                      : CarbonIcons.chevronLeft,
+                  label: labels.nextMonthLabel,
                   onTap: _canStep(1) ? () => _step(1) : null,
                 ),
               ],
@@ -367,13 +379,20 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
             const SizedBox(height: CarbonSpacing.spacing03),
             Row(
               children: <Widget>[
-                for (final String w in _weekdays)
-                  SizedBox(
-                    width: 40,
-                    height: 40,
+                for (int offset = 0; offset < 7; offset++)
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 40,
+                      maxWidth: 40,
+                      minHeight: 40,
+                    ),
                     child: Center(
                       child: Text(
-                        w,
+                        labels.weekdayNames[(labels.firstDayOfWeek % 7 +
+                                offset) %
+                            7],
+                        textAlign: TextAlign.center,
+                        locale: labels.locale,
                         style: CarbonTypeStyles.label01.copyWith(
                           color: theme.textHelper,
                         ),
@@ -450,7 +469,9 @@ class _CarbonCalendarState extends State<CarbonCalendar> {
         preview != null && day == preview && day != start && end == null;
 
     return _DayCell(
-      day: dayNum,
+      text: widget.localizations.formatDay(day),
+      label: widget.localizations.formatDayLabel(day),
+      locale: widget.localizations.locale,
       selected: selected,
       inRange: inRange,
       previewEnd: previewEnd,
@@ -511,7 +532,9 @@ class _NavArrow extends StatelessWidget {
 
 class _DayCell extends StatefulWidget {
   const _DayCell({
-    required this.day,
+    required this.text,
+    required this.label,
+    required this.locale,
     required this.selected,
     required this.inRange,
     required this.previewEnd,
@@ -524,7 +547,9 @@ class _DayCell extends StatefulWidget {
     required this.onHover,
   });
 
-  final int day;
+  final String text;
+  final String label;
+  final Locale locale;
   final bool selected;
   final bool inRange;
   final bool previewEnd;
@@ -574,7 +599,7 @@ class _DayCellState extends State<_DayCell> {
       enabled: !widget.disabled,
       focusable: widget.focusable,
       focused: widget.focused,
-      label: '${widget.day}',
+      label: widget.label,
       onTap: widget.onTap,
       onFocus: widget.onFocus,
       child: ExcludeSemantics(
@@ -606,7 +631,8 @@ class _DayCellState extends State<_DayCell> {
                   alignment: Alignment.center,
                   children: <Widget>[
                     Text(
-                      '${widget.day}',
+                      widget.text,
+                      locale: widget.locale,
                       style: CarbonTypeStyles.bodyCompact01.copyWith(
                         color: text,
                       ),
@@ -654,10 +680,11 @@ class CarbonDatePicker extends StatefulWidget {
     required this.labelText,
     required this.onChanged,
     super.key,
+    this.localizations = CarbonDatePickerLocalizations.enUS,
     this.value,
     this.firstDate,
     this.lastDate,
-    this.placeholder = 'mm/dd/yyyy',
+    this._placeholder,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
     this.readOnly = false,
@@ -669,6 +696,9 @@ class CarbonDatePicker extends StatefulWidget {
     this.aiRevert = false,
     this.fluid = false,
   });
+
+  /// Calendar labels, week start and date formatting.
+  final CarbonDatePickerLocalizations localizations;
 
   /// The field label.
   final String labelText;
@@ -696,8 +726,13 @@ class CarbonDatePicker extends StatefulWidget {
   /// The latest selectable date.
   final DateTime? lastDate;
 
-  /// The placeholder shown when empty.
-  final String placeholder;
+  /// The empty-field hint, derived from [localizations]' date pattern.
+  ///
+  /// An explicit constructor `placeholder` overrides the derived hint.
+  String get placeholder =>
+      _placeholder ?? localizations.dateFormat.placeholder;
+
+  final String? _placeholder;
 
   /// The field size.
   final CarbonFieldSize size;
@@ -723,10 +758,6 @@ class CarbonDatePicker extends StatefulWidget {
   @override
   State<CarbonDatePicker> createState() => _CarbonDatePickerState();
 }
-
-String _format(DateTime d) =>
-    '${d.month.toString().padLeft(2, '0')}/'
-    '${d.day.toString().padLeft(2, '0')}/${d.year}';
 
 void _returnPickerFocus(
   FocusNode? opener, {
@@ -850,6 +881,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
         includeSemantics: false,
         child: CarbonCalendar(
           value: widget.value,
+          localizations: widget.localizations,
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
           autofocus: true,
@@ -870,7 +902,9 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
           readOnlyHint: widget.readOnlyHint,
           recoverFocus: !_open,
           label: widget.labelText,
-          value: widget.value != null ? _format(widget.value!) : null,
+          value: widget.value != null
+              ? widget.localizations.dateFormat.format(widget.value!)
+              : null,
           child: Focus(
             focusNode: _focus,
             includeSemantics: false,
@@ -885,8 +919,11 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
                 readOnly: _controlState.isReadOnly,
                 invalid: widget.invalid,
                 focused: _focus.hasFocus,
-                text: widget.value == null ? null : _format(widget.value!),
+                text: widget.value == null
+                    ? null
+                    : widget.localizations.dateFormat.format(widget.value!),
                 placeholder: widget.placeholder,
+                locale: widget.localizations.locale,
                 aiLabel: widget.aiLabel,
                 aiRevert: widget.aiRevert,
                 fluidLabel: _fluid ? widget.labelText : null,
@@ -946,12 +983,13 @@ class CarbonDateRangePicker extends StatefulWidget {
   const CarbonDateRangePicker({
     required this.onChanged,
     super.key,
+    this.localizations = CarbonDatePickerLocalizations.enUS,
     this.value,
     this.startLabelText = 'Start date',
     this.endLabelText = 'End date',
     this.firstDate,
     this.lastDate,
-    this.placeholder = 'mm/dd/yyyy',
+    this._placeholder,
     this.size = CarbonFieldSize.md,
     this.disabled = false,
     this.readOnly = false,
@@ -963,6 +1001,9 @@ class CarbonDateRangePicker extends StatefulWidget {
     this.aiRevert = false,
     this.fluid = false,
   });
+
+  /// Calendar labels, week start and date formatting.
+  final CarbonDatePickerLocalizations localizations;
 
   /// The selected range; null when nothing has been picked.
   final CarbonDateRange? value;
@@ -996,8 +1037,13 @@ class CarbonDateRangePicker extends StatefulWidget {
   /// The latest selectable date.
   final DateTime? lastDate;
 
-  /// The placeholder shown in an empty field.
-  final String placeholder;
+  /// The empty-field hint, derived from [localizations]' date pattern.
+  ///
+  /// An explicit constructor `placeholder` overrides the derived hint.
+  String get placeholder =>
+      _placeholder ?? localizations.dateFormat.placeholder;
+
+  final String? _placeholder;
 
   /// The field size.
   final CarbonFieldSize size;
@@ -1191,7 +1237,9 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
             readOnlyHint: widget.readOnlyHint,
             recoverFocus: !_open,
             label: label,
-            value: date == null ? null : _format(date),
+            value: date == null
+                ? null
+                : widget.localizations.dateFormat.format(date),
             child: Focus(
               focusNode: focus,
               includeSemantics: false,
@@ -1208,8 +1256,11 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
                     readOnly: _controlState.isReadOnly,
                     invalid: widget.invalid,
                     focused: focus.hasFocus,
-                    text: date == null ? null : _format(date),
+                    text: date == null
+                        ? null
+                        : widget.localizations.dateFormat.format(date),
                     placeholder: widget.placeholder,
+                    locale: widget.localizations.locale,
                     aiLabel: widget.aiLabel,
                     aiRevert: widget.aiRevert,
                     fluidLabel: _fluid ? label : null,
@@ -1249,6 +1300,7 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
         includeSemantics: false,
         child: CarbonCalendar(
           range: displayed,
+          localizations: widget.localizations,
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
           autofocus: true,
@@ -1373,6 +1425,7 @@ class _PickerTriggerSemanticsState extends State<_PickerTriggerSemantics> {
 class _DateField extends StatelessWidget {
   const _DateField({
     required this.size,
+    required this.locale,
     required this.disabled,
     this.readOnly = false,
     required this.invalid,
@@ -1385,6 +1438,7 @@ class _DateField extends StatelessWidget {
   });
 
   final CarbonFieldSize size;
+  final Locale locale;
   final bool disabled;
   final bool readOnly;
   final bool invalid;
@@ -1428,6 +1482,7 @@ class _DateField extends StatelessWidget {
                 alignment: AlignmentDirectional.centerStart,
                 child: Text(
                   text ?? placeholder,
+                  locale: locale,
                   style: CarbonTypeStyles.bodyCompact01.copyWith(
                     color: textColor,
                   ),
@@ -1441,6 +1496,7 @@ class _DateField extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     fluidLabel!,
+                    locale: locale,
                     style: CarbonTypeStyles.label01.copyWith(
                       color: disabled
                           ? theme.textDisabled
@@ -1450,6 +1506,7 @@ class _DateField extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     text ?? placeholder,
+                    locale: locale,
                     style: CarbonTypeStyles.bodyCompact01.copyWith(
                       color: textColor,
                     ),

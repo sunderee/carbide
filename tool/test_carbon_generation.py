@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regression tests for the Carbon 11.117 source-format migration."""
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -16,6 +17,19 @@ from generate_carbon_type import normalize_styles, style
 
 def token(value, **extensions):
     return {"$extensions": {"carbon.themes": {"white": value}, **extensions}}
+
+
+class LocaleFontFixtureTest(unittest.TestCase):
+    def test_locale_fixture_bytes_match_recorded_provenance(self):
+        root = Path(__file__).resolve().parent.parent / "test/support/fonts"
+        manifest = json.loads((root / "manifest.json").read_text())
+        self.assertEqual(manifest["sourceCommit"], "763c36ef9117782905ae010056dfbe8fd2653a25")
+        for font in manifest["fonts"]:
+            with self.subTest(font=font["file"]):
+                data = (root / font["file"]).read_bytes()
+                self.assertEqual(len(data), font["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), font["sha256"])
+                self.assertTrue(font["codePoints"])
 
 
 class ThemeGenerationTest(unittest.TestCase):
