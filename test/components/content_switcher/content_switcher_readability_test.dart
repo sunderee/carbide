@@ -4,8 +4,6 @@ import 'dart:ui' show ViewFocusEvent, ViewFocusState, ViewFocusDirection;
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/semantics.dart'
-    show SemanticsAction, SemanticsActionEvent;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -207,6 +205,9 @@ void main() {
         );
         expect(focus.hasFocus, isTrue);
         expect(selected, 1);
+        final rect = tester.getRect(find.bySemanticsLabel('Second segment'));
+        expect(rect.left, greaterThanOrEqualTo(-.1));
+        expect(rect.right, lessThanOrEqualTo(w + .1));
         expect(tester.takeException(), isNull);
       }
     },
