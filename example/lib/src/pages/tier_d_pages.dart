@@ -229,26 +229,21 @@ class _TimePickerPage extends StatelessWidget {
   const _TimePickerPage();
   @override
   Widget build(BuildContext context) {
-    return DemoScaffold(
+    return const DemoScaffold(
       title: 'Time picker',
-      description: 'A compact time field with AM/PM and timezone selects.',
+      description:
+          'A compact time field with coordinated AM/PM. Enter or leaving the '
+          'field group validates and normalizes the draft.',
       previewAlignment: Alignment.topCenter,
       preview: CarbonTimePicker(
         labelText: 'Start time',
         initialValue: '09:30',
-        children: <Widget>[
-          CarbonTimePickerSelect<String>(
-            labelText: 'AM/PM',
-            value: 'AM',
-            items: const <CarbonSelectItem<String>>[
-              CarbonSelectItem<String>(value: 'AM', label: 'AM'),
-              CarbonSelectItem<String>(value: 'PM', label: 'PM'),
-            ],
-            onChanged: (_) {},
-          ),
-        ],
+        format: CarbonTimeFormat.twelveHour,
+        invalidText: 'Enter an hour from 1 to 12 and minutes from 0 to 59.',
       ),
-      code: 'CarbonTimePicker(labelText: \'Start time\', children: <…>[…]);',
+      code:
+          'CarbonTimePicker(labelText: \'Start time\', '
+          'format: CarbonTimeFormat.twelveHour);',
     );
   }
 }

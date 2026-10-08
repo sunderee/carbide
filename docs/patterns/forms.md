@@ -67,6 +67,11 @@ See [read-only states](read-only-states.md) for review-screen composition.
 
 ## Navigating picker options
 
+Date calendar localization and patterns are described in
+[date pickers](date-pickers.md). Time inputs retain permissive typing by default;
+[time picker policies](time-pickers.md) opt into parsing, normalization and
+Enter/Done/group-blur commits with coordinated 12/24-hour behavior.
+
 Dropdown, Select, ComboBox and both MultiSelect variants share one announcement
 policy. Arrow keys move an active option without committing it. The trigger
 keeps keyboard focus, exposes its expanded state and describes the active

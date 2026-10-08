@@ -60,6 +60,7 @@ export 'src/components/dialog/carbon_dialog.dart';
 export 'src/components/file_uploader/carbon_file_uploader.dart';
 export 'src/components/page_header/carbon_page_header.dart';
 export 'src/components/time_picker/carbon_time_picker.dart';
+export 'src/components/time_picker/time_format.dart';
 export 'src/components/tree_view/carbon_tree_view.dart';
 export 'src/components/dropdown/carbon_dropdown.dart';
 export 'src/components/list/carbon_list.dart';
