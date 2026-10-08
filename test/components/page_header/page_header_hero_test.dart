@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'dart:ui' show ViewFocusEvent, ViewFocusState, ViewFocusDirection;
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
