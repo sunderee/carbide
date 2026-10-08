@@ -12,7 +12,9 @@ void _noop() {}
 
 final Map<String, Widget Function()>
 fidelityBuilders = <String, Widget Function()>{
-  'button': () => const CarbonButton(label: 'Button', onPressed: _noop),
+  'button': () => const IntrinsicWidth(
+    child: CarbonButton(label: 'Button', onPressed: _noop),
+  ),
   'tag': () => Wrap(
     spacing: 4,
     runSpacing: 4,
@@ -434,7 +436,9 @@ class _FidelityModalFixtureState extends State<FidelityModalFixture> {
       const Positioned(
         left: 42,
         top: 42,
-        child: CarbonButton(label: 'Launch modal', onPressed: _noop),
+        child: IntrinsicWidth(
+          child: CarbonButton(label: 'Launch modal', onPressed: _noop),
+        ),
       ),
       CarbonModal(
         open: true,

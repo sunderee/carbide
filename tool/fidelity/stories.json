@@ -19,7 +19,7 @@
           "width": 1196,
           "height": 48
         },
-        "finding": "Default component, label, state and dimensions match the pinned story; preserve original root framing."
+        "finding": "Match the content-sized inline button in the full-width Storybook root with IntrinsicWidth, preserving default primary/lg label and action."
       }
     },
     {
