@@ -24,15 +24,9 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/menu_shadow.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
-
-/// The drop shadow under a menu (`box-shadow()`: `0 2px 6px $shadow`).
-const BoxShadow _menuShadow = BoxShadow(
-  color: Color(0x4D000000),
-  offset: Offset(0, 2),
-  blurRadius: 6,
-);
 
 /// The item height of a [CarbonMenu] (`_menu.scss` supported sizes).
 enum CarbonMenuSize {
@@ -246,7 +240,7 @@ class _CarbonMenuState extends State<CarbonMenu> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: layer.layer,
-              boxShadow: const <BoxShadow>[_menuShadow],
+              boxShadow: <BoxShadow>[carbonMenuShadow(theme.shadow)],
               border: widget.border
                   ? Border.all(color: layer.borderSubtle)
                   : null,

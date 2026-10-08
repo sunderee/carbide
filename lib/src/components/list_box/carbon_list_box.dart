@@ -26,16 +26,9 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/menu_shadow.dart';
 import '../../utils/scroll_into_view.dart';
 import '../form/carbon_form.dart' show CarbonField, CarbonFieldSize;
-
-/// The drop shadow under a list-box menu (`box-shadow()`: `0 2px 6px $shadow`;
-/// `$shadow` is `rgba(0, 0, 0, 0.3)`).
-const BoxShadow _menuShadow = BoxShadow(
-  color: Color(0x4D000000),
-  offset: Offset(0, 2),
-  blurRadius: 6,
-);
 
 /// The field trigger surface for a list-box control.
 ///
@@ -321,10 +314,11 @@ class CarbonListBoxMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
+    final CarbonThemeData theme = CarbonTheme.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: layer.layer,
-        boxShadow: const <BoxShadow>[_menuShadow],
+        boxShadow: <BoxShadow>[carbonMenuShadow(theme.shadow)],
       ),
       child: ConstrainedBox(
         // _list-box.scss: 5.5 rows of the item height (40 -> 220, etc.).
