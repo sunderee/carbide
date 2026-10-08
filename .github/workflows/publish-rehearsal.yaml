@@ -1,16 +1,6 @@
 name: Publish rehearsal
 
-# Packaging dry-run (#233). The real publish (publish.yaml) uses
-# `dart pub publish --force` because the strict dry-run fails on one known,
-# expected warning: CI checks out without submodules, so the five
-# documentation/ gitlinks are "checked-in files ignored by a rule" as far as
-# pub is concerned. `--force` proceeds past warnings — which also means a
-# *real* packaging error would surface only at tag-publish time.
-#
-# This workflow closes that gap on every PR that touches packaging inputs:
-# it runs the strict dry-run and passes only when the output is clean OR
-# contains exactly the known submodule warning and nothing else.
-
+# This workflow never receives OIDC credentials and never uploads a package.
 on:
   pull_request:
     paths:
@@ -21,45 +11,50 @@ on:
       - NOTICE
       - .gitignore
       - .pubignore
+      - tool/release_verification.py
+      - tool/test_release_verification.py
+      - .github/workflows/verify.yaml
       - .github/workflows/publish*.yaml
   workflow_dispatch:
+    inputs:
+      fail-closed-probe:
+        description: Prove failed verification skips the publication surrogate
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
+  verify:
+    name: Verification
+    uses: ./.github/workflows/verify.yaml
+    with:
+      fail-closed-probe: ${{ inputs.fail-closed-probe || false }}
+
   dry-run:
-    name: pub publish --dry-run (strict)
+    name: Publication surrogate (dry-run only)
+    needs: verify
     runs-on: ubuntu-latest
     steps:
-      # No submodules, exactly like publish.yaml's checkout.
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
+      - run: flutter pub get
+      - run: python3 tool/release_verification.py dry-run
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Strict dry-run (known submodule warning tolerated)
-        run: |
-          set +e
-          output=$(dart pub publish --dry-run 2>&1)
-          code=$?
-          set -e
-          echo "$output"
-          if [ "$code" -eq 0 ]; then
-            echo "Dry-run clean."
-            exit 0
-          fi
-          if echo "$output" | grep -q "documentation/carbon" \
-            && echo "$output" | grep -q "Package has 1 warning"; then
-            echo "Only the expected documentation/ submodule warning — OK."
-            exit 0
-          fi
-          echo "::error::Unexpected pub publish warnings/errors — see above."
-          exit 1
+  assert-blocked:
+    name: Assert failed verification blocks publication
+    if: ${{ always() && inputs.fail-closed-probe }}
+    needs: [verify, dry-run]
+    runs-on: ubuntu-latest
+    env:
+      VERIFICATION_RESULT: ${{ needs.verify.result }}
+      PUBLICATION_RESULT: ${{ needs.dry-run.result }}
+    steps:
+      - run: |
+          test "$VERIFICATION_RESULT" = failure
+          test "$PUBLICATION_RESULT" = skipped
+          echo "Verified: failed gate prevented the publication surrogate from running."

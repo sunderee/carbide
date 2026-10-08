@@ -1,88 +1,42 @@
 name: Publish to pub.dev
 
-# Tag-triggered, hands-off publishing to pub.dev using pub.dev's automated
-# (OIDC) publishing — no long-lived credentials. The repository is registered
-# as a trusted publisher for `carbide` on pub.dev, restricted to the tag
-# pattern below.
-#
-# Why not pub.dev's reusable workflow (dart-lang/setup-dart/.../publish.yml)?
-# It checks out with `submodules: false` and then runs a *strict*
-# `dart pub publish --dry-run` that fails on any warning. Our repo vendors the
-# upstream Carbon sources as git submodules under documentation/; with the
-# submodules left as bare gitlinks, pub warns that those 5 checked-in paths are
-# excluded by our ignore rules, and the strict dry-run turns that warning into a
-# hard failure. So we replicate the reusable workflow's internals here
-# (dart-lang/setup-dart for the OIDC credential + Flutter for the SDK) but
-# publish with `--force`, which proceeds past warnings (they are not errors).
-#
-# Release flow (see CONTRIBUTING.md): bump `version` + CHANGELOG.md on master,
-# then push a matching `vX.Y.Z` tag.
-
+# Release only from an explicitly pushed tag. OIDC is confined to the upload job.
 on:
   push:
     tags:
-      # GitHub ref glob: one-or-more digits per segment, plus an optional
-      # suffix so pre-release tags (e.g. v0.0.2-rc.1) also publish.
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
-# Least privilege by default; the publish job opts into the OIDC token.
 permissions:
   contents: read
 
 jobs:
-  # Gate (issue #160): the package must pass the same format/analyze/test checks
-  # as CI before anything is published. Tag pushes don't trigger ci.yaml.
-  verify:
-    name: Format, analyze, test
+  version:
+    name: Tag matches package version
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+      - run: python3 tool/release_verification.py tag "$GITHUB_REF_NAME"
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Verify formatting
-        run: dart format --set-exit-if-changed .
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Run tests
-        run: flutter test
+  verify:
+    name: Verification
+    uses: ./.github/workflows/verify.yaml
 
   publish:
     name: Publish to pub.dev
-    needs: verify
+    needs: [version, verify]
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Required for actions/checkout.
-      id-token: write # Required for OIDC authentication with pub.dev.
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      # Sets up the pub.dev OIDC credential from the workflow's id-token. This
-      # is the piece that makes `dart pub publish` non-interactive in CI.
+      - uses: actions/checkout@v7
       - name: Set up Dart (OIDC)
         uses: dart-lang/setup-dart@v1
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      # `--force` skips the confirmation prompt and proceeds past the
-      # documentation/ submodule warning (a warning, not an error).
-      - name: Publish
-        run: dart pub publish --force
+      - run: flutter pub get
+      # Recheck the archive on the upload runner before tolerating its known warning.
+      - run: python3 tool/release_verification.py dry-run
+      - run: dart pub publish --force
