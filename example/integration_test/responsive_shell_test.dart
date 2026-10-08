@@ -53,12 +53,16 @@ void main() {
             expect(tester.getSize(find.byType(CarbonHeader)), headerSize);
             await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
             expect(_document.activeElement?.tagName, 'INPUT');
-            await tester.enterText(find.byType(EditableText), 'Retained draft');
-            await _settle(tester);
-            expect(_document.activeElement?.tagName, 'INPUT');
             final ShellFixturePageState page = tester.state(
               find.byType(ShellFixturePage),
             );
+            // The release integration binding does not install TestTextInput.
+            // Seed the owned controller for the resize contract; trusted native
+            // typing is exercised separately by the real-browser validation.
+            page.editor.text = 'Retained draft';
+            await _settle(tester);
+            expect(_document.activeElement?.tagName, 'INPUT');
+            expect(_document.activeElement?.value, 'Retained draft');
             _button('Toggle navigation').focus();
             await _settle(tester);
             await _key(
@@ -192,6 +196,7 @@ extension type _Element(JSObject _) implements JSObject {
   external String? getAttribute(String name);
   external String? get textContent;
   external String get tagName;
+  external String? get value;
   String? get accessibleName =>
       getAttribute('aria-label') ?? textContent?.trim();
   external void focus();
