@@ -119,6 +119,9 @@ class CarbonPageHeader extends StatelessWidget {
     this.actions,
     this.actionsOverflowLabel = 'More page actions',
     this.tags = const <Widget>[],
+    this.collapseTags = false,
+    this.tagsOverflowLabel,
+    this.tagsDisclosureLabel = 'Hidden tags',
     this.tabs,
     this.headingLevel = 1,
   }) : assert(headingLevel >= 1 && headingLevel <= 6),
@@ -171,6 +174,20 @@ class CarbonPageHeader extends StatelessWidget {
 
   /// Tags rendered after the body.
   final List<Widget> tags;
+
+  /// Whether to keep fitting tags on one row and disclose the rest in a popover.
+  ///
+  /// Defaults to wrapping all [tags]. Opt-in children must support dry layout
+  /// within Carbon's 208px tag maximum. Give stateful/reordered tags stable
+  /// keys; their original instances move between the row and disclosure.
+  /// Custom viewport or LayoutBuilder children should keep the wrapping mode.
+  final bool collapseTags;
+
+  /// The localized hidden-count name; defaults to `N more tags`.
+  final String Function(int hiddenCount)? tagsOverflowLabel;
+
+  /// The localized name of the disclosed tag list.
+  final String tagsDisclosureLabel;
 
   /// An optional tabs row (typically a [CarbonTabs]); rendered flush to the
   /// content gutter.
