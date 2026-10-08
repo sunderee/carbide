@@ -843,44 +843,125 @@ class _DialogPageState extends State<_DialogPage> {
   }
 }
 
-class _NotificationPage extends StatelessWidget {
+class _NotificationPage extends StatefulWidget {
   const _NotificationPage();
+
+  @override
+  State<_NotificationPage> createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<_NotificationPage> {
+  bool _narrow = false;
+  bool _rtl = false;
+  bool _scaled = false;
+  bool _lowContrast = false;
+  int _actions = 0;
+  int _closes = 0;
+
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Notification',
       description: 'Inline, toast, actionable and callout notifications.',
       previewAlignment: Alignment.topLeft,
-      preview: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (final CarbonNotificationKind kind
-              in CarbonNotificationKind.values)
-            Padding(
-              padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing05),
-              child: CarbonInlineNotification(
-                kind: kind,
-                title: '${kind.name[0].toUpperCase()}${kind.name.substring(1)}',
-                subtitle: 'An inline ${kind.name} notification.',
-                onClose: () {},
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: CarbonSpacing.spacing05),
-            child: CarbonCallout(
-              title: 'Callout',
-              subtitle: 'A static, non-dismissible callout.',
-              actionLabel: 'Review',
-              onAction: () {},
+      controls: <Widget>[
+        boolKnob(
+          label: 'Narrow notifications',
+          value: _narrow,
+          onChanged: (bool value) => setState(() => _narrow = value),
+        ),
+        boolKnob(
+          label: 'RTL notifications',
+          value: _rtl,
+          onChanged: (bool value) => setState(() => _rtl = value),
+        ),
+        boolKnob(
+          label: 'Scale notification text',
+          value: _scaled,
+          onChanged: (bool value) => setState(() => _scaled = value),
+        ),
+        boolKnob(
+          label: 'Low contrast',
+          value: _lowContrast,
+          onChanged: (bool value) => setState(() => _lowContrast = value),
+        ),
+      ],
+      preview: MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(_scaled ? 2 : 1)),
+        child: Directionality(
+          textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+          child: SizedBox(
+            width: _narrow ? 320 : 760,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text('Actions: $_actions; closes: $_closes'),
+                const SizedBox(height: 16),
+                for (final CarbonNotificationKind kind
+                    in CarbonNotificationKind.values)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: CarbonSpacing.spacing05,
+                    ),
+                    child: CarbonInlineNotification(
+                      kind: kind,
+                      title:
+                          '${kind.name[0].toUpperCase()}${kind.name.substring(1)}',
+                      subtitle: 'An inline ${kind.name} notification.',
+                      lowContrast: _lowContrast,
+                      onClose: () => setState(() => _closes++),
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: CarbonSpacing.spacing05,
+                  ),
+                  child: CarbonActionableNotification(
+                    kind: CarbonNotificationKind.warning,
+                    title: 'Connection lost',
+                    subtitle: 'Supporting detail for the optional action.',
+                    actionLabel: 'Retry operation',
+                    lowContrast: _lowContrast,
+                    onAction: () => setState(() => _actions++),
+                    onClose: () => setState(() => _closes++),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: CarbonSpacing.spacing05,
+                  ),
+                  child: CarbonToastNotification(
+                    kind: CarbonNotificationKind.success,
+                    title: 'Changes saved',
+                    subtitle: 'Your changes are available.',
+                    caption: 'Just now',
+                    lowContrast: _lowContrast,
+                    onClose: () => setState(() => _closes++),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: CarbonSpacing.spacing05,
+                  ),
+                  child: CarbonCallout(
+                    title: 'Callout',
+                    subtitle: 'A static, non-dismissible callout.',
+                    actionLabel: 'Review',
+                    lowContrast: _lowContrast,
+                    onAction: () => setState(() => _actions++),
+                  ),
+                ),
+                const CarbonCallout(
+                  kind: CarbonNotificationKind.warning,
+                  title: 'Callout',
+                  subtitle: 'A low-contrast warning callout.',
+                  lowContrast: true,
+                ),
+              ],
             ),
           ),
-          const CarbonCallout(
-            kind: CarbonNotificationKind.warning,
-            title: 'Callout',
-            subtitle: 'A low-contrast warning callout.',
-            lowContrast: true,
-          ),
-        ],
+        ),
       ),
       code:
           'CarbonInlineNotification(kind: CarbonNotificationKind.success, …);',
