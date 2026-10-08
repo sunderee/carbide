@@ -1,0 +1,1574 @@
+{
+  "entrypointSha256": "2e0940a2c8bad75b1c14af3aeb1331fdfd9e8920f1f3002f9c680f3145e512bb",
+  "modules": {
+    "AILabel": {
+      "source": "packages/react/src/components/AILabel/index.tsx",
+      "sha256": "75aaa6171928a6754077d5202538d0ef4ab015c8ef36b5c762770372c2a7b3db"
+    },
+    "AISkeleton": {
+      "source": "packages/react/src/components/AISkeleton/index.tsx",
+      "sha256": "cc00e91e6b6600f15a7c9c870f14b44e0e2e6507279b3f019c848aca4c35c491"
+    },
+    "Accordion": {
+      "source": "packages/react/src/components/Accordion/index.tsx",
+      "sha256": "8cceba89dc1eb3a903f7bd59cce6f83fca9bd7d937e78a78e2e1019bd4351d27"
+    },
+    "AccordionItem": {
+      "source": "packages/react/src/components/AccordionItem/index.ts",
+      "sha256": "fdef8f190d7dc5201ff396e87e7247c3caed77c8ebc429662b605a1e4441632f"
+    },
+    "AspectRatio": {
+      "source": "packages/react/src/components/AspectRatio/index.tsx",
+      "sha256": "7adbfe7ace849ca787ca993dcf19a45d48148002f0151bae1e859f5488d9582f"
+    },
+    "Breadcrumb": {
+      "source": "packages/react/src/components/Breadcrumb/index.ts",
+      "sha256": "0ac3a35e3a7b8de18c21145f9200c392c8869a46010c7c9619b92dc190e8d202"
+    },
+    "Button": {
+      "source": "packages/react/src/components/Button/index.ts",
+      "sha256": "ea82a59ce260ef0423d00bfd5c5cc1aef360bd0a7b3622c8e7b1e1dcd7bf0eef"
+    },
+    "ButtonSet": {
+      "source": "packages/react/src/components/ButtonSet/index.ts",
+      "sha256": "e266171ffce5c90c9572d5e0e5e78dada0671d3a0f8e1d74cb4ee2fbf7dd45f5"
+    },
+    "Card": {
+      "source": "packages/react/src/components/Card/index.ts",
+      "sha256": "598f6039e5f7cd3ca6065ef304f7500d9fd31b60456cac67b7bd49156df92ea4"
+    },
+    "ChatButton": {
+      "source": "packages/react/src/components/ChatButton/index.tsx",
+      "sha256": "2e4734cfc0f1fdfcb327456f7c6e60221f5f1e76e218c2a9bc3da5bd28c1213f"
+    },
+    "Checkbox": {
+      "source": "packages/react/src/components/Checkbox/index.ts",
+      "sha256": "20a0b5a0eee0bb3d37a8decc144a139f4fcfd03f539e421523ad90421c544e41"
+    },
+    "CheckboxGroup": {
+      "source": "packages/react/src/components/CheckboxGroup/index.ts",
+      "sha256": "8982bc7d7d46f5831cef6730a63f3bda3842d68e364467aa8c068441dfdc46f8"
+    },
+    "ClassPrefix": {
+      "source": "packages/react/src/components/ClassPrefix/index.tsx",
+      "sha256": "8f35c932d1d62d50b742f05a85ed4eccc852dd760cd944f9f91a19caac11b9b0"
+    },
+    "CodeSnippet": {
+      "source": "packages/react/src/components/CodeSnippet/index.ts",
+      "sha256": "a3309f1315ac5b4ad08d3a379d233859b0eda63b1e1a7678dfcf67472cbd37c8"
+    },
+    "ComboBox": {
+      "source": "packages/react/src/components/ComboBox/index.ts",
+      "sha256": "775d1e96ed79fdf1c7ed1d18deba7a1f3f97cbb6ce4cd6172afefe032dc4f939"
+    },
+    "ComboButton": {
+      "source": "packages/react/src/components/ComboButton/index.tsx",
+      "sha256": "d11d398f7181b401898d445b9e18b824caddd76458cd80aa0696e05a5eac9fd7"
+    },
+    "ComposedModal": {
+      "source": "packages/react/src/components/ComposedModal/index.tsx",
+      "sha256": "8ebadae8e49c62e8f9e6a06b8545c71fd5f298fa268ec175194c370749543f6d"
+    },
+    "ContainedList": {
+      "source": "packages/react/src/components/ContainedList/index.ts",
+      "sha256": "1f90f8fe4cfc6d658ce1f401014a26cc9e105dd34913615b435b348db8ae9951"
+    },
+    "ContentSwitcher": {
+      "source": "packages/react/src/components/ContentSwitcher/index.ts",
+      "sha256": "98f532da2223a1d64df892d1925830aeae0cf5b50af2a46bec87c4374fc212fa"
+    },
+    "ContextMenu": {
+      "source": "packages/react/src/components/ContextMenu/index.ts",
+      "sha256": "3f542e6cb7f79257f735fc2d0c8de1c8d037fd2c2d18e02497bc2c27e75cb6c5"
+    },
+    "Copy": {
+      "source": "packages/react/src/components/Copy/index.ts",
+      "sha256": "12522a2d5bd3ab1e42ab0e23ff40a1298272d0912f3dfed1e061635800cc3611"
+    },
+    "CopyButton": {
+      "source": "packages/react/src/components/CopyButton/index.ts",
+      "sha256": "d2be3418ff746a6196ad3d81a4ae0376873d106840cb90ede69eec8fd3c72f41"
+    },
+    "DangerButton": {
+      "source": "packages/react/src/components/DangerButton/index.ts",
+      "sha256": "d392a8a03e20047f60bcb8afba70f804105301b3f48d9ea6077bc478d4e4c8ae"
+    },
+    "DataTable": {
+      "source": "packages/react/src/components/DataTable/index.ts",
+      "sha256": "ef1d4f519c2cf4922f0e8d7a8e881381163f95ee9372a23a38147ea135447714"
+    },
+    "DataTableSkeleton": {
+      "source": "packages/react/src/components/DataTableSkeleton/index.ts",
+      "sha256": "d0cf0d3121c6ad612e4cbcb39fa43f0c27e8e4bf035e6d231b943aaf8d8b6dc0"
+    },
+    "DatePicker": {
+      "source": "packages/react/src/components/DatePicker/index.tsx",
+      "sha256": "e0cad7bca7e270fb298699ca41be17996bde652fc7c7963964d96939d7c21a42"
+    },
+    "DatePicker/next": {
+      "source": "packages/react/src/components/DatePicker/next/index.tsx",
+      "sha256": "2a8236f8ed8a12af33cd04673d843f1510fc1ee837c86c34f99618f0b698466b"
+    },
+    "DatePickerInput": {
+      "source": "packages/react/src/components/DatePickerInput/index.ts",
+      "sha256": "42ded9bf8599256ee05a52c976bd221304abffd9291647afecf86dcdf11d3cab"
+    },
+    "Dialog": {
+      "source": "packages/react/src/components/Dialog/index.tsx",
+      "sha256": "79a5e0824dd76fcc2d224d5051d9b7eb6aebc7cc7499087fda57c244fa7edbb3"
+    },
+    "Dropdown": {
+      "source": "packages/react/src/components/Dropdown/index.ts",
+      "sha256": "ae6b221fc5046dbed04dd7c8445030e138513c6efb18d31d4bc8379fa6a93e54"
+    },
+    "ErrorBoundary": {
+      "source": "packages/react/src/components/ErrorBoundary/index.ts",
+      "sha256": "81f2d898250ffc4cef32e0e3fea978f0635c5c28115fe2745653423723a8ac8e"
+    },
+    "ExpandableSearch": {
+      "source": "packages/react/src/components/ExpandableSearch/index.ts",
+      "sha256": "4a37a315683962c057d32af0d013a63e0421d0ba103556cad21cc69cee5ef3f7"
+    },
+    "FeatureFlags": {
+      "source": "packages/react/src/components/FeatureFlags/index.tsx",
+      "sha256": "1362e28f03ed0cffb5f7915e08583fca6076d10fa3a7af2726d5330239a4b2f4"
+    },
+    "FileUploader": {
+      "source": "packages/react/src/components/FileUploader/index.ts",
+      "sha256": "5e2a3ff8dacd93f9486e15d8c69b7ac583a36e859099861a29e87fc8087f25df"
+    },
+    "FluidComboBox": {
+      "source": "packages/react/src/components/FluidComboBox/index.tsx",
+      "sha256": "9acb81ca73fe88749283cfd9dce5cc3e9ddac686884b7652ea99d452744cee4e"
+    },
+    "FluidDatePicker": {
+      "source": "packages/react/src/components/FluidDatePicker/index.tsx",
+      "sha256": "6baaf2e397342bc477a67c36626259febc3ee5b6a56075ad6f3ca44610fc54e9"
+    },
+    "FluidDatePickerInput": {
+      "source": "packages/react/src/components/FluidDatePickerInput/index.tsx",
+      "sha256": "ab0f5007f5e3391f68f51c80b0ad06b0d7befb0d4766cf641ca2b785ef062421"
+    },
+    "FluidDropdown": {
+      "source": "packages/react/src/components/FluidDropdown/index.tsx",
+      "sha256": "d3e0ae9545ebd9ea7796815b07ea70ce753d5340111adec126fc00858616d4b1"
+    },
+    "FluidForm": {
+      "source": "packages/react/src/components/FluidForm/index.ts",
+      "sha256": "1e8b27584eb8c37e9ec22cb33721d5e97f4051b2c632ccc6f46920be8e186aa3"
+    },
+    "FluidMultiSelect": {
+      "source": "packages/react/src/components/FluidMultiSelect/index.tsx",
+      "sha256": "9b87e387ee20c38f29d55c7f085dda6d1a582309c761d030991a16842c04e642"
+    },
+    "FluidNumberInput": {
+      "source": "packages/react/src/components/FluidNumberInput/index.tsx",
+      "sha256": "02c15b733cce5411a0143bd3ee690f1ad08a4b2b64043089fca8732e8db6732c"
+    },
+    "FluidSearch": {
+      "source": "packages/react/src/components/FluidSearch/index.tsx",
+      "sha256": "dbe5de77da9e4c4b3f519c1d0f14987293d4d675babde1e205bd5c21eb774eb9"
+    },
+    "FluidSelect": {
+      "source": "packages/react/src/components/FluidSelect/index.tsx",
+      "sha256": "d5864130fb1604973bae78420fd076ab3b7ac5af038b2fca25cda132b6c435bd"
+    },
+    "FluidTextArea": {
+      "source": "packages/react/src/components/FluidTextArea/index.tsx",
+      "sha256": "0520f97dc893939b98df9866311745b341d081f94d1f851f6e46c0335ff201a1"
+    },
+    "FluidTextInput": {
+      "source": "packages/react/src/components/FluidTextInput/index.tsx",
+      "sha256": "dac8a158992b65362155523813313b5726a2305af28e00e6abab9835d568fa3c"
+    },
+    "FluidTimePicker": {
+      "source": "packages/react/src/components/FluidTimePicker/index.tsx",
+      "sha256": "09ba7ca52eba8a54676335bc328be0ce2d8b483ea1e25c92754a4a7e77919fa8"
+    },
+    "FluidTimePickerSelect": {
+      "source": "packages/react/src/components/FluidTimePickerSelect/index.tsx",
+      "sha256": "7278c52e0188020658c43f27efa09a5b706ea1fbe3ac5e8a3406bb95e072dfab"
+    },
+    "Form": {
+      "source": "packages/react/src/components/Form/index.ts",
+      "sha256": "f8624b1c37dfd9aa5d2e7b62eceb98a193d399b221ecd40d049b5517826afe73"
+    },
+    "FormGroup": {
+      "source": "packages/react/src/components/FormGroup/index.ts",
+      "sha256": "60e57c8da958fad21081012f0e72b01f4059a7b8d4d8e2b188f58514bdb02c79"
+    },
+    "FormItem": {
+      "source": "packages/react/src/components/FormItem/index.ts",
+      "sha256": "5464725e24b56eaf5678dd856a4db81fb20bb9ded2ce085dc69108274778d0a2"
+    },
+    "FormLabel": {
+      "source": "packages/react/src/components/FormLabel/index.ts",
+      "sha256": "6713194b5a1ddc2a3f9a0f1d747669ea0844cf6e9841bb1ae99f4a536d689c19"
+    },
+    "Grid": {
+      "source": "packages/react/src/components/Grid/index.ts",
+      "sha256": "339a7c27c273f092775ede167ebb6966df486bc4f9ee68c0954b034b13ef530f"
+    },
+    "Heading": {
+      "source": "packages/react/src/components/Heading/index.tsx",
+      "sha256": "6c45acf6f6b09509a3455cbd861dcc75b9b29b12e15f5e23dc06c7854197ff0a"
+    },
+    "Icon/Icon.Skeleton": {
+      "source": "packages/react/src/components/Icon/Icon.Skeleton.tsx",
+      "sha256": "715879b149391a2f5f13221f6c72d1e81fd49a95062901117bf02aecb884e22b"
+    },
+    "IconButton": {
+      "source": "packages/react/src/components/IconButton/index.tsx",
+      "sha256": "67cbdf8496f96ff4e505a1919ae5ac1c59c76e3a5b67ccb2e983ed2c7cc5c0d9"
+    },
+    "IconIndicator": {
+      "source": "packages/react/src/components/IconIndicator/index.tsx",
+      "sha256": "389b7c53f8edb246ef057b4c97bfffc75db0b7084a381bab9d4ac06fe9ddf059"
+    },
+    "IdPrefix": {
+      "source": "packages/react/src/components/IdPrefix/index.tsx",
+      "sha256": "4137c829f56777f8a453b9ffdff153607bd80264aace5f962597745f332f767d"
+    },
+    "InlineCheckbox": {
+      "source": "packages/react/src/components/InlineCheckbox/index.tsx",
+      "sha256": "31059fc15e230bab4f39fc6e8f0a4b485a884da906ba08db1d6673ac892ad99c"
+    },
+    "InlineLoading": {
+      "source": "packages/react/src/components/InlineLoading/index.ts",
+      "sha256": "98c967527ae895ff82f89d339f204b75185072220b54a42fa6905fd790b3a62f"
+    },
+    "Layer": {
+      "source": "packages/react/src/components/Layer/index.tsx",
+      "sha256": "156c5592aaece8776982bdc1fbc264dc18830c17974dbce6f4c52c49d69d4b87"
+    },
+    "Layout": {
+      "source": "packages/react/src/components/Layout/index.tsx",
+      "sha256": "20bb1bf922c8f089a0d8b5d6673f1b41d9d3233d3f91b905b93bde1b557b9b2f"
+    },
+    "LayoutDirection": {
+      "source": "packages/react/src/components/LayoutDirection/index.ts",
+      "sha256": "9ce65b81a64d3214b4bd3fddd33508d398873d3f34e1525daa61f0c72b01900e"
+    },
+    "Link": {
+      "source": "packages/react/src/components/Link/index.tsx",
+      "sha256": "54021bcc06229cc28adbdb95a45d5f54fd0b299ae793c1ead4b036b80e9b892e"
+    },
+    "ListItem": {
+      "source": "packages/react/src/components/ListItem/index.ts",
+      "sha256": "605c9dfeb539cf38e91cfbe903a66f621459350a3e647076b42178d7a15b8215"
+    },
+    "Loading": {
+      "source": "packages/react/src/components/Loading/index.ts",
+      "sha256": "22d2bdb8634b667110d9c178624dee19fe589e629d0d18cdfad66ccaa43037eb"
+    },
+    "Menu": {
+      "source": "packages/react/src/components/Menu/index.ts",
+      "sha256": "26d838d8251f0b43d4a1eb3cca8ef5f947cc7ba9da723e6810cec82d0f68b7fa"
+    },
+    "MenuButton": {
+      "source": "packages/react/src/components/MenuButton/index.tsx",
+      "sha256": "7047cf99ed95451239376069663d4180e2863a339d38322041d72975192e420f"
+    },
+    "Modal": {
+      "source": "packages/react/src/components/Modal/index.ts",
+      "sha256": "4df4fc1bafae0b982a5ace5a90dfcc5865dd0a90cdb785d58501e7673844e7b2"
+    },
+    "ModalWrapper": {
+      "source": "packages/react/src/components/ModalWrapper/index.ts",
+      "sha256": "961b15a4ef9becff6ac921ff848fd3ed90023316057a30cfb283492b185e55c1"
+    },
+    "MultiSelect": {
+      "source": "packages/react/src/components/MultiSelect/index.tsx",
+      "sha256": "c70dbff2ac74370129ee6c95fee3e86d9212114eb9087c3eb29646c66c211a96"
+    },
+    "Notification": {
+      "source": "packages/react/src/components/Notification/index.tsx",
+      "sha256": "62a05704ffcca096e1768870e899b294d9f01310f668f2f3359345366f72773c"
+    },
+    "NumberInput": {
+      "source": "packages/react/src/components/NumberInput/index.ts",
+      "sha256": "31d0e584a77b13319f097836ef13d55f3d42d61702beac6336a8ce1481bea1be"
+    },
+    "OrderedList": {
+      "source": "packages/react/src/components/OrderedList/index.ts",
+      "sha256": "9d0545820ced46a5af357f9c9f890154f078eb8f3284b4c7b58f23ac7781a0e0"
+    },
+    "OverflowMenu": {
+      "source": "packages/react/src/components/OverflowMenu/index.tsx",
+      "sha256": "61cd1bcbc3d8af37788d578a60e4298037293a1afd03b561d0f9da555ce53309"
+    },
+    "OverflowMenuItem": {
+      "source": "packages/react/src/components/OverflowMenuItem/index.ts",
+      "sha256": "8bcd350acbb6087854b9de075a3d2159c27e3229fc824a45f135d074703e12e6"
+    },
+    "OverflowMenuV2": {
+      "source": "packages/react/src/components/OverflowMenuV2/index.js",
+      "sha256": "90b234c3ca7dd3780f3765681bc1a194c45319387a9233a46de17b45b72718c1"
+    },
+    "PageHeaderDeprecated": {
+      "source": "packages/react/src/components/PageHeaderDeprecated/index.tsx",
+      "sha256": "d4b7161c493a83140731e9bbc7f91b5198577b8ed024abea15fbf18f8bbd29ed"
+    },
+    "Pagination": {
+      "source": "packages/react/src/components/Pagination/index.ts",
+      "sha256": "234c78b552ba0bb1d22bee2713c724a6d5351c29627dcd8e524caac965dbd90f"
+    },
+    "Pagination/Pagination.Skeleton": {
+      "source": "packages/react/src/components/Pagination/Pagination.Skeleton.tsx",
+      "sha256": "20f8a4c2c3f979caf06b23573f638851ddb6824dfa4126ae71d72c338ea13eb4"
+    },
+    "Pagination/experimental": {
+      "source": "packages/react/src/components/Pagination/experimental/index.js",
+      "sha256": "b0b8ead2e90377f85d8aaf4c7410ef96cfde41e94c8e21216814ddc1ab984f8e"
+    },
+    "PaginationNav": {
+      "source": "packages/react/src/components/PaginationNav/index.ts",
+      "sha256": "c075547fe8f0abb1774a38d7b86fe410c933d9931af123cc451995929566abf5"
+    },
+    "PasswordInput": {
+      "source": "packages/react/src/components/PasswordInput/index.ts",
+      "sha256": "c5a3e49a73a6fa33a9b01a863496cb0d60e6a168cccf47d73a1b3a65ca8312e3"
+    },
+    "Popover": {
+      "source": "packages/react/src/components/Popover/index.tsx",
+      "sha256": "c4c2785a7fe7b345671fc32af49941ae4c687a40548c2836f1dd36e43518874c"
+    },
+    "PrimaryButton": {
+      "source": "packages/react/src/components/PrimaryButton/index.ts",
+      "sha256": "8caddc9800edd994d8e1136f1c1007fbfe45d5e054f03e075a8a4d38ec04006b"
+    },
+    "ProgressBar": {
+      "source": "packages/react/src/components/ProgressBar/index.ts",
+      "sha256": "13ae31c6ec8b05cd4118bdce164cf5c6fc97e9b1b209dd54318f8e3e9f7957f8"
+    },
+    "ProgressIndicator": {
+      "source": "packages/react/src/components/ProgressIndicator/index.ts",
+      "sha256": "b5fe62d86dc4d17330a8034719985f5f4724604f21cc12619df1d9f0c6624d5c"
+    },
+    "RadioButton": {
+      "source": "packages/react/src/components/RadioButton/index.ts",
+      "sha256": "65c94f9a2be1833c9493e0005db7eec7a79bd96f335e7d9c5da5467a1d2a7314"
+    },
+    "RadioButton/RadioButton.Skeleton": {
+      "source": "packages/react/src/components/RadioButton/RadioButton.Skeleton.tsx",
+      "sha256": "8c15668e5932f731890266dbe45b547908f9679d18c13b16750e46fd17f760fa"
+    },
+    "RadioButtonGroup": {
+      "source": "packages/react/src/components/RadioButtonGroup/index.ts",
+      "sha256": "c995429b8944d453f00b97ec96f6a7dc6982e73b64c979968b58c2772ea4d709"
+    },
+    "RadioTile": {
+      "source": "packages/react/src/components/RadioTile/index.ts",
+      "sha256": "cbdd4f757e417624bd42d5e387fad15fd1c3c147043c0caa744286588a84f578"
+    },
+    "Search": {
+      "source": "packages/react/src/components/Search/index.tsx",
+      "sha256": "89d8d7d9df78b8856fd87edf0ac1731f6dd4b3d27b78f3262002815d78586bbd"
+    },
+    "SecondaryButton": {
+      "source": "packages/react/src/components/SecondaryButton/index.ts",
+      "sha256": "dd6f975c3522fb19c84874a90516a5667767ad966f032e0b337bbe8c2e36295e"
+    },
+    "Select": {
+      "source": "packages/react/src/components/Select/index.ts",
+      "sha256": "72fedd7837083394505a5fe676732e81bbbba6fdb5c6d409941d629249cc164b"
+    },
+    "SelectItem": {
+      "source": "packages/react/src/components/SelectItem/index.ts",
+      "sha256": "cfb38c935a6621779ea83e50bf3161a5cd3f2877936109b6242877570c71cf22"
+    },
+    "SelectItemGroup": {
+      "source": "packages/react/src/components/SelectItemGroup/index.ts",
+      "sha256": "c42d876a2473d88db8e80ee242b22fc21e107e6ed54ca71e39775bd82afb4d0b"
+    },
+    "ShapeIndicator": {
+      "source": "packages/react/src/components/ShapeIndicator/index.tsx",
+      "sha256": "231411e7fb39784cf9399ef54f567fdf9d43b967317f0facc9c9cef3e8c8d476"
+    },
+    "SkeletonIcon": {
+      "source": "packages/react/src/components/SkeletonIcon/index.ts",
+      "sha256": "28ee5148649d7072a10354b79473e7b30b79d438bb0e8e01075bfa1c48141ccd"
+    },
+    "SkeletonPlaceholder": {
+      "source": "packages/react/src/components/SkeletonPlaceholder/index.ts",
+      "sha256": "75b57dcb2bebb6587a63f95f92b94af27637d7b5c6592c8e7002784719f4bff5"
+    },
+    "SkeletonText": {
+      "source": "packages/react/src/components/SkeletonText/index.tsx",
+      "sha256": "87e8cc99fda98832fdee9cc7b06508b0a2e2b26b00e9462561e84855d2e88993"
+    },
+    "Slider": {
+      "source": "packages/react/src/components/Slider/index.ts",
+      "sha256": "4d5c07bf7a3bdbbce86076c7b6f7be543dcb6cc98a6b5551f586625242ca73dd"
+    },
+    "Stack": {
+      "source": "packages/react/src/components/Stack/index.ts",
+      "sha256": "02b5be094ce3f2e7f70977f9664cd5b89b15edb825215caa7c1f6996d7bad4bc"
+    },
+    "StructuredList": {
+      "source": "packages/react/src/components/StructuredList/index.tsx",
+      "sha256": "31f93925d56e28134b320b93813f09395d419d9f1d19faa26e7954fa936af7d4"
+    },
+    "Switch": {
+      "source": "packages/react/src/components/Switch/index.ts",
+      "sha256": "290122f827b3bb9cf69f0abd885a01fbf040ca90dd7c3e8a0fa7efa84fa031b8"
+    },
+    "Tab": {
+      "source": "packages/react/src/components/Tab/index.tsx",
+      "sha256": "2f87e0a5ddf2bbc7b4d3b7f4f002d1a77857768ea62e9ffd3c49b38671c3dd8c"
+    },
+    "TabContent": {
+      "source": "packages/react/src/components/TabContent/index.tsx",
+      "sha256": "f4ddf3363ab6788f1ab0158a459713a40d4ec9f1c4f3ff5293b3b35b754e547f"
+    },
+    "Tabs": {
+      "source": "packages/react/src/components/Tabs/index.tsx",
+      "sha256": "3d7cbbc9d18827d29dd293a1602898eda05e3fa2e99ff595e0ecb00720a3e64b"
+    },
+    "Tag": {
+      "source": "packages/react/src/components/Tag/index.ts",
+      "sha256": "ac276267c722e8246ee33b663fa1c44cd62a86d12465986feeafbdc9d87b230e"
+    },
+    "Tag/Tag.Skeleton": {
+      "source": "packages/react/src/components/Tag/Tag.Skeleton.tsx",
+      "sha256": "1fd560df4864e19235af10fb6630ec2814632f25940d6cedbfacc969f2819495"
+    },
+    "Text": {
+      "source": "packages/react/src/components/Text/index.ts",
+      "sha256": "c1892cabbafb58e45135eee633df9a55974fd5997752f2d2baa295c38a6e2977"
+    },
+    "TextArea": {
+      "source": "packages/react/src/components/TextArea/index.ts",
+      "sha256": "940c3fb227d005f9e77654ae275450929dd67afc6536c67c1efebb4073825e43"
+    },
+    "TextInput": {
+      "source": "packages/react/src/components/TextInput/index.ts",
+      "sha256": "3ae0fe6cabe292dde7213db5c73095d1aabafd83773f75040f896ba5486af6b0"
+    },
+    "Theme": {
+      "source": "packages/react/src/components/Theme/index.tsx",
+      "sha256": "53614b72ed5a75b5812898c03467b66e781b57c838853c5988ac62d7f2c03330"
+    },
+    "Tile": {
+      "source": "packages/react/src/components/Tile/index.tsx",
+      "sha256": "f3a126576983d32e8ca948f7ee078e4c44eca910148aececdd6691132669a1f4"
+    },
+    "TileGroup": {
+      "source": "packages/react/src/components/TileGroup/index.ts",
+      "sha256": "5b9394b1547a17d36e8f503164d755ae3d1d878e53dbcfabb20e8b299601b29c"
+    },
+    "TimePicker": {
+      "source": "packages/react/src/components/TimePicker/index.ts",
+      "sha256": "e025c858ba7a0e1c552b05783c4d86cc52ff1764aff62ed54bba0aeb4cdbbe26"
+    },
+    "TimePickerSelect": {
+      "source": "packages/react/src/components/TimePickerSelect/index.ts",
+      "sha256": "5aaf5d0c8e92b8fd25c0e45677074372714313f642ea5a3dab2919ca073fc14c"
+    },
+    "Toggle": {
+      "source": "packages/react/src/components/Toggle/index.tsx",
+      "sha256": "e99e46ff7060f1e13c648484d585275e079050f6bb546248a0ed6d958cc66598"
+    },
+    "Toggle/Toggle.Skeleton": {
+      "source": "packages/react/src/components/Toggle/Toggle.Skeleton.tsx",
+      "sha256": "9b361605f4f1e27c2e99c39b609694f83ee16b0dd422b1346a91d41909e44503"
+    },
+    "ToggleSmall/ToggleSmall.Skeleton": {
+      "source": "packages/react/src/components/ToggleSmall/ToggleSmall.Skeleton.tsx",
+      "sha256": "6f0e2b264b4a8da76fcf1175deef66ca26061dfeccc2005b9f4b02eaa4329380"
+    },
+    "Toggletip": {
+      "source": "packages/react/src/components/Toggletip/index.tsx",
+      "sha256": "c1606141879cc8cf25ba97b09c1bbb8d32464a3d0b81b6afcf56d6bc2c406c2f"
+    },
+    "Tooltip": {
+      "source": "packages/react/src/components/Tooltip/index.ts",
+      "sha256": "4eee60b7c2dbf875c6fa041109d58dfadb7914ab652ab5ad947759a82c1c7bf5"
+    },
+    "Tooltip/DefinitionTooltip": {
+      "source": "packages/react/src/components/Tooltip/DefinitionTooltip.tsx",
+      "sha256": "c8a1409c79b34bfc7ef8ff5f97bcf8a4a84afca7d4e2272807d17c3ee6bb5319"
+    },
+    "TreeView": {
+      "source": "packages/react/src/components/TreeView/index.tsx",
+      "sha256": "72469273acaf0a7204ac70a8d17dc9902b5532c9b136d67ed72e46fc528b091d"
+    },
+    "UIShell": {
+      "source": "packages/react/src/components/UIShell/index.ts",
+      "sha256": "7193e0ee718c9f31fb32727559cf212b2fe9dfaf229746d2bf62a9ee73b7521e"
+    },
+    "UnorderedList": {
+      "source": "packages/react/src/components/UnorderedList/index.ts",
+      "sha256": "327472f1f56008791502adaf39da2d2a677c6839dfcacdf50aa011064dc63af0"
+    }
+  },
+  "carbonCommit": "44f90d8d6b24889af06cee1422ceb37f58e40bed",
+  "carbonTag": "v11.118.0",
+  "components": {
+    "AILabel": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonAILabel"
+      ],
+      "tier": "golden-locked",
+      "note": "Popover body/actions are caller-supplied content rather than separate React sections."
+    },
+    "AISkeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonAISkeletonText",
+        "CarbonAISkeletonIcon",
+        "CarbonAISkeletonPlaceholder"
+      ],
+      "tier": "golden-locked",
+      "note": "AI loading primitives are implemented."
+    },
+    "Accordion": {
+      "state": "Present",
+      "apis": [
+        "CarbonAccordion"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "accordion"
+    },
+    "AccordionItem": {
+      "state": "Present",
+      "apis": [
+        "CarbonAccordionItem"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "AspectRatio": {
+      "state": "Present",
+      "apis": [
+        "CarbonAspectRatio"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Breadcrumb": {
+      "state": "Present",
+      "apis": [
+        "CarbonBreadcrumb"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "breadcrumb"
+    },
+    "Button": {
+      "state": "Present",
+      "apis": [
+        "CarbonButton"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "button"
+    },
+    "ButtonSet": {
+      "state": "Present",
+      "apis": [
+        "CarbonButtonSet"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Card": {
+      "state": "Deferred",
+      "apis": [],
+      "tier": "not implemented",
+      "note": "The preview compound Card API is outside the 0.5.0 implementation scope; Tile is not claimed as equivalent."
+    },
+    "ChatButton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonChatButton",
+        "CarbonButtonSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Chat button is implemented; loading composition uses existing skeleton primitives rather than a dedicated ChatButtonSkeleton export."
+    },
+    "Checkbox": {
+      "state": "Present",
+      "apis": [
+        "CarbonCheckbox"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "checkbox"
+    },
+    "CheckboxGroup": {
+      "state": "Present",
+      "apis": [
+        "CarbonCheckboxGroup"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "ClassPrefix": {
+      "state": "Out of scope",
+      "apis": [],
+      "tier": "not applicable",
+      "note": "React CSS class-prefix provider has no corresponding Flutter package mechanism."
+    },
+    "CodeSnippet": {
+      "state": "Present",
+      "apis": [
+        "CarbonCodeSnippet"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "code-snippet"
+    },
+    "ComboBox": {
+      "state": "Present",
+      "apis": [
+        "CarbonComboBox"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "combo-box"
+    },
+    "ComboButton": {
+      "state": "Present",
+      "apis": [
+        "CarbonComboButton"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "ComposedModal": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonDialog"
+      ],
+      "tier": "golden-locked",
+      "note": "Dialog header/body/footer/actions are Flutter composition with controlled open state."
+    },
+    "ContainedList": {
+      "state": "Present",
+      "apis": [
+        "CarbonContainedList"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "ContentSwitcher": {
+      "state": "Partial",
+      "apis": [
+        "CarbonContentSwitcher"
+      ],
+      "tier": "curated story",
+      "note": "Readable text/icon switching and keyboard navigation are implemented; the separate low-contrast variant remains follow-up.",
+      "story": "content-switcher",
+      "issue": 384
+    },
+    "ContextMenu": {
+      "state": "Present",
+      "apis": [
+        "CarbonContextMenu"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Copy": {
+      "state": "Present",
+      "apis": [
+        "CarbonCopy"
+      ],
+      "tier": "golden-locked",
+      "note": "Shared copy affordance and feedback; clipboard interaction is checked separately in native browsers."
+    },
+    "CopyButton": {
+      "state": "Present",
+      "apis": [
+        "CarbonCopyButton"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "DangerButton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonButton",
+        "CarbonButtonKind"
+      ],
+      "tier": "golden-locked",
+      "note": "Use the danger button kinds."
+    },
+    "DataTable": {
+      "state": "Partial",
+      "apis": [
+        "CarbonDataTable",
+        "CarbonTableToolbar"
+      ],
+      "tier": "curated story",
+      "note": "Stable-ID sorting/selection/expansion, batch actions, sticky and virtual viewports are implemented; dedicated decorator-row and compact inline-checkbox patterns remain separate follow-up.",
+      "story": "data-table",
+      "issue": 433
+    },
+    "DataTableSkeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonDataTableSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "DatePicker": {
+      "state": "Present",
+      "apis": [
+        "CarbonDatePicker"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "date-picker"
+    },
+    "DatePicker/next": {
+      "state": "Deferred",
+      "apis": [],
+      "tier": "not implemented",
+      "note": "The preview next-generation date-picker API is not the released v11 contract ported by CarbonDatePicker."
+    },
+    "DatePickerInput": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonDatePicker",
+        "CarbonDateRangePicker"
+      ],
+      "tier": "golden-locked",
+      "note": "Date fields are composed by the controlled single/range picker APIs."
+    },
+    "Dialog": {
+      "state": "Present",
+      "apis": [
+        "CarbonDialog"
+      ],
+      "tier": "golden-locked",
+      "note": "Controlled Flutter dialog with caller-composed sections and modal/nonmodal focus policy."
+    },
+    "Dropdown": {
+      "state": "Present",
+      "apis": [
+        "CarbonDropdown"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "dropdown"
+    },
+    "ErrorBoundary": {
+      "state": "Out of scope",
+      "apis": [],
+      "tier": "not applicable",
+      "note": "React subtree error-boundary lifecycle is platform infrastructure, not a Carbon-styled widget port."
+    },
+    "ExpandableSearch": {
+      "state": "Present",
+      "apis": [
+        "CarbonExpandableSearch"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "FeatureFlags": {
+      "state": "Out of scope",
+      "apis": [],
+      "tier": "not applicable",
+      "note": "React runtime contexts/hooks are not ported; intentional v11/v12 decisions are recorded in ADR 0002."
+    },
+    "FileUploader": {
+      "state": "Present",
+      "apis": [
+        "CarbonFileUploader"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "FluidComboBox": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonComboBox",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidDatePicker": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonDatePicker",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidDatePickerInput": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonDatePicker",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidDropdown": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonDropdown",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidForm": {
+      "state": "Present",
+      "apis": [
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Inherited fluid-form scope; application owns submission and validation."
+    },
+    "FluidMultiSelect": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonMultiSelect",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidNumberInput": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonNumberInput",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidSearch": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonSearch",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidSelect": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonSelect",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidTextArea": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTextArea",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidTextInput": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTextInput",
+        "CarbonFluidForm",
+        "CarbonPasswordInput"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget. Password mode is also provided by CarbonPasswordInput."
+    },
+    "FluidTimePicker": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTimePicker",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "FluidTimePickerSelect": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTimePickerSelect",
+        "CarbonFluidForm"
+      ],
+      "tier": "golden-locked",
+      "note": "Use fluid: true or the ambient CarbonFluidForm scope; no separate Fluid-prefixed widget."
+    },
+    "Form": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonFormGroup",
+        "CarbonFormItem",
+        "CarbonField"
+      ],
+      "tier": "behavior-tested",
+      "note": "Compose fields with Flutter layout and application validation; HTML form submission is not provided."
+    },
+    "FormGroup": {
+      "state": "Present",
+      "apis": [
+        "CarbonFormGroup"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "FormItem": {
+      "state": "Present",
+      "apis": [
+        "CarbonFormItem"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "FormLabel": {
+      "state": "Present",
+      "apis": [
+        "CarbonFormLabel"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Grid": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonGrid",
+        "CarbonColumn",
+        "CarbonGridMode"
+      ],
+      "tier": "golden-locked",
+      "note": "Flutter Wrap-based spans/margins/gutters/hang replace React Grid/FlexGrid wrappers; CSS track/subgrid behavior is an intentional boundary."
+    },
+    "Heading": {
+      "state": "Present",
+      "apis": [
+        "CarbonHeading"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Icon/Icon.Skeleton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonSkeletonIcon"
+      ],
+      "tier": "golden-locked",
+      "note": "Icon loading shape uses the exported skeleton primitive."
+    },
+    "IconButton": {
+      "state": "Present",
+      "apis": [
+        "CarbonIconButton"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "IconIndicator": {
+      "state": "Present",
+      "apis": [
+        "CarbonIconIndicator"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "IdPrefix": {
+      "state": "Out of scope",
+      "apis": [],
+      "tier": "not applicable",
+      "note": "React DOM ID-prefix provider is not a Flutter consumer API."
+    },
+    "InlineCheckbox": {
+      "state": "Partial",
+      "apis": [
+        "CarbonCheckbox"
+      ],
+      "tier": "golden-locked",
+      "note": "Full checkbox is implemented; the dedicated compact table-inline pattern remains follow-up.",
+      "issue": 433
+    },
+    "InlineLoading": {
+      "state": "Present",
+      "apis": [
+        "CarbonInlineLoading"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "inline-loading"
+    },
+    "Layer": {
+      "state": "Present",
+      "apis": [
+        "CarbonLayer"
+      ],
+      "tier": "golden-locked",
+      "note": "Contextual theme layers are inherited through Flutter composition."
+    },
+    "Layout": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonSpacing",
+        "CarbonContainer",
+        "CarbonLayer"
+      ],
+      "tier": "behavior-tested",
+      "note": "Use tokens and Flutter layout composition; preview CSS layout context is not a dedicated widget API."
+    },
+    "LayoutDirection": {
+      "state": "Out of scope",
+      "apis": [],
+      "tier": "not applicable",
+      "note": "Flutter Directionality supplies layout direction; React hooks/provider exports are not duplicated."
+    },
+    "Link": {
+      "state": "Present",
+      "apis": [
+        "CarbonLink"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "link"
+    },
+    "ListItem": {
+      "state": "Present",
+      "apis": [
+        "CarbonListItem"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Loading": {
+      "state": "Present",
+      "apis": [
+        "CarbonLoading"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "loading"
+    },
+    "Menu": {
+      "state": "Present",
+      "apis": [
+        "CarbonMenu"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "MenuButton": {
+      "state": "Present",
+      "apis": [
+        "CarbonMenuButton"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Modal": {
+      "state": "Present",
+      "apis": [
+        "CarbonModal"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "modal"
+    },
+    "ModalWrapper": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonModal"
+      ],
+      "tier": "golden-locked",
+      "note": "Applications own the trigger and controlled open state instead of using React launcher state wrappers."
+    },
+    "MultiSelect": {
+      "state": "Present",
+      "apis": [
+        "CarbonMultiSelect"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "multiselect"
+    },
+    "Notification": {
+      "state": "Present",
+      "apis": [
+        "CarbonInlineNotification",
+        "CarbonToastNotification",
+        "CarbonActionableNotification",
+        "CarbonCallout"
+      ],
+      "tier": "curated story",
+      "note": "All four notification compositions expose theme/kind options and responsive content.",
+      "story": "notification"
+    },
+    "NumberInput": {
+      "state": "Present",
+      "apis": [
+        "CarbonNumberInput"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "number-input"
+    },
+    "OrderedList": {
+      "state": "Present",
+      "apis": [
+        "CarbonOrderedList"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "OverflowMenu": {
+      "state": "Present",
+      "apis": [
+        "CarbonOverflowMenu"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "overflow-menu"
+    },
+    "OverflowMenuItem": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonMenuItem"
+      ],
+      "tier": "golden-locked",
+      "note": "Overflow actions use the shared menu-item engine."
+    },
+    "OverflowMenuV2": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonOverflowMenu",
+        "CarbonMenu"
+      ],
+      "tier": "golden-locked",
+      "note": "Shared menu engine provides the deliberately adopted v12 overflow architecture; no duplicate V2 widget."
+    },
+    "PageHeaderDeprecated": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonPageHeader",
+        "CarbonPageHeaderAction"
+      ],
+      "tier": "golden-locked",
+      "note": "Historical band/constructor composition with responsive actions/tags, title recovery and hero content; compound scrolling root is deferred."
+    },
+    "Pagination": {
+      "state": "Present",
+      "apis": [
+        "CarbonPagination"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "pagination"
+    },
+    "Pagination/Pagination.Skeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonPaginationSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Pagination loading skeleton is implemented."
+    },
+    "Pagination/experimental": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonPagination"
+      ],
+      "tier": "golden-locked",
+      "note": "Controlled selectors and injectable pagination formatters replace the deprecated experimental React wrapper."
+    },
+    "PaginationNav": {
+      "state": "Present",
+      "apis": [
+        "CarbonPaginationNav"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "PasswordInput": {
+      "state": "Present",
+      "apis": [
+        "CarbonPasswordInput"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Popover": {
+      "state": "Present",
+      "apis": [
+        "CarbonPopover"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "PrimaryButton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonButton",
+        "CarbonButtonKind"
+      ],
+      "tier": "golden-locked",
+      "note": "Use CarbonButtonKind.primary."
+    },
+    "ProgressBar": {
+      "state": "Present",
+      "apis": [
+        "CarbonProgressBar"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "progress-bar"
+    },
+    "ProgressIndicator": {
+      "state": "Present",
+      "apis": [
+        "CarbonProgressIndicator"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "progress-indicator"
+    },
+    "RadioButton": {
+      "state": "Present",
+      "apis": [
+        "CarbonRadioButton"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "radio-button"
+    },
+    "RadioButton/RadioButton.Skeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonRadioButtonSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Radio loading skeleton is implemented."
+    },
+    "RadioButtonGroup": {
+      "state": "Present",
+      "apis": [
+        "CarbonRadioButtonGroup"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "radio-button"
+    },
+    "RadioTile": {
+      "state": "Present",
+      "apis": [
+        "CarbonRadioTile"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Search": {
+      "state": "Present",
+      "apis": [
+        "CarbonSearch"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "search"
+    },
+    "SecondaryButton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonButton",
+        "CarbonButtonKind"
+      ],
+      "tier": "golden-locked",
+      "note": "Use CarbonButtonKind.secondary."
+    },
+    "Select": {
+      "state": "Present",
+      "apis": [
+        "CarbonSelect"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "select"
+    },
+    "SelectItem": {
+      "state": "Present",
+      "apis": [
+        "CarbonSelectItem"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "SelectItemGroup": {
+      "state": "Present",
+      "apis": [
+        "CarbonSelectItemGroup"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "ShapeIndicator": {
+      "state": "Present",
+      "apis": [
+        "CarbonShapeIndicator"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "SkeletonIcon": {
+      "state": "Present",
+      "apis": [
+        "CarbonSkeletonIcon"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "SkeletonPlaceholder": {
+      "state": "Present",
+      "apis": [
+        "CarbonSkeletonPlaceholder"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "SkeletonText": {
+      "state": "Present",
+      "apis": [
+        "CarbonSkeletonText"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Slider": {
+      "state": "Present",
+      "apis": [
+        "CarbonSlider"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "slider"
+    },
+    "Stack": {
+      "state": "Present",
+      "apis": [
+        "CarbonStack"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "StructuredList": {
+      "state": "Present",
+      "apis": [
+        "CarbonStructuredList"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "structured-list"
+    },
+    "Switch": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonSwitch",
+        "CarbonContentSwitcher"
+      ],
+      "tier": "golden-locked",
+      "note": "Switch items are composed by the content-switcher group."
+    },
+    "Tab": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTab",
+        "CarbonTabs"
+      ],
+      "tier": "golden-locked",
+      "note": "Tab data/content is composed by the controlled tabs widget."
+    },
+    "TabContent": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTab",
+        "CarbonTabs"
+      ],
+      "tier": "golden-locked",
+      "note": "Panel content is supplied to CarbonTab; no independent DOM panel wrapper."
+    },
+    "Tabs": {
+      "state": "Present",
+      "apis": [
+        "CarbonTabs"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "tabs"
+    },
+    "Tag": {
+      "state": "Present",
+      "apis": [
+        "CarbonTag"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "tag"
+    },
+    "Tag/Tag.Skeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonTagSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Tag loading skeleton is implemented."
+    },
+    "Text": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonText",
+        "CarbonFluidText"
+      ],
+      "tier": "golden-locked",
+      "note": "Fixed and responsive text use Carbon styles with Flutter direction/semantics options."
+    },
+    "TextArea": {
+      "state": "Present",
+      "apis": [
+        "CarbonTextArea"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "TextInput": {
+      "state": "Present",
+      "apis": [
+        "CarbonTextInput"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "text-input"
+    },
+    "Theme": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonTheme",
+        "CarbonThemeData",
+        "AnimatedCarbonTheme"
+      ],
+      "tier": "behavior-tested",
+      "note": "Flutter theme data/inherited scope replaces React theme contexts and CSS custom properties."
+    },
+    "Tile": {
+      "state": "Present",
+      "apis": [
+        "CarbonTile"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "tile"
+    },
+    "TileGroup": {
+      "state": "Present",
+      "apis": [
+        "CarbonTileGroup"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "TimePicker": {
+      "state": "Present",
+      "apis": [
+        "CarbonTimePicker"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "TimePickerSelect": {
+      "state": "Present",
+      "apis": [
+        "CarbonTimePickerSelect"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Toggle": {
+      "state": "Present",
+      "apis": [
+        "CarbonToggle"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "toggle"
+    },
+    "Toggle/Toggle.Skeleton": {
+      "state": "Present",
+      "apis": [
+        "CarbonToggleSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Toggle loading skeleton is implemented."
+    },
+    "ToggleSmall/ToggleSmall.Skeleton": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonToggle",
+        "CarbonToggleSize",
+        "CarbonToggleSkeleton"
+      ],
+      "tier": "golden-locked",
+      "note": "Use the small toggle size and the shared skeleton instead of a separate ToggleSmall API."
+    },
+    "Toggletip": {
+      "state": "Present",
+      "apis": [
+        "CarbonToggletip"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    },
+    "Tooltip": {
+      "state": "Present",
+      "apis": [
+        "CarbonTooltip"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "tooltip"
+    },
+    "Tooltip/DefinitionTooltip": {
+      "state": "Deferred",
+      "apis": [],
+      "tier": "not implemented",
+      "note": "Dedicated underlined definition-trigger semantics and styling are not implemented for 0.5.0; generic CarbonTooltip is not claimed as full equivalent."
+    },
+    "TreeView": {
+      "state": "Present",
+      "apis": [
+        "CarbonTreeView"
+      ],
+      "tier": "curated story",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition.",
+      "story": "tree-view"
+    },
+    "UIShell": {
+      "state": "Consolidated",
+      "apis": [
+        "CarbonHeader",
+        "CarbonSideNav",
+        "CarbonShellContent",
+        "CarbonSkipToContent",
+        "CarbonSwitcher"
+      ],
+      "tier": "golden-locked",
+      "note": "Header/navigation/switcher/skip controls are Flutter composition; React HeaderContainer state and auxiliary DOM wrappers become caller state and widgets."
+    },
+    "UnorderedList": {
+      "state": "Present",
+      "apis": [
+        "CarbonUnorderedList"
+      ],
+      "tier": "golden-locked",
+      "note": "The released family control is implemented; React prop/DOM wrappers are expressed through Flutter composition."
+    }
+  }
+}

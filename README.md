@@ -110,6 +110,12 @@ set and the layering rules.
 
 ## Component catalog
 
+The [checked Carbon parity matrix](docs/carbon-parity.md) distinguishes present,
+consolidated, partial, deferred and platform-specific APIs, with a fidelity tier
+and explicit boundaries. React `Fluid*` names map to the existing picker/field
+APIs and `CarbonFluidForm`; React providers and CSS subgrid are separate
+platform/architecture decisions. The matrix does not promise full variant parity.
+
 Components are organized in tiers, mirroring the gallery's navigation.
 
 **Foundations** — color tokens, typography, spacing/layout, icons, motion.
