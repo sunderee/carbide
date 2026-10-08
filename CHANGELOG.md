@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Tables and trees offer optional virtual viewports with stable-ID recycling,
+  focused-row retention, scrolling semantics and keyboard reveal for unmounted
+  tree nodes. Eager intrinsic rendering remains available, with a measured
+  100-record performance envelope and large-data guidance (#336).
+
 - Modal and dialog surfaces retain focus and semantics through expressive exit
   motion, cancel removal on reopening, and honor live reduced-motion changes.
   A shared modal boundary blocks ancestor wheel/touch scrolling and background

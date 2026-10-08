@@ -31,6 +31,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/keep_focused_row.dart';
+import '../../utils/focus_retaining_sliver.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
@@ -220,6 +222,9 @@ class CarbonDataTable extends StatelessWidget {
     this.size = CarbonTableSize.lg,
     this.zebra = false,
     this.stickyHeader = false,
+    this.virtualized = false,
+    this.viewportHeight = 320,
+    this.scrollController,
     this.stickyHeaderHeight = 320,
     this.title,
     this.description,
@@ -241,7 +246,16 @@ class CarbonDataTable extends StatelessWidget {
     this.expandedRowIds,
     this.onExpansionChanged,
     this.onExpandedChanged,
-  }) : selectedRows = selectedRows ?? const <int>{},
+  }) : assert(viewportHeight > 0 && viewportHeight < double.infinity),
+       assert(
+         !virtualized ||
+             (selectedRows == null &&
+                 onSelectionChanged == null &&
+                 expandedRows == null &&
+                 onExpandedChanged == null),
+         'Virtualized tables use stable ID selection and expansion APIs.',
+       ),
+       selectedRows = selectedRows ?? const <int>{},
        expandedRows = expandedRows ?? const <int>{},
        assert(
          (selectedRowIds == null && onSelectedRowIdsChanged == null) ||
@@ -265,6 +279,18 @@ class CarbonDataTable extends StatelessWidget {
 
   /// Whether even rows are tinted (`useZebraStyles`).
   final bool zebra;
+
+  /// Builds only the viewport's rows in a bounded sliver. Every row requires
+  /// a unique stable ID. Eager rendering remains the default for intrinsic
+  /// layouts. Data models remain caller-owned; only row widgets are recycled.
+  final bool virtualized;
+
+  /// The virtual viewport height. With [stickyHeader], this bounds the body;
+  /// otherwise it includes the scrolling header. Must be positive and finite.
+  final double viewportHeight;
+
+  /// Optional externally owned body/virtual viewport scroll controller.
+  final ScrollController? scrollController;
 
   /// Whether the header stays fixed while the body scrolls.
   final bool stickyHeader;
@@ -376,6 +402,7 @@ class CarbonDataTable extends StatelessWidget {
 
 void _validateTable(CarbonDataTable table) {
   final bool requiresIds =
+      table.virtualized ||
       table.selectedRowIds != null ||
       table.onSelectedRowIdsChanged != null ||
       table.expandedRowIds != null ||
@@ -401,11 +428,13 @@ class _TableBody extends StatefulWidget {
 }
 
 class _TableBodyState extends State<_TableBody> {
-  final ScrollController _bodyScroll = ScrollController();
+  final ScrollController _ownedScroll = ScrollController();
+  ScrollController get _bodyScroll =>
+      widget.table.scrollController ?? _ownedScroll;
 
   @override
   void dispose() {
-    _bodyScroll.dispose();
+    _ownedScroll.dispose();
     super.dispose();
   }
 
@@ -649,32 +678,33 @@ class _TableBodyState extends State<_TableBody> {
       leading: leadingRow(rowIndex: null),
     );
 
-    final List<Widget> bodyRows = <Widget>[
-      for (int i = 0; i < rows.length; i++) ...<Widget>[
-        _BodyRow(
-          key: _rowKey('body', i),
-          row: rows[i],
-          semanticsOrder: i * 2 + 1,
-          columns: columns,
-          size: size,
-          // Zebra tints even rows (`tr:nth-child(even)`); rows are 1-based in
-          // CSS, so the 0-based odd index is the even child.
-          tinted: zebra && i.isOdd,
-          isLast: i == rows.length - 1 && !_expanded(i),
-          selected: _selected(i),
+    List<Widget> rowChildren(int i) => <Widget>[
+      _BodyRow(
+        key: _rowKey('body', i),
+        row: rows[i],
+        semanticsOrder: i * 2 + 1,
+        columns: columns,
+        size: size,
+        // Zebra tints even rows (`tr:nth-child(even)`); rows are 1-based in
+        // CSS, so the 0-based odd index is the even child.
+        tinted: zebra && i.isOdd,
+        isLast: i == rows.length - 1 && !_expanded(i),
+        selected: _selected(i),
+        expanded: _expanded(i),
+        leading: leadingRow(rowIndex: i),
+      ),
+      if (expandable && rows[i].expandedContent != null)
+        _ExpandedDetail(
+          key: _rowKey('detail', i),
           expanded: _expanded(i),
-          leading: leadingRow(rowIndex: i),
+          semanticsOrder: i * 2 + 2,
+          isLast: i == rows.length - 1,
+          child: rows[i].expandedContent!,
         ),
-        if (expandable && rows[i].expandedContent != null)
-          _ExpandedDetail(
-            key: _rowKey('detail', i),
-            expanded: _expanded(i),
-            semanticsOrder: i * 2 + 2,
-            isLast: i == rows.length - 1,
-            child: rows[i].expandedContent!,
-          ),
-      ],
     ];
+    final List<Widget> bodyRows = widget.table.virtualized
+        ? const <Widget>[]
+        : <Widget>[for (int i = 0; i < rows.length; i++) ...rowChildren(i)];
 
     final Widget headerArea = selection == CarbonTableSelection.multi
         ? _BatchHeader(
@@ -687,7 +717,40 @@ class _TableBodyState extends State<_TableBody> {
           )
         : header;
 
-    final Widget body = stickyHeader
+    final Map<Object, int> indices = widget.table.virtualized
+        ? <Object, int>{for (int i = 0; i < rows.length; i++) rows[i].id!: i}
+        : const <Object, int>{};
+    final Widget body = widget.table.virtualized
+        ? SizedBox(
+            height: widget.table.viewportHeight,
+            child: Scrollable(
+              controller: _bodyScroll,
+              excludeFromSemantics: true,
+              viewportBuilder: (_, offset) => CarbonFocusRetainingViewport(
+                offset: offset,
+                slivers: <Widget>[
+                  if (!stickyHeader) SliverToBoxAdapter(child: headerArea),
+                  CarbonFocusRetainingSliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, i) => CarbonKeepFocusedRow(
+                        key: ValueKey<Object>(rows[i].id!),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: rowChildren(i),
+                        ),
+                      ),
+                      childCount: rows.length,
+                      addSemanticIndexes: false,
+                      findChildIndexCallback: (key) =>
+                          key is ValueKey<Object> ? indices[key.value] : null,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        : stickyHeader
         ? ConstrainedBox(
             constraints: BoxConstraints(maxHeight: stickyHeaderHeight),
             child: Scrollable(
@@ -783,11 +846,16 @@ class _TableBodyState extends State<_TableBody> {
             _TableScrollSemantics(
               label: widget.table.semanticsLabel ?? title ?? 'Data table',
               textDirection: Directionality.of(context),
-              controller: stickyHeader ? _bodyScroll : null,
+              controller: stickyHeader || widget.table.virtualized
+                  ? _bodyScroll
+                  : null,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[headerArea, body],
+                children: <Widget>[
+                  if (!widget.table.virtualized || stickyHeader) headerArea,
+                  body,
+                ],
               ),
             ),
           ],

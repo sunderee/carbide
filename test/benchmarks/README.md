@@ -49,3 +49,37 @@ mutation, additional package dependency or runtime telemetry is introduced.
 
 For the resulting cache lifetime policy, see
 [architecture](../../docs/ARCHITECTURE.md#icon-path-cache-policy).
+
+## Table and tree eager rendering
+
+```sh
+flutter test --enable-vmservice test/benchmarks/data_rendering_benchmark.dart \
+  --dart-define=DATA_FAMILY=table --dart-define=DATA_COUNT=100
+```
+
+Repeat for `DATA_FAMILY=tree` and counts `100`, `1000`, `10000`, with three fresh
+processes per case and no concurrent builds/tests/browser runs. `DATA-MEASURE`
+lines contain JSON. The fixtures use two-column sticky, expandable tables (all
+details initially closed) and flat trees. Both have a 320px viewport and bundled
+Plex fonts. Model creation precedes the baseline; five rows warm the component
+before unmounting. VM timeline `BUILD` and `LAYOUT` spans measure the first full
+mount, and a wall stopwatch includes all other pump work.
+
+Two GC requests with a 50ms finalizer gap precede each memory snapshot. The
+managed-heap difference estimates retained widget/framework allocation; it is
+an isolate-wide delta, not an exact component ownership census. External
+allocation and whole-process RSS deltas are reported separately. Timing and
+memory describe native debug/JIT execution, not release frame budgets or web
+memory. Ordinary leak-test stack instrumentation is paused only in this opt-in
+measurement because storing creation stacks distorts allocation/timing; the
+normal component suites continue to enforce leak freedom. Cleanup still
+unmounts the component and closes the HTTP client.
+
+Timeline methods follow the [Dart VM service protocol](https://github.com/dart-lang/sdk/blob/main/runtime/vm/service/service.md).
+Results and supported rendering guidance are documented with the component's
+large-data rendering mode.
+
+Repeat the data cases with `--dart-define=DATA_VIRTUALIZED=true` for the bounded
+viewport. Sliver builders execute during layout: `BUILD`/`LAYOUT` spans include
+nested work and can overlap, so do not add them. Use the wall pump duration
+for an overall first-mount observation.

@@ -226,3 +226,12 @@ and semantics contracts; eager items retain their existing rendering mode.
 Pagination combines bounded page choices, result-shrink clamping, measured
 responsive layouts and injectable formatter delegates. See [pagination input
 and layout policy](pagination.md) for validation and compatibility details.
+
+
+## Large data views
+
+Tables and trees retain eager rendering for intrinsic layouts and offer bounded
+virtual viewports keyed by stable IDs. Focused rows stay mounted until focus
+leaves; controlled selection/expansion survives recycling. Data metadata remains
+proportional to record count. See [large-data rendering](large-data.md) for the
+measured eager envelope, benchmark limits and viewport/controller contracts.
