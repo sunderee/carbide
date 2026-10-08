@@ -268,10 +268,12 @@ final Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'slider': () => SizedBox(
     width: 400,
     child: CarbonSlider(
-      labelText: 'Slider label',
+      // @carbon/react v1.118.0 Slider.stories.js: Default sharedArgs.
+      labelText: 'Storage allocation',
       value: 50,
       min: 0,
       max: 100,
+      formatLabel: (num value) => '$value GB',
       onChanged: (num _) {},
     ),
   ),

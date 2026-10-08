@@ -80,8 +80,11 @@ Off-PR cadence: **OS matrix** (`os-matrix.yaml`, weekly + on demand via
 `gh workflow run os-matrix.yaml`) runs the full package suite on macOS and
 Windows (text goldens get the lenient off-Linux bound), the dart:io-free
 suites on the web platform (`--platform chrome`, goldens skipped), and the
-gallery's `integration_test/` smoke driven in a real browser — the same
-configuration the deployed gallery ships.
+gallery's `integration_test/` contracts driven in a real browser — the same
+configuration the deployed gallery ships. Native web contracts run in six
+parallel groups (gallery, lifecycle, data, controls, pickers, preferences),
+each preserving its debug/release modes and limited to 15 minutes. A failing
+group does not cancel the others, so the full matrix remains visible.
 
 ### Accessibility gates
 

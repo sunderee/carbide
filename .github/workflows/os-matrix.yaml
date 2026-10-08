@@ -133,11 +133,15 @@ jobs:
 
   gallery-web-integration:
     if: ${{ !inputs.picker-options-only }}
-    name: Gallery integration test — web
-    # The full native matrix took 23 minutes before the active-option fixture;
-    # leave room for its extra browser compilation and interaction cases.
-    timeout-minutes: 30
+    name: Gallery native web — ${{ matrix.group }}
+    # All contracts ran sequentially in one job and exceeded 30 minutes.
+    # Keep each group bounded and retain every debug/release invocation.
+    timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [gallery, lifecycle, data, controls, pickers, preferences]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -156,194 +160,54 @@ jobs:
       - name: Start chromedriver
         run: chromedriver --port=4444 &
 
-      - name: Drive the gallery smoke test
+      - name: Drive native contracts
         working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/gallery_smoke_test.dart
-          -d web-server
-
-      - name: Drive tabs release contract test
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/tabs_release_contract_test.dart
-          -d web-server
-
-      - name: Drive form ownership and native input test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/form_ownership_test.dart
-          -d web-server
-
-      - name: Drive text-area native limit and composition test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/text_area_limit_test.dart
-          -d web-server
-
-      - name: Drive number-input native draft and commit test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/number_input_commit_test.dart
-          -d web-server
-
-      - name: Drive slider native policy and semantics test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/slider_state_test.dart
-          -d web-server
-
-      - name: Drive date-picker native state and range session test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/date_picker_state_test.dart
-          -d web-server
-
-      - name: Drive date-picker state and range sessions in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/date_picker_state_test.dart
-          -d web-server
-
-      - name: Drive tree-view native reconciliation and expansion test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/tree_view_state_test.dart
-          -d web-server
-
-      - name: Drive data-table native identity and focus test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/data_table_identity_test.dart
-          -d web-server
-
-      - name: Drive data-table native accessibility in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/data_table_accessibility_test.dart
-          -d web-server
-
-      - name: Drive context-menu native keyboard and focus in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/context_menu_keyboard_test.dart
-          -d web-server
-
-      - name: Drive reduced-motion interactions in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/reduced_motion_test.dart
-          -d web-server
-
-      - name: Drive high-contrast native focus and editing in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/high_contrast_test.dart
-          -d web-server
-
-      - name: Drive list native marker and scrolling test
-        working-directory: example
-        run: >
-          flutter drive
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/list_markers_test.dart
-          -d web-server
-
-      - name: Drive static content semantics in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/static_semantics_test.dart
-          -d web-server
-
-      - name: Drive modal and dialog native focus contracts in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/dialog_focus_test.dart
-          -d web-server
-
-      - name: Drive binary-control native read-only contracts in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/binary_control_state_test.dart
-          -d web-server
-
-      - name: Drive password native visibility contracts in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/password_visibility_test.dart
-          -d web-server
-
-      - name: Drive read-only picker native focus contracts in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/read_only_picker_test.dart
-          -d web-server
-
-      - name: Drive picker keyboard and ancestor propagation in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/picker_keyboard_contract_test.dart
-          -d web-server
-
-      - name: Drive picker shared-editor policy without semantics in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/picker_keyboard_without_semantics_test.dart
-          -d web-server
-
-      - name: Drive picker native active-option semantics in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/picker_option_semantics_test.dart
-          -d web-server
-
-      - name: Drive content-switcher native name contracts in release mode
-        working-directory: example
-        run: >
-          flutter drive --release
-          --driver=test_driver/integration_test.dart
-          --target=integration_test/content_switcher_names_test.dart
-          -d web-server
+        env:
+          NATIVE_TEST_GROUP: ${{ matrix.group }}
+        run: |
+          drive_native() {
+            echo "Native contract: $*"
+            flutter drive "$@" --driver=test_driver/integration_test.dart -d web-server
+          }
+          case "$NATIVE_TEST_GROUP" in
+            gallery)
+              drive_native --target=integration_test/gallery_smoke_test.dart
+              drive_native --release --target=integration_test/tabs_release_contract_test.dart
+              drive_native --target=integration_test/list_markers_test.dart
+              drive_native --release --target=integration_test/static_semantics_test.dart
+              ;;
+            lifecycle)
+              drive_native --target=integration_test/form_ownership_test.dart
+              drive_native --target=integration_test/text_area_limit_test.dart
+              drive_native --target=integration_test/number_input_commit_test.dart
+              drive_native --target=integration_test/slider_state_test.dart
+              drive_native --target=integration_test/tree_view_state_test.dart
+              ;;
+            data)
+              drive_native --target=integration_test/date_picker_state_test.dart
+              drive_native --release --target=integration_test/date_picker_state_test.dart
+              drive_native --target=integration_test/data_table_identity_test.dart
+              drive_native --release --target=integration_test/data_table_accessibility_test.dart
+              drive_native --release --target=integration_test/context_menu_keyboard_test.dart
+              ;;
+            controls)
+              drive_native --release --target=integration_test/dialog_focus_test.dart
+              drive_native --release --target=integration_test/binary_control_state_test.dart
+              drive_native --release --target=integration_test/password_visibility_test.dart
+              drive_native --release --target=integration_test/content_switcher_names_test.dart
+              ;;
+            pickers)
+              drive_native --release --target=integration_test/read_only_picker_test.dart
+              drive_native --release --target=integration_test/picker_keyboard_contract_test.dart
+              drive_native --release --target=integration_test/picker_keyboard_without_semantics_test.dart
+              drive_native --release --target=integration_test/picker_option_semantics_test.dart
+              ;;
+            preferences)
+              drive_native --release --target=integration_test/reduced_motion_test.dart
+              drive_native --release --target=integration_test/high_contrast_test.dart
+              ;;
+            *)
+              echo "Unknown native test group: $NATIVE_TEST_GROUP" >&2
+              exit 1
+              ;;
+          esac
