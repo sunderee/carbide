@@ -1011,8 +1011,8 @@
           "width": 1196,
           "height": 28.2969
         },
-        "finding": "Restore optional/invalid labels and complete/current/invalid states in intrinsic-height content, without an arbitrary 640px host width.",
-        "limitation": "The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity."
+        "finding": "Five fixed 128px steps with 16px glyphs and 88px ellipsized labels beside them; complete/current leading lines, optional/invalid labels and default states retained.",
+        "limitation": "Horizontal supporting labels remain inside their step and use ellipsis with full accessible hints. Intrinsic Flutter height includes supporting text; Carbon positions that text outside its 28.3px list box. The 24x24 luminance metric is a drift budget, not pixel parity."
       },
       "baseline": {
         "algorithm": "mean-absolute-24x24-luminance",
@@ -1032,11 +1032,11 @@
       "rationale": "Maximum of the four measured Linux theme scores plus 0.01 for cross-platform glyph rasterization and grid-edge rounding. This is a drift budget around the reviewed fixture, not a claim of pixel parity. The port retains its existing intrinsic step widths and labels below the glyph/line; Carbon uses fixed 128px steps and an 88px ellipsized label beside its glyph. This is component geometry drift, not a substituted fixture; the coarse gate does not establish pixel parity.",
       "structural": {
         "size": [
-          627.76796,
-          58.0
+          640,
+          44.3
         ],
-        "sizeTolerance": 3,
-        "rationale": "Actual control bounds, excluding the forced Storybook background width. A 3px allowance covers intrinsic Plex glyph metrics and fractional layout rounding; large padding/height changes fail."
+        "sizeTolerance": 0.5,
+        "rationale": "Five fixed 128px horizontal steps. Supporting labels grow the intrinsic band to 44.3px; the 0.5px allowance covers fractional line-height rounding. Label and glyph geometry is separately asserted."
       }
     },
     {

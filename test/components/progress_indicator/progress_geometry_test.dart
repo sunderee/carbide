@@ -51,7 +51,8 @@ void main() {
       final a = tester.getRect(find.text('Account')),
           b = tester.getRect(find.text('Details'));
       expect(b.left - a.left, 128);
-      expect(a.width, 88);
+      expect(a.width, lessThanOrEqualTo(88));
+      expect(tester.getSize(find.text(steps[3].label)).width, 88);
       final glyph = tester.getRect(find.byType(CarbonIcon).first);
       expect(glyph.size, const Size(16, 16));
       expect(a.left - glyph.left, 24);
@@ -97,7 +98,7 @@ void main() {
             tester.getRect(find.text('Account')).top,
         58,
       );
-      expect(tester.getSize(find.text('Account')).width, 160);
+      expect(tester.getSize(find.text(steps[3].label)).width, 160);
       expect(
         tester
             .widget<Text>(find.text('Review with a deliberately long name'))
@@ -155,7 +156,7 @@ void main() {
                 .getSemantics(find.bySemanticsLabel('Details'))
                 .getSemanticsData();
             expect(s.hint, contains('Optional'));
-            expect(s.flagsCollection.isSelected, isTrue);
+            expect(s.flagsCollection.isSelected.name, 'isTrue');
           } finally {
             h.dispose();
           }

@@ -980,31 +980,66 @@ class _ProgressIndicatorPageState extends State<_ProgressIndicatorPage> {
   int _currentIndex = 1;
   bool _vertical = false;
   bool _interactive = true;
+  bool _narrow = false;
+  double _scale = 1;
 
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Progress indicator',
-      description:
-          'Steps through a multi-stage flow. Select a step to navigate.',
+      description: 'Fixed Carbon step spacing; narrow horizontal flows scroll. Select an enabled step with pointer, Enter or Space.',
       previewAlignment: Alignment.topLeft,
-      preview: SizedBox(
-        width: 560,
-        child: CarbonProgressIndicator(
-          currentIndex: _currentIndex,
-          vertical: _vertical,
-          interactive: _interactive,
-          onStepSelected: (int index) => setState(() => _currentIndex = index),
-          steps: const <CarbonProgressStep>[
-            CarbonProgressStep(label: 'Account'),
-            CarbonProgressStep(label: 'Profile'),
-            CarbonProgressStep(label: 'Confirm'),
-            CarbonProgressStep(label: 'Problem', invalid: true),
-            CarbonProgressStep(label: 'Locked', disabled: true),
-          ],
+      preview: MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(_scale)),
+        child: SizedBox(
+          width: _narrow ? 160 : 640,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CarbonProgressIndicator(
+                currentIndex: _currentIndex,
+                vertical: _vertical,
+                interactive: _interactive,
+                onStepSelected: (int index) =>
+                    setState(() => _currentIndex = index),
+                steps: const <CarbonProgressStep>[
+                  CarbonProgressStep(label: 'Account'),
+                  CarbonProgressStep(
+                    label: 'Profile',
+                    secondaryLabel: 'Optional',
+                  ),
+                  CarbonProgressStep(
+                    label: 'Confirm with a deliberately long name',
+                  ),
+                  CarbonProgressStep(label: 'Problem', invalid: true),
+                  CarbonProgressStep(label: 'Locked', disabled: true),
+                ],
+              ),
+              Text(
+                'Current step: ${_currentIndex + 1}',
+                style: CarbonTypeStyles.body01.copyWith(
+                  color: CarbonTheme.of(context).textPrimary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Narrow flow',
+          value: _narrow,
+          onChanged: (bool value) => setState(() => _narrow = value),
+        ),
+        choiceKnob<double>(
+          label: 'Text scale',
+          value: _scale,
+          options: const <double>[1, 1.3, 2],
+          labelOf: (double value) => '${value}×',
+          onChanged: (double value) => setState(() => _scale = value),
+        ),
         boolKnob(
           label: 'Vertical',
           value: _vertical,
