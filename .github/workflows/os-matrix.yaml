@@ -23,6 +23,10 @@ on:
         description: Run only the picker active-option native contract
         type: boolean
         default: false
+      responsive-shell-only:
+        description: Run only the responsive shell native contract
+        type: boolean
+        default: false
       notification-policy-only:
         description: Run only the notification native semantics contract
         type: boolean
@@ -37,7 +41,7 @@ permissions:
 
 jobs:
   picker-options:
-    if: ${{ inputs.picker-options-only || inputs.notification-policy-only }}
+    if: ${{ inputs.picker-options-only || inputs.notification-policy-only || inputs.responsive-shell-only }}
     name: Selected native contract — native web
     timeout-minutes: 10
     runs-on: ubuntu-latest
@@ -57,7 +61,7 @@ jobs:
       - name: Drive selected native semantics in release mode
         working-directory: example
         env:
-          NATIVE_TARGET: ${{ inputs.notification-policy-only && 'integration_test/notification_policy_test.dart' || 'integration_test/picker_option_semantics_test.dart' }}
+          NATIVE_TARGET: ${{ inputs.responsive-shell-only && 'integration_test/responsive_shell_test.dart' || inputs.notification-policy-only && 'integration_test/notification_policy_test.dart' || 'integration_test/picker_option_semantics_test.dart' }}
         run: >
           flutter drive --release
           --driver=test_driver/integration_test.dart
@@ -65,7 +69,7 @@ jobs:
           -d web-server
 
   desktop:
-    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only }}
+    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only && !inputs.responsive-shell-only }}
     name: Package tests — ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
@@ -90,7 +94,7 @@ jobs:
         run: flutter test
 
   web-smoke:
-    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only }}
+    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only && !inputs.responsive-shell-only }}
     name: Package tests — web (chrome)
     # The #271 "loading"-phase hang is fixed: it was the Plex font load in
     # `flutter_test_config.dart` — on the web test platform the
@@ -146,7 +150,7 @@ jobs:
           test/components/radio_button test/components/toggle
 
   gallery-web-integration:
-    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only }}
+    if: ${{ !inputs.picker-options-only && !inputs.notification-policy-only && !inputs.responsive-shell-only }}
     name: Gallery native web — ${{ matrix.group }}
     # All contracts ran sequentially in one job and exceeded 30 minutes.
     # Keep each group bounded and retain every debug/release invocation.
