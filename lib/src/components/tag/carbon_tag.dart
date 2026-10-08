@@ -283,6 +283,8 @@ class CarbonTag extends StatelessWidget {
 /// horizontal padding (12px for lg), 32–208px width, label-01 text with
 /// ellipsis truncation, optional 16px leading icon with a 4px gap (icon
 /// shifts the start padding to 4px; 8px for lg).
+/// Internal shared surface; use the exported Carbon tag widgets.
+/// This type is intentionally hidden from the public barrel.
 class TagSurface extends StatelessWidget {
   /// Creates the tag surface.
   const TagSurface({

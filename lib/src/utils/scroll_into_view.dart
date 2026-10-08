@@ -5,6 +5,8 @@
 
 import 'package:flutter/widgets.dart';
 
+/// Internal implementation helper, not exported from carbide.dart.
+///
 /// Scrolls [child] into view inside the enclosing [Scrollable] whenever
 /// [active] flips true — and on first build when already true, so a popup
 /// that opens with its highlight below the fold reveals it immediately.
@@ -14,13 +16,9 @@ import 'package:flutter/widgets.dart';
 /// keyboard-highlighted option of a native list box in view (#279). The
 /// jump is instant, like the browser behavior it mirrors. Without an
 /// enclosing [Scrollable] this is inert.
-class CarbonScrollIntoView extends StatefulWidget {
+class ScrollIntoView extends StatefulWidget {
   /// Creates a scroll-into-view region driven by [active].
-  const CarbonScrollIntoView({
-    required this.active,
-    required this.child,
-    super.key,
-  });
+  const ScrollIntoView({required this.active, required this.child, super.key});
 
   /// Whether the child must be kept visible (typically "is highlighted").
   final bool active;
@@ -29,10 +27,10 @@ class CarbonScrollIntoView extends StatefulWidget {
   final Widget child;
 
   @override
-  State<CarbonScrollIntoView> createState() => _CarbonScrollIntoViewState();
+  State<ScrollIntoView> createState() => _ScrollIntoViewState();
 }
 
-class _CarbonScrollIntoViewState extends State<CarbonScrollIntoView> {
+class _ScrollIntoViewState extends State<ScrollIntoView> {
   @override
   void initState() {
     super.initState();
@@ -42,7 +40,7 @@ class _CarbonScrollIntoViewState extends State<CarbonScrollIntoView> {
   }
 
   @override
-  void didUpdateWidget(CarbonScrollIntoView oldWidget) {
+  void didUpdateWidget(ScrollIntoView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.active && !oldWidget.active) {
       _reveal();

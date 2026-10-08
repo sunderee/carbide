@@ -1600,12 +1600,6 @@
       "base": "StatelessWidget",
       "visual": true
     },
-    "TagSurface": {
-      "source": "lib/src/components/tag/carbon_tag.dart",
-      "kind": "class",
-      "base": "StatelessWidget",
-      "visual": true
-    },
     "carbonDuration": {
       "source": "lib/src/foundations/motion.dart",
       "kind": "function",

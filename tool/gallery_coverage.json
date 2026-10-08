@@ -1862,13 +1862,6 @@
         "list"
       ]
     },
-    "TagSurface": {
-      "mode": "composition",
-      "routes": [
-        "tag"
-      ],
-      "reason": "Exported tag surface implementation; gallery demonstrates the supported tag variants. Stability classification is tracked in #354."
-    },
     "carbonDuration": {
       "mode": "nonvisual",
       "routes": [

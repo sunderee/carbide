@@ -17,6 +17,10 @@ import '../../utils/overlay_focus_repair.dart';
 /// [position] is one-based in the visible options, including disabled rows.
 /// [count] is the number of visible options. Supply a translated complete
 /// phrase to a picker's `activeOptionFormatter` to localize its announcement.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 typedef CarbonListBoxActiveOptionFormatter = String Function(
   String label,
   int position,
@@ -27,6 +31,10 @@ typedef CarbonListBoxActiveOptionFormatter = String Function(
 ///
 /// For example, `carbonListBoxActiveOptionLabel('Email', 2, 3)` returns
 /// `Active option: Email, 2 of 3`. This describes navigation, not commitment.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 String carbonListBoxActiveOptionLabel(String label, int position, int count) =>
     'Active option: $label, $position of $count';
 

@@ -16,6 +16,10 @@ import 'package:flutter/foundation.dart' show immutable, listEquals;
 /// Instances are generated from the Carbon sources into `CarbonIcons`;
 /// constructing custom instances is supported for icons outside Carbon.
 @immutable
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonIconData {
   /// Creates an icon definition from its artwork variants.
   ///
@@ -75,6 +79,10 @@ class CarbonIconData {
 
 /// One size variant of an icon's artwork.
 @immutable
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonIconArtwork {
   /// Creates an artwork variant.
   const CarbonIconArtwork({
@@ -120,6 +128,10 @@ class CarbonIconArtwork {
 /// One filled shape of an icon: SVG path data plus its fill rule and an
 /// optional 2D affine transform.
 @immutable
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonIconShape {
   /// Creates a shape from SVG path data.
   const CarbonIconShape({required this.d, this.evenOdd = false, this.matrix});

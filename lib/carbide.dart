@@ -16,9 +16,10 @@
 /// is implemented from Flutter's base widgets so the result matches Carbon's
 /// specification rather than Material's.
 ///
-/// Public API is exported from this barrel as each layer lands. Foundations
-/// (design tokens) are tracked in milestone M1, theming in M2, and components
-/// from M4 onward.
+/// Import this barrel for the supported public API. All exports follow the
+/// [stability policy](https://github.com/sunderee/carbide/blob/master/docs/api-stability.md).
+/// Advanced building blocks are explicitly marked in their documentation;
+/// direct imports from src are internal and carry no compatibility promise.
 library;
 
 // Foundations — design tokens.
@@ -93,7 +94,7 @@ export 'src/components/skeleton/carbon_skeleton_text.dart';
 export 'src/components/stack/carbon_stack.dart';
 export 'src/components/structured_list/carbon_structured_list.dart';
 export 'src/components/tag/carbon_interactive_tags.dart';
-export 'src/components/tag/carbon_tag.dart';
+export 'src/components/tag/carbon_tag.dart' hide TagSurface;
 export 'src/components/tabs/carbon_tabs.dart';
 export 'src/components/text/carbon_text.dart';
 export 'src/components/text/carbon_fluid_text.dart';

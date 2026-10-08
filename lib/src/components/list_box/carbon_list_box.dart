@@ -38,6 +38,10 @@ import '../form/carbon_form.dart' show CarbonField, CarbonFieldSize;
 /// (clear button or count), and the rotating chevron. State — open/closed,
 /// validation, focus — is supplied by the consumer; this widget only paints the
 /// chrome (background, hover, bottom border, focus ring) to `_list-box.scss`.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBox extends StatefulWidget {
   /// Creates a list-box field surface.
   const CarbonListBox({
@@ -256,6 +260,10 @@ class _CarbonListBoxState extends State<CarbonListBox> {
 }
 
 /// The chevron at the end of a [CarbonListBox] field, rotating 180° when open.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBoxMenuIcon extends StatelessWidget {
   /// Creates the menu chevron.
   const CarbonListBoxMenuIcon({
@@ -300,6 +308,10 @@ class CarbonListBoxMenuIcon extends StatelessWidget {
 ///
 /// Consumers render this inside an `OverlayPortal` anchored to the field. It
 /// shows at most 5.5 rows (`max-block-size` per size) before scrolling.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBoxMenu extends StatelessWidget {
   /// Creates a list-box menu wrapping [children] option rows.
   const CarbonListBoxMenu({
@@ -393,6 +405,10 @@ class CarbonListBoxMenu extends StatelessWidget {
 /// text); [isActive] marks the currently selected value. A top divider
 /// separates rows, suppressed on the first row and around the highlighted row,
 /// matching `_list-box.scss`.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBoxMenuItem extends StatefulWidget {
   /// Creates a list-box option row.
   const CarbonListBoxMenuItem({
@@ -472,7 +488,7 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
         : const Color(0x00000000);
 
     // The keyboard-roved row keeps itself inside the 5.5-row fold (#279).
-    return CarbonScrollIntoView(
+    return ScrollIntoView(
       active: widget.isHighlighted,
       child: MouseRegion(
         cursor: widget.disabled
@@ -527,6 +543,10 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
 }
 
 /// The clear (X) control inside a [CarbonListBox] field.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBoxSelection extends StatelessWidget {
   /// Creates a clear control.
   const CarbonListBoxSelection({
@@ -568,6 +588,10 @@ class CarbonListBoxSelection extends StatelessWidget {
 
 /// The multi-select count badge (a pill showing how many items are selected
 /// with an inline clear control).
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonListBoxSelectionCount extends StatelessWidget {
   /// Creates a selection-count badge.
   const CarbonListBoxSelectionCount({

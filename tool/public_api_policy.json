@@ -1,0 +1,846 @@
+{
+  "schema": 1,
+  "exports": {
+    "AnimatedCarbonTheme": {
+      "stability": "stable"
+    },
+    "CarbonAILabel": {
+      "stability": "stable"
+    },
+    "CarbonAILabelSize": {
+      "stability": "stable"
+    },
+    "CarbonAISkeletonIcon": {
+      "stability": "stable"
+    },
+    "CarbonAISkeletonPlaceholder": {
+      "stability": "stable"
+    },
+    "CarbonAISkeletonText": {
+      "stability": "stable"
+    },
+    "CarbonAccordion": {
+      "stability": "stable"
+    },
+    "CarbonAccordionAlign": {
+      "stability": "stable"
+    },
+    "CarbonAccordionItem": {
+      "stability": "stable"
+    },
+    "CarbonAccordionSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonActionableNotification": {
+      "stability": "stable"
+    },
+    "CarbonAspectRatio": {
+      "stability": "stable"
+    },
+    "CarbonAspectRatioValue": {
+      "stability": "stable"
+    },
+    "CarbonBadgeIndicator": {
+      "stability": "stable"
+    },
+    "CarbonBreadcrumb": {
+      "stability": "stable"
+    },
+    "CarbonBreadcrumbItem": {
+      "stability": "stable"
+    },
+    "CarbonBreadcrumbSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonBreakpoint": {
+      "stability": "stable"
+    },
+    "CarbonButton": {
+      "stability": "stable"
+    },
+    "CarbonButtonKind": {
+      "stability": "stable"
+    },
+    "CarbonButtonSet": {
+      "stability": "stable"
+    },
+    "CarbonButtonSize": {
+      "stability": "stable"
+    },
+    "CarbonButtonSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonCalendar": {
+      "stability": "stable"
+    },
+    "CarbonCallout": {
+      "stability": "stable"
+    },
+    "CarbonChatButton": {
+      "stability": "stable"
+    },
+    "CarbonChatButtonSize": {
+      "stability": "stable"
+    },
+    "CarbonCheckbox": {
+      "stability": "stable"
+    },
+    "CarbonCheckboxGroup": {
+      "stability": "stable"
+    },
+    "CarbonCheckboxSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonClickableTile": {
+      "stability": "stable"
+    },
+    "CarbonCodeSnippet": {
+      "stability": "stable"
+    },
+    "CarbonCodeSnippetSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonCodeSnippetType": {
+      "stability": "stable"
+    },
+    "CarbonColors": {
+      "stability": "stable"
+    },
+    "CarbonColumn": {
+      "stability": "stable"
+    },
+    "CarbonComboBox": {
+      "stability": "stable"
+    },
+    "CarbonComboBoxItem": {
+      "stability": "stable"
+    },
+    "CarbonComboButton": {
+      "stability": "stable"
+    },
+    "CarbonContainedList": {
+      "stability": "stable"
+    },
+    "CarbonContainedListItem": {
+      "stability": "stable"
+    },
+    "CarbonContainedListKind": {
+      "stability": "stable"
+    },
+    "CarbonContainedListSize": {
+      "stability": "stable"
+    },
+    "CarbonContainer": {
+      "stability": "stable"
+    },
+    "CarbonContentSwitcher": {
+      "stability": "stable"
+    },
+    "CarbonContextMenu": {
+      "stability": "stable"
+    },
+    "CarbonCopy": {
+      "stability": "stable"
+    },
+    "CarbonCopyButton": {
+      "stability": "stable"
+    },
+    "CarbonCopySize": {
+      "stability": "stable"
+    },
+    "CarbonCounterMode": {
+      "stability": "stable"
+    },
+    "CarbonDataTable": {
+      "stability": "stable"
+    },
+    "CarbonDataTableSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonDateFormat": {
+      "stability": "stable"
+    },
+    "CarbonDateFormatter": {
+      "stability": "stable"
+    },
+    "CarbonDateParser": {
+      "stability": "stable"
+    },
+    "CarbonDatePicker": {
+      "stability": "stable"
+    },
+    "CarbonDatePickerLocalizations": {
+      "stability": "stable"
+    },
+    "CarbonDatePickerSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonDateRange": {
+      "stability": "stable"
+    },
+    "CarbonDateRangePicker": {
+      "stability": "stable"
+    },
+    "CarbonDialog": {
+      "stability": "stable"
+    },
+    "CarbonDialogBody": {
+      "stability": "stable"
+    },
+    "CarbonDialogCloseButton": {
+      "stability": "stable"
+    },
+    "CarbonDialogControls": {
+      "stability": "stable"
+    },
+    "CarbonDialogFooter": {
+      "stability": "stable"
+    },
+    "CarbonDialogHeader": {
+      "stability": "stable"
+    },
+    "CarbonDialogSubtitle": {
+      "stability": "stable"
+    },
+    "CarbonDialogTitle": {
+      "stability": "stable"
+    },
+    "CarbonDismissibleTag": {
+      "stability": "stable"
+    },
+    "CarbonDropdown": {
+      "stability": "stable"
+    },
+    "CarbonDropdownDirection": {
+      "stability": "stable"
+    },
+    "CarbonDropdownItem": {
+      "stability": "stable"
+    },
+    "CarbonDropdownSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonDuration": {
+      "stability": "stable"
+    },
+    "CarbonEasing": {
+      "stability": "stable"
+    },
+    "CarbonEasingMode": {
+      "stability": "stable"
+    },
+    "CarbonEasingStyle": {
+      "stability": "stable"
+    },
+    "CarbonExpandableSearch": {
+      "stability": "stable"
+    },
+    "CarbonExpandableTile": {
+      "stability": "stable"
+    },
+    "CarbonField": {
+      "stability": "stable"
+    },
+    "CarbonFieldRequirement": {
+      "stability": "stable"
+    },
+    "CarbonFieldSize": {
+      "stability": "stable"
+    },
+    "CarbonFieldStatus": {
+      "stability": "stable"
+    },
+    "CarbonFileStatus": {
+      "stability": "stable"
+    },
+    "CarbonFileUploader": {
+      "stability": "stable"
+    },
+    "CarbonFileUploaderButton": {
+      "stability": "stable"
+    },
+    "CarbonFileUploaderDropContainer": {
+      "stability": "stable"
+    },
+    "CarbonFileUploaderItem": {
+      "stability": "stable"
+    },
+    "CarbonFileUploaderSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonFluidForm": {
+      "stability": "stable"
+    },
+    "CarbonFluidSpacing": {
+      "stability": "stable"
+    },
+    "CarbonFluidText": {
+      "stability": "stable"
+    },
+    "CarbonFluidTextStyle": {
+      "stability": "stable"
+    },
+    "CarbonFluidTextWidthSource": {
+      "stability": "stable"
+    },
+    "CarbonFluidTypeStyles": {
+      "stability": "stable"
+    },
+    "CarbonFocusRing": {
+      "stability": "stable"
+    },
+    "CarbonFontFamily": {
+      "stability": "stable"
+    },
+    "CarbonFontWeight": {
+      "stability": "stable"
+    },
+    "CarbonFormGroup": {
+      "stability": "stable"
+    },
+    "CarbonFormItem": {
+      "stability": "stable"
+    },
+    "CarbonFormLabel": {
+      "stability": "stable"
+    },
+    "CarbonGrid": {
+      "stability": "stable"
+    },
+    "CarbonGridMode": {
+      "stability": "stable"
+    },
+    "CarbonHeader": {
+      "stability": "stable"
+    },
+    "CarbonHeaderGlobalAction": {
+      "stability": "stable"
+    },
+    "CarbonHeaderMenu": {
+      "stability": "stable"
+    },
+    "CarbonHeaderMenuButton": {
+      "stability": "stable"
+    },
+    "CarbonHeaderMenuItem": {
+      "stability": "stable"
+    },
+    "CarbonHeaderName": {
+      "stability": "stable"
+    },
+    "CarbonHeaderPanel": {
+      "stability": "stable"
+    },
+    "CarbonHeaderSideNavItems": {
+      "stability": "stable"
+    },
+    "CarbonHeading": {
+      "stability": "stable"
+    },
+    "CarbonHelperText": {
+      "stability": "stable"
+    },
+    "CarbonIcon": {
+      "stability": "stable"
+    },
+    "CarbonIconArtwork": {
+      "stability": "advanced"
+    },
+    "CarbonIconButton": {
+      "stability": "stable"
+    },
+    "CarbonIconData": {
+      "stability": "advanced"
+    },
+    "CarbonIconIndicator": {
+      "stability": "stable"
+    },
+    "CarbonIconIndicatorKind": {
+      "stability": "stable"
+    },
+    "CarbonIconPainter": {
+      "stability": "advanced"
+    },
+    "CarbonIconShape": {
+      "stability": "advanced"
+    },
+    "CarbonIconSize": {
+      "stability": "stable"
+    },
+    "CarbonIcons": {
+      "stability": "stable"
+    },
+    "CarbonInlineLoading": {
+      "stability": "stable"
+    },
+    "CarbonInlineLoadingStatus": {
+      "stability": "stable"
+    },
+    "CarbonInlineNotification": {
+      "stability": "stable"
+    },
+    "CarbonInteraction": {
+      "stability": "stable"
+    },
+    "CarbonInteractionBuilder": {
+      "stability": "stable"
+    },
+    "CarbonLayer": {
+      "stability": "stable"
+    },
+    "CarbonLayerTokens": {
+      "stability": "stable"
+    },
+    "CarbonLink": {
+      "stability": "stable"
+    },
+    "CarbonLinkSize": {
+      "stability": "stable"
+    },
+    "CarbonListBox": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxActiveOptionFormatter": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxMenu": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxMenuIcon": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxMenuItem": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxSelection": {
+      "stability": "advanced"
+    },
+    "CarbonListBoxSelectionCount": {
+      "stability": "advanced"
+    },
+    "CarbonListItem": {
+      "stability": "stable"
+    },
+    "CarbonLoading": {
+      "stability": "stable"
+    },
+    "CarbonLoadingPainter": {
+      "stability": "stable"
+    },
+    "CarbonMenu": {
+      "stability": "stable"
+    },
+    "CarbonMenuAlignment": {
+      "stability": "stable"
+    },
+    "CarbonMenuButton": {
+      "stability": "stable"
+    },
+    "CarbonMenuItem": {
+      "stability": "stable"
+    },
+    "CarbonMenuItemDivider": {
+      "stability": "stable"
+    },
+    "CarbonMenuItemGroup": {
+      "stability": "stable"
+    },
+    "CarbonMenuItemKind": {
+      "stability": "stable"
+    },
+    "CarbonMenuItemRadioGroup": {
+      "stability": "stable"
+    },
+    "CarbonMenuItemSelectable": {
+      "stability": "stable"
+    },
+    "CarbonMenuSize": {
+      "stability": "stable"
+    },
+    "CarbonModal": {
+      "stability": "stable"
+    },
+    "CarbonModalAction": {
+      "stability": "stable"
+    },
+    "CarbonModalSize": {
+      "stability": "stable"
+    },
+    "CarbonMultiSelect": {
+      "stability": "stable"
+    },
+    "CarbonMultiSelectItem": {
+      "stability": "stable"
+    },
+    "CarbonNotificationKind": {
+      "stability": "stable"
+    },
+    "CarbonNumberInput": {
+      "stability": "stable"
+    },
+    "CarbonNumberInputSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonOperationalTag": {
+      "stability": "stable"
+    },
+    "CarbonOrderedList": {
+      "stability": "stable"
+    },
+    "CarbonOverflowMenu": {
+      "stability": "stable"
+    },
+    "CarbonOverlaySide": {
+      "stability": "stable"
+    },
+    "CarbonPageHeader": {
+      "stability": "stable"
+    },
+    "CarbonPageHeaderAction": {
+      "stability": "stable"
+    },
+    "CarbonPagination": {
+      "stability": "stable"
+    },
+    "CarbonPaginationLocalizations": {
+      "stability": "stable"
+    },
+    "CarbonPaginationNav": {
+      "stability": "stable"
+    },
+    "CarbonPaginationNavSize": {
+      "stability": "stable"
+    },
+    "CarbonPaginationNumberFormatter": {
+      "stability": "stable"
+    },
+    "CarbonPaginationRangeFormatter": {
+      "stability": "stable"
+    },
+    "CarbonPaginationSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonPasswordInput": {
+      "stability": "stable"
+    },
+    "CarbonPictogram": {
+      "stability": "stable"
+    },
+    "CarbonPictograms": {
+      "stability": "stable"
+    },
+    "CarbonPopover": {
+      "stability": "stable"
+    },
+    "CarbonPopoverAlignment": {
+      "stability": "stable"
+    },
+    "CarbonProgressBar": {
+      "stability": "stable"
+    },
+    "CarbonProgressBarSize": {
+      "stability": "stable"
+    },
+    "CarbonProgressBarStatus": {
+      "stability": "stable"
+    },
+    "CarbonProgressBarType": {
+      "stability": "stable"
+    },
+    "CarbonProgressIndicator": {
+      "stability": "stable"
+    },
+    "CarbonProgressIndicatorSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonProgressStep": {
+      "stability": "stable"
+    },
+    "CarbonRadioButton": {
+      "stability": "stable"
+    },
+    "CarbonRadioButtonGroup": {
+      "stability": "stable"
+    },
+    "CarbonRadioButtonSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonRadioLabelPosition": {
+      "stability": "stable"
+    },
+    "CarbonRadioTile": {
+      "stability": "stable"
+    },
+    "CarbonSearch": {
+      "stability": "stable"
+    },
+    "CarbonSearchSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonSection": {
+      "stability": "stable"
+    },
+    "CarbonSelect": {
+      "stability": "stable"
+    },
+    "CarbonSelectEntry": {
+      "stability": "stable"
+    },
+    "CarbonSelectItem": {
+      "stability": "stable"
+    },
+    "CarbonSelectItemGroup": {
+      "stability": "stable"
+    },
+    "CarbonSelectSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonSelectableTag": {
+      "stability": "stable"
+    },
+    "CarbonSelectableTile": {
+      "stability": "stable"
+    },
+    "CarbonShapeIndicator": {
+      "stability": "stable"
+    },
+    "CarbonShapeIndicatorKind": {
+      "stability": "stable"
+    },
+    "CarbonShellContent": {
+      "stability": "stable"
+    },
+    "CarbonSideNav": {
+      "stability": "stable"
+    },
+    "CarbonSideNavDivider": {
+      "stability": "stable"
+    },
+    "CarbonSideNavLink": {
+      "stability": "stable"
+    },
+    "CarbonSideNavMenu": {
+      "stability": "stable"
+    },
+    "CarbonSideNavMenuItem": {
+      "stability": "stable"
+    },
+    "CarbonSize": {
+      "stability": "stable"
+    },
+    "CarbonSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonSkeletonIcon": {
+      "stability": "stable"
+    },
+    "CarbonSkeletonPhase": {
+      "stability": "stable"
+    },
+    "CarbonSkeletonPlaceholder": {
+      "stability": "stable"
+    },
+    "CarbonSkeletonText": {
+      "stability": "stable"
+    },
+    "CarbonSkipToContent": {
+      "stability": "stable"
+    },
+    "CarbonSlider": {
+      "stability": "stable"
+    },
+    "CarbonSliderSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonSortDirection": {
+      "stability": "stable"
+    },
+    "CarbonSpacing": {
+      "stability": "stable"
+    },
+    "CarbonStack": {
+      "stability": "stable"
+    },
+    "CarbonStructuredList": {
+      "stability": "stable"
+    },
+    "CarbonStructuredListRow": {
+      "stability": "stable"
+    },
+    "CarbonStructuredListSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonSwitch": {
+      "stability": "stable"
+    },
+    "CarbonSwitcher": {
+      "stability": "stable"
+    },
+    "CarbonSwitcherDivider": {
+      "stability": "stable"
+    },
+    "CarbonSwitcherItem": {
+      "stability": "stable"
+    },
+    "CarbonTab": {
+      "stability": "stable"
+    },
+    "CarbonTabActivationMode": {
+      "stability": "stable"
+    },
+    "CarbonTabVariant": {
+      "stability": "stable"
+    },
+    "CarbonTableBatchAction": {
+      "stability": "stable"
+    },
+    "CarbonTableColumn": {
+      "stability": "stable"
+    },
+    "CarbonTableRow": {
+      "stability": "stable"
+    },
+    "CarbonTableSelection": {
+      "stability": "stable"
+    },
+    "CarbonTableSize": {
+      "stability": "stable"
+    },
+    "CarbonTableSortDirectionFormatter": {
+      "stability": "stable"
+    },
+    "CarbonTableToolbar": {
+      "stability": "stable"
+    },
+    "CarbonTabs": {
+      "stability": "stable"
+    },
+    "CarbonTabsSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonTabsVertical": {
+      "stability": "stable"
+    },
+    "CarbonTabsVerticalSize": {
+      "stability": "stable"
+    },
+    "CarbonTag": {
+      "stability": "stable"
+    },
+    "CarbonTagColors": {
+      "stability": "stable"
+    },
+    "CarbonTagSize": {
+      "stability": "stable"
+    },
+    "CarbonTagSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonTagType": {
+      "stability": "stable"
+    },
+    "CarbonText": {
+      "stability": "stable"
+    },
+    "CarbonTextArea": {
+      "stability": "stable"
+    },
+    "CarbonTextAreaSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonTextInput": {
+      "stability": "stable"
+    },
+    "CarbonTextInputSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonTheme": {
+      "stability": "stable"
+    },
+    "CarbonThemeData": {
+      "stability": "stable"
+    },
+    "CarbonTile": {
+      "stability": "stable"
+    },
+    "CarbonTileGroup": {
+      "stability": "stable"
+    },
+    "CarbonTileSpec": {
+      "stability": "stable"
+    },
+    "CarbonTimeFormat": {
+      "stability": "stable"
+    },
+    "CarbonTimeFormatter": {
+      "stability": "stable"
+    },
+    "CarbonTimeHourCycle": {
+      "stability": "stable"
+    },
+    "CarbonTimeParser": {
+      "stability": "stable"
+    },
+    "CarbonTimePeriod": {
+      "stability": "stable"
+    },
+    "CarbonTimePicker": {
+      "stability": "stable"
+    },
+    "CarbonTimePickerSelect": {
+      "stability": "stable"
+    },
+    "CarbonTimeValue": {
+      "stability": "stable"
+    },
+    "CarbonToastNotification": {
+      "stability": "stable"
+    },
+    "CarbonToggle": {
+      "stability": "stable"
+    },
+    "CarbonToggleSize": {
+      "stability": "stable"
+    },
+    "CarbonToggleSkeleton": {
+      "stability": "stable"
+    },
+    "CarbonToggletip": {
+      "stability": "stable"
+    },
+    "CarbonTooltip": {
+      "stability": "stable"
+    },
+    "CarbonTreeNode": {
+      "stability": "stable"
+    },
+    "CarbonTreeSize": {
+      "stability": "stable"
+    },
+    "CarbonTreeView": {
+      "stability": "stable"
+    },
+    "CarbonTypeScale": {
+      "stability": "stable"
+    },
+    "CarbonTypeStyles": {
+      "stability": "stable"
+    },
+    "CarbonUnorderedList": {
+      "stability": "stable"
+    },
+    "carbonDuration": {
+      "stability": "stable"
+    },
+    "carbonListBoxActiveOptionLabel": {
+      "stability": "advanced"
+    },
+    "carbonTableSortDirectionLabel": {
+      "stability": "stable"
+    }
+  },
+  "internal": [
+    "TagSurface",
+    "ScrollIntoView"
+  ]
+}

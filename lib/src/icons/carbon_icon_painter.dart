@@ -26,6 +26,10 @@ import 'svg_path_parser.dart';
 /// The artwork is scaled uniformly to fit the paint size and centered, which
 /// is a no-op for the square sized artwork and letterboxes the few
 /// rectangular glyph assets.
+/// **Advanced API.** A supported low-level building block. Prefer the family
+/// widgets or generated artwork constants unless custom composition requires it.
+/// Changes follow the published compatibility policy; advanced does not mean
+/// breaking changes may be shipped silently in patch releases.
 class CarbonIconPainter extends CustomPainter {
   /// Creates a painter for [artwork] filled with [color].
   const CarbonIconPainter({required this.artwork, required this.color});

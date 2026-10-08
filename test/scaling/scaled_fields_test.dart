@@ -153,8 +153,7 @@ void main() {
             await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
             await tester.pumpAndSettle();
             final Finder active = find.byWidgetPredicate(
-              (Widget widget) =>
-                  widget is CarbonScrollIntoView && widget.active,
+              (Widget widget) => widget is ScrollIntoView && widget.active,
             );
             expect(active, findsOneWidget);
             final Rect row = tester.getRect(active);
