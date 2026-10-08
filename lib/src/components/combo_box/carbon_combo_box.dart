@@ -495,7 +495,9 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
             child: AnimatedContainer(
               duration: carbonDuration(context, CarbonDuration.fast01),
               curve: CarbonEasing.standardProductive,
-              height: _fluid ? 64 : widget.size.height,
+              constraints: BoxConstraints(
+                minHeight: _fluid ? 64 : widget.size.height,
+              ),
               decoration: BoxDecoration(
                 color: background,
                 gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
@@ -512,6 +514,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     // (the house centered-column fluid treatment).
                     child: _fluid
                         ? Column(
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[

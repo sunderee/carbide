@@ -64,7 +64,7 @@ class CarbonListBox extends StatefulWidget {
   /// The value or placeholder shown in the field.
   final Widget child;
 
-  /// The field height: sm/md/lg = 32/40/48.
+  /// The minimum field height: sm/md/lg = 32/40/48. Text scaling can grow it.
   final CarbonFieldSize size;
 
   /// Whether the menu is open (rotates the chevron and softens the border).
@@ -189,7 +189,9 @@ class _CarbonListBoxState extends State<CarbonListBox> {
           child: AnimatedContainer(
             duration: carbonDuration(context, CarbonDuration.fast01),
             curve: CarbonEasing.standardProductive,
-            height: widget.fluid ? 64 : widget.size.height,
+            constraints: BoxConstraints(
+              minHeight: widget.fluid ? 64 : widget.size.height,
+            ),
             decoration: BoxDecoration(
               color: background,
               gradient: ai ? CarbonField.aiFieldGradient(theme) : null,
@@ -214,6 +216,7 @@ class _CarbonListBoxState extends State<CarbonListBox> {
                     // treatment shared with Select and Text Input).
                     child: widget.fluid
                         ? Column(
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -439,8 +442,9 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
             child: ColoredBox(
               color: background,
               child: Container(
-                height: widget.fluid ? 64 : widget.size.height,
-                alignment: AlignmentDirectional.centerStart,
+                constraints: BoxConstraints(
+                  minHeight: widget.fluid ? 64 : widget.size.height,
+                ),
                 // The divider sits inside a spacing-05 inset
                 // (`margin: 0 16px`).
                 margin: const EdgeInsetsDirectional.symmetric(
@@ -449,13 +453,17 @@ class _CarbonListBoxMenuItemState extends State<CarbonListBoxMenuItem> {
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: dividerColor)),
                 ),
-                child: DefaultTextStyle.merge(
-                  style: CarbonTypeStyles.bodyCompact01.copyWith(
-                    color: textColor,
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  heightFactor: 1,
+                  child: DefaultTextStyle.merge(
+                    style: CarbonTypeStyles.bodyCompact01.copyWith(
+                      color: textColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    child: widget.child,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  child: widget.child,
                 ),
               ),
             ),
@@ -544,10 +552,10 @@ class CarbonListBoxSelectionCount extends StatelessWidget {
     // close icon overflow the padding box and stay vertically centered. A
     // Flutter `Container(height: 24, padding-block: 8)` instead *clamps* the
     // child to 8px and clips the count glyph to an illegible sliver. Reproduce
-    // the CSS result faithfully: fixed 24px height, horizontal-only padding,
+    // the CSS result faithfully: minimum 24px height, horizontal-only padding,
     // and a centered row that lets the content use the full height.
     return Container(
-      height: 24,
+      constraints: const BoxConstraints(minHeight: 24),
       padding: EdgeInsetsDirectional.only(start: 8, end: readOnly ? 8 : 2),
       decoration: BoxDecoration(
         color: background,

@@ -142,7 +142,15 @@ void main() {
       );
       for (final (CarbonMenuSize size, double height) in sizes) {
         expect(
-          _row(tester, 'Item ${size.name}').constraints?.maxHeight,
+          tester
+              .getSize(
+                find.byWidgetPredicate(
+                  (Widget widget) =>
+                      widget is CarbonMenuItem &&
+                      widget.label == 'Item ${size.name}',
+                ),
+              )
+              .height,
           height,
           reason: '$size',
         );

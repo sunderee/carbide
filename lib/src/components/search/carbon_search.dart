@@ -8,6 +8,8 @@
 //   styles/scss/components/fluid-search/_fluid-search.scss
 //   react/src/components/{Search,ExpandableSearch}
 
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
@@ -352,6 +354,29 @@ class _CarbonSearchField extends StatelessWidget {
       ],
     );
 
+    // Preserve the fluid label/row positions at 1x. Under scaling the row
+    // moves below the complete label and grows from its contents. A bottom-
+    // positioned row in a fixed 64px stack cannot provide that space.
+    final TextScaler scaler =
+        MediaQuery.maybeTextScalerOf(context) ?? TextScaler.noScaling;
+    const TextStyle labelStyle = CarbonTypeStyles.label01;
+    const TextStyle valueStyle = CarbonTypeStyles.bodyCompact01;
+    final double labelHeight =
+        scaler.scale(labelStyle.fontSize!) * labelStyle.height!;
+    final double valueHeight =
+        scaler.scale(valueStyle.fontSize!) * valueStyle.height!;
+    final double baseLabelHeight = labelStyle.fontSize! * labelStyle.height!;
+    final double baseValueHeight = valueStyle.fontSize! * valueStyle.height!;
+    final double rowHeight = math.max(h, valueHeight);
+    final double labelGap = math.max(
+      0,
+      64 - (h + baseValueHeight) / 2 - 13 - baseLabelHeight,
+    );
+    final double rowTop = math.max(
+      64 - h,
+      13 + labelHeight + labelGap - (rowHeight - valueHeight) / 2,
+    );
+
     Widget box = DecoratedBox(
       decoration: BoxDecoration(
         color: state.isReadOnly ? const Color(0x00000000) : layer.field,
@@ -369,16 +394,19 @@ class _CarbonSearchField extends StatelessWidget {
           // The fluid treatment puts the label inside a 64px box above the
           // search row (the magnifier stays leading — Carbon moves it trailing
           // in fluid; a deliberate simplification for a coherent widget).
-          ? SizedBox(
-              height: 64,
+          ? ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 64),
               child: Stack(
                 children: <Widget>[
                   PositionedDirectional(
                     top: 13,
                     start: CarbonField.paddingInline,
+                    end: CarbonField.paddingInline,
                     child: ExcludeSemantics(
                       child: Text(
                         labelText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: CarbonTypeStyles.label01.copyWith(
                           color: disabled
                               ? theme.textDisabled
@@ -387,16 +415,20 @@ class _CarbonSearchField extends StatelessWidget {
                       ),
                     ),
                   ),
-                  PositionedDirectional(
-                    bottom: 0,
-                    start: 0,
-                    end: 0,
-                    child: SizedBox(height: h, child: searchRow),
+                  Padding(
+                    padding: EdgeInsets.only(top: rowTop),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: h),
+                      child: searchRow,
+                    ),
                   ),
                 ],
               ),
             )
-          : SizedBox(height: h, child: searchRow),
+          : ConstrainedBox(
+              constraints: BoxConstraints(minHeight: h),
+              child: searchRow,
+            ),
     );
     box = CarbonFocusRing(visible: focusNode.hasFocus, child: box);
     // Keep the editable's semantics parent stable when the clear button fades

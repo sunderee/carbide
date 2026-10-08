@@ -126,6 +126,7 @@ jobs:
           flutter test --platform chrome
           --dart-define=CARBIDE_SKIP_GOLDENS=true
           test/theme test/utils test/foundations
+          test/scaling/scaled_fields_test.dart test/harness/legibility_test.dart
           test/lifecycle test/components/number_input test/components/text_area
           test/components/text_input
           test/components/time_picker

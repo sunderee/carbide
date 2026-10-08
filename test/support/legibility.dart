@@ -101,6 +101,11 @@ void expectNoClippedTextAtScale(
           )
           .first,
     );
+    expect(
+      paragraph.textScaler.scale(1),
+      closeTo(scale, 0.001),
+      reason: 'Text "$data" must retain the requested system text scale.',
+    );
     final TextPainter painter = TextPainter(
       text: paragraph.text,
       textDirection: paragraph.textDirection,
@@ -129,6 +134,11 @@ void expectNoClippedTextAtScale(
     if (editable.size == Size.zero) {
       continue;
     }
+    expect(
+      editable.textScaler.scale(1),
+      closeTo(scale, 0.001),
+      reason: 'EditableText must retain the requested system text scale.',
+    );
     expect(
       editable.size.height,
       greaterThanOrEqualTo(editable.preferredLineHeight - slack),

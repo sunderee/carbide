@@ -46,6 +46,7 @@ Map<String, WidgetBuilder> scaledFieldSpecimens({
     titleText: 'Cities',
     label: 'gypy',
     filterable: true,
+    fluid: fluid,
     size: size,
     selectedValues: const <int>{0, 1},
     items: <CarbonMultiSelectItem<int>>[

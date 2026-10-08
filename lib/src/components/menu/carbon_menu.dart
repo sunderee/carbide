@@ -136,7 +136,7 @@ class CarbonMenu extends StatefulWidget {
   /// The menu rows (items, groups, dividers).
   final List<Widget> children;
 
-  /// The row height.
+  /// The minimum row height; rows grow to accommodate scaled text.
   final CarbonMenuSize size;
 
   /// Whether to outline the surface with a 1px subtle border.
@@ -566,7 +566,7 @@ class _MenuItemRow extends StatelessWidget {
     return AnimatedContainer(
       duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.standardProductive,
-      height: size.height,
+      constraints: BoxConstraints(minHeight: size.height),
       decoration: BoxDecoration(color: background),
       padding: const EdgeInsets.symmetric(horizontal: CarbonSpacing.spacing05),
       child: Row(

@@ -21,6 +21,22 @@ Widget _host(Widget child) => Directionality(
 );
 
 void main() {
+  testWidgets('the guard rejects a scale clamp even when the line fits', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.noScaling),
+          child: SizedBox(height: 48, child: Text('gypy')),
+        ),
+      ),
+    );
+    expect(
+      () => expectNoClippedTextAtScale(tester, 2),
+      throwsA(isA<TestFailure>()),
+    );
+  });
   testWidgets('the guard rejects a clipped inherited line box', (tester) async {
     await tester.pumpWidget(
       _host(const SizedBox(height: 30, child: Text('gypy'))),

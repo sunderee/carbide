@@ -39,14 +39,21 @@ accessibility setting) and **2.0×** (the WCAG 1.4.4 requirement) and
 asserts:
 
 - the tree lays out without exceptions (overflow errors throw in tests);
-- no `Text` renders below one scaled line box
+- no `Text` or `EditableText` renders below one scaled line box, using resolved
+  inherited styles, real font metrics and the effective scaler
   (`expectNoClippedTextAtScale` in `test/support/legibility.dart`).
 
-Goldens stay at scale 1.0 (a scaled golden doubles maintenance for little
-signal beyond what the sweep asserts), with one exception: a single 1.3×
-text-input canary golden pins the grown-chrome rendering so a regression in
-the growth behavior itself is visible as pixels. `expectThemeGoldens`
-accepts a `mediaQuery` override for cases like it.
+Most goldens stay at scale 1.0. A 1.3× text-input canary and the compact field
+canvases in `test/scaling/scaled_fields_test.dart` pin the chrome that previously
+clipped: small fields at 2×, fluid label/value stacks at 1.3× and 2×, and open
+dropdown rows at 2×. Each field canvas covers four themes and both directions.
+`expectThemeGoldens` accepts a `mediaQuery` override for these cases.
+
+The field suite also opens dropdown, select, combo-box, multi-select and the
+time picker's period select at both scales. It checks complete editable and
+option line boxes, popup viewport bounds, Escape dismissal and unscaled icon
+artwork. The list-box fold remains bounded and scrollable as rows grow. Viewport
+edge collisions and placement after resize are tracked separately in #335.
 
 New components join the sweep by adding a specimen to
 `test/support/specimens.dart` — the sweep, the RTL crash guard, and the
