@@ -15,6 +15,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../utils/indexed_options.dart';
 import '../../utils/anchored_overlay.dart';
 import '../../utils/typeahead.dart';
 
@@ -92,7 +93,9 @@ class CarbonDropdown<T> extends StatefulWidget {
   /// Creates a dropdown.
   const CarbonDropdown({
     required this.titleText,
-    required this.items,
+    List<CarbonDropdownItem<T>>? items,
+    this.itemBuilder,
+    this.itemCount,
     super.key,
     this.selectedItem,
     this.onChanged,
@@ -116,8 +119,21 @@ class CarbonDropdown<T> extends StatefulWidget {
     this.condensed = false,
     this.focusNode,
     this.autofocus = false,
-  }) : direction = direction ?? CarbonDropdownDirection.bottom,
+  }) : items = items ?? const [],
+       direction = direction ?? CarbonDropdownDirection.bottom,
        _automaticDirection = direction == null,
+       assert(
+         itemBuilder == null || items == null,
+         'Use either items or itemBuilder.',
+       ),
+       assert(
+         (itemBuilder == null) == (itemCount == null),
+         'itemBuilder and itemCount must be supplied together.',
+       ),
+       assert(
+         itemCount == null || itemCount >= 0,
+         'itemCount must be non-negative.',
+       ),
        assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
   /// The field title shown above (or beside, when [inline]) the trigger.
@@ -125,6 +141,16 @@ class CarbonDropdown<T> extends StatefulWidget {
 
   /// The options.
   final List<CarbonDropdownItem<T>> items;
+
+  /// Reads an option's data by index for a lazy menu. This callback is also
+  /// used for offscreen keyboard search and value reconciliation; keep it pure
+  /// and lightweight, and return stable values (fresh model objects are fine).
+  /// Supply [itemCount] together with this callback and omit [items].
+  final CarbonDropdownItem<T> Function(int index)? itemBuilder;
+
+  /// The number of logical options read by [itemBuilder], including disabled
+  /// options.
+  final int? itemCount;
 
   /// The selected value.
   final T? selectedItem;
@@ -226,12 +252,19 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   late final OwnedFocusNode _focusOwner;
   FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
+  List<CarbonDropdownItem<T>> get _items => widget.itemBuilder == null
+      ? widget.items
+      : CarbonIndexedOptions<CarbonDropdownItem<T>>(
+          widget.itemCount!,
+          widget.itemBuilder!,
+        );
+
   double _triggerWidth = 0;
 
   bool get _enabled => _controlState.canActivate;
 
   CarbonDropdownItem<T>? get _selected {
-    for (final CarbonDropdownItem<T> item in widget.items) {
+    for (final CarbonDropdownItem<T> item in _items) {
       if (item.value == widget.selectedItem) return item;
     }
     return null;
@@ -280,11 +313,11 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   void _open({bool fromEnd = false, bool preferSelection = true}) {
     if (!mounted || !_controlState.canActivate) return;
     _highlighted = fromEnd
-        ? widget.items.lastIndexWhere((CarbonDropdownItem<T> i) => !i.disabled)
-        : widget.items.indexWhere((CarbonDropdownItem<T> i) => !i.disabled);
+        ? _items.lastIndexWhere((CarbonDropdownItem<T> i) => !i.disabled)
+        : _items.indexWhere((CarbonDropdownItem<T> i) => !i.disabled);
     final CarbonDropdownItem<T>? selected = _selected;
     if (preferSelection && selected != null && !selected.disabled) {
-      _highlighted = widget.items.indexOf(selected);
+      _highlighted = _items.indexWhere((item) => item.value == selected.value);
     }
     _overlay.show();
     setState(() {});
@@ -307,7 +340,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   bool _moveHighlight(int delta) {
-    final List<CarbonDropdownItem<T>> items = widget.items;
+    final List<CarbonDropdownItem<T>> items = _items;
     int next = _highlighted;
     if (next < 0 || next >= items.length) next = delta < 0 ? 0 : -1;
     for (int i = 0; i < items.length; i++) {
@@ -355,9 +388,9 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       case LogicalKeyboardKey.enter:
       case LogicalKeyboardKey.space:
         if (_highlighted >= 0 &&
-            _highlighted < widget.items.length &&
-            !widget.items[_highlighted].disabled) {
-          _select(widget.items[_highlighted]);
+            _highlighted < _items.length &&
+            !_items[_highlighted].disabled) {
+          _select(_items[_highlighted]);
           return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
@@ -366,10 +399,10 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     if (character != null && character.trim().isNotEmpty) {
       final String ch = carbonTypeaheadKey(character);
       final int start = _highlighted + 1;
-      for (int i = 0; i < widget.items.length; i++) {
-        final int idx = (start + i) % widget.items.length;
-        if (!widget.items[idx].disabled &&
-            carbonTypeaheadKey(widget.items[idx].label).startsWith(ch)) {
+      for (int i = 0; i < _items.length; i++) {
+        final int idx = (start + i) % _items.length;
+        if (!_items[idx].disabled &&
+            carbonTypeaheadKey(_items[idx].label).startsWith(ch)) {
           if (idx == _highlighted) return KeyEventResult.ignored;
           setState(() => _highlighted = idx);
           return KeyEventResult.handled;
@@ -384,9 +417,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     expanded: _controlState.canActivate && _overlay.isShowing,
     activeIndex: _highlighted,
     focusNode: _focus,
-    optionLabels: <String?>[
-      for (final item in widget.items) item.disabled ? null : item.label,
-    ],
+    optionLabels: widget.itemBuilder != null
+        ? CarbonIndexedOptions<String?>(_items.length, (int index) {
+            final item = _items[index];
+            return item.disabled ? null : item.label;
+          })
+        : <String?>[
+            for (final item in _items) item.disabled ? null : item.label,
+          ],
     formatActiveOption: widget.activeOptionFormatter,
     builder: _build,
   );
@@ -512,10 +550,12 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
 
   Widget _buildMenu(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    final List<Widget> rows = <Widget>[
-      for (int i = 0; i < widget.items.length; i++)
-        _menuRow(widget.items[i], i, theme),
-    ];
+    final List<Widget> rows = widget.itemBuilder != null
+        ? const <Widget>[]
+        : <Widget>[
+            for (int i = 0; i < _items.length; i++)
+              _menuRow(_items[i], i, theme),
+          ];
 
     final bool below = widget.direction == CarbonDropdownDirection.bottom;
     return CarbonAnchoredOverlay(
@@ -529,11 +569,20 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           // Non-focusable so the trigger keeps keyboard focus (and its key
           // handler) while the menu is open; rows stay tappable.
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(
-              size: widget.size,
-              fluidRows: _fluid && !widget.condensed,
-              children: rows,
-            ),
+            child: widget.itemBuilder != null
+                ? CarbonListBoxMenu.builder(
+                    itemCount: _items.length,
+                    itemBuilder: (_, index) =>
+                        _menuRow(_items[index], index, theme),
+                    activeIndex: _highlighted,
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                  )
+                : CarbonListBoxMenu(
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                    children: rows,
+                  ),
           ),
         ),
       ),

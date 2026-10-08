@@ -6,9 +6,9 @@
 // Long-list popup scrolling (#232): the list-box family caps its popup at
 // 5.5 rows (`_list-box.scss` $list-box-menu-max-height) behind a
 // SingleChildScrollView, so these lock the cap, pointer-wheel scrolling,
-// and the (documented, eager) build behavior at 1,000 items. Keyboard
-// scroll-into-view does not exist yet — those locks are spec-shaped and
-// skip-marked. CarbonMenu renders uncapped (upstream menus don't cap
+// and the eager API's build behavior at 1,000 items. Keyboard reveal and
+// the additive lazy builder mode have separate regressions. Standalone
+// CarbonMenu renders uncapped (upstream menus don't cap
 // either); the tree view scrolls in its host like any block content.
 
 import 'package:carbide/carbide.dart';
@@ -171,8 +171,9 @@ void main() {
       _expectRowWithinFold(tester, 'Option 50');
     });
 
-    testWidgets('builds all 1,000 options eagerly (documented absence of '
-        'virtualization)', (WidgetTester tester) async {
+    testWidgets('the eager API still builds all 1,000 options', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           CarbonDropdown<int>(
@@ -185,9 +186,8 @@ void main() {
       await tester.tap(find.byType(CarbonListBox));
       await tester.pumpAndSettle();
       // The popup is a SingleChildScrollView over a Column: every row
-      // widget exists after open. This is the current, documented
-      // behavior — a laziness regression OR an improvement flips this
-      // count and must update this lock (and ideally virtualize).
+      // widget exists after open. The additive builder API has its own
+      // bounded-window tests; this lock preserves the eager rendering mode.
       expect(find.textContaining('Option '), findsNWidgets(1000));
     });
   });

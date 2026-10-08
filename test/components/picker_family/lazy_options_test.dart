@@ -10,6 +10,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/overlay_entries.dart';
+import '../../support/legibility.dart';
+import '../../support/golden.dart';
 
 enum _Kind { dropdown, select, combo, multi, filteredMulti }
 
@@ -28,6 +30,7 @@ Widget _picker(
     titleText: 'City',
     focusNode: focus,
     fluid: fluid,
+    size: CarbonFieldSize.sm,
     selectedItem: selected,
     itemCount: count,
     itemBuilder: (int index) => CarbonDropdownItem<int>(
@@ -41,6 +44,7 @@ Widget _picker(
     labelText: 'City',
     focusNode: focus,
     fluid: fluid,
+    size: CarbonFieldSize.sm,
     value: selected,
     itemCount: count,
     itemBuilder: (int index) => CarbonSelectItem<int>(
@@ -54,6 +58,7 @@ Widget _picker(
     titleText: 'City',
     focusNode: focus,
     fluid: fluid,
+    size: CarbonFieldSize.sm,
     selectedItem: selected,
     itemCount: count,
     itemBuilder: (int index) => CarbonComboBoxItem<int>(
@@ -69,7 +74,8 @@ Widget _picker(
     focusNode: focus,
     filterable: kind == _Kind.filteredMulti,
     fluid: fluid,
-    selectedValues: <int>{if (selected != null) selected},
+    size: CarbonFieldSize.sm,
+    selectedValues: <int>{?selected},
     itemCount: count,
     itemBuilder: (int index) => CarbonMultiSelectItem<int>(
       value: index,
@@ -131,84 +137,97 @@ void main() {
   for (final _Kind kind in _Kind.values) {
     for (final TextDirection direction in TextDirection.values) {
       for (final double scale in <double>[1.3, 2]) {
-        testWidgets(
-          '$kind mounts a bounded 1000-option window, $direction/$scale',
-          (tester) async {
-            final FocusNode focus = FocusNode();
-            addTearDown(focus.dispose);
-            addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
-            int? chosen;
-            await tester.pumpWidget(
-              _host(
-                _picker(
-                  kind,
-                  focus: focus,
-                  fluid: true,
-                  onChanged: (v) => chosen = v,
+        for (final bool fluid in <bool>[false, true]) {
+          testWidgets(
+            '$kind mounts a bounded 1000-option window, $direction/$scale/fluid=$fluid',
+            (tester) async {
+              final FocusNode focus = FocusNode();
+              addTearDown(focus.dispose);
+              addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+              int? chosen;
+              await tester.pumpWidget(
+                _host(
+                  _picker(
+                    kind,
+                    focus: focus,
+                    fluid: fluid,
+                    onChanged: (v) => chosen = v,
+                  ),
+                  direction,
+                  scale,
                 ),
-                direction,
-                scale,
-              ),
-            );
-            await _open(tester, focus);
-            _boundedAndVisible(tester, 'Option 1');
-            expect(find.text('Option 997'), findsNothing);
-            // Wrap to an option that has never mounted, skipping disabled tails.
-            await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-            await tester.pumpAndSettle();
-            _boundedAndVisible(tester, 'Option 997');
-            await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-            await tester.pumpAndSettle();
-            expect(chosen, 997);
-            expect(focus.hasPrimaryFocus, isTrue);
-            await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-            await tester.pumpAndSettle();
-            expect(_options, findsNothing);
-            expect(tester.takeException(), isNull);
-          },
-        );
+              );
+              await _open(tester, focus);
+              _boundedAndVisible(tester, 'Option 1');
+              expectNoClippedTextAtScale(tester, scale);
+              expect(find.text('Option 997'), findsNothing);
+              // Wrap to an option that has never mounted, skipping disabled tails.
+              await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+              await tester.pumpAndSettle();
+              _boundedAndVisible(tester, 'Option 997');
+              expectNoClippedTextAtScale(tester, scale);
+              await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+              await tester.pumpAndSettle();
+              expect(chosen, 997);
+              expect(focus.hasPrimaryFocus, isTrue);
+              await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+              await tester.pumpAndSettle();
+              expect(_options, findsNothing);
+              expect(tester.takeException(), isNull);
+            },
+          );
+        }
       }
     }
     testWidgets('$kind searches metadata for a never-mounted option', (
       tester,
     ) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
-      addTearDown(semantics.dispose);
-      final FocusNode focus = FocusNode();
-      addTearDown(focus.dispose);
-      addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
-      await tester.pumpWidget(
-        _host(
-          _picker(kind, focus: focus, onChanged: (_) {}),
-          TextDirection.ltr,
-          1,
-        ),
-      );
-      await _open(tester, focus);
-      expect(find.text('Zebra 500'), findsNothing);
-      if (kind == _Kind.combo || kind == _Kind.filteredMulti) {
-        await tester.enterText(find.byType(EditableText), 'Zebra');
-      } else {
-        await tester.sendKeyEvent(LogicalKeyboardKey.keyZ, character: 'z');
-      }
-      await tester.pumpAndSettle();
-      _boundedAndVisible(tester, 'Zebra 500');
-      // Accessibility describes the logical data set without mounting it.
-      final String hint = tester.getSemantics(_active).getSemanticsData().hint;
-      expect(
-        hint,
-        contains(
-          kind == _Kind.combo || kind == _Kind.filteredMulti
-              ? '1 of 1'
-              : '501 of 1000',
-        ),
-      );
-      if (kind != _Kind.combo && kind != _Kind.filteredMulti) {
-        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      try {
+        final FocusNode focus = FocusNode();
+        addTearDown(focus.dispose);
+        addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+        await tester.pumpWidget(
+          _host(
+            _picker(kind, focus: focus, onChanged: (_) {}),
+            TextDirection.ltr,
+            1,
+          ),
+        );
+        await _open(tester, focus);
+        expect(find.text('Zebra 500'), findsNothing);
+        if (kind == _Kind.combo || kind == _Kind.filteredMulti) {
+          await tester.enterText(find.byType(EditableText), 'Zebra');
+        } else {
+          await tester.sendKeyEvent(LogicalKeyboardKey.keyZ, character: 'z');
+        }
         await tester.pumpAndSettle();
-        _boundedAndVisible(tester, 'Option 502');
+        _boundedAndVisible(tester, 'Zebra 500');
+        // Accessibility describes the logical data set without mounting it.
+        final String hint = tester.semantics
+            .simulatedAccessibilityTraversal()
+            .singleWhere((node) => node.getSemanticsData().label == 'Zebra 500')
+            .getSemanticsData()
+            .hint;
+        expect(
+          hint,
+          contains(
+            kind == _Kind.combo || kind == _Kind.filteredMulti
+                ? '1 of 1'
+                : '501 of 1000',
+          ),
+        );
+        if (kind != _Kind.combo && kind != _Kind.filteredMulti) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+          await tester.pumpAndSettle();
+          _boundedAndVisible(tester, 'Option 502');
+        }
+        expect(tester.takeException(), isNull);
+      } finally {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+        semantics.dispose();
       }
-      expect(tester.takeException(), isNull);
     });
     testWidgets('$kind handles an empty source and live shrinking', (
       tester,
@@ -271,6 +290,135 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pumpAndSettle();
       _boundedAndVisible(tester, 'Option 502');
+    });
+  }
+  test('builder APIs reject incomplete, conflicting and negative sources', () {
+    expect(
+      () => CarbonDropdown<int>(titleText: 'City', itemCount: 1),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonSelect<int>(labelText: 'City', itemCount: 1),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonComboBox<int>(titleText: 'City', itemCount: 1),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonMultiSelect<int>(
+        titleText: 'City',
+        label: 'Choose',
+        itemCount: 1,
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonDropdown<int>(
+        titleText: 'City',
+        itemCount: -1,
+        itemBuilder: (i) => CarbonDropdownItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonSelect<int>(
+        labelText: 'City',
+        itemCount: -1,
+        itemBuilder: (i) => CarbonSelectItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonComboBox<int>(
+        titleText: 'City',
+        itemCount: -1,
+        itemBuilder: (i) => CarbonComboBoxItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonMultiSelect<int>(
+        titleText: 'City',
+        label: 'Choose',
+        itemCount: -1,
+        itemBuilder: (i) => CarbonMultiSelectItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonDropdown<int>(
+        titleText: 'City',
+        items: const [],
+        itemCount: 1,
+        itemBuilder: (i) => CarbonDropdownItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonSelect<int>(
+        labelText: 'City',
+        items: const [],
+        itemCount: 1,
+        itemBuilder: (i) => CarbonSelectItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonComboBox<int>(
+        titleText: 'City',
+        items: const [],
+        itemCount: 1,
+        itemBuilder: (i) => CarbonComboBoxItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonMultiSelect<int>(
+        titleText: 'City',
+        label: 'Choose',
+        items: const [],
+        itemCount: 1,
+        itemBuilder: (i) => CarbonMultiSelectItem<int>(value: i, label: '$i'),
+      ),
+      throwsAssertionError,
+    );
+  });
+  for (final _Kind kind in _Kind.values) {
+    testWidgets('$kind lazy scaled popup goldens', (tester) async {
+      final FocusNode focus = FocusNode();
+      addTearDown(focus.dispose);
+      await expectThemeGoldens(
+        tester,
+        name: 'lazy_${kind.name}_scaled_window',
+        containsText: true,
+        size: const Size(320, 520),
+        mediaQuery: const MediaQueryData(textScaler: TextScaler.linear(2)),
+        directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
+        builder: (_) => Overlay(
+          initialEntries: <OverlayEntry>[
+            managedOverlayEntry(
+              builder: (_) => Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: 288,
+                    child: _picker(kind, focus: focus, onChanged: (_) {}),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        afterPump: (tester) async {
+          await _open(tester, focus);
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+          await tester.pumpAndSettle();
+          _boundedAndVisible(tester, 'Option 997');
+          expectNoClippedTextAtScale(tester, 2);
+        },
+      );
     });
   }
 }

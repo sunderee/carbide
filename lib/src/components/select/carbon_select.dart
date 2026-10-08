@@ -21,6 +21,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/indexed_options.dart';
 import '../../utils/anchored_overlay.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
@@ -31,6 +32,7 @@ import '../../utils/owned_listenable.dart';
 import '../../utils/scroll_into_view.dart';
 import '../form/carbon_form.dart';
 import '../list_box/list_box_semantics.dart';
+import '../list_box/lazy_option_menu.dart';
 
 /// An entry in a [CarbonSelect]: either an item or a group of items.
 sealed class CarbonSelectEntry<T> {
@@ -86,7 +88,9 @@ class CarbonSelect<T> extends StatefulWidget {
   const CarbonSelect({
     super.key,
     required this.labelText,
-    required this.items,
+    List<CarbonSelectEntry<T>>? items,
+    this.itemBuilder,
+    this.itemCount,
     this.value,
     this.onChanged,
     this.placeholder,
@@ -108,13 +112,36 @@ class CarbonSelect<T> extends StatefulWidget {
     this.aiRevert = false,
     this.focusNode,
     this.autofocus = false,
-  }) : assert(!(inline && fluid), 'inline and fluid are mutually exclusive');
+  }) : items = items ?? const [],
+       assert(
+         itemBuilder == null || items == null,
+         'Use either items or itemBuilder.',
+       ),
+       assert(
+         (itemBuilder == null) == (itemCount == null),
+         'itemBuilder and itemCount must be supplied together.',
+       ),
+       assert(
+         itemCount == null || itemCount >= 0,
+         'itemCount must be non-negative.',
+       ),
+       assert(!(inline && fluid), 'inline and fluid are mutually exclusive');
 
   /// The field label.
   final String labelText;
 
   /// The options (items and/or groups).
   final List<CarbonSelectEntry<T>> items;
+
+  /// Reads an option's data by index for a lazy menu. This callback is also
+  /// used for offscreen keyboard search and value reconciliation; keep it pure
+  /// and lightweight, and return stable values (fresh model objects are fine).
+  /// Supply [itemCount] together with this callback and omit [items].
+  final CarbonSelectItem<T> Function(int index)? itemBuilder;
+
+  /// The number of logical options read by [itemBuilder], including disabled
+  /// options. Select's builder mode supplies flat items; groups use [items].
+  final int? itemCount;
 
   /// The selected value.
   final T? value;
@@ -210,15 +237,27 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   late final OwnedFocusNode _focusOwner;
   FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
+  List<CarbonSelectEntry<T>> get _items => widget.itemBuilder == null
+      ? widget.items
+      : CarbonIndexedOptions<CarbonSelectItem<T>>(
+          widget.itemCount!,
+          widget.itemBuilder!,
+        );
+
   double _triggerWidth = 0;
 
-  List<CarbonSelectItem<T>> get _flatItems => <CarbonSelectItem<T>>[
-    for (final CarbonSelectEntry<T> entry in widget.items)
-      if (entry is CarbonSelectItem<T>)
-        entry
-      else if (entry is CarbonSelectItemGroup<T>)
-        ...entry.items,
-  ];
+  List<CarbonSelectItem<T>> get _flatItems => widget.itemBuilder != null
+      ? CarbonIndexedOptions<CarbonSelectItem<T>>(
+          widget.itemCount!,
+          widget.itemBuilder!,
+        )
+      : <CarbonSelectItem<T>>[
+          for (final CarbonSelectEntry<T> entry in _items)
+            if (entry is CarbonSelectItem<T>)
+              entry
+            else if (entry is CarbonSelectItemGroup<T>)
+              ...entry.items,
+        ];
 
   CarbonSelectItem<T>? get _selectedItem {
     for (final CarbonSelectItem<T> item in _flatItems) {
@@ -273,7 +312,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         : items.indexWhere((CarbonSelectItem<T> i) => !i.disabled);
     final CarbonSelectItem<T>? selected = _selectedItem;
     if (preferSelection && selected != null && !selected.disabled) {
-      _highlighted = items.indexOf(selected);
+      _highlighted = items.indexWhere((item) => item.value == selected.value);
     }
     _overlay.show();
     setState(() {});
@@ -398,9 +437,14 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     expanded: _controlState.canActivate && _overlay.isShowing,
     activeIndex: _highlighted,
     focusNode: _focus,
-    optionLabels: <String?>[
-      for (final item in _flatItems) item.disabled ? null : item.label,
-    ],
+    optionLabels: widget.itemBuilder != null
+        ? CarbonIndexedOptions<String?>(_flatItems.length, (int index) {
+            final item = _flatItems[index];
+            return item.disabled ? null : item.label;
+          })
+        : <String?>[
+            for (final item in _flatItems) item.disabled ? null : item.label,
+          ],
     formatActiveOption: widget.activeOptionFormatter,
     builder: _build,
   );
@@ -562,24 +606,26 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     final List<CarbonSelectItem<T>> flat = _flatItems;
 
     final List<Widget> rows = <Widget>[];
-    for (final CarbonSelectEntry<T> entry in widget.items) {
-      if (entry is CarbonSelectItemGroup<T>) {
-        rows.add(
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 4),
-            child: Text(
-              entry.label,
-              style: CarbonTypeStyles.label01.copyWith(
-                color: theme.textSecondary,
+    if (widget.itemBuilder == null) {
+      for (final CarbonSelectEntry<T> entry in _items) {
+        if (entry is CarbonSelectItemGroup<T>) {
+          rows.add(
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 4),
+              child: Text(
+                entry.label,
+                style: CarbonTypeStyles.label01.copyWith(
+                  color: theme.textSecondary,
+                ),
               ),
             ),
-          ),
-        );
-        for (final CarbonSelectItem<T> item in entry.items) {
-          rows.add(_menuRow(item, flat.indexOf(item), theme, layer));
+          );
+          for (final CarbonSelectItem<T> item in entry.items) {
+            rows.add(_menuRow(item, flat.indexOf(item), theme, layer));
+          }
+        } else if (entry is CarbonSelectItem<T>) {
+          rows.add(_menuRow(entry, flat.indexOf(entry), theme, layer));
         }
-      } else if (entry is CarbonSelectItem<T>) {
-        rows.add(_menuRow(entry, flat.indexOf(entry), theme, layer));
       }
     }
 
@@ -596,16 +642,26 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
           child: ExcludeFocus(
             child: ColoredBox(
               color: layer.field,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 240),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: rows,
-                  ),
-                ),
-              ),
+              child: widget.itemBuilder != null
+                  ? CarbonLazyOptionMenu(
+                      itemCount: flat.length,
+                      itemBuilder: (_, index) =>
+                          _menuRow(flat[index], index, theme, layer),
+                      activeIndex: _highlighted,
+                      minimumRowHeight: widget.size.height,
+                      maximumHeight: 240,
+                      verticalPadding: 0,
+                    )
+                  : ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 240),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: rows,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),

@@ -21,6 +21,8 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/indexed_options.dart';
+import '../../utils/typeahead.dart';
 import '../../utils/anchored_overlay.dart';
 import '../../utils/picker_overlay.dart';
 import '../../utils/control_semantics.dart';
@@ -68,7 +70,9 @@ class CarbonMultiSelect<T> extends StatefulWidget {
   const CarbonMultiSelect({
     required this.titleText,
     required this.label,
-    required this.items,
+    List<CarbonMultiSelectItem<T>>? items,
+    this.itemBuilder,
+    this.itemCount,
     super.key,
     this.selectedValues = const <Never>{},
     this.onChanged,
@@ -91,7 +95,20 @@ class CarbonMultiSelect<T> extends StatefulWidget {
     this.condensed = false,
     this.aiRevert = false,
     this.focusNode,
-  }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
+  }) : items = items ?? const [],
+       assert(
+         itemBuilder == null || items == null,
+         'Use either items or itemBuilder.',
+       ),
+       assert(
+         (itemBuilder == null) == (itemCount == null),
+         'itemBuilder and itemCount must be supplied together.',
+       ),
+       assert(
+         itemCount == null || itemCount >= 0,
+         'itemCount must be non-negative.',
+       ),
+       assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
   /// The field title shown above the trigger.
   final String titleText;
@@ -101,6 +118,16 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 
   /// The options.
   final List<CarbonMultiSelectItem<T>> items;
+
+  /// Reads an option's data by index for a lazy menu. This callback is also
+  /// used for offscreen keyboard search and value reconciliation; keep it pure
+  /// and lightweight, and return stable values (fresh model objects are fine).
+  /// Supply [itemCount] together with this callback and omit [items].
+  final CarbonMultiSelectItem<T> Function(int index)? itemBuilder;
+
+  /// The number of logical options read by [itemBuilder], including disabled
+  /// options.
+  final int? itemCount;
 
   /// The currently selected values.
   final Set<T> selectedValues;
@@ -202,7 +229,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   final TextEditingController _filter = TextEditingController();
   TextEditingValue _filterDraft = TextEditingValue.empty;
 
-  String get _selectedLabels => widget.items
+  String get _selectedLabels => _items
       .where(
         (CarbonMultiSelectItem<T> item) =>
             widget.selectedValues.contains(item.value),
@@ -212,15 +239,37 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   late final OwnedFocusNode _focusOwner;
   FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
+  List<CarbonMultiSelectItem<T>> get _items => widget.itemBuilder == null
+      ? widget.items
+      : CarbonIndexedOptions<CarbonMultiSelectItem<T>>(
+          widget.itemCount!,
+          widget.itemBuilder!,
+        );
+
   double _triggerWidth = 0;
   bool _hovered = false;
 
+  Object? _filteredWidget;
+  String? _filteredQuery;
+  List<CarbonMultiSelectItem<T>>? _filteredCache;
+
   List<CarbonMultiSelectItem<T>> get _filtered {
-    if (!widget.filterable) return widget.items;
+    if (!widget.filterable) return _items;
     final String q = _filter.text.trim().toLowerCase();
-    if (q.isEmpty) return widget.items;
+    if (q.isEmpty) return _items;
+    if (widget.itemBuilder != null) {
+      if (identical(_filteredWidget, widget) && _filteredQuery == q) {
+        return _filteredCache!;
+      }
+      _filteredWidget = widget;
+      _filteredQuery = q;
+      return _filteredCache = carbonFilteredOptions<CarbonMultiSelectItem<T>>(
+        _items,
+        (item) => item.label.toLowerCase().contains(q),
+      );
+    }
     return <CarbonMultiSelectItem<T>>[
-      for (final CarbonMultiSelectItem<T> item in widget.items)
+      for (final CarbonMultiSelectItem<T> item in _items)
         if (item.label.toLowerCase().contains(q)) item,
     ];
   }
@@ -392,6 +441,19 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         }
         return KeyEventResult.ignored;
     }
+    final String? character = event.character;
+    if (!widget.filterable && isCarbonTypeaheadCharacter(character)) {
+      final String query = carbonTypeaheadKey(character!);
+      for (int offset = 1; offset <= items.length; offset++) {
+        final int index = (_highlighted + offset) % items.length;
+        final item = items[index];
+        if (!item.disabled &&
+            carbonTypeaheadKey(item.label).startsWith(query)) {
+          setState(() => _highlighted = index);
+          return KeyEventResult.handled;
+        }
+      }
+    }
     return KeyEventResult.ignored;
   }
 
@@ -400,9 +462,14 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     expanded: _controlState.canActivate && _overlay.isShowing,
     activeIndex: _highlighted,
     focusNode: _focus,
-    optionLabels: <String?>[
-      for (final item in _filtered) item.disabled ? null : item.label,
-    ],
+    optionLabels: widget.itemBuilder != null
+        ? CarbonIndexedOptions<String?>(_filtered.length, (int index) {
+            final item = _filtered[index];
+            return item.disabled ? null : item.label;
+          })
+        : <String?>[
+            for (final item in _filtered) item.disabled ? null : item.label,
+          ],
     formatActiveOption: widget.activeOptionFormatter,
     builder: _build,
   );
@@ -666,9 +733,11 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
 
   Widget _buildMenu(BuildContext context) {
     final List<CarbonMultiSelectItem<T>> items = _filtered;
-    final List<Widget> rows = <Widget>[
-      for (int i = 0; i < items.length; i++) _menuRow(items[i], i),
-    ];
+    final List<Widget> rows = widget.itemBuilder != null
+        ? const <Widget>[]
+        : <Widget>[
+            for (int i = 0; i < items.length; i++) _menuRow(items[i], i),
+          ];
 
     return CarbonAnchoredOverlay(
       link: _link,
@@ -679,11 +748,20 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         child: TapRegion(
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(
-              size: widget.size,
-              fluidRows: _fluid && !widget.condensed,
-              children: rows,
-            ),
+            child: widget.itemBuilder != null
+                ? CarbonListBoxMenu.builder(
+                    itemCount: items.length,
+                    itemBuilder: (_, index) => _menuRow(items[index], index),
+                    activeIndex: _highlighted,
+                    rowVerticalInset: 6,
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                  )
+                : CarbonListBoxMenu(
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                    children: rows,
+                  ),
           ),
         ),
       ),

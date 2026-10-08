@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add itemBuilder/itemCount data sources to dropdown, select, combo box and
+  multi-select, with bounded lazy row mounting, computed keyboard reveal,
+  metadata-based search/disabled skipping and visible-option semantics.
+  Preserve eager rendering and reconcile fresh option models by value (#337).
+
 - Share viewport placement across pickers, popovers and anchored action menus:
   logical alignment, automatic flipping/clamping, bounded popup constraints,
   composition-time scroll/resize updates and side overrides. Preserve explicit
