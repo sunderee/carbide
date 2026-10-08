@@ -81,15 +81,37 @@ CarbonActionableNotification(
 
 Toasts anchor to the top trailing corner of the viewport and stack
 newest-first; keep at most a handful on screen and drop the oldest. Inline
-notifications span the content column they concern — full width of the
-form or card, immediately above it.
+notifications sit immediately above the content they concern. Their width
+is capped at 288 px below `md`, 608 px from `md`, 736 px from `lg`, and
+832 px from `max`. Toasts use 288 px, growing to 352 px from `max`.
+These shared Carbon breakpoints use viewport width (`MediaQuery.size`);
+without a viewport, the available width is used. Parent constraints always
+cap the result. Action buttons move below the message on small viewports
+and in narrow content columns. Their height grows with scaled or wrapped text.
 
 ## Accessibility
 
-Carbide notifications expose their kind and text to assistive technology.
-Toasts announce politely; error notifications assertively. Auto-dismissing
-toasts must never carry actions the user could miss — if it has a button,
-it persists.
+| Variant | Announcement | Focus policy |
+|---|---|---|
+| Inline | `status` (polite), or `alert` (assertive) for errors on web | Keeps current focus |
+| Toast | Same severity policy; includes the caption | Keeps current focus |
+| Actionable | Same severity policy; includes the optional action's label | Keeps focus; action and close controls participate in traversal |
+| Callout | Static page content, no live region | Optional action participates in traversal |
+
+Web notifications use the roles' [implicit live-region urgency](https://www.w3.org/TR/wai-aria-1.2/#alert)
+(`status` is [polite](https://www.w3.org/TR/wai-aria-1.2/#status)). They omit
+Flutter's additional live-region flag, whose web handler queues a separate
+polite announcement. Native notifications retain that flag, with urgency
+and timing controlled by the platform accessibility service: Flutter does
+not expose equivalent per-node native politeness. Its explicit announcement
+API also [supports assertiveness only on web](https://api.flutter.dev/flutter/semantics/SemanticsService/sendAnnouncement.html).
+
+Actionable notifications deliberately remain nonmodal: Retry or Undo can be
+offered without moving or trapping focus and interrupting the current task.
+This differs from Carbon React's default `alertdialog`. Use a modal dialog
+when the user must respond before work can continue. Callouts never announce
+updates automatically. Auto-dismissing toasts must never carry actions the
+user could miss; an actionable message persists.
 
 ## Related
 

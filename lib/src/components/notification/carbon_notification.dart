@@ -15,10 +15,11 @@
 // overlay on the top/end/bottom edges (the start edge is the status bar;
 // toasts have no overlay). The warning icons paint their inner exclamation
 // path `black-100` per the `path[opacity='0']` / `path:first-of-type` rules.
-// The md+ layout is ported: the <md flex-wrap layout and the 352px
-// max-breakpoint toast width are not. Inline/actionable/callout max width
-// steps 608/736/832 with the available width; toasts are a fixed 288px.
+// Viewport breakpoints cap bars at 288/608/736/832px and toasts at 288/352px.
+// Narrow actions wrap below the message. Parent constraints still win.
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundations/colors.dart';
@@ -29,7 +30,28 @@ import '../../icons/carbon_icon_data.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/interaction.dart';
+
+// Flutter's web liveRegion handler queues a separate polite announcement.
+// The ARIA alert/status roles already provide assertive/polite live regions;
+// use their implicit policy on web to avoid that duplicate polite queue.
+SemanticsRole _announcementRole(CarbonNotificationKind kind) => !kIsWeb
+    ? SemanticsRole.none
+    : kind == CarbonNotificationKind.error
+    ? SemanticsRole.alert
+    : SemanticsRole.status;
+
+String _announcementLabel(Iterable<String?> parts) => parts
+    .whereType<String>()
+    .where((String part) => part.trim().isNotEmpty)
+    .join('. ');
+
+double _breakpointWidth(BuildContext context, double available) {
+  final double viewport = MediaQuery.maybeSizeOf(context)?.width ?? 0;
+  return viewport > 0 ? viewport : available;
+}
 
 /// The status of a notification.
 enum CarbonNotificationKind {
@@ -159,6 +181,10 @@ class _KindStyle {
 }
 
 /// An inline notification, shown within page content.
+///
+/// Announces without moving focus: web errors use the alert role, other kinds
+/// the status role. These roles supply assertive/polite urgency; native live
+/// region timing is controlled by the platform accessibility service.
 class CarbonInlineNotification extends StatelessWidget {
   /// Creates an inline notification.
   const CarbonInlineNotification({
@@ -210,7 +236,8 @@ class CarbonInlineNotification extends StatelessWidget {
 }
 
 /// A floating toast notification with stacked title/subtitle and optional
-/// [caption].
+/// [caption], included in its announcement. Uses the same announcement and
+/// focus policy as [CarbonInlineNotification].
 class CarbonToastNotification extends StatelessWidget {
   /// Creates a toast notification.
   const CarbonToastNotification({
@@ -304,61 +331,65 @@ class CarbonToastNotification extends StatelessWidget {
 
     return Semantics(
       container: true,
-      liveRegion: true,
+      role: _announcementRole(kind),
+      liveRegion: !kIsWeb,
       explicitChildNodes: true,
-      label: '$title. ${subtitle ?? ''}'.trim(),
-      // A toast is a fixed 288px regardless of the parent's width (Align
-      // loosens a tight parent constraint; the factors shrink-wrap it in
-      // loose ones).
+      label: _announcementLabel(<String?>[title, subtitle, caption]),
       child: Align(
         alignment: AlignmentDirectional.topStart,
         widthFactor: 1,
         heightFactor: 1,
-        child: SizedBox(
-          width: 288,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: lowContrast ? style.tint : theme.backgroundInverse,
-              border: BorderDirectional(
-                start: BorderSide(color: style.accent, width: 3),
-              ),
-              // box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2).
-              boxShadow: const <BoxShadow>[
-                BoxShadow(
-                  color: Color(0x33000000),
-                  offset: Offset(0, 2),
-                  blurRadius: 6,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) => SizedBox(
+            width:
+                _breakpointWidth(context, constraints.maxWidth) >=
+                    CarbonBreakpoint.max.width
+                ? 352
+                : 288,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: lowContrast ? style.tint : theme.backgroundInverse,
+                border: BorderDirectional(
+                  start: BorderSide(color: style.accent, width: 3),
                 ),
-              ],
-            ),
-            child: Padding(
-              // 3px status-bar border + padding-inline-start 13px: the border
-              // paints inside this box, so the content inset is their sum.
-              padding: const EdgeInsetsDirectional.only(start: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    // __icon: margin-block-start + margin-inline-end
-                    // $spacing-05.
-                    padding: const EdgeInsetsDirectional.only(
-                      top: CarbonSpacing.spacing05,
-                      end: CarbonSpacing.spacing05,
-                    ),
-                    child: _StatusIcon(
-                      style: style,
-                      description:
-                          statusIconDescription ?? '${kind.carbonName} icon',
-                    ),
+                // box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2).
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    offset: Offset(0, 2),
+                    blurRadius: 6,
                   ),
-                  Expanded(child: details),
-                  if (onClose != null)
-                    _CloseButton(
-                      onClose: onClose!,
-                      label: closeLabel,
-                      lowContrast: lowContrast,
-                    ),
                 ],
+              ),
+              child: Padding(
+                // 3px status-bar border + padding-inline-start 13px: the border
+                // paints inside this box, so the content inset is their sum.
+                padding: const EdgeInsetsDirectional.only(start: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      // __icon: margin-block-start + margin-inline-end
+                      // $spacing-05.
+                      padding: const EdgeInsetsDirectional.only(
+                        top: CarbonSpacing.spacing05,
+                        end: CarbonSpacing.spacing05,
+                      ),
+                      child: _StatusIcon(
+                        style: style,
+                        description:
+                            statusIconDescription ?? '${kind.carbonName} icon',
+                      ),
+                    ),
+                    Expanded(child: details),
+                    if (onClose != null)
+                      _CloseButton(
+                        onClose: onClose!,
+                        label: closeLabel,
+                        lowContrast: lowContrast,
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -368,7 +399,12 @@ class CarbonToastNotification extends StatelessWidget {
   }
 }
 
-/// A notification with an inline action button (alertdialog role).
+/// A nonmodal announcement with an optional response button.
+///
+/// Uses the inline notification's severity role and includes [actionLabel]
+/// in its accessible message. It neither moves nor traps focus: Retry and
+/// Undo can be discovered without interrupting the current task. Use a
+/// dialog when a response is mandatory before work can continue.
 class CarbonActionableNotification extends StatelessWidget {
   /// Creates an actionable notification.
   const CarbonActionableNotification({
@@ -491,7 +527,7 @@ class CarbonCallout extends StatelessWidget {
   }
 }
 
-/// The shared md+ bar layout of the inline, actionable, and callout variants.
+/// The responsive bar layout of inline, actionable, and callout variants.
 class _NotificationBar extends StatelessWidget {
   const _NotificationBar({
     required this.kind,
@@ -518,7 +554,7 @@ class _NotificationBar extends StatelessWidget {
   final String closeLabel;
 
   /// The max-inline-size steps: 608px from md, 736px from lg, 832px from the
-  /// max breakpoint (resolved against the available width).
+  /// max breakpoint, with 288px below md (resolved against viewport width).
   static double _maxInlineSize(double available) {
     if (available >= CarbonBreakpoint.max.width) {
       return 832;
@@ -526,7 +562,7 @@ class _NotificationBar extends StatelessWidget {
     if (available >= CarbonBreakpoint.lg.width) {
       return 736;
     }
-    return 608;
+    return available >= CarbonBreakpoint.md.width ? 608 : 288;
   }
 
   @override
@@ -562,9 +598,26 @@ class _NotificationBar extends StatelessWidget {
     final Widget bar = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double available = constraints.maxWidth;
-        final double maxWidth = available.isFinite
-            ? _maxInlineSize(available)
-            : 832.0;
+        final double breakpointWidth = _breakpointWidth(context, available);
+        final double maxWidth = _maxInlineSize(breakpointWidth);
+        final bool narrow =
+            breakpointWidth < CarbonBreakpoint.md.width ||
+            available < CarbonBreakpoint.md.width;
+        final Widget action = Padding(
+          padding: EdgeInsetsDirectional.only(
+            top: narrow ? 0 : CarbonSpacing.spacing03,
+            bottom: CarbonSpacing.spacing03,
+            end: onClose == null || narrow ? CarbonSpacing.spacing03 : 0,
+          ),
+          child: FocusTraversalOrder(
+            order: const NumericFocusOrder(1),
+            child: _ActionButton(
+              label: actionLabel ?? '',
+              onPressed: onAction,
+              lowContrast: lowContrast,
+            ),
+          ),
+        );
         return Align(
           // max-inline-size caps the bar even when the parent is wider
           // (Align loosens a tight parent constraint, like CSS max-width
@@ -619,53 +672,65 @@ class _NotificationBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                Row(
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    // 3px status-bar border + __details margin-inline-start
-                    // 13px (the border paints under this box, so the content
-                    // inset is their sum).
-                    const SizedBox(width: 16),
-                    Padding(
-                      // __icon: margin-block-start 14px, margin-inline-end
-                      // $spacing-05.
-                      padding: const EdgeInsetsDirectional.only(
-                        top: 14,
-                        end: CarbonSpacing.spacing05,
-                      ),
-                      child: _StatusIcon(
-                        style: style,
-                        description:
-                            statusIconDescription ?? '${kind.carbonName} icon',
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // 3px status-bar border + __details margin-inline-start
+                        // 13px (the border paints under this box, so the content
+                        // inset is their sum).
+                        const SizedBox(width: 16),
+                        Padding(
+                          // __icon: margin-block-start 14px, margin-inline-end
+                          // $spacing-05.
+                          padding: const EdgeInsetsDirectional.only(
+                            top: 14,
+                            end: CarbonSpacing.spacing05,
+                          ),
+                          child: _StatusIcon(
+                            style: style,
+                            description:
+                                statusIconDescription ??
+                                '${kind.carbonName} icon',
+                          ),
+                        ),
+                        Expanded(child: textWrapper),
+                        // __details margin-inline-end: 13px.
+                        const SizedBox(width: 13),
+                        if (actionLabel != null && !narrow)
+                          Flexible(child: action),
+                        if (onClose != null) const SizedBox(width: 48),
+                      ],
                     ),
-                    Expanded(child: textWrapper),
-                    // __details margin-inline-end: 13px.
-                    const SizedBox(width: 13),
-                    if (actionLabel != null)
+                    if (actionLabel != null && narrow)
                       Padding(
-                        // Ghost action button margin: $spacing-03 0; with the
-                        // close button hidden it also gets margin-inline-end
-                        // $spacing-03.
-                        padding: EdgeInsetsDirectional.only(
-                          top: CarbonSpacing.spacing03,
-                          bottom: CarbonSpacing.spacing03,
-                          end: onClose == null ? CarbonSpacing.spacing03 : 0,
+                        padding: const EdgeInsetsDirectional.only(
+                          start: 3 + CarbonSpacing.spacing08,
                         ),
-                        child: _ActionButton(
-                          label: actionLabel!,
-                          onPressed: onAction,
-                          lowContrast: lowContrast,
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          widthFactor: 1,
+                          child: IntrinsicWidth(child: action),
                         ),
                       ),
-                    if (onClose != null)
-                      _CloseButton(
+                  ],
+                ),
+                if (onClose != null)
+                  PositionedDirectional(
+                    top: 0,
+                    end: 0,
+                    child: FocusTraversalOrder(
+                      order: const NumericFocusOrder(2),
+                      child: _CloseButton(
                         onClose: onClose!,
                         label: closeLabel,
                         lowContrast: lowContrast,
                       ),
-                  ],
-                ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -675,10 +740,13 @@ class _NotificationBar extends StatelessWidget {
 
     return Semantics(
       container: true,
-      liveRegion: liveRegion,
+      role: liveRegion ? _announcementRole(kind) : SemanticsRole.none,
+      liveRegion: liveRegion && !kIsWeb,
       explicitChildNodes: true,
-      label: liveRegion ? '$title. ${subtitle ?? ''}'.trim() : null,
-      child: bar,
+      label: liveRegion
+          ? _announcementLabel(<String?>[title, subtitle, actionLabel])
+          : null,
+      child: FocusTraversalGroup(policy: OrderedTraversalPolicy(), child: bar),
     );
   }
 }
@@ -741,49 +809,57 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
-    return Semantics(
+    return CarbonControlSemantics(
       button: true,
-      enabled: onPressed != null,
+      state: CarbonControlState.resolve(hasCallback: onPressed != null),
+      readOnlyHint: '',
       label: label,
-      child: CarbonInteraction(
-        enabled: onPressed != null,
-        onPressed: onPressed,
-        builder: (BuildContext context, Set<WidgetState> states) {
-          final bool hovered =
-              states.contains(WidgetState.hovered) ||
-              states.contains(WidgetState.pressed);
-          final bool focused = states.contains(WidgetState.focused);
-          final Color text = lowContrast
-              ? (hovered ? theme.linkPrimaryHover : theme.linkPrimary)
-              : theme.linkInverse;
-          final Color? fill = hovered
-              ? (lowContrast
-                    ? theme.notificationActionHover
-                    : theme.backgroundInverseHover)
-              : null;
-          final Color focusColor = lowContrast
-              ? theme.focus
-              : theme.focusInverse;
-          return Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(
-              horizontal: CarbonSpacing.spacing05,
-            ),
-            color: fill,
-            // outline: 2px solid, outline-offset: -2px — painted over the
-            // content so focus does not shift layout.
-            foregroundDecoration: focused
-                ? BoxDecoration(border: Border.all(color: focusColor, width: 2))
-                : null,
-            alignment: Alignment.center,
-            child: ExcludeSemantics(
-              child: Text(
-                label,
-                style: CarbonTypeStyles.bodyCompact01.copyWith(color: text),
+      onActivate: onPressed,
+      builder: (FocusNode focus) => ExcludeSemantics(
+        child: CarbonInteraction(
+          focusNode: focus,
+          includeSemantics: false,
+          enabled: onPressed != null,
+          onPressed: onPressed,
+          builder: (BuildContext context, Set<WidgetState> states) {
+            final bool hovered =
+                states.contains(WidgetState.hovered) ||
+                states.contains(WidgetState.pressed);
+            final bool focused = states.contains(WidgetState.focused);
+            final Color text = lowContrast
+                ? (hovered ? theme.linkPrimaryHover : theme.linkPrimary)
+                : theme.linkInverse;
+            final Color? fill = hovered
+                ? (lowContrast
+                      ? theme.notificationActionHover
+                      : theme.backgroundInverseHover)
+                : null;
+            final Color focusColor = lowContrast
+                ? theme.focus
+                : theme.focusInverse;
+            return Container(
+              constraints: const BoxConstraints(minHeight: 32),
+              padding: const EdgeInsets.symmetric(
+                horizontal: CarbonSpacing.spacing05,
               ),
-            ),
-          );
-        },
+              color: fill,
+              // outline: 2px solid, outline-offset: -2px — painted over the
+              // content so focus does not shift layout.
+              foregroundDecoration: focused
+                  ? BoxDecoration(
+                      border: Border.all(color: focusColor, width: 2),
+                    )
+                  : null,
+              alignment: Alignment.center,
+              child: ExcludeSemantics(
+                child: Text(
+                  label,
+                  style: CarbonTypeStyles.bodyCompact01.copyWith(color: text),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -806,28 +882,37 @@ class _CloseButton extends StatelessWidget {
     final CarbonThemeData theme = CarbonTheme.of(context);
     final Color iconColor = lowContrast ? theme.iconPrimary : theme.iconInverse;
     final Color focusColor = lowContrast ? theme.focus : theme.focusInverse;
-    return Semantics(
+    return CarbonControlSemantics(
       button: true,
+      state: CarbonControlState.interactive,
+      readOnlyHint: '',
       label: label,
-      child: CarbonInteraction(
-        onPressed: onClose,
-        builder: (BuildContext context, Set<WidgetState> states) {
-          final bool focused = states.contains(WidgetState.focused);
-          return Container(
-            width: 48,
-            height: 48,
-            // outline: 2px solid; outline-offset: -2px — painted over the
-            // content so focus does not shift layout.
-            foregroundDecoration: focused
-                ? BoxDecoration(border: Border.all(color: focusColor, width: 2))
-                : null,
-            child: Center(
-              child: ExcludeSemantics(
-                child: CarbonIcon(CarbonIcons.close, color: iconColor),
+      onActivate: onClose,
+      builder: (FocusNode focus) => ExcludeSemantics(
+        child: CarbonInteraction(
+          focusNode: focus,
+          includeSemantics: false,
+          onPressed: onClose,
+          builder: (BuildContext context, Set<WidgetState> states) {
+            final bool focused = states.contains(WidgetState.focused);
+            return Container(
+              width: 48,
+              height: 48,
+              // outline: 2px solid; outline-offset: -2px — painted over the
+              // content so focus does not shift layout.
+              foregroundDecoration: focused
+                  ? BoxDecoration(
+                      border: Border.all(color: focusColor, width: 2),
+                    )
+                  : null,
+              child: Center(
+                child: ExcludeSemantics(
+                  child: CarbonIcon(CarbonIcons.close, color: iconColor),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

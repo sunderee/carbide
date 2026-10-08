@@ -4,6 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -16,10 +17,13 @@ import '../../support/legibility.dart';
 
 Widget _host(Widget child, {double width = 480}) => Directionality(
   textDirection: TextDirection.ltr,
-  child: CarbonTheme(
-    data: CarbonThemeData.white,
-    child: Center(
-      child: SizedBox(width: width, child: child),
+  child: MediaQuery(
+    data: MediaQueryData(size: Size(width, 800)),
+    child: CarbonTheme(
+      data: CarbonThemeData.white,
+      child: Center(
+        child: SizedBox(width: width, child: child),
+      ),
     ),
   ),
 );
@@ -223,6 +227,7 @@ void main() {
             title: 'Error',
             subtitle: 'Something failed',
           ),
+          width: 760,
         ),
       );
       final Finder bar = find
@@ -263,7 +268,7 @@ void main() {
       expectTextNotClipped(tester, find.text('Something failed'));
     });
 
-    testWidgets('max width steps 608/736 with the available width', (
+    testWidgets('max width steps 608/736 with the viewport width', (
       WidgetTester tester,
     ) async {
       final Finder surface = find
@@ -345,7 +350,11 @@ void main() {
       final SemanticsNode bar = tester.getSemantics(
         find.bySemanticsLabel('Careful. Check this'),
       );
-      expect(bar.flagsCollection.isLiveRegion, isTrue);
+      expect(bar.flagsCollection.isLiveRegion, !kIsWeb);
+      expect(
+        bar.getSemanticsData().role,
+        kIsWeb ? SemanticsRole.status : SemanticsRole.none,
+      );
       expect(find.bySemanticsLabel('warning-alt icon'), findsOneWidget);
       handle.dispose();
     });
