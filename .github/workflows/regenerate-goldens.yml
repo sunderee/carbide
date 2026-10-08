@@ -43,10 +43,12 @@ jobs:
           cp test/screenshots/overview.png ../docs/images/overview.png
           cp test/screenshots/button_dark.png ../docs/images/button_dark.png
           cp test/screenshots/data_table.png ../docs/images/data_table.png
+          python3 ../tool/package_metadata.py --sync-screenshots
 
       - name: Commit regenerated goldens
         run: |
           git add -A -- '*/goldens/*.png' example/test/screenshots/*.png docs/images/*.png
+          git add screenshots/*.png
           if git diff --cached --quiet; then
             echo "No golden changes."
             exit 0

@@ -14,6 +14,14 @@ topics:
   - widgets
   - carbon
 
+screenshots:
+  - description: Carbide gallery overview and theme controls.
+    path: screenshots/overview.png
+  - description: Carbon button controls on the Gray 90 theme.
+    path: screenshots/button_dark.png
+  - description: Data table with controlled selection and responsive options.
+    path: screenshots/data_table.png
+
 environment:
   sdk: ">=3.13.5 <4.0.0"
   flutter: ">=3.47.6"
