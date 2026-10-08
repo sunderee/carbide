@@ -82,7 +82,8 @@ jobs:
       # Upstream fidelity (epic W3): the fidelity test renders each Carbide
       # component beside its committed Carbon Storybook reference. Publish the
       # side-by-side images for human review on every PR (the test itself only
-      # hard-gates on a non-blank render — see test/fidelity/).
+      # gates on measured per-story drift budgets, nonblank renders and structural
+      # size/colour/state checks — see test/fidelity/).
       - name: Upload fidelity comparisons
         if: always()
         uses: actions/upload-artifact@v7
