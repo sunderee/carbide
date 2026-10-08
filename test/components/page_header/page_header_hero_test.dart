@@ -5,9 +5,9 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' show ViewFocusEvent, ViewFocusState, ViewFocusDirection;
 
 import 'package:carbide/carbide.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -39,7 +39,12 @@ Widget _host(
             managedOverlayEntry(
               builder: (_) => Align(
                 alignment: Alignment.topLeft,
-                child: SizedBox(width: width, child: child),
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  minWidth: width,
+                  maxWidth: width,
+                  child: SizedBox(width: width, child: child),
+                ),
               ),
             ),
           ],
@@ -57,6 +62,11 @@ Widget _imageHero() => Image.memory(
 );
 
 void main() {
+  // Decoded fixture images belong to the test cache, not the hero owner.
+  tearDown(() {
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+  });
   testWidgets('hero dimensions follow actual md/lg width and optional ratio', (
     tester,
   ) async {
@@ -65,15 +75,16 @@ void main() {
     for (final width in [320.0, 671.0, 672.0, 1055.0, 1056.0, 1100.0]) {
       await tester.pumpWidget(
         _host(
-          CarbonPageHeader(
+          const CarbonPageHeader(
             title: 'Report',
-            hero: const ColoredBox(key: _hero, color: Color(0xff0f62fe)),
+            hero: ColoredBox(key: _hero, color: Color(0xff0f62fe)),
           ),
           width: width,
         ),
       );
       await tester.pumpAndSettle();
       final size = tester.getSize(find.byKey(_hero));
+      expect(size.width, closeTo((width < 672 ? width : width / 2) - 32, .001));
       expect(size.width / size.height, closeTo(width >= 1056 ? 2 : 1.5, .001));
       final title = tester.getRect(find.text('Report')),
           hero = tester.getRect(find.byKey(_hero));
@@ -127,6 +138,8 @@ void main() {
     (tester) async {
       final handle = tester.ensureSemantics();
       try {
+        await tester.binding.setSurfaceSize(const Size(1200, 1000));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
         for (final (decorative, label) in <(bool, String?)>[
           (false, null),
           (true, null),
@@ -165,49 +178,55 @@ void main() {
       }
     },
   );
-  for (final direction in TextDirection.values) {
-    for (final scale in [1.3, 2.0]) {
-      testWidgets('scaled hero layout and reading order $direction/$scale', (
-        tester,
-      ) async {
-        final handle = tester.ensureSemantics();
-        try {
-          await tester.pumpWidget(
-            _host(
-              CarbonPageHeader(
-                title: 'Report',
-                subtitle: 'Finance',
-                body: 'Revenue summary',
-                hero: _imageHero(),
-                tabs: const Text('Tab area'),
-                breadcrumbs: const [
-                  CarbonBreadcrumbItem(label: 'Home', isCurrentPage: true),
-                ],
-              ),
-              direction: direction,
-              scale: scale,
-            ),
-          );
-          await tester.pumpAndSettle();
-          expectNoClippedTextAtScale(tester, scale);
-          final labels = tester.semantics
-              .simulatedAccessibilityTraversal()
-              .map((node) => node.getSemanticsData().label)
-              .toList();
-          int index(String name) =>
-              labels.indexWhere((label) => label.contains(name));
-          expect(index('Home'), lessThan(index('Report')));
-          expect(index('Report'), lessThan(index('Revenue summary')));
-          expect(
-            index('Revenue summary'),
-            lessThan(index('Report illustration')),
-          );
-          expect(index('Report illustration'), lessThan(index('Tab area')));
-          expect(tester.takeException(), isNull);
-        } finally {
-          handle.dispose();
-        }
-      });
+  for (final width in [320.0, 1100.0]) {
+    for (final direction in TextDirection.values) {
+      for (final scale in [1.3, 2.0]) {
+        testWidgets(
+          'scaled hero layout and reading order $width/$direction/$scale',
+          (tester) async {
+            final handle = tester.ensureSemantics();
+            try {
+              await tester.binding.setSurfaceSize(const Size(1200, 1000));
+              addTearDown(() => tester.binding.setSurfaceSize(null));
+              await tester.pumpWidget(
+                _host(
+                  CarbonPageHeader(
+                    title: 'Report',
+                    subtitle: 'Finance',
+                    body: 'Revenue summary',
+                    hero: _imageHero(),
+                    tabs: const Text('Tab area'),
+                    breadcrumbs: const [
+                      CarbonBreadcrumbItem(label: 'Home', isCurrentPage: true),
+                    ],
+                  ),
+                  direction: direction,
+                  scale: scale,
+                  width: width,
+                ),
+              );
+              await tester.pumpAndSettle();
+              expectNoClippedTextAtScale(tester, scale);
+              final labels = tester.semantics
+                  .simulatedAccessibilityTraversal()
+                  .map((node) => node.getSemanticsData().label)
+                  .toList();
+              int index(String name) =>
+                  labels.indexWhere((label) => label.contains(name));
+              expect(index('Home'), lessThan(index('Report')));
+              expect(index('Report'), lessThan(index('Revenue summary')));
+              expect(
+                index('Revenue summary'),
+                lessThan(index('Report illustration')),
+              );
+              expect(index('Report illustration'), lessThan(index('Tab area')));
+              expect(tester.takeException(), isNull);
+            } finally {
+              handle.dispose();
+            }
+          },
+        );
+      }
     }
   }
   testWidgets(
@@ -231,6 +250,13 @@ void main() {
                   child: CarbonPageHeader(
                     title: 'Report',
                     hero: _HeroEditor(key: key, lifecycle: lifecycle),
+                    actions: <CarbonPageHeaderAction>[
+                      CarbonPageHeaderAction(
+                        id: 'edit',
+                        label: 'Edit',
+                        onPressed: () {},
+                      ),
+                    ],
                   ),
                 );
               },
@@ -241,15 +267,28 @@ void main() {
       );
       await tester.pumpAndSettle();
       final original = key.currentState!;
+      tester.binding.handleViewFocusChanged(
+        ViewFocusEvent(
+          viewId: tester.view.viewId,
+          state: ViewFocusState.focused,
+          direction: ViewFocusDirection.undefined,
+        ),
+      );
       await tester.enterText(find.byType(EditableText), 'Keep hero draft');
+      final FocusNode focus = tester
+          .widget<EditableText>(find.byType(EditableText))
+          .focusNode;
+      expect(focus.hasFocus, isTrue);
       update(() => width = 320);
       await tester.pumpAndSettle();
       expect(key.currentState, same(original));
       expect(original.controller.text, 'Keep hero draft');
+      expect(focus.hasFocus, isTrue);
       update(() => width = 1100);
       await tester.pumpAndSettle();
       expect(key.currentState, same(original));
       expect(original.controller.text, 'Keep hero draft');
+      expect(focus.hasFocus, isTrue);
       expect(lifecycle, ['created']);
       await tester.pumpWidget(const SizedBox.shrink());
       expect(lifecycle, ['created', 'disposed']);
@@ -261,7 +300,7 @@ void main() {
       testWidgets('golden hero $kind/$width', (tester) async {
         await expectThemeGoldens(
           tester,
-          name: 'page_header_hero_' + kind + '_' + width.toInt().toString(),
+          name: 'page_header_hero_${kind}_${width.toInt()}',
           size: Size(width, 700),
           containsText: true,
           directions: TextDirection.values.toSet(),
@@ -293,7 +332,17 @@ void main() {
               ),
             ],
           ),
-          afterPump: (tester) async => tester.pumpAndSettle(),
+          afterPump: (tester) async {
+            if (kind == 'image') {
+              await tester.runAsync(
+                () => precacheImage(
+                  MemoryImage(_image),
+                  tester.element(find.byKey(_hero)),
+                ),
+              );
+            }
+            await tester.pumpAndSettle();
+          },
         );
       });
     }

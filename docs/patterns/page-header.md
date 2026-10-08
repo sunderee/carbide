@@ -1,9 +1,10 @@
 # Page headers
 
 `CarbonPageHeader` retains Carbide's constructor composition. Its visual
-reference is Carbon core v11.118.0's historical PageHeader SCSS; the former
-React preview moved to IBM Products and is deprecated. This port does not
-adopt the IBM Products component API.
+reference is Carbon core v11.118.0's historical PageHeader SCSS. The former
+React preview moved to IBM Products at v11.111.0; the pinned core now also has
+a compound `PageHeader.Root` with scroll/collapse behavior. Carbide retains
+its constructor API and does not implement that sticky/collapsing root.
 
 ## Responsive actions
 
@@ -146,3 +147,48 @@ already supplies the complete accessible name.
 `onOpenChanged` reports actual visibility transitions, allowing the heading
 owner to coordinate guarded focus repair after popup removal in a nested
 router. It does not fire again for events that keep the same visibility.
+
+## Hero content
+
+Supply `hero` for an image or custom widget. At an actual header width of
+672 px or more, text and hero use equal columns with 16 px gutters and 24 px
+vertical padding. Below that width, the hero stacks after the text, before
+the tabs. The default ratio is 2:1 from 1056 px and 3:2 below it, following
+the pinned `PageHeaderHeroImage.tsx`. Override `heroAspectRatio` with a
+positive, finite value when the content needs another shape.
+
+```dart
+CarbonPageHeader(
+  title: 'Quarterly report',
+  body: 'A summary of revenue and spend.',
+  hero: Image.asset(
+    'assets/report.jpg',
+    fit: BoxFit.cover,
+    semanticLabel: 'Revenue by region',
+  ),
+)
+```
+
+The aspect-ratio box gives its child tight dimensions and clips painting at
+its edges. Images choose their own `fit`: `BoxFit.cover` fills and crops;
+`BoxFit.contain` preserves the whole image. Custom content must fit those
+dimensions or provide its own scrolling, or choose a taller ratio. Text in
+the adjacent band grows naturally at larger text scales.
+
+By default the child keeps its own semantics, including `Image.semanticLabel`
+and interactive custom controls. Set `heroDecorative: true` only for content
+that should be excluded from both accessibility and keyboard focus. For a
+single informative image, `heroLabel` can replace the child's semantics with
+one image name; it also excludes child focus. Do not use either option to
+wrap interactive custom content. Decorative content cannot have a label.
+
+The text and hero subtrees keep their state across side-by-side/stacked
+reflow. Caller-owned controllers stay caller-owned; removing a custom hero
+has the usual Flutter disposal behavior. Without a hero the existing content
+composition is unchanged. Breadcrumbs precede the band; the heading, body,
+hero and tabs retain logical reading order in both directions.
+
+The upstream story hides the hero on small screens. This constructor port
+intentionally stacks it so caller-provided information and controls remain
+available. The gallery demonstrates no hero, the attributed upstream image,
+and a custom editor whose draft survives resizing.

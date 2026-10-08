@@ -45,6 +45,10 @@ translations of Carbon source carry an attribution header pointing back to this
 notice. A copy of the Apache-2.0 license text is retained at
 documentation/carbon/LICENSE.
 
+The gallery's assets/page_header_hero.jpg is Carbon's Apache-2.0 licensed
+PageHeader story image (_story-assets/2x1.jpg), copied from Carbon v11.118.0:
+https://github.com/carbon-design-system/carbon/blob/v11.118.0/packages/react/src/components/PageHeader/_story-assets/2x1.jpg
+
 --------------------------------------------------------------------------------
 IBM Plex typeface
 --------------------------------------------------------------------------------

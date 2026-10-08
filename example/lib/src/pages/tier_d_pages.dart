@@ -366,14 +366,35 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
   bool _showDraft = true;
   bool _collapseTags = true;
   bool _longTitle = true;
+  String _hero = 'None';
+  bool _decorativeHero = false;
+  final TextEditingController _heroNote = TextEditingController();
+
+  @override
+  void dispose() {
+    _heroNote.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Page header',
-      description:
-          'Resize to disclose hidden actions while preserving the title.',
+      description: 'Resize to disclose actions and tags, recover the title, and reflow optional hero content.',
       previewAlignment: Alignment.topLeft,
       controls: <Widget>[
+        choiceKnob<String>(
+          label: 'Hero content',
+          value: _hero,
+          options: const <String>['None', 'Image', 'Custom'],
+          labelOf: (String value) => value,
+          onChanged: (String value) => setState(() => _hero = value),
+        ),
+        boolKnob(
+          label: 'Decorative image',
+          value: _decorativeHero,
+          onChanged: (bool value) => setState(() => _decorativeHero = value),
+        ),
         boolKnob(
           label: 'Long title',
           value: _longTitle,
@@ -403,6 +424,27 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
                 : 'Report',
             headingLevel: _headingLevel,
             subtitle: 'Finance',
+            heroDecorative: _hero == 'Image' && _decorativeHero,
+            hero: switch (_hero) {
+              'Image' => Image.asset(
+                'assets/page_header_hero.jpg',
+                fit: BoxFit.cover,
+                semanticLabel: 'Manufacturing presentation',
+              ),
+              'Custom' => ColoredBox(
+                color: CarbonTheme.of(context).layer02,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: CarbonTextInput(
+                      labelText: 'Hero note',
+                      controller: _heroNote,
+                    ),
+                  ),
+                ),
+              ),
+              _ => null,
+            },
             body: 'A summary of revenue and spend for the quarter.',
             collapseTags: _collapseTags,
             tags: <Widget>[
