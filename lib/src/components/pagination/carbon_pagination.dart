@@ -179,7 +179,7 @@ class _PaginationBodyState extends State<_PaginationBody> {
     }
 
     double selectWidth(int value) =>
-        math.max(80, textWidth(labels.formatNumber(value)) + 56);
+        math.max(112, textWidth(labels.formatNumber(value)) + 56);
     final double sizeWidth = selectWidth(config.pageSize);
     final double pageWidth = selectWidth(page);
     final double requiredWidth =
