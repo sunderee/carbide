@@ -21,6 +21,7 @@ import '../../foundations/typography.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/indexed_options.dart';
 import '../../utils/anchored_overlay.dart';
 import '../../utils/picker_overlay.dart';
 import '../../utils/control_state.dart';
@@ -65,7 +66,9 @@ class CarbonComboBox<T> extends StatefulWidget {
   /// Creates a combo box.
   const CarbonComboBox({
     required this.titleText,
-    required this.items,
+    List<CarbonComboBoxItem<T>>? items,
+    this.itemBuilder,
+    this.itemCount,
     super.key,
     this.selectedItem,
     this.onChanged,
@@ -88,13 +91,36 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.condensed = false,
     this.aiRevert = false,
     this.focusNode,
-  }) : assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
+  }) : items = items ?? const [],
+       assert(
+         itemBuilder == null || items == null,
+         'Use either items or itemBuilder.',
+       ),
+       assert(
+         (itemBuilder == null) == (itemCount == null),
+         'itemBuilder and itemCount must be supplied together.',
+       ),
+       assert(
+         itemCount == null || itemCount >= 0,
+         'itemCount must be non-negative.',
+       ),
+       assert(!(invalid && warn), 'invalid and warn are mutually exclusive');
 
   /// The field title shown above the trigger.
   final String titleText;
 
   /// The options.
   final List<CarbonComboBoxItem<T>> items;
+
+  /// Reads an option's data by index for a lazy menu. This callback is also
+  /// used for offscreen keyboard search and value reconciliation; keep it pure
+  /// and lightweight, and return stable values (fresh model objects are fine).
+  /// Supply [itemCount] together with this callback and omit [items].
+  final CarbonComboBoxItem<T> Function(int index)? itemBuilder;
+
+  /// The number of logical options read by [itemBuilder], including disabled
+  /// options.
+  final int? itemCount;
 
   /// The selected value.
   final T? selectedItem;
@@ -195,22 +221,44 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   late final OwnedFocusNode _focusOwner;
   FocusNode get _focus => _focusOwner.value;
   int _highlighted = -1;
+  List<CarbonComboBoxItem<T>> get _items => widget.itemBuilder == null
+      ? widget.items
+      : CarbonIndexedOptions<CarbonComboBoxItem<T>>(
+          widget.itemCount!,
+          widget.itemBuilder!,
+        );
+
   double _triggerWidth = 0;
   bool _hovered = false;
   bool _dismissedWhileFocused = false;
 
   CarbonComboBoxItem<T>? get _selected {
-    for (final CarbonComboBoxItem<T> item in widget.items) {
+    for (final CarbonComboBoxItem<T> item in _items) {
       if (item.value == widget.selectedItem) return item;
     }
     return null;
   }
 
+  Object? _filteredWidget;
+  String? _filteredQuery;
+  List<CarbonComboBoxItem<T>>? _filteredCache;
+
   List<CarbonComboBoxItem<T>> get _filtered {
     final String q = _controller.text.trim().toLowerCase();
-    if (q.isEmpty || q == _selected?.label.toLowerCase()) return widget.items;
+    if (q.isEmpty || q == _selected?.label.toLowerCase()) return _items;
+    if (widget.itemBuilder != null) {
+      if (identical(_filteredWidget, widget) && _filteredQuery == q) {
+        return _filteredCache!;
+      }
+      _filteredWidget = widget;
+      _filteredQuery = q;
+      return _filteredCache = carbonFilteredOptions<CarbonComboBoxItem<T>>(
+        _items,
+        (item) => item.label.toLowerCase().contains(q),
+      );
+    }
     return <CarbonComboBoxItem<T>>[
-      for (final CarbonComboBoxItem<T> item in widget.items)
+      for (final CarbonComboBoxItem<T> item in _items)
         if (item.label.toLowerCase().contains(q)) item,
     ];
   }
@@ -286,8 +334,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     final List<CarbonComboBoxItem<T>> items = _filtered;
     _highlighted = items.indexWhere((CarbonComboBoxItem<T> i) => !i.disabled);
     final CarbonComboBoxItem<T>? selected = _selected;
-    if (selected != null && !selected.disabled && items.contains(selected)) {
-      _highlighted = items.indexOf(selected);
+    if (selected != null &&
+        !selected.disabled &&
+        items.any((item) => item.value == selected.value)) {
+      _highlighted = items.indexWhere((item) => item.value == selected.value);
     }
     _overlay.show();
     setState(() {});
@@ -387,9 +437,14 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     expanded: _controlState.canActivate && _overlay.isShowing,
     activeIndex: _highlighted,
     focusNode: _focus,
-    optionLabels: <String?>[
-      for (final item in _filtered) item.disabled ? null : item.label,
-    ],
+    optionLabels: widget.itemBuilder != null
+        ? CarbonIndexedOptions<String?>(_filtered.length, (int index) {
+            final item = _filtered[index];
+            return item.disabled ? null : item.label;
+          })
+        : <String?>[
+            for (final item in _filtered) item.disabled ? null : item.label,
+          ],
     formatActiveOption: widget.activeOptionFormatter,
     builder: _build,
   );
@@ -594,9 +649,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   Widget _buildMenu(BuildContext context) {
     final List<CarbonComboBoxItem<T>> items = _filtered;
-    final List<Widget> rows = <Widget>[
-      for (int i = 0; i < items.length; i++) _menuRow(items[i], i),
-    ];
+    final List<Widget> rows = widget.itemBuilder != null
+        ? const <Widget>[]
+        : <Widget>[
+            for (int i = 0; i < items.length; i++) _menuRow(items[i], i),
+          ];
 
     return CarbonAnchoredOverlay(
       link: _link,
@@ -608,11 +665,19 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
           groupId: this,
           onTapOutside: (_) => _close(),
           child: ExcludeFocus(
-            child: CarbonListBoxMenu(
-              size: widget.size,
-              fluidRows: _fluid && !widget.condensed,
-              children: rows,
-            ),
+            child: widget.itemBuilder != null
+                ? CarbonListBoxMenu.builder(
+                    itemCount: items.length,
+                    itemBuilder: (_, index) => _menuRow(items[index], index),
+                    activeIndex: _highlighted,
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                  )
+                : CarbonListBoxMenu(
+                    size: widget.size,
+                    fluidRows: _fluid && !widget.condensed,
+                    children: rows,
+                  ),
           ),
         ),
       ),

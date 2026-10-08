@@ -17,6 +17,8 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'lazy_option_menu.dart';
+
 import '../../foundations/layout.dart';
 import '../../foundations/motion.dart';
 import '../../foundations/typography.dart';
@@ -305,10 +307,43 @@ class CarbonListBoxMenu extends StatelessWidget {
     this.size = CarbonFieldSize.md,
     this.fluidRows = false,
     super.key,
-  });
+  }) : itemBuilder = null,
+       itemCount = 0,
+       activeIndex = -1,
+       rowVerticalInset = 5;
+
+  /// Creates a menu that builds only the visible option rows.
+  const CarbonListBoxMenu.builder({
+    required this.itemCount,
+    required IndexedWidgetBuilder itemBuilder,
+    required this.activeIndex,
+    this.rowVerticalInset = 5,
+    this.size = CarbonFieldSize.md,
+    this.fluidRows = false,
+    super.key,
+    // Lazy callers require a builder; eager constructor storage is nullable.
+    // ignore: prefer_initializing_formals
+  }) : itemBuilder = itemBuilder,
+       children = const <Widget>[],
+       assert(itemCount >= 0),
+       assert(rowVerticalInset >= 0);
 
   /// The option rows (typically [CarbonListBoxMenuItem]s).
   final List<Widget> children;
+
+  /// Builds one mounted row in lazy mode, or null in eager mode.
+  final IndexedWidgetBuilder? itemBuilder;
+
+  /// The logical option count for lazy mode.
+  final int itemCount;
+
+  /// The logical keyboard highlight to reveal in lazy mode.
+  final int activeIndex;
+
+  /// Total border and content inset around a lazy row's single text line.
+  /// The ordinary list-box row uses 4px padding plus a 1px divider; checkbox
+  /// rows add the checkbox label's 1px top inset.
+  final double rowVerticalInset;
 
   /// The host field size, which sets the visible-row cap.
   final CarbonFieldSize size;
@@ -331,13 +366,22 @@ class CarbonListBoxMenu extends StatelessWidget {
         constraints: BoxConstraints(
           maxHeight: (fluidRows ? 64 : size.height) * 5.5,
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
-          ),
-        ),
+        child: itemBuilder != null
+            ? CarbonLazyOptionMenu(
+                itemCount: itemCount,
+                itemBuilder: itemBuilder!,
+                activeIndex: activeIndex,
+                minimumRowHeight: fluidRows ? 64 : size.height,
+                maximumHeight: (fluidRows ? 64 : size.height) * 5.5,
+                verticalPadding: rowVerticalInset,
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: children,
+                ),
+              ),
       ),
     );
   }

@@ -214,3 +214,9 @@ The upstream sources used to port from live as submodules under
 Picker and menu surfaces share composition-time viewport geometry and bounded
 constraints. See [placement and side overrides](overlay-placement.md) for the
 logical alignment, pinning and retained-scroll contracts.
+
+## Lazy picker options
+
+Builder option sources separate metadata lookup from a bounded sliver viewport.
+See [lazy option sources](lazy-options.md) for the builder, keyboard, filtering
+and semantics contracts; eager items retain their existing rendering mode.
