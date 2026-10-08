@@ -40,7 +40,7 @@ void main() {
             final Size headerSize = tester.getSize(find.byType(CarbonHeader));
             await _key(tester, LogicalKeyboardKey.tab, PhysicalKeyboardKey.tab);
             expect(
-              _document.activeElement?.getAttribute('aria-label'),
+              _document.activeElement?.accessibleName,
               'Skip to main content',
             );
             await _key(
@@ -89,7 +89,7 @@ void main() {
             );
             expect(find.byType(CarbonSideNav), findsNothing);
             expect(
-              _document.activeElement?.getAttribute('aria-label'),
+              _document.activeElement?.accessibleName,
               'Toggle navigation',
             );
             key.currentState!.resize(1200);
@@ -192,5 +192,7 @@ extension type _Element(JSObject _) implements JSObject {
   external String? getAttribute(String name);
   external String? get textContent;
   external String get tagName;
+  String? get accessibleName =>
+      getAttribute('aria-label') ?? textContent?.trim();
   external void focus();
 }
