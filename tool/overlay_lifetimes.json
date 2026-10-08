@@ -1,0 +1,13 @@
+{
+  "lib/src/components/context_menu/carbon_context_menu.dart": ["context menu"],
+  "lib/src/components/dialog/carbon_dialog.dart": ["dialog modal", "dialog nonmodal"],
+  "lib/src/components/dropdown/carbon_dropdown.dart": ["dropdown"],
+  "lib/src/components/menu/carbon_menu.dart": ["menu", "header submenu"],
+  "lib/src/components/modal/carbon_modal.dart": ["modal"],
+  "lib/src/components/overflow_menu/carbon_overflow_menu.dart": ["overflow menu"],
+  "lib/src/components/page_header/page_header_tags.dart": ["page tag disclosure"],
+  "lib/src/components/popover/carbon_popover.dart": ["popover", "tooltip", "toggletip", "ai label", "copy feedback", "date picker", "date range", "header submenu"],
+  "lib/src/components/select/carbon_select.dart": ["select", "time picker", "pagination size", "pagination page"],
+  "lib/src/components/ui_shell/carbon_side_nav.dart": ["side nav rail"],
+  "lib/src/utils/picker_overlay.dart": ["combo box", "multi select", "filterable multi select"]
+}

@@ -44,6 +44,8 @@ jobs:
           python3 tool/public_surface.py --check
           python3 tool/test_accessibility_inventory.py
           python3 tool/check_accessibility_inventory.py
+          python3 tool/test_overlay_lifetimes.py
+          python3 tool/check_overlay_lifetimes.py
 
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
