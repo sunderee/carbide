@@ -24,7 +24,8 @@ drive most of the decisions:
 
 - Several flags exist to fix **web/DOM mechanics** (sentinel nodes, CSS
   custom properties, floating-ui inline styles, the native `<dialog>`
-  element). Flutter has no DOM; Carbide implements the *outcome* natively,
+  element). Carbide does not port React DOM mechanisms; Flutter renders the controls
+  and supplies a semantics DOM on web. Carbide implements the *outcome*,
   so the flag's old-vs-new distinction has no analogue.
 - Several flags exist to fix **React API legacy** (uncontrolled component
   state). Carbide was written controlled-first in the Flutter idiom, so the
@@ -103,9 +104,8 @@ v12 radius mode or a public border-radius token family yet.
   `TreeView.tsx:107-121` @ v11.111.0) instead of initial-value-only, and
   adds `onActivate`. `CarbonTreeView` was written controlled-first
   (`selectedId` + `onSelect`), which is the flagged shape in the Flutter
-  idiom. The remaining surface the flagged API exposes that Carbide does
-  not — `multiselect` and the separate active-vs-selected distinction — is
-  tracked as follow-up parity work (see Consequences), not a flag matter.
+  idiom. Multiselect and the separate controlled active-vs-selected state
+  were delivered in #253; they are no longer pending parity work.
   Header updated to name the flag.
 - **`enable-v12-toggle-reduced-label-spacing`** — the flag reduces the gap
   between the toggle's top label and the control from `$spacing-05` (16px)
@@ -152,9 +152,10 @@ v12 radius mode or a public border-radius token family yet.
   `$border-tile` border (`$border-disabled` when disabled), and the
   selection checkmark becomes always-visible (`_tile.scss:79-86, 126-133,
   164-171, 239-246`). Pure rendering change; adopting early would break
-  every tile golden against the released default. Migration note: Carbide
-  has no `borderTile` token yet — the theme generator grows it when this
-  lands.
+  tile goldens against the released default. `borderTile01` and
+  `borderTile02` already exist in the themes and contextual layer mapping;
+  the migration changes their visual consumption rather than adding missing
+  theme tokens.
 - **`enable-v12-tile-default-icons`** — clickable tiles render a default
   `ArrowRight` icon (an `Error` icon when disabled) if the caller provides
   none (`Tile.tsx:268-276`). `CarbonClickableTile` already exposes the
@@ -188,11 +189,10 @@ v12 radius mode or a public border-radius token family yet.
   decorator slots proceed against the v11 rendering (checkmark visible on
   hover/selection for SelectableTile, `checkmarkFilled` for RadioTile).
 - The v12 migration checklist is the "Defer to v12" list above, plus:
-  regenerate all tile/structured-list goldens, add the `borderTile` token,
-  and swap the RadioTile icon pair.
-- Follow-up filed for the TreeView API surface the controllable flag
-  exposes beyond Carbide's current single-select (`multiselect`,
-  active-vs-selected split).
+  regenerate tile/structured-list goldens, review the existing borderTile
+  token consumption, and swap the RadioTile icon pair.
+- TreeView multiselect and controlled active state are delivered in #253.
+  Future changes to that API follow the public compatibility policy.
 - No implementation issues are needed for the adopted flags — all four
   were adopted before this ADR existed; this document and the header
   updates make that intentional rather than incidental.

@@ -8,7 +8,7 @@ This guide takes you from an empty Flutter app to a Carbide screen.
 flutter pub add carbide
 ```
 
-Carbide bundles the IBM Plex font families (Sans and Mono) used by Carbon, so
+Carbide bundles the IBM Plex font families (Sans, Mono and Serif) used by Carbon, so
 there is no font setup to do.
 
 ## 2. Import the library
@@ -19,7 +19,7 @@ A single barrel exports everything — tokens, themes, and components:
 import 'package:carbide/carbide.dart';
 ```
 
-Carbide is built on `package:flutter/widgets.dart` and never imports Material or
+Carbide uses Flutter base widgets and SDK rendering/services libraries, and never imports Material or
 Cupertino. You will typically pair it with `import
 'package:flutter/widgets.dart';` for `StatelessWidget`, `runApp`, and friends.
 
@@ -87,7 +87,7 @@ own buttons follow.
 
 - [Theming & layers](theming-and-layers.md) — the four themes,
   `AnimatedCarbonTheme`, and `CarbonLayer`.
-- [Live gallery](https://sunderee.github.io/carbide/) — every component
-  with live controls and copyable code.
-- API reference — generated from the source; run `dart doc` locally, or browse
-  the published reference once it is available.
+- [Live gallery](https://sunderee.github.io/carbide/) — cataloged component
+  families and compositions with live controls and compiled, copyable examples.
+- [API reference](https://pub.dev/documentation/carbide/latest/) — the published
+  package API. Run `dart doc` for the current checkout, which may be newer.

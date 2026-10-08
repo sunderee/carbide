@@ -3,7 +3,8 @@
 `CarbonPageHeader` retains Carbide's constructor composition. Its visual
 reference is Carbon core v11.118.0's historical PageHeader SCSS. The former
 React preview moved to IBM Products at v11.111.0; the pinned core now also has
-a compound `PageHeader.Root` with scroll/collapse behavior. Carbide retains
+a compound `PageHeader.Root` implementation with scroll/collapse behavior; its
+entrypoint export is deferred to v12. Carbide retains
 its constructor API and does not implement that sticky/collapsing root.
 
 ## Responsive actions

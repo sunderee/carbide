@@ -1,7 +1,8 @@
 # Architecture
 
-Carbide is a token-driven UI library built **only** on
-`package:flutter/widgets.dart`. This document describes the layering, the
+Carbide is a token-driven UI library built on Flutter's base widgets and SDK
+rendering, painting, services, scheduler and semantics libraries. It imports
+no Material or Cupertino in library code. This document describes the layering, the
 no-Material theming model, and the conventions every contribution follows.
 
 ## Hard constraints
@@ -19,12 +20,14 @@ no-Material theming model, and the conventions every contribution follows.
 
 ## Layers
 
-Dependencies flow strictly downward; a layer may only depend on layers above it.
+Components depend on shared utilities, theme data and foundations. Theme data
+resolves foundation tokens; utilities may depend on both. Artwork data and
+rendering helpers are shared by icons and pictograms.
 
 ```
 foundations  (design tokens: color, type, layout, motion)
      │
-   theme      (CarbonTheme InheritedWidget, CarbideThemeData, Layer model)
+   theme      (CarbonTheme InheritedWidget, CarbonThemeData, Layer model)
      │
    utils      (focus ring, interaction-state helpers, shared painters)
      │
@@ -38,13 +41,14 @@ lib/
   carbide.dart            # public barrel — exports the supported API
   src/
     foundations/          # color, type, layout, motion token sets
-    theme/                # CarbonTheme, CarbideThemeData, themes, Layer
+    theme/                # CarbonTheme, CarbonThemeData, themes, Layer
     utils/                # focus ring, WidgetState helpers, painters
     components/           # one folder per component
 ```
 
-Everything under `lib/src/` is private to the package; only symbols re-exported
-from `lib/carbide.dart` are public API.
+Only symbols re-exported from `lib/carbide.dart` are supported public API.
+Their implementation files live under `lib/src/`; importing an internal symbol
+from those files bypasses the [stability policy](api-stability.md).
 
 ## Foundations (design tokens)
 
@@ -64,7 +68,7 @@ them as plain, immutable Dart, derived from the upstream `@carbon/*` packages in
   AI, status and content-switcher token families are included. Chat is partial
   (the shipped button), and syntax highlighting is deferred. The exact boundary
   is published in [the token coverage contract](theming-and-layers.md#token-coverage-contract).
-- **Type** — IBM Plex font families, the 23-step type scale, font weights, and
+- **Type** — bundled IBM Plex Sans, Mono and Serif families, the 23-step type scale, font weights, and
   the named type styles (`body-01`, `heading-03`, `code-02`, …) as `TextStyle`
   builders, including productive vs. expressive and fluid type (`@carbon/type`).
 - **Layout** — the spacing scale (`spacing-01`..`spacing-13`), size/height
@@ -83,6 +87,11 @@ them as plain, immutable Dart, derived from the upstream `@carbon/*` packages in
 
 Token values are copied faithfully from the Apache-2.0 source; files that are
 direct translations carry an attribution header pointing to `NOTICE`.
+
+The [generated reference facts](reference-facts.md) list artwork/font counts and
+SDK/reference versions, checked against source and lockfiles in CI. The complete
+[token coverage contract](theming-and-layers.md#token-coverage-contract) separates
+delivered tokens from deferred font families and syntax highlighting.
 
 ## Icons
 
@@ -139,11 +148,11 @@ our own:
 - **App shell:** consumers use `WidgetsApp` (or their own), not `MaterialApp`.
 - **`CarbonThemeData`:** an immutable aggregate of the resolved semantic token
   set for one theme (the four built-ins plus user-defined themes).
-- **`CarbonTheme`:** an `InheritedWidget` exposing `CarbonTheme.of(context)`,
-  with the four built-in themes and support for custom ones. Provides `lerp`
-  for animated theme transitions.
-- **`Layer`:** Carbon's contextual layering model (background elevation), as its
-  own inherited widget that shifts the active layer tokens for descendants.
+- **`CarbonTheme`:** an `InheritedWidget` exposing `CarbonTheme.of(context)`.
+  `CarbonThemeData.lerp` interpolates tokens; `AnimatedCarbonTheme` owns the
+  transition. High-contrast preferences adapt tokens at the nearest MediaQuery.
+- **`CarbonLayer`:** Carbon's contextual layering model (background elevation), as its
+  scope that shifts the active layer tokens for descendants.
 
 ## Interaction & styling primitives (`utils`)
 
@@ -188,10 +197,13 @@ Each token group and component lands with:
 
 1. **State-matrix widget tests** — rendering and interaction across every
    variant, size, and state.
-2. **Golden tests** — visual fidelity against the Carbon spec. IBM Plex is
+2. **Golden tests** — regression baselines for the port. Curated upstream
+   story comparisons are a separate fidelity tier. IBM Plex is
    loaded via `FontLoader` in the test harness so goldens render real glyphs;
-   goldens are generated and verified on a single pinned CI platform to stay
-   deterministic.
+   goldens are generated and verified on Linux. The SDK follows the latest
+   Flutter stable; the declared minimum is tested separately. VM font aliases
+   are not proof of consuming-app registration: the native browser font
+   contract checks the consumer manifest and actual bundled glyph metrics.
 3. **Semantics tests** — accessibility tree, labels, and focus order.
 
 Unit tests cover token math (type scale, fluid type, color/curve conversions).
@@ -235,3 +247,32 @@ virtual viewports keyed by stable IDs. Focused rows stay mounted until focus
 leaves; controlled selection/expansion survives recycling. Data metadata remains
 proportional to record count. See [large-data rendering](large-data.md) for the
 measured eager envelope, benchmark limits and viewport/controller contracts.
+
+## Delivered compositions and current boundaries
+
+Fluid typography, PaginationNav, RadioTile, ExpandableTile, controlled TreeView
+active state and multiselect, responsive shell navigation, breadcrumb and tab
+overflow, and responsive notification variants are implemented. The gallery
+[coverage policy](testing/gallery-coverage.md) records discovery coverage; it
+does not imply that every upstream variant has an independent comparison.
+
+PageHeader deliberately retains constructor composition and its historical v11
+SCSS geometry. Pinned core source contains a newer compound PageHeader with
+scroll/collapse behavior; the v11 entrypoint keeps its deprecated preview
+namespace and defers the newer export to v12. Carbide now supplies responsive
+actions, overflowing tags, truncated-title help and a caller-owned hero slot.
+It does not implement the compound header's scroll/collapse orchestration.
+See the [PageHeader recipe](patterns/page-header.md).
+
+File selection and transport belong to the application, as documented in the
+[file upload integration recipe](patterns/file-upload.md). React prefix
+providers, feature-flag contexts and DOM portal APIs are not copied into the
+Flutter API. CSS subgrid is outside the Wrap-based grid architecture. Deferred
+v12 tile/structured-list visuals are an upstream migration decision, not a
+claim that their current Carbide controls are missing.
+
+The gallery is built with WASM and JavaScript outputs. Cross-origin isolation
+enables multi-threaded skwasm; without isolation, compatible browsers can use
+single-threaded skwasm. The manual Chromium validation used this mode. Browser
+capability determines fallback; missing COOP/COEP headers alone do not imply
+CanvasKit. See [Flutter's WASM guidance](https://docs.flutter.dev/platform-integration/web/wasm).

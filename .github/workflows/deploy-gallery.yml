@@ -1,11 +1,9 @@
 name: Deploy gallery
 
-# Builds the Carbide gallery (example/) for the web with WebAssembly and
-# publishes it to GitHub Pages. The `--wasm` build ships both a skwasm (WASM)
-# and a CanvasKit (JS) renderer; the bootstrapper serves WASM where the browser
-# is cross-origin isolated and falls back to CanvasKit otherwise (GitHub Pages
-# cannot set the COOP/COEP headers skwasm needs, so most visitors get the
-# CanvasKit fallback — the app is identical either way).
+# Deploys the verified WASM and JavaScript gallery outputs. Compatible browsers
+# can use single-threaded skwasm without COOP/COEP; cross-origin isolation enables
+# multiple threads. Renderer fallback depends on browser capability, not simply
+# on whether GitHub Pages can configure these headers.
 
 on:
   push:

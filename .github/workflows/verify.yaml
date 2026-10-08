@@ -103,6 +103,8 @@ jobs:
           python3 tool/public_surface.py --check
           python3 tool/test_public_api_policy.py
           python3 tool/public_api_policy.py
+          python3 tool/test_documentation_facts.py
+          python3 tool/documentation_facts.py --check
           python3 tool/test_gallery_coverage.py
           python3 tool/gallery_coverage.py --check
           python3 tool/test_accessibility_inventory.py

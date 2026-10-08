@@ -11,10 +11,8 @@
 
 /// Carbide — an unofficial Flutter port of the IBM Carbon Design System.
 ///
-/// Carbide is built strictly on `package:flutter/widgets.dart`. It deliberately
-/// does not depend on Material or Cupertino: every token, theme, and component
-/// is implemented from Flutter's base widgets so the result matches Carbon's
-/// specification rather than Material's.
+/// Carbide uses Flutter base widgets and SDK rendering, painting, services
+/// and semantics libraries. Library code imports no Material or Cupertino.
 ///
 /// Import this barrel for the supported public API. All exports follow the
 /// [stability policy](https://github.com/sunderee/carbide/blob/master/docs/api-stability.md).

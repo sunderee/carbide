@@ -74,10 +74,10 @@ CarbonOverflowMenu(
 )
 ```
 
-Gap: upstream collapses long breadcrumbs into an ellipsis with an
-overflow menu; `CarbonBreadcrumb` does not implement that collapse yet
-(tracked as a follow-up). Until it lands, keep trails short or compose
-a `CarbonOverflowMenu` between the first and last crumbs yourself.
+`CarbonBreadcrumb` implements measured single-line collapse into a keyboard
+navigable overflow menu. Hidden-item actions retain
+their own callbacks, and Escape returns focus to the disclosure. See the
+component API for the responsive visibility policy.
 
 ## "Show more"
 
