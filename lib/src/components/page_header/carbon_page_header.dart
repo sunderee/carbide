@@ -38,6 +38,21 @@ import '../breadcrumb/carbon_breadcrumb.dart';
 /// A page-level header band with a title, optional breadcrumb, description and
 /// tabs.
 ///
+/// The title is a heading at [headingLevel] (level one by default); subtitle
+/// and body remain supporting prose. There is no generic container
+/// announcement, so the caller's title supplies the page's own language.
+/// Heading level does not change the productive-heading-04 visual style.
+///
+/// Ports the layered band, optional breadcrumbs/icon/actions, title and
+/// description, wrapping tags and a tabs slot. Responsive action collapse,
+/// tag `+N` disclosure, a truncated-title tooltip and a hero/content slot are
+/// separate follow-ups: [actions](https://github.com/sunderee/carbide/issues/395),
+/// [tags](https://github.com/sunderee/carbide/issues/396),
+/// [tooltip](https://github.com/sunderee/carbide/issues/397), and
+/// [hero](https://github.com/sunderee/carbide/issues/398).
+/// The former core React preview was deprecated and moved to IBM Products;
+/// this constructor intentionally preserves Carbide's composition API.
+///
 /// ```dart
 /// CarbonPageHeader(
 ///   breadcrumbs: <CarbonBreadcrumbItem>[
@@ -64,16 +79,23 @@ class CarbonPageHeader extends StatelessWidget {
     this.pageActions,
     this.tags = const <Widget>[],
     this.tabs,
-  });
+    this.headingLevel = 1,
+  }) : assert(headingLevel >= 1 && headingLevel <= 6);
 
   /// The page title (`productive-heading-04`).
   final String title;
 
+  /// The title's semantic heading level, from one through six.
+  ///
+  /// Defaults to the page-level heading. Set a deeper level when composing
+  /// the header inside an existing document hierarchy; styling stays fixed.
+  final int headingLevel;
+
   /// An optional leading title icon.
   final CarbonIconData? icon;
 
-  /// An optional subtitle above nothing/below the title
-  /// (`productive-heading-03`).
+  /// Supporting prose below the title, styled with productive-heading-03.
+  /// It does not introduce a second semantic heading.
   final String? subtitle;
 
   /// An optional descriptive body (`body-01`).
@@ -115,7 +137,6 @@ class CarbonPageHeader extends StatelessWidget {
     return Semantics(
       container: true,
       explicitChildNodes: true,
-      label: 'Page header',
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: layer.layer,
@@ -223,12 +244,19 @@ class _Content extends StatelessWidget {
                       constraints: const BoxConstraints(
                         maxWidth: CarbonPageHeader.maxTextWidth,
                       ),
-                      child: Text(
-                        header.title,
-                        maxLines: header.pageActions != null ? 1 : 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: CarbonTypeStyles.productiveHeading04.copyWith(
-                          color: theme.textPrimary,
+                      child: Semantics(
+                        // Flutter 3.47 creates the native h1–h6 tag once.
+                        // Replace just this node when its hierarchy changes.
+                        key: ValueKey<int>(header.headingLevel),
+                        header: true,
+                        headingLevel: header.headingLevel,
+                        child: Text(
+                          header.title,
+                          maxLines: header.pageActions != null ? 1 : 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: CarbonTypeStyles.productiveHeading04.copyWith(
+                            color: theme.textPrimary,
+                          ),
                         ),
                       ),
                     ),

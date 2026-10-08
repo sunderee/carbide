@@ -57,10 +57,19 @@ void main() {
       expect((deco.border! as Border).bottom.width, 1);
     });
 
-    testWidgets('exposes a page-header container', (WidgetTester tester) async {
+    testWidgets('announces the page title without a generic container label', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const CarbonPageHeader(title: 'Reports')));
-      expect(find.bySemanticsLabel('Page header'), findsOneWidget);
+      expect(find.bySemanticsLabel('Page header'), findsNothing);
+      expect(
+        tester
+            .getSemantics(find.text('Reports'))
+            .getSemanticsData()
+            .headingLevel,
+        1,
+      );
       handle.dispose();
     });
   });

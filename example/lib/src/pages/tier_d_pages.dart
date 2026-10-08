@@ -351,29 +351,52 @@ class _TreeViewPageState extends State<_TreeViewPage> {
   }
 }
 
-class _PageHeaderPage extends StatelessWidget {
+class _PageHeaderPage extends StatefulWidget {
   const _PageHeaderPage();
+  @override
+  State<_PageHeaderPage> createState() => _PageHeaderPageState();
+}
+
+class _PageHeaderPageState extends State<_PageHeaderPage> {
+  int _headingLevel = 2;
+  int _edits = 0;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Page header',
       description: 'A page-level header band with breadcrumb and actions.',
       previewAlignment: Alignment.topLeft,
-      preview: CarbonPageHeader(
-        title: 'Quarterly report',
-        subtitle: 'Finance',
-        body: 'A summary of revenue and spend for the quarter.',
-        breadcrumbs: <CarbonBreadcrumbItem>[
-          CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
-          CarbonBreadcrumbItem(label: 'Finance', onPressed: () {}),
-        ],
-        pageActions: CarbonButton(
-          label: 'Edit',
-          kind: CarbonButtonKind.tertiary,
-          onPressed: () {},
+      controls: <Widget>[
+        choiceKnob<int>(
+          label: 'Heading level',
+          value: _headingLevel,
+          options: const <int>[1, 2, 3, 4, 5, 6],
+          labelOf: (int level) => '$level',
+          onChanged: (int level) => setState(() => _headingLevel = level),
         ),
+      ],
+      preview: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text('Edits: $_edits'),
+          CarbonPageHeader(
+            title: 'Quarterly report',
+            headingLevel: _headingLevel,
+            subtitle: 'Finance',
+            body: 'A summary of revenue and spend for the quarter.',
+            breadcrumbs: <CarbonBreadcrumbItem>[
+              CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
+              CarbonBreadcrumbItem(label: 'Finance', onPressed: () {}),
+            ],
+            pageActions: CarbonButton(
+              label: 'Edit',
+              kind: CarbonButtonKind.tertiary,
+              onPressed: () => setState(() => _edits++),
+            ),
+          ),
+        ],
       ),
-      code: 'CarbonPageHeader(title: \'…\', breadcrumbs: <…>[…]);',
+      code: 'CarbonPageHeader(title: \'…\', headingLevel: 2, breadcrumbs: <…>[…]);',
     );
   }
 }
