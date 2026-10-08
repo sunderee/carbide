@@ -6,6 +6,7 @@ import 'dart:ui' show SemanticsRole;
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -411,6 +412,82 @@ void main() {
       expect(find.text('Record 999').hitTestable(), findsOneWidget);
     },
   );
+  check('a kept-alive offscreen editor retains its root semantics value', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics(),
+        scroll = ScrollController(),
+        focus = FocusNode(),
+        controller = TextEditingController(text: 'Retained draft');
+    addTearDown(scroll.dispose);
+    addTearDown(focus.dispose);
+    addTearDown(controller.dispose);
+    try {
+      await tester.pumpWidget(
+        _host(
+          CarbonDataTable(
+            columns: _columns,
+            rows: [
+              CarbonTableRow(
+                id: 0,
+                cells: [
+                  CarbonTextInput(
+                    labelText: 'Draft',
+                    controller: controller,
+                    focusNode: focus,
+                  ),
+                  const Text('Available'),
+                ],
+              ),
+              for (int i = 1; i < 1000; i++)
+                CarbonTableRow(
+                  id: i,
+                  cells: [Text('Item $i'), const Text('Available')],
+                ),
+            ],
+            virtualized: true,
+            scrollController: scroll,
+            stickyHeader: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      focus.requestFocus();
+      await tester.pumpAndSettle();
+      final node = tester.getSemantics(find.bySemanticsLabel('Draft'));
+      final owner = tester
+          .renderObject(find.byType(CarbonDataTable))
+          .owner!
+          .semanticsOwner!;
+      bool present() {
+        bool found = false;
+        void visit(SemanticsNode current) {
+          if (current.id == node.id) found = true;
+          current.visitChildren((SemanticsNode child) {
+            visit(child);
+            return true;
+          });
+        }
+
+        visit(owner.rootSemanticsNode!);
+        return found;
+      }
+
+      scroll.jumpTo(1200);
+      await tester.pumpAndSettle();
+      expect(focus.hasPrimaryFocus, isTrue);
+      expect(present(), isTrue);
+      expect(node.value, 'Retained draft');
+      scroll.jumpTo(0);
+      await tester.pumpAndSettle();
+      expect(controller.text, 'Retained draft');
+      expect(tester.getSemantics(find.bySemanticsLabel('Draft')).id, node.id);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    } finally {
+      semantics.dispose();
+    }
+  });
   check('eager table supports intrinsic measurement', (tester) async {
     await tester.pumpWidget(
       _host(
