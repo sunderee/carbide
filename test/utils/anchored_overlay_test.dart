@@ -4,6 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -86,6 +87,9 @@ void main() {
               _ => find.byType(CarbonListBox),
             };
             await tester.tap(trigger.first);
+            if (entry.key == 'filterable multi select') {
+              await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+            }
           }
           await tester.pumpAndSettle();
           final Finder popup = switch (entry.key) {
