@@ -8,7 +8,11 @@ Cupertino in library code. Tokens and component behavior are ported from
 Carbon's pinned reference sources.
 
 [**▶ Explore the live gallery**](https://sunderee.github.io/carbide/) —
-every component, every theme, with live controls and copyable code.
+cataloged families and compositions in four themes, with live controls and compiled clipboard examples.
+
+<!-- carbide-readme:coverage:start -->
+The checked catalog contains **67 routes**. The public barrel exposes **279 declarations**, including **170 widget classes** across **63 source families**. These counts include composition and inherited-scope types, not separate independent controls. The [API-to-gallery policy](docs/testing/gallery-coverage.md) records live references and reasoned composition/nonvisual exemptions.
+<!-- carbide-readme:coverage:end -->
 
 ![The Carbide gallery overview](https://raw.githubusercontent.com/sunderee/carbide/master/docs/images/overview.png)
 
@@ -116,22 +120,18 @@ and explicit boundaries. React `Fluid*` names map to the existing picker/field
 APIs and `CarbonFluidForm`; React providers and CSS subgrid are separate
 platform/architecture decisions. The matrix does not promise full variant parity.
 
-Components are organized in tiers, mirroring the gallery's navigation.
+<!-- carbide-readme:catalog:start -->
+| Gallery category | Pages | Public widget declarations mapped |
+| --- | --- | --- |
+| Foundations | [Color tokens](https://sunderee.github.io/carbide/#/components/colors), [Typography](https://sunderee.github.io/carbide/#/components/typography), [Fluid typography](https://sunderee.github.io/carbide/#/components/fluid-type), [Spacing](https://sunderee.github.io/carbide/#/components/spacing), [Icons](https://sunderee.github.io/carbide/#/components/icons), [Pictograms](https://sunderee.github.io/carbide/#/components/pictograms), [Motion](https://sunderee.github.io/carbide/#/components/motion) | 5 |
+| Foundational | [Button](https://sunderee.github.io/carbide/#/components/button), [Copy button](https://sunderee.github.io/carbide/#/components/copy-button), [Code snippet](https://sunderee.github.io/carbide/#/components/code-snippet), [Icon button](https://sunderee.github.io/carbide/#/components/icon-button), [Indicators](https://sunderee.github.io/carbide/#/components/indicators), [Aspect ratio](https://sunderee.github.io/carbide/#/components/aspect-ratio), [Grid](https://sunderee.github.io/carbide/#/components/grid), [Skeletons](https://sunderee.github.io/carbide/#/components/skeletons), [Tag](https://sunderee.github.io/carbide/#/components/tag), [Link](https://sunderee.github.io/carbide/#/components/link), [Tile](https://sunderee.github.io/carbide/#/components/tile), [Loading](https://sunderee.github.io/carbide/#/components/loading), [Progress bar](https://sunderee.github.io/carbide/#/components/progress-bar), [List](https://sunderee.github.io/carbide/#/components/list), [Stack](https://sunderee.github.io/carbide/#/components/stack), [Heading](https://sunderee.github.io/carbide/#/components/heading) | 61 |
+| Forms | [Text input](https://sunderee.github.io/carbide/#/components/text-input), [Text area](https://sunderee.github.io/carbide/#/components/text-area), [Number input](https://sunderee.github.io/carbide/#/components/number-input), [Select](https://sunderee.github.io/carbide/#/components/select), [Search](https://sunderee.github.io/carbide/#/components/search), [Checkbox](https://sunderee.github.io/carbide/#/components/checkbox), [Radio button](https://sunderee.github.io/carbide/#/components/radio), [Toggle](https://sunderee.github.io/carbide/#/components/toggle), [Slider](https://sunderee.github.io/carbide/#/components/slider) | 13 |
+| Composite | [AI label](https://sunderee.github.io/carbide/#/components/ai-label), [Chat button](https://sunderee.github.io/carbide/#/components/chat-button), [Contained list](https://sunderee.github.io/carbide/#/components/contained-list), [Context menu](https://sunderee.github.io/carbide/#/components/context-menu), [Pagination nav](https://sunderee.github.io/carbide/#/components/pagination-nav), [Dropdown](https://sunderee.github.io/carbide/#/components/dropdown), [Combo box](https://sunderee.github.io/carbide/#/components/combo-box), [Multi-select](https://sunderee.github.io/carbide/#/components/multi-select), [Tooltip](https://sunderee.github.io/carbide/#/components/tooltip), [Toggletip](https://sunderee.github.io/carbide/#/components/toggletip), [Overflow menu](https://sunderee.github.io/carbide/#/components/overflow-menu), [Tabs](https://sunderee.github.io/carbide/#/components/tabs), [Accordion](https://sunderee.github.io/carbide/#/components/accordion), [Content switcher](https://sunderee.github.io/carbide/#/components/content-switcher), [Breadcrumb](https://sunderee.github.io/carbide/#/components/breadcrumb), [Pagination](https://sunderee.github.io/carbide/#/components/pagination), [Modal](https://sunderee.github.io/carbide/#/components/modal), [Dialog](https://sunderee.github.io/carbide/#/components/dialog), [Notification](https://sunderee.github.io/carbide/#/components/notification), [Progress indicator](https://sunderee.github.io/carbide/#/components/progress-indicator), [Structured list](https://sunderee.github.io/carbide/#/components/structured-list) | 42 |
+| Complex & data | [Data table](https://sunderee.github.io/carbide/#/components/data-table), [Date picker](https://sunderee.github.io/carbide/#/components/date-picker), [Time picker](https://sunderee.github.io/carbide/#/components/time-picker), [File uploader](https://sunderee.github.io/carbide/#/components/file-uploader), [Tree view](https://sunderee.github.io/carbide/#/components/tree-view), [Page header](https://sunderee.github.io/carbide/#/components/page-header) | 12 |
+| Compositions | [Form](https://sunderee.github.io/carbide/#/components/form), [Button set](https://sunderee.github.io/carbide/#/components/button-set), [Menu](https://sunderee.github.io/carbide/#/components/menu), [Popover](https://sunderee.github.io/carbide/#/components/popover), [Table toolbar](https://sunderee.github.io/carbide/#/components/table-toolbar), [UI shell](https://sunderee.github.io/carbide/#/components/ui-shell), [Layers and breakpoints](https://sunderee.github.io/carbide/#/components/layers-and-breakpoints), [Fluid pickers](https://sunderee.github.io/carbide/#/components/fluid-pickers) | 41 |
 
-**Foundations** — color tokens, typography, spacing/layout, icons, motion.
-
-**Tier A · Foundational** — Button, Tag, Link, Tile, Loading, Progress bar,
-List, Stack, Heading.
-
-**Tier B · Forms** — Text input, Text area, Number input, Select, Search,
-Checkbox, Radio button, Toggle, Slider.
-
-**Tier C · Composite** — Dropdown, Combo box, Multi-select, Tooltip, Toggletip,
-Overflow menu, Tabs, Accordion, Content switcher, Breadcrumb, Pagination, Modal,
-Notification, Progress indicator, Structured list.
-
-**Tier D · Complex & data** — Data table, Date picker, Time picker, File
-uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
+A widget can map to several categories; these per-category counts are not additive. Mappings include composed variants rather than implying a dedicated page for each declaration. Component pages provide clipboard copy/expand controls and source-derived functional examples; CI compiles their actual displayed code and reviewed Button configurations.
+<!-- carbide-readme:catalog:end -->
 
 ![The Carbon data table on the White theme](https://raw.githubusercontent.com/sunderee/carbide/master/docs/images/data_table.png)
 
@@ -151,17 +151,17 @@ code snippets and application-supplied context.
 - **Platform preferences.** Decorative motion follows reduced motion, and
   [increased contrast](docs/theming-and-layers.md#increased-contrast-accessibility)
   strengthens boundaries, focus indicators and inactive labels centrally.
-- **Tested to a high bar.** Nothing ships without tests: each token group and
-  component lands with state-matrix widget tests, golden tests against the
-  Carbon spec, and semantics/accessibility tests. Every public API is
-  documented (enforced in CI), and 33 curated default stories are rendered beside committed Carbon
-  Storybook references. Their 24×24 luminance-grid comparisons are a coarse
-  drift gate, strengthened by control-size, token-colour and state assertions.
-  They do not establish pixel identity or cover every component variant.
+- **Checked contracts.** State, focus, semantics, lifetime and scaling tests
+  accompany component changes. Public API documentation, inventories and
+  generated artifacts are checked in CI.
+
+<!-- carbide-readme:fidelity:start -->
+**33 curated default stories** compare selected families with committed upstream Carbon Storybook images. Their 24×24 luminance-grid scores, control dimensions, token colors and state contracts detect reviewed drift; they do not establish pixel identity or all-variant coverage. Other family specimens use Linux golden regression baselines and behavior/accessibility tests. The [parity matrix](docs/carbon-parity.md) records these distinct tiers and implementation boundaries.
+<!-- carbide-readme:fidelity:end -->
 
 ## Principles
 
-1. **Base widgets only.** No `package:flutter/material.dart` or
+1. **No Material or Cupertino.** No `package:flutter/material.dart` or
    `package:flutter/cupertino.dart` in `lib/`. Theming, state, and styling are
    built from scratch on the widgets layer.
 2. **Token-driven.** Components consume design tokens (color, type, layout,

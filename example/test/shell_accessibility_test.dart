@@ -56,7 +56,7 @@ void main() {
       await tester.tap(find.text('Button').hitTestable());
       await tester.pumpAndSettle();
       expect(
-        find.text('Eight kinds across six sizes, with an optional icon.'),
+        find.text('Button kinds and sizes, with an optional icon.'),
         findsOneWidget,
       );
       final CarbonHeaderName home = tester.widget<CarbonHeaderName>(
@@ -76,7 +76,7 @@ void main() {
       await tester.tap(find.text('Button').hitTestable());
       await tester.pumpAndSettle();
       expect(
-        find.text('Eight kinds across six sizes, with an optional icon.'),
+        find.text('Button kinds and sizes, with an optional icon.'),
         findsOneWidget,
       );
       final SemanticsNode node = tester.getSemantics(
@@ -119,7 +119,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(CarbonSideNav), findsNothing);
       expect(
-        find.text('Eight kinds across six sizes, with an optional icon.'),
+        find.text('Button kinds and sizes, with an optional icon.'),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);
