@@ -31,20 +31,8 @@ Widget _rtlHost(Widget child) => Directionality(
 /// Like [_rtlHost], with an Overlay so portal-based specimens (dialog)
 /// can mount — used by the crash sweep only (the behavior tests keep the
 /// plain host their pointer math was written against).
-Widget _rtlOverlayHost(Widget child) => Directionality(
-  textDirection: TextDirection.rtl,
-  child: CarbonTheme(
-    data: CarbonThemeData.white,
-    child: Overlay(
-      initialEntries: <OverlayEntry>[
-        managedOverlayEntry(
-          builder: (BuildContext context) =>
-              Align(alignment: AlignmentDirectional.topStart, child: child),
-        ),
-      ],
-    ),
-  ),
-);
+Widget _rtlOverlayHost(Widget child) =>
+    carbideSpecimenHost(direction: TextDirection.rtl, child: child);
 
 void main() {
   group('RTL crash guard', () {

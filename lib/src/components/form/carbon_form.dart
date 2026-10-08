@@ -207,10 +207,12 @@ class CarbonFormGroup extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  legend,
-                  style: CarbonTypeStyles.label01.copyWith(
-                    color: theme.textSecondary,
+                Flexible(
+                  child: Text(
+                    legend,
+                    style: CarbonTypeStyles.label01.copyWith(
+                      color: theme.textSecondary,
+                    ),
                   ),
                 ),
                 // The AI label flows after the legend with an 8px margin

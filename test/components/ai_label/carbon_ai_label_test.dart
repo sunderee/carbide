@@ -4,6 +4,7 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,16 +68,24 @@ void main() {
         ),
       );
       for (final CarbonAILabelSize size in CarbonAILabelSize.values) {
-        expect(
-          tester.getSize(
-            find.descendant(
-              of: find.byKey(ValueKey<CarbonAILabelSize>(size)),
-              matching: find.byType(AnimatedContainer),
-            ),
+        final Size rendered = tester.getSize(
+          find.descendant(
+            of: find.byKey(ValueKey<CarbonAILabelSize>(size)),
+            matching: find.byType(AnimatedContainer),
           ),
-          Size(size.dimension, size.dimension),
-          reason: '$size box should be ${size.dimension}px',
         );
+        if (kIsWeb) {
+          // Chrome widget tests use Ahem (#271). Its wider glyphs must fit;
+          // the VM/Plex check below remains the exact upstream size authority.
+          expect(rendered.width, greaterThanOrEqualTo(size.dimension));
+          expect(rendered.height, rendered.width);
+        } else {
+          expect(
+            rendered,
+            Size(size.dimension, size.dimension),
+            reason: '$size box should be ${size.dimension}px',
+          );
+        }
       }
     });
 
