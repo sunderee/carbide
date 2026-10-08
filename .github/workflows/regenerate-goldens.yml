@@ -35,9 +35,18 @@ jobs:
       - name: Regenerate goldens
         run: flutter test --update-goldens
 
+      - name: Regenerate gallery and README review images
+        working-directory: example
+        run: |
+          flutter pub get
+          flutter test --dart-define=SCREENSHOTS=true --update-goldens test/screenshots_test.dart
+          cp test/screenshots/overview.png ../docs/images/overview.png
+          cp test/screenshots/button_dark.png ../docs/images/button_dark.png
+          cp test/screenshots/data_table.png ../docs/images/data_table.png
+
       - name: Commit regenerated goldens
         run: |
-          git add -A -- '*/goldens/*.png'
+          git add -A -- '*/goldens/*.png' example/test/screenshots/*.png docs/images/*.png
           if git diff --cached --quiet; then
             echo "No golden changes."
             exit 0
