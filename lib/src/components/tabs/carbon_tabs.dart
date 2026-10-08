@@ -10,9 +10,13 @@
 // Tabs: a TabList of Tabs over matching TabPanels, in line (underline) and
 // contained (filled) variants, plus the vertical variant (CarbonTabsVertical,
 // upstream TabsVertical/TabListVertical — always contained). Roving keyboard
-// selection with automatic activation. (Overflow scroll buttons for the
-// horizontal variants are a follow-up.)
+// selection with automatic or manual activation, shared overflow handling and
+// logical horizontal scroll controls.
 
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -26,7 +30,155 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/native_tab_semantics.dart';
 import '../form/carbon_form.dart' show CarbonFieldSize;
+
+int _nextTabsSemanticsId = 0;
+
+void _syncTabAfterFrame(
+  String identifier, {
+  required bool enabled,
+  required bool roving,
+  required bool Function() mounted,
+}) {
+  if (!kIsWeb) return;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted()) {
+      syncNativeTabSemantics(identifier, enabled: enabled, roving: roving);
+    }
+  });
+}
+
+/// Shared scroll metrics, edge state and reveal policy for both tab axes.
+class _TabOverflowCoordinator extends ChangeNotifier {
+  _TabOverflowCoordinator({required this.onViewportChanged}) {
+    controller.addListener(refresh);
+  }
+
+  final ScrollController controller = ScrollController();
+  final VoidCallback onViewportChanged;
+  bool before = false;
+  bool after = false;
+  bool hasOverflow = false;
+  double edgeThreshold = 0;
+  double? wholeExtent;
+  double? _viewport;
+  double? _animationTarget;
+  int _animationSerial = 0;
+  bool _disposed = false;
+
+  void refresh() {
+    if (_disposed || !controller.hasClients) return;
+    final ScrollPosition position = controller.position;
+    if (!position.hasContentDimensions) return;
+    final bool viewportChanged = _viewport != position.viewportDimension;
+    _viewport = position.viewportDimension;
+    final double contentExtent =
+        position.maxScrollExtent + position.viewportDimension;
+    final bool overflow =
+        contentExtent > (wholeExtent ?? position.viewportDimension) + 0.5;
+    final bool start = edgeThreshold == 0
+        ? position.pixels > 0.5
+        : position.pixels > edgeThreshold;
+    final double remaining = position.maxScrollExtent - position.pixels;
+    final bool end = edgeThreshold == 0
+        ? remaining > 0.5
+        : remaining >= edgeThreshold;
+    if (viewportChanged) onViewportChanged();
+    if (overflow != hasOverflow ||
+        start != before ||
+        end != after ||
+        viewportChanged) {
+      hasOverflow = overflow;
+      before = start;
+      after = end;
+      notifyListeners();
+    }
+  }
+
+  void scrollTo(BuildContext context, double target) {
+    if (_disposed || !controller.hasClients) return;
+    final double offset = target.clamp(
+      controller.position.minScrollExtent,
+      controller.position.maxScrollExtent,
+    );
+    if ((offset - controller.position.pixels).abs() < 0.1) return;
+    final Duration duration = carbonDuration(
+      context,
+      CarbonDuration.moderate01,
+    );
+    final int serial = ++_animationSerial;
+    if (duration == Duration.zero) {
+      _animationTarget = null;
+      controller.jumpTo(offset);
+    } else {
+      _animationTarget = offset;
+      unawaited(
+        controller
+            .animateTo(
+              offset,
+              duration: duration,
+              curve: CarbonEasing.standardProductive,
+            )
+            .then((_) {
+              if (!_disposed && serial == _animationSerial) {
+                _animationTarget = null;
+              }
+            }),
+      );
+    }
+  }
+
+  void finishReducedMotion(BuildContext context) {
+    if (_animationTarget != null &&
+        controller.hasClients &&
+        carbonDuration(context, CarbonDuration.moderate01) == Duration.zero) {
+      final double target = _animationTarget!;
+      _animationTarget = null;
+      _animationSerial++;
+      controller.jumpTo(
+        target.clamp(
+          controller.position.minScrollExtent,
+          controller.position.maxScrollExtent,
+        ),
+      );
+    }
+  }
+
+  void reveal(
+    BuildContext owner,
+    BuildContext? targetContext, {
+    double padding = 0,
+    double? preferredOffset,
+  }) {
+    if (_disposed || !controller.hasClients || targetContext == null) return;
+    final RenderObject? object = targetContext.findRenderObject();
+    if (object == null || !object.attached) return;
+    final RenderAbstractViewport? viewport = RenderAbstractViewport.maybeOf(
+      object,
+    );
+    if (viewport == null) return;
+    final double start = viewport.getOffsetToReveal(object, 0).offset - padding;
+    final double end = viewport.getOffsetToReveal(object, 1).offset + padding;
+    final double pixels = controller.position.pixels;
+    final double? target = pixels > start
+        ? start
+        : pixels < end
+        ? end
+        : null;
+    if (target != null) {
+      scrollTo(owner, preferredOffset ?? target);
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    controller.removeListener(refresh);
+    controller.dispose();
+    super.dispose();
+  }
+}
 
 /// The visual style of a [CarbonTabs].
 enum CarbonTabVariant {
@@ -35,6 +187,15 @@ enum CarbonTabVariant {
 
   /// Filled tabs with a top indicator on the selected tab.
   contained,
+}
+
+/// Whether moving keyboard focus also selects a tab.
+enum CarbonTabActivationMode {
+  /// Arrow keys and Home/End focus and select the destination tab.
+  automatic,
+
+  /// Navigation changes focus; Enter or Space selects the focused tab.
+  manual,
 }
 
 /// A single tab in a [CarbonTabs].
@@ -74,7 +235,10 @@ class CarbonTab {
 /// last visible selection.
 ///
 /// Selection is controlled when [selectedIndex] is provided, otherwise managed
-/// internally. Left/Right (Home/End) move and activate tabs. When the
+/// internally. Left/Right (Home/End) move focus and, under [activation]'s
+/// automatic default, select the destination. Manual mode waits for Enter or
+/// Space. Overflow controls use logical first/last directions; the selected or
+/// focused tab is revealed when it changes and after viewport resizing. When the
 /// platform requests reduced motion, tab state transitions complete
 /// instantly.
 ///
@@ -99,6 +263,10 @@ class CarbonTabs extends StatefulWidget {
     this.onChanged,
     this.variant = CarbonTabVariant.line,
     this.size = CarbonFieldSize.lg,
+    this.activation = CarbonTabActivationMode.automatic,
+    this.tabListLabel = 'Tabs',
+    this.scrollBackwardLabel = 'Scroll toward first tab',
+    this.scrollForwardLabel = 'Scroll toward last tab',
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty'),
        assert(panels.length == tabs.length, 'each tab must have a panel'),
        assert(
@@ -125,42 +293,126 @@ class CarbonTabs extends StatefulWidget {
   /// The tab height.
   final CarbonFieldSize size;
 
+  /// Whether keyboard navigation selects immediately or waits for activation.
+  final CarbonTabActivationMode activation;
+
+  /// The localized accessible name of the tab list.
+  final String tabListLabel;
+
+  /// The localized name of the control that scrolls toward earlier tabs.
+  final String scrollBackwardLabel;
+
+  /// The localized name of the control that scrolls toward later tabs.
+  final String scrollForwardLabel;
+
   @override
   State<CarbonTabs> createState() => _CarbonTabsState();
 }
 
 class _CarbonTabsState extends State<CarbonTabs> {
   late int _selected = widget.selectedIndex ?? 0;
+  late int _active = _current;
   late List<FocusNode> _nodes = _makeNodes();
+  late final _TabOverflowCoordinator _overflow;
+  final String _semanticId = 'carbide-tabs-${_nextTabsSemanticsId++}';
+  bool _revealPending = true;
 
-  List<FocusNode> _makeNodes() =>
-      List<FocusNode>.generate(widget.tabs.length, (_) => FocusNode());
-
+  String get _panelId => '$_semanticId-panel';
   int _clampIndex(int index) =>
       _safeTabIndex(index, widget.tabs.length, widget.panels.length);
-
   int get _current => _clampIndex(widget.selectedIndex ?? _selected);
+  int get _activeIndex =>
+      _active >= 0 &&
+          _active < widget.tabs.length &&
+          !widget.tabs[_active].disabled
+      ? _active
+      : widget.tabs.indexWhere((CarbonTab tab) => !tab.disabled);
+
+  List<FocusNode> _makeNodes() =>
+      List<FocusNode>.generate(widget.tabs.length, (int i) {
+        final FocusNode node = FocusNode();
+        node.addListener(() {
+          if (mounted && node.hasPrimaryFocus) {
+            setState(() {
+              _active = i;
+              _revealPending = true;
+            });
+          }
+        });
+        return node;
+      });
+
+  @override
+  void initState() {
+    super.initState();
+    _overflow = _TabOverflowCoordinator(
+      onViewportChanged: () => _revealPending = true,
+    )..addListener(_refresh);
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _overflow.finishReducedMotion(context);
+    _revealPending = true;
+  }
 
   @override
   void didUpdateWidget(CarbonTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final bool focused = _nodes.any((FocusNode node) => node.hasFocus);
     if (widget.tabs.length != _nodes.length) {
       for (final FocusNode node in _nodes) {
         node.dispose();
       }
       _nodes = _makeNodes();
+      _active = _clampIndex(_active);
+      _revealPending = true;
+      if (focused && _activeIndex >= 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _activeIndex >= 0) _nodes[_activeIndex].requestFocus();
+        });
+      }
     }
     _selected = _clampIndex(
       widget.selectedIndex ?? oldWidget.selectedIndex ?? _selected,
     );
+    if (widget.selectedIndex != oldWidget.selectedIndex) {
+      _active = _current;
+      _revealPending = true;
+      if (focused && _activeIndex >= 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _activeIndex >= 0) _nodes[_activeIndex].requestFocus();
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
+    _overflow.removeListener(_refresh);
+    _overflow.dispose();
     for (final FocusNode node in _nodes) {
       node.dispose();
     }
     super.dispose();
+  }
+
+  void _focusIndex(int index) {
+    if (index < 0 ||
+        index >= widget.tabs.length ||
+        widget.tabs[index].disabled) {
+      return;
+    }
+    setState(() {
+      _active = index;
+      _revealPending = true;
+    });
+    _nodes[index].requestFocus();
   }
 
   void _select(int index) {
@@ -169,18 +421,27 @@ class _CarbonTabsState extends State<CarbonTabs> {
         widget.tabs[index].disabled) {
       return;
     }
+    setState(() {
+      if (widget.selectedIndex == null) _selected = index;
+      _active = index;
+      _revealPending = true;
+    });
     widget.onChanged?.call(index);
-    if (widget.selectedIndex == null) setState(() => _selected = index);
     _nodes[index].requestFocus();
   }
 
+  void _navigate(int index) =>
+      widget.activation == CarbonTabActivationMode.manual
+      ? _focusIndex(index)
+      : _select(index);
+
   void _move(int delta) {
     final int n = widget.tabs.length;
-    int next = _current;
+    int next = _activeIndex;
     for (int i = 0; i < n; i++) {
       next = (next + delta + n) % n;
       if (!widget.tabs[next].disabled) {
-        _select(next);
+        _navigate(next);
         return;
       }
     }
@@ -188,63 +449,188 @@ class _CarbonTabsState extends State<CarbonTabs> {
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
-    // Horizontal arrows follow the visual direction (mirrored under RTL,
-    // like slider and menu); vertical arrows stay logical.
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    final LogicalKeyboardKey nextKey = rtl
+    final LogicalKeyboardKey next = rtl
         ? LogicalKeyboardKey.arrowLeft
         : LogicalKeyboardKey.arrowRight;
-    final LogicalKeyboardKey previousKey = rtl
+    final LogicalKeyboardKey previous = rtl
         ? LogicalKeyboardKey.arrowRight
         : LogicalKeyboardKey.arrowLeft;
-    if (event.logicalKey == nextKey ||
+    if (event.logicalKey == next ||
         event.logicalKey == LogicalKeyboardKey.arrowDown) {
       _move(1);
       return KeyEventResult.handled;
     }
-    if (event.logicalKey == previousKey ||
+    if (event.logicalKey == previous ||
         event.logicalKey == LogicalKeyboardKey.arrowUp) {
       _move(-1);
       return KeyEventResult.handled;
     }
-    switch (event.logicalKey) {
-      case LogicalKeyboardKey.home:
-        _select(widget.tabs.indexWhere((CarbonTab t) => !t.disabled));
-        return KeyEventResult.handled;
-      case LogicalKeyboardKey.end:
-        _select(widget.tabs.lastIndexWhere((CarbonTab t) => !t.disabled));
-        return KeyEventResult.handled;
+    if (event.logicalKey == LogicalKeyboardKey.home) {
+      _navigate(widget.tabs.indexWhere((CarbonTab tab) => !tab.disabled));
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.end) {
+      _navigate(widget.tabs.lastIndexWhere((CarbonTab tab) => !tab.disabled));
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      _select(_activeIndex);
+      return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
   }
 
+  void _scheduleLayout() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _overflow.refresh();
+      if (_revealPending) {
+        _revealPending = false;
+        final int index = _activeIndex;
+        if (index >= 0 && index < _nodes.length) {
+          _overflow.reveal(context, _nodes[index].context);
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Widget> tabWidgets = <Widget>[
-      for (int i = 0; i < widget.tabs.length; i++)
-        _TabButton(
-          tab: widget.tabs[i],
-          variant: widget.variant,
-          size: widget.size,
-          selected: i == _current,
-          focusNode: _nodes[i],
-          onKey: _onKey,
-          onTap: () => _select(i),
-        ),
-    ];
-
+    _scheduleLayout();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Semantics(
-          explicitChildNodes: true,
-          container: true,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: widget.variant == CarbonTabVariant.contained
-                ? tabWidgets
-                : <Widget>[...tabWidgets, const Expanded(child: _LineFiller())],
+        Focus(
+          canRequestFocus: false,
+          includeSemantics: false,
+          onFocusChange: (bool focused) {
+            if (!focused && mounted && _active != _current) {
+              setState(() {
+                _active = _current;
+                _revealPending = false;
+              });
+            }
+          },
+          child: SizedBox(
+            height: widget.size.height,
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                _overflow.wholeExtent = constraints.maxWidth;
+                final bool controls = _overflow.hasOverflow;
+                final double available =
+                    (constraints.maxWidth - (controls ? 64 : 0)).clamp(
+                      64,
+                      double.infinity,
+                    );
+                final bool rtl =
+                    Directionality.of(context) == TextDirection.rtl;
+                return Stack(
+                  children: <Widget>[
+                    if (widget.variant == CarbonTabVariant.line)
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: _LineFiller(),
+                      ),
+                    Row(
+                      children: <Widget>[
+                        if (controls)
+                          _TabScrollButton(
+                            label: widget.scrollBackwardLabel,
+                            icon: rtl
+                                ? CarbonIcons.chevronRight
+                                : CarbonIcons.chevronLeft,
+                            height: widget.size.height,
+                            onPressed: _overflow.before
+                                ? () => _overflow.scrollTo(
+                                    context,
+                                    _overflow.controller.position.pixels -
+                                        _overflow
+                                            .controller
+                                            .position
+                                            .viewportDimension,
+                                  )
+                                : null,
+                          ),
+                        Expanded(
+                          key: const ValueKey<String>('carbide-tab-viewport'),
+                          child:
+                              NotificationListener<ScrollMetricsNotification>(
+                                onNotification: (_) {
+                                  _scheduleLayout();
+                                  return false;
+                                },
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false),
+                                  child: SingleChildScrollView(
+                                    controller: _overflow.controller,
+                                    scrollDirection: Axis.horizontal,
+                                    child: Semantics(
+                                      container: true,
+                                      explicitChildNodes: true,
+                                      role: widget.tabs.isEmpty
+                                          ? SemanticsRole.none
+                                          : SemanticsRole.tabBar,
+                                      label: widget.tabListLabel,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          for (
+                                            int i = 0;
+                                            i < widget.tabs.length;
+                                            i++
+                                          )
+                                            _TabButton(
+                                              tab: widget.tabs[i],
+                                              variant: widget.variant,
+                                              size: widget.size,
+                                              selected: i == _current,
+                                              focusNode: _nodes[i],
+                                              roving: i == _activeIndex,
+                                              maxWidth: available,
+                                              identifier: '$_semanticId-tab-$i',
+                                              panelId: widget.panels.isEmpty
+                                                  ? ''
+                                                  : _panelId,
+                                              onKey: _onKey,
+                                              onTap: () => _select(i),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                        ),
+                        if (controls)
+                          _TabScrollButton(
+                            label: widget.scrollForwardLabel,
+                            icon: rtl
+                                ? CarbonIcons.chevronLeft
+                                : CarbonIcons.chevronRight,
+                            height: widget.size.height,
+                            onPressed: _overflow.after
+                                ? () => _overflow.scrollTo(
+                                    context,
+                                    _overflow.controller.position.pixels +
+                                        _overflow
+                                            .controller
+                                            .position
+                                            .viewportDimension,
+                                  )
+                                : null,
+                          ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
         if (widget.tabs.isNotEmpty && widget.panels.isNotEmpty)
@@ -252,6 +638,8 @@ class _CarbonTabsState extends State<CarbonTabs> {
             padding: const EdgeInsets.only(top: CarbonSpacing.spacing05),
             child: Semantics(
               container: true,
+              role: SemanticsRole.tabPanel,
+              identifier: _panelId,
               child: KeyedSubtree(
                 key: ValueKey<int>(_current),
                 child: widget.panels[_current],
@@ -298,7 +686,8 @@ enum CarbonTabsVerticalSize {
 /// list takes a quarter of the available width (the upstream grid spans),
 /// scrolls when its tabs overflow the available height — with 64px fade
 /// gradients marking the overflow — and keeps the selected tab scrolled
-/// into view. Up/Down move the selection (Home/End jump); labels wrap to
+/// into view. Up/Down move focus (Home/End jump); [activation] controls whether
+/// navigation selects immediately or Enter/Space commits. Labels wrap to
 /// two lines (one at [CarbonTabsVerticalSize.sm]).
 ///
 /// Dismissable tabs are not part of the vertical variant upstream and are
@@ -316,6 +705,8 @@ class CarbonTabsVertical extends StatefulWidget {
     this.onChanged,
     this.size = CarbonTabsVerticalSize.xl,
     this.height,
+    this.activation = CarbonTabActivationMode.automatic,
+    this.tabListLabel = 'Tabs',
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty'),
        assert(panels.length == tabs.length, 'each tab must have a panel'),
        assert(
@@ -344,6 +735,12 @@ class CarbonTabsVertical extends StatefulWidget {
   /// height in an unbounded one.
   final double? height;
 
+  /// Whether keyboard navigation selects immediately or waits for activation.
+  final CarbonTabActivationMode activation;
+
+  /// The localized accessible name of the tab list.
+  final String tabListLabel;
+
   @override
   State<CarbonTabsVertical> createState() => _CarbonTabsVerticalState();
 }
@@ -351,12 +748,31 @@ class CarbonTabsVertical extends StatefulWidget {
 class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
   late int _selected = widget.selectedIndex ?? 0;
   late List<FocusNode> _nodes = _makeNodes();
-  final ScrollController _scroll = ScrollController();
-  bool _overflowTop = false;
-  bool _overflowBottom = false;
+  late final _TabOverflowCoordinator _overflow;
+  late int _active = _current;
+  bool _revealPending = true;
+  final String _semanticId = 'carbide-tabs-${_nextTabsSemanticsId++}';
+  String get _panelId => '$_semanticId-panel';
+  int get _activeIndex =>
+      _active >= 0 &&
+          _active < widget.tabs.length &&
+          !widget.tabs[_active].disabled
+      ? _active
+      : widget.tabs.indexWhere((CarbonTab tab) => !tab.disabled);
 
   List<FocusNode> _makeNodes() =>
-      List<FocusNode>.generate(widget.tabs.length, (_) => FocusNode());
+      List<FocusNode>.generate(widget.tabs.length, (int i) {
+        final FocusNode node = FocusNode();
+        node.addListener(() {
+          if (mounted && node.hasPrimaryFocus) {
+            setState(() {
+              _active = i;
+              _revealPending = true;
+            });
+          }
+        });
+        return node;
+      });
 
   int _clampIndex(int index) =>
       _safeTabIndex(index, widget.tabs.length, widget.panels.length);
@@ -366,21 +782,45 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(_updateOverflow);
+    _overflow = _TabOverflowCoordinator(
+      onViewportChanged: () => _revealPending = true,
+    )..addListener(_refresh);
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _overflow.finishReducedMotion(context);
+    _revealPending = true;
   }
 
   @override
   void didUpdateWidget(CarbonTabsVertical oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final bool focused = _nodes.any((FocusNode node) => node.hasFocus);
     if (widget.tabs.length != _nodes.length) {
       for (final FocusNode node in _nodes) {
         node.dispose();
       }
       _nodes = _makeNodes();
     }
+    _revealPending = true;
     _selected = _clampIndex(
       widget.selectedIndex ?? oldWidget.selectedIndex ?? _selected,
     );
+    if (widget.selectedIndex != oldWidget.selectedIndex ||
+        _active >= widget.tabs.length) {
+      _active = _current;
+    }
+    if (focused && _activeIndex >= 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _activeIndex >= 0) _nodes[_activeIndex].requestFocus();
+      });
+    }
   }
 
   @override
@@ -388,63 +828,39 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
     for (final FocusNode node in _nodes) {
       node.dispose();
     }
-    _scroll.dispose();
+    _overflow.removeListener(_refresh);
+    _overflow.dispose();
     super.dispose();
   }
 
-  /// Mirrors upstream's overflow tracking: an edge overflows once more than
-  /// half a tab row is hidden beyond it.
-  void _updateOverflow() {
-    if (!_scroll.hasClients) {
-      return;
-    }
-    final double half = widget.size.height / 2;
-    final ScrollPosition position = _scroll.position;
-    final bool top = position.pixels > half;
-    final bool bottom =
-        position.pixels + position.viewportDimension + half <=
-        position.maxScrollExtent + position.viewportDimension;
-    if (top != _overflowTop || bottom != _overflowBottom) {
-      setState(() {
-        _overflowTop = top;
-        _overflowBottom = bottom;
-      });
-    }
+  void _revealSelected(int index) {
+    if (index < 0 || index >= _nodes.length) return;
+    final double height = widget.size.height;
+    _overflow.reveal(
+      context,
+      _nodes[index].context,
+      padding: height / 2,
+      preferredOffset: (index - 1) * height,
+    );
   }
 
-  /// Scrolls the selected tab into view (upstream scrolls to
-  /// `(selectedIndex - 1) * tabHeight` when the selection leaves the
-  /// viewport by more than half a row).
-  void _revealSelected(int index) {
-    if (!_scroll.hasClients) {
+  void _focusIndex(int index) {
+    if (index < 0 ||
+        index >= widget.tabs.length ||
+        widget.tabs[index].disabled) {
       return;
     }
-    final double h = widget.size.height;
-    final ScrollPosition position = _scroll.position;
-    final double topInViewport = index * h - position.pixels;
-    final bool outside =
-        topInViewport - h / 2 < 0 ||
-        topInViewport + h + h / 2 > position.viewportDimension;
-    if (outside) {
-      final double target = ((index - 1) * h).clamp(
-        0,
-        position.maxScrollExtent,
-      );
-      final Duration duration = carbonDuration(
-        context,
-        CarbonDuration.moderate01,
-      );
-      if (duration == Duration.zero) {
-        _scroll.jumpTo(target);
-      } else {
-        _scroll.animateTo(
-          target,
-          duration: duration,
-          curve: CarbonEasing.standardProductive,
-        );
-      }
-    }
+    setState(() {
+      _active = index;
+      _revealPending = true;
+    });
+    _nodes[index].requestFocus();
   }
+
+  void _navigate(int index) =>
+      widget.activation == CarbonTabActivationMode.manual
+      ? _focusIndex(index)
+      : _select(index);
 
   void _select(int index) {
     if (index < 0 ||
@@ -452,6 +868,8 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
         widget.tabs[index].disabled) {
       return;
     }
+    _active = index;
+    _revealPending = true;
     widget.onChanged?.call(index);
     if (widget.selectedIndex == null) setState(() => _selected = index);
     _nodes[index].requestFocus();
@@ -460,11 +878,11 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
 
   void _move(int delta) {
     final int n = widget.tabs.length;
-    int next = _current;
+    int next = _activeIndex;
     for (int i = 0; i < n; i++) {
       next = (next + delta + n) % n;
       if (!widget.tabs[next].disabled) {
-        _select(next);
+        _navigate(next);
         return;
       }
     }
@@ -482,84 +900,113 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
         _move(-1);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.home:
-        _select(widget.tabs.indexWhere((CarbonTab t) => !t.disabled));
+        _navigate(widget.tabs.indexWhere((CarbonTab t) => !t.disabled));
         return KeyEventResult.handled;
       case LogicalKeyboardKey.end:
-        _select(widget.tabs.lastIndexWhere((CarbonTab t) => !t.disabled));
+        _navigate(widget.tabs.lastIndexWhere((CarbonTab t) => !t.disabled));
         return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      _select(_activeIndex);
+      return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
   }
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      !widget.tabs.any((CarbonTab tab) => tab.dismissable),
+      'Dismissable tabs are not supported in the vertical variant.',
+    );
     final CarbonThemeData theme = CarbonTheme.of(context);
     final CarbonLayerTokens layer = CarbonLayer.of(context);
 
-    final Widget list = Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          controller: _scroll,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              for (int i = 0; i < widget.tabs.length; i++)
-                _VerticalTabButton(
-                  tab: widget.tabs[i],
-                  size: widget.size,
-                  selected: i == _current,
-                  focusNode: _nodes[i],
-                  onKey: _onKey,
-                  onTap: () => _select(i),
-                ),
-            ],
-          ),
-        ),
-        // 64px fade gradients mark hidden rows past either edge
-        // (`--tab--list-gradient_top/_bottom`, block-size $spacing-10).
-        if (_overflowTop)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 64,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: <Color>[
-                      layer.layer.withValues(alpha: 0),
-                      layer.layer,
-                    ],
-                  ),
+    final Widget list = Semantics(
+      container: true,
+      explicitChildNodes: true,
+
+      child: Stack(
+        children: <Widget>[
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context)
+                .copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              controller: _overflow.controller,
+              child: Semantics(
+                container: true,
+                explicitChildNodes: true,
+                role: widget.tabs.isEmpty
+                    ? SemanticsRole.none
+                    : SemanticsRole.tabBar,
+                label: widget.tabListLabel,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    for (int i = 0; i < widget.tabs.length; i++)
+                      _VerticalTabButton(
+                        tab: widget.tabs[i],
+                        size: widget.size,
+                        selected: i == _current,
+                        roving: i == _activeIndex,
+                        identifier: '$_semanticId-tab-$i',
+                        panelId: widget.panels.isEmpty ? '' : _panelId,
+                        focusNode: _nodes[i],
+                        onKey: _onKey,
+                        onTap: () => _select(i),
+                      ),
+                  ],
                 ),
               ),
             ),
           ),
-        if (_overflowBottom)
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 64,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: <Color>[
-                      layer.layer.withValues(alpha: 0),
-                      layer.layer,
-                    ],
+          // 64px fade gradients mark hidden rows past either edge
+          // (`--tab--list-gradient_top/_bottom`, block-size $spacing-10).
+          if (_overflow.before)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 64,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: <Color>[
+                        layer.layer.withValues(alpha: 0),
+                        layer.layer,
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
+          if (_overflow.after)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 64,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: <Color>[
+                        layer.layer.withValues(alpha: 0),
+                        layer.layer,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
 
     final Widget body = LayoutBuilder(
@@ -602,6 +1049,8 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
                       ),
                       child: Semantics(
                         container: true,
+                        role: SemanticsRole.tabPanel,
+                        identifier: _panelId,
                         child: KeyedSubtree(
                           key: ValueKey<int>(_current),
                           child: widget.tabs.isEmpty || widget.panels.isEmpty
@@ -628,7 +1077,15 @@ class _CarbonTabsVerticalState extends State<CarbonTabsVertical> {
     );
 
     // Recompute the overflow marks once the list has laid out.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _updateOverflow());
+    _overflow.edgeThreshold = widget.size.height / 2;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _overflow.refresh();
+      if (_revealPending) {
+        _revealPending = false;
+        _revealSelected(_activeIndex);
+      }
+    });
     return body;
   }
 }
@@ -642,6 +1099,9 @@ class _VerticalTabButton extends StatefulWidget {
     required this.focusNode,
     required this.onKey,
     required this.onTap,
+    required this.roving,
+    required this.identifier,
+    required this.panelId,
   });
 
   final CarbonTab tab;
@@ -650,6 +1110,9 @@ class _VerticalTabButton extends StatefulWidget {
   final FocusNode focusNode;
   final KeyEventResult Function(FocusNode, KeyEvent) onKey;
   final VoidCallback onTap;
+  final bool roving;
+  final String identifier;
+  final String panelId;
 
   @override
   State<_VerticalTabButton> createState() => _VerticalTabButtonState();
@@ -669,6 +1132,12 @@ class _VerticalTabButtonState extends State<_VerticalTabButton> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = !widget.tab.disabled;
     final bool hovered = enabled && _hovered && !widget.selected;
+    _syncTabAfterFrame(
+      widget.identifier,
+      enabled: enabled,
+      roving: widget.roving,
+      mounted: () => mounted,
+    );
 
     final Color text = widget.tab.disabled
         ? theme.textDisabled
@@ -706,10 +1175,21 @@ class _VerticalTabButtonState extends State<_VerticalTabButton> {
         ? CarbonTypeStyles.headingCompact01
         : CarbonTypeStyles.bodyCompact01;
 
-    // No `onTap` on the Semantics widget: the inner GestureDetector and
-    // Focus merge their tap/focus actions into this labelled node instead
-    // of forking an unlabelled companion node (#268).
+    // This labelled tab owns its actions. The pointer detector and Focus
+    // exclude their automatic semantics to keep one actionable node (#268).
     return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      role: SemanticsRole.tab,
+      identifier: widget.identifier,
+      controlsNodes: widget.panelId.isEmpty
+          ? const <String>{}
+          : <String>{widget.panelId},
+      // A non-null focused value makes the native node a Tab stop in Flutter.
+      // Inactive tabs still expose their named accessibility focus action.
+      focused: enabled && widget.roving ? _focused : null,
+      onFocus: enabled ? widget.focusNode.requestFocus : null,
+      onTap: enabled ? widget.onTap : null,
       selected: widget.selected,
       enabled: enabled,
       button: true,
@@ -721,9 +1201,12 @@ class _VerticalTabButtonState extends State<_VerticalTabButton> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: GestureDetector(
+          excludeFromSemantics: true,
           behavior: HitTestBehavior.opaque,
           onTap: enabled ? widget.onTap : null,
           child: Focus(
+            includeSemantics: false,
+            skipTraversal: !widget.roving,
             focusNode: widget.focusNode,
             canRequestFocus: enabled,
             onKeyEvent: widget.onKey,
@@ -779,6 +1262,48 @@ class _VerticalTabButtonState extends State<_VerticalTabButton> {
 }
 
 /// The 1px subtle baseline that line tabs sit on, filling the unused width.
+/// Scroll controls are outside keyboard traversal; arrows navigate the tabs.
+class _TabScrollButton extends StatelessWidget {
+  const _TabScrollButton({
+    required this.label,
+    required this.icon,
+    required this.height,
+    required this.onPressed,
+  });
+
+  final String label;
+  final CarbonIconData icon;
+  final double height;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: label,
+    enabled: onPressed != null,
+    focusable: false,
+    onTap: onPressed,
+    child: GestureDetector(
+      excludeFromSemantics: true,
+      behavior: HitTestBehavior.opaque,
+      onTap: onPressed,
+      child: SizedBox(
+        width: 32,
+        height: height,
+        child: Center(
+          child: CarbonIcon(
+            icon,
+            size: 16,
+            color: onPressed == null
+                ? CarbonTheme.of(context).iconDisabled
+                : CarbonTheme.of(context).iconPrimary,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 class _LineFiller extends StatelessWidget {
   const _LineFiller();
 
@@ -804,6 +1329,10 @@ class _TabButton extends StatefulWidget {
     required this.focusNode,
     required this.onKey,
     required this.onTap,
+    required this.roving,
+    required this.maxWidth,
+    required this.identifier,
+    required this.panelId,
   });
 
   final CarbonTab tab;
@@ -813,6 +1342,10 @@ class _TabButton extends StatefulWidget {
   final FocusNode focusNode;
   final KeyEventResult Function(FocusNode, KeyEvent) onKey;
   final VoidCallback onTap;
+  final bool roving;
+  final double maxWidth;
+  final String identifier;
+  final String panelId;
 
   @override
   State<_TabButton> createState() => _TabButtonState();
@@ -828,6 +1361,12 @@ class _TabButtonState extends State<_TabButton> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     final bool enabled = !widget.tab.disabled;
     final bool line = widget.variant == CarbonTabVariant.line;
+    _syncTabAfterFrame(
+      widget.identifier,
+      enabled: enabled,
+      roving: widget.roving,
+      mounted: () => mounted,
+    );
     final bool active = enabled && (_hovered);
 
     final Color text = widget.tab.disabled
@@ -875,12 +1414,14 @@ class _TabButtonState extends State<_TabButton> {
           CarbonIcon(widget.tab.icon!, color: text),
           const SizedBox(width: CarbonSpacing.spacing03),
         ],
-        ExcludeSemantics(
-          child: Text(
-            widget.tab.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: CarbonTypeStyles.bodyCompact01.copyWith(color: text),
+        Flexible(
+          child: ExcludeSemantics(
+            child: Text(
+              widget.tab.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CarbonTypeStyles.bodyCompact01.copyWith(color: text),
+            ),
           ),
         ),
         if (widget.tab.dismissable) ...<Widget>[
@@ -899,11 +1440,22 @@ class _TabButtonState extends State<_TabButton> {
       ],
     );
 
-    // No `onTap` on the Semantics widget: the inner GestureDetector and
-    // Focus merge their tap/focus actions into this labelled node instead
-    // of forking an unlabelled companion node (#268). The dismiss icon's
+    // This labelled tab owns its actions. The pointer detector and Focus
+    // exclude their automatic semantics to keep one actionable node (#268). The dismiss icon's
     // own tap handler still forks, but that node carries its own label.
     return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      role: SemanticsRole.tab,
+      identifier: widget.identifier,
+      controlsNodes: widget.panelId.isEmpty
+          ? const <String>{}
+          : <String>{widget.panelId},
+      // A non-null focused value makes the native node a Tab stop in Flutter.
+      // Inactive tabs still expose their named accessibility focus action.
+      focused: enabled && widget.roving ? _focused : null,
+      onFocus: enabled ? widget.focusNode.requestFocus : null,
+      onTap: enabled ? widget.onTap : null,
       selected: widget.selected,
       enabled: enabled,
       button: true,
@@ -915,9 +1467,12 @@ class _TabButtonState extends State<_TabButton> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: GestureDetector(
+          excludeFromSemantics: true,
           behavior: HitTestBehavior.opaque,
           onTap: enabled ? widget.onTap : null,
           child: Focus(
+            includeSemantics: false,
+            skipTraversal: !widget.roving,
             focusNode: widget.focusNode,
             canRequestFocus: enabled,
             onKeyEvent: widget.onKey,
@@ -929,13 +1484,16 @@ class _TabButtonState extends State<_TabButton> {
               // border-bottom-color / outline $duration-fast-01
               // motion(standard, productive).
               child: AnimatedContainer(
+                constraints: BoxConstraints(
+                  minWidth: 64,
+                  maxWidth: widget.maxWidth,
+                ),
                 duration: carbonDuration(context, CarbonDuration.fast01),
                 curve: CarbonEasing.standardProductive,
                 height: widget.size.height,
                 padding: const EdgeInsets.symmetric(
                   horizontal: CarbonSpacing.spacing05,
                 ),
-                alignment: Alignment.center,
                 decoration: decoration,
                 child: content,
               ),

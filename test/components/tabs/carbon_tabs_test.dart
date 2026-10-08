@@ -16,7 +16,9 @@ Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
   child: CarbonTheme(
     data: CarbonThemeData.white,
-    child: Center(child: SizedBox(width: 420, child: child)),
+    // Selection/style cases fit four labels even with the web test font.
+    // tabs_overflow_test.dart separately forces and navigates 320px overflow.
+    child: Center(child: SizedBox(width: 760, child: child)),
   ),
 );
 
@@ -263,20 +265,25 @@ void main() {
         directions: const <TextDirection>{TextDirection.ltr, TextDirection.rtl},
         containsText: true,
         size: const Size(440, 220),
-        builder: (BuildContext context) => Center(
-          child: SizedBox(
-            width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                CarbonTabs(tabs: _tabs, panels: _panels),
-                const SizedBox(height: 24),
-                CarbonTabs(
-                  tabs: _tabs,
-                  panels: _panels,
-                  variant: CarbonTabVariant.contained,
-                ),
-              ],
+        builder: (BuildContext context) => DefaultTextStyle(
+          style: CarbonTypeStyles.body01.copyWith(
+            color: CarbonTheme.of(context).textPrimary,
+          ),
+          child: Center(
+            child: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CarbonTabs(tabs: _tabs, panels: _panels),
+                  const SizedBox(height: 24),
+                  CarbonTabs(
+                    tabs: _tabs,
+                    panels: _panels,
+                    variant: CarbonTabVariant.contained,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -504,23 +511,28 @@ void main() {
         name: 'tabs_vertical',
         containsText: true,
         size: const Size(640, 300),
-        builder: (BuildContext context) => Center(
-          child: SizedBox(
-            width: 600,
-            height: 260,
-            child: CarbonTabsVertical(
-              tabs: const <CarbonTab>[
-                CarbonTab(label: 'Overview'),
-                CarbonTab(label: 'Details'),
-                CarbonTab(label: 'Settings', disabled: true),
-                CarbonTab(label: 'A longer label that wraps to two lines'),
-              ],
-              panels: const <Widget>[
-                Text('Overview panel'),
-                Text('Details panel'),
-                Text('Settings panel'),
-                Text('Long panel'),
-              ],
+        builder: (BuildContext context) => DefaultTextStyle(
+          style: CarbonTypeStyles.body01.copyWith(
+            color: CarbonTheme.of(context).textPrimary,
+          ),
+          child: Center(
+            child: SizedBox(
+              width: 600,
+              height: 260,
+              child: CarbonTabsVertical(
+                tabs: const <CarbonTab>[
+                  CarbonTab(label: 'Overview'),
+                  CarbonTab(label: 'Details'),
+                  CarbonTab(label: 'Settings', disabled: true),
+                  CarbonTab(label: 'A longer label that wraps to two lines'),
+                ],
+                panels: const <Widget>[
+                  Text('Overview panel'),
+                  Text('Details panel'),
+                  Text('Settings panel'),
+                  Text('Long panel'),
+                ],
+              ),
             ),
           ),
         ),

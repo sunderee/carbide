@@ -366,6 +366,9 @@ class _TabsPage extends StatefulWidget {
 
 class _TabsPageState extends State<_TabsPage> {
   bool _vertical = false;
+  bool _many = false;
+  bool _manual = false;
+  CarbonTabVariant _variant = CarbonTabVariant.line;
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData t = CarbonTheme.of(context);
@@ -376,39 +379,71 @@ class _TabsPageState extends State<_TabsPage> {
         style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
       ),
     );
-    const List<CarbonTab> tabs = <CarbonTab>[
-      CarbonTab(label: 'Overview'),
-      CarbonTab(label: 'Specs'),
-      CarbonTab(label: 'Reviews'),
-    ];
+    final List<CarbonTab> tabs = _many
+        ? <CarbonTab>[
+            for (int i = 0; i < 18; i++)
+              CarbonTab(label: 'Category ${i + 1}', disabled: i == 2),
+          ]
+        : const <CarbonTab>[
+            CarbonTab(label: 'Overview'),
+            CarbonTab(label: 'Specs'),
+            CarbonTab(label: 'Reviews'),
+          ];
+    final List<Widget> panels = _many
+        ? <Widget>[
+            for (int i = 0; i < 18; i++) panel('Category ${i + 1} content.'),
+          ]
+        : <Widget>[
+            panel('Overview content.'),
+            panel('Technical specifications.'),
+            panel('Customer reviews.'),
+          ];
+    final CarbonTabActivationMode activation = _manual
+        ? CarbonTabActivationMode.manual
+        : CarbonTabActivationMode.automatic;
     return DemoScaffold(
       title: 'Tabs',
-      description: 'Line, contained and vertical tabs switching panels.',
+      description:
+          'Overflowing tabs stay reachable. Manual activation moves focus '
+          'with arrows and selects with Enter or Space.',
       previewAlignment: Alignment.topLeft,
       preview: SizedBox(
-        width: 480,
+        width: _many && !_vertical ? 320 : 480,
         child: _vertical
             ? SizedBox(
                 height: 260,
                 child: CarbonTabsVertical(
                   tabs: tabs,
-                  panels: const <Widget>[
-                    Text('Overview content.'),
-                    Text('Technical specifications.'),
-                    Text('Customer reviews.'),
-                  ],
+                  panels: panels,
+                  activation: activation,
                 ),
               )
             : CarbonTabs(
                 tabs: tabs,
-                panels: <Widget>[
-                  panel('Overview content.'),
-                  panel('Technical specifications.'),
-                  panel('Customer reviews.'),
-                ],
+                panels: panels,
+                activation: activation,
+                variant: _variant,
               ),
       ),
       controls: <Widget>[
+        boolKnob(
+          label: 'Many tabs',
+          value: _many,
+          onChanged: (bool many) => setState(() => _many = many),
+        ),
+        boolKnob(
+          label: 'Manual activation',
+          value: _manual,
+          onChanged: (bool manual) => setState(() => _manual = manual),
+        ),
+        choiceKnob<CarbonTabVariant>(
+          label: 'Style',
+          value: _variant,
+          options: CarbonTabVariant.values,
+          labelOf: (CarbonTabVariant v) => v.name,
+          onChanged: (CarbonTabVariant variant) =>
+              setState(() => _variant = variant),
+        ),
         boolKnob(
           label: 'Vertical',
           value: _vertical,
@@ -416,8 +451,11 @@ class _TabsPageState extends State<_TabsPage> {
         ),
       ],
       code: _vertical
-          ? 'CarbonTabsVertical(tabs: <CarbonTab>[…], panels: <Widget>[…]);'
-          : 'CarbonTabs(tabs: <CarbonTab>[…], panels: <Widget>[…]);',
+          ? 'CarbonTabsVertical(activation: CarbonTabActivationMode.${activation.name}, '
+                'tabs: <CarbonTab>[…], panels: <Widget>[…]);'
+          : 'CarbonTabs(variant: CarbonTabVariant.${_variant.name}, '
+                'activation: CarbonTabActivationMode.${activation.name}, '
+                'tabs: <CarbonTab>[…], panels: <Widget>[…]);',
     );
   }
 }
