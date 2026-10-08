@@ -49,6 +49,7 @@ void main() {
       CarbonTypeStyles.caption01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.33333,
@@ -59,6 +60,7 @@ void main() {
       CarbonTypeStyles.caption02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -69,6 +71,7 @@ void main() {
       CarbonTypeStyles.label01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.33333,
@@ -79,6 +82,7 @@ void main() {
       CarbonTypeStyles.label02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -89,6 +93,7 @@ void main() {
       CarbonTypeStyles.helperText01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.33333,
@@ -99,6 +104,7 @@ void main() {
       CarbonTypeStyles.helperText02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -109,6 +115,7 @@ void main() {
       CarbonTypeStyles.legal01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.33333,
@@ -119,6 +126,7 @@ void main() {
       CarbonTypeStyles.legal02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -129,6 +137,7 @@ void main() {
       CarbonTypeStyles.code01,
       const TextStyle(
         fontFamily: CarbonFontFamily.mono,
+        package: CarbonFontFamily.package,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.33333,
@@ -139,6 +148,7 @@ void main() {
       CarbonTypeStyles.code02,
       const TextStyle(
         fontFamily: CarbonFontFamily.mono,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.42857,
@@ -149,6 +159,7 @@ void main() {
       CarbonTypeStyles.bodyShort01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -159,6 +170,7 @@ void main() {
       CarbonTypeStyles.bodyShort02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 1.375,
@@ -169,6 +181,7 @@ void main() {
       CarbonTypeStyles.bodyLong01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.42857,
@@ -179,6 +192,7 @@ void main() {
       CarbonTypeStyles.bodyLong02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 1.5,
@@ -189,6 +203,7 @@ void main() {
       CarbonTypeStyles.heading01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.42857,
@@ -199,6 +214,7 @@ void main() {
       CarbonTypeStyles.heading02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -209,6 +225,7 @@ void main() {
       CarbonTypeStyles.productiveHeading01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.28572,
@@ -219,6 +236,7 @@ void main() {
       CarbonTypeStyles.productiveHeading02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.375,
@@ -229,6 +247,7 @@ void main() {
       CarbonTypeStyles.productiveHeading03,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.4,
@@ -239,6 +258,7 @@ void main() {
       CarbonTypeStyles.productiveHeading04,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 28,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -249,6 +269,7 @@ void main() {
       CarbonTypeStyles.productiveHeading05,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 32,
         fontWeight: FontWeight.w400,
         height: 1.25,
@@ -259,6 +280,7 @@ void main() {
       CarbonTypeStyles.productiveHeading06,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.199,
@@ -269,6 +291,7 @@ void main() {
       CarbonTypeStyles.productiveHeading07,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 54,
         fontWeight: FontWeight.w300,
         height: 1.199,
@@ -279,6 +302,7 @@ void main() {
       CarbonTypeStyles.expressiveHeading01,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -289,6 +313,7 @@ void main() {
       CarbonTypeStyles.expressiveHeading02,
       const TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -315,7 +340,10 @@ void main() {
   });
 
   test('every style names a bundled Plex family', () {
-    const families = <String>{CarbonFontFamily.sans, CarbonFontFamily.mono};
+    const families = <String>{
+      'packages/carbide/${CarbonFontFamily.sans}',
+      'packages/carbide/${CarbonFontFamily.mono}',
+    };
     for (final TextStyle style in <TextStyle>[
       CarbonTypeStyles.caption01,
       CarbonTypeStyles.caption02,

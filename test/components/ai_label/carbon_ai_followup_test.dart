@@ -8,6 +8,7 @@
 // rewritten by those PRs).
 
 import 'package:carbide/carbide.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -124,11 +125,18 @@ void main() {
         ),
       );
       expect(find.byType(CarbonFormLabel), findsNothing);
-      // Both fields render fluid with their labels inside.
-      expect(tester.getSize(find.byType(CarbonField).first).height, 64);
-      expect(tester.getSize(find.byType(CarbonField).last).height, 64);
+      // Both fields select fluid chrome. Chrome's Ahem placeholder makes the
+      // date glyph line taller than Plex, so 64px remains a minimum there.
+      for (final Element field in find.byType(CarbonField).evaluate()) {
+        expect((field.widget as CarbonField).fluid, isTrue);
+        expect(
+          tester.getSize(find.byWidget(field.widget)).height,
+          kIsWeb ? greaterThanOrEqualTo(64) : equals(64),
+        );
+      }
       expect(find.text('Start date'), findsOneWidget);
       expect(find.text('End date'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
     });
   });
 

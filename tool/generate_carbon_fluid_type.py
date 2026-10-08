@@ -138,6 +138,7 @@ def emit_style(f: dict, *, base: bool) -> str:
     a: list[str] = []
     if base or "family" in f:
         a.append(f"fontFamily: {FAMILY[f.get('family', 'sans')]}")
+        a.append("package: CarbonFontFamily.package")
     if "size" in f:
         a.append(f"fontSize: {f['size']}")
     if base or "weight" in f:

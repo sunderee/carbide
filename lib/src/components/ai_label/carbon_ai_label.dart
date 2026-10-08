@@ -291,6 +291,7 @@ class _AILabelButtonState extends State<_AILabelButton> {
   TextStyle _textStyle(double fontSize, double lineHeight, Color color) =>
       TextStyle(
         fontFamily: CarbonFontFamily.sans,
+        package: CarbonFontFamily.package,
         fontWeight: FontWeight.w600,
         fontSize: fontSize,
         height: lineHeight / fontSize,

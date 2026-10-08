@@ -37,6 +37,13 @@ jobs:
           --driver=test_driver/integration_test.dart
           --target=integration_test/code_snippet_focus_test.dart
           -d web-server
+      - name: Verify consumer font registration and actual glyph metrics
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/font_resolution_test.dart
+          -d web-server
       - name: Build deployed configuration
         working-directory: example
         run: flutter build web --release --wasm --base-href /carbide/

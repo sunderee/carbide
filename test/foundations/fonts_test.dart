@@ -15,6 +15,8 @@ void main() {
   test('font family names match the Carbon families', () {
     expect(CarbonFontFamily.sans, 'IBM Plex Sans');
     expect(CarbonFontFamily.mono, 'IBM Plex Mono');
+    expect(CarbonFontFamily.serif, 'IBM Plex Serif');
+    expect(CarbonFontFamily.package, 'carbide');
   });
 
   test('bundled Plex fonts load from the asset bundle', () async {
@@ -35,11 +37,17 @@ void main() {
           children: <Widget>[
             Text(
               'Carbide',
-              style: TextStyle(fontFamily: CarbonFontFamily.sans),
+              style: TextStyle(
+                fontFamily: CarbonFontFamily.sans,
+                package: CarbonFontFamily.package,
+              ),
             ),
             Text(
               'const x = 1;',
-              style: TextStyle(fontFamily: CarbonFontFamily.mono),
+              style: TextStyle(
+                fontFamily: CarbonFontFamily.mono,
+                package: CarbonFontFamily.package,
+              ),
             ),
           ],
         ),
@@ -50,7 +58,7 @@ void main() {
     expect(find.text('const x = 1;'), findsOneWidget);
 
     final Text sans = tester.widget<Text>(find.text('Carbide'));
-    expect(sans.style?.fontFamily, CarbonFontFamily.sans);
+    expect(sans.style?.fontFamily, 'packages/carbide/${CarbonFontFamily.sans}');
 
     // The paragraph lays out with real glyph metrics, so it has a non-zero size.
     final Size size = tester.getSize(find.text('Carbide'));
