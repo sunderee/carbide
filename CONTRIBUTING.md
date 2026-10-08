@@ -301,6 +301,13 @@ can only configure a trusted publisher for a package that already exists):
 dart pub publish        # authenticates via your pub.dev account in a browser
 ```
 
+### Carbon reference generation
+
+For Carbon reference bumps, run the nonmutating generator checks and independent
+color reader described in [token verification](docs/testing/token-verification.md).
+The Carbon reference generation workflow checks token output before a bump can
+merge; update generated files and artwork locks explicitly and review the diff.
+
 ### Public surface and layout specimens
 
 Every declaration exported from `lib/carbide.dart` is inventoried in

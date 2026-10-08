@@ -23,6 +23,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 ROOT = Path(__file__).resolve().parent.parent
 TYPE_DIR = ROOT / "documentation/carbon/packages/type/src"
 LIB_OUT = ROOT / "lib/src/foundations/typography.dart"
@@ -233,12 +235,12 @@ def main() -> None:
     wmap = weights()
     objects = parse_objects()
     styles = {name: style(objects[name], scale, wmap) for name in OBJECTS}
-    LIB_OUT.write_text(emit_lib(scale, wmap, styles))
-    TEST_OUT.write_text(emit_test(scale, wmap, styles))
+    write_generated(LIB_OUT, emit_lib(scale, wmap, styles))
+    write_generated(TEST_OUT, emit_test(scale, wmap, styles))
     print(f"scale: {len(scale)} steps; weights: {wmap}")
     print(f"fixed styles: {len(OBJECTS)} objects + {len(ALIASES)} aliases")
-    print(f"wrote {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
+    print(f"prepared {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

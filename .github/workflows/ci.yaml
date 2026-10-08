@@ -35,6 +35,8 @@ jobs:
       - name: Icon lockfile drift guard
         run: |
           python3 tool/test_carbon_generation.py
+          python3 tool/test_generation_check.py
+          python3 tool/test_upstream_tokens.py
           python3 tool/test_icons_lock.py
           python3 tool/check_icons_lock.py
 

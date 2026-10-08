@@ -18,6 +18,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 from generate_carbon_type import normalize_styles, scale_steps, weights
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -231,11 +233,11 @@ def emit_test(parsed: dict[str, tuple]) -> str:
 def main() -> None:
     text = normalize_styles((TYPE_DIR / "styles.ts").read_text())
     parsed = {name: parse(text, name) for name in OBJECTS}
-    LIB_OUT.write_text(emit_lib(parsed))
-    TEST_OUT.write_text(emit_test(parsed))
+    write_generated(LIB_OUT, emit_lib(parsed))
+    write_generated(TEST_OUT, emit_test(parsed))
     print(f"fluid styles: {len(OBJECTS)} objects + {len(ALIASES)} aliases")
-    print(f"wrote {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
+    print(f"prepared {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)
