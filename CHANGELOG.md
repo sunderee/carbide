@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Grow small field, fluid list-box, combo-box, filterable multi-select, search,
+  selection-count and menu chrome with scaled text. Add missing specimens,
+  inherited-font/editor clipping guards and closed/open scaling coverage while
+  preserving normal geometry and fixed icon artwork (#334).
+
 - Measure icon/pictogram path-cache retention and parsing costs, document the
   retained process-lifetime cache policy, and verify value keys, winding rules
   and transformed cached renders. Add a reproducible opt-in benchmark (#340).

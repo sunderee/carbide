@@ -550,71 +550,104 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
             child: AnimatedContainer(
               duration: carbonDuration(context, CarbonDuration.fast01),
               curve: CarbonEasing.standardProductive,
-              height: widget.size.height,
+              constraints: BoxConstraints(
+                minHeight: _fluid ? 64 : widget.size.height,
+              ),
               decoration: BoxDecoration(color: background, border: border),
               padding: const EdgeInsetsDirectional.only(
                 start: CarbonSpacing.spacing05,
                 end: CarbonSpacing.spacing04,
+                top: CarbonSpacing.spacing01,
+                bottom: CarbonSpacing.spacing01,
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  if (count > 0) ...<Widget>[
+                  if (_fluid) ...<Widget>[
                     ExcludeSemantics(
-                      excluding: !_controlState.canActivate,
-                      child: CarbonListBoxSelectionCount(
-                        count: count,
-                        disabled: _controlState.isDisabled,
-                        readOnly: _controlState.isReadOnly,
-                        onClear: _clearAll,
-                      ),
-                    ),
-                    const SizedBox(width: CarbonSpacing.spacing03),
-                  ],
-                  Expanded(
-                    child: CarbonTextControlSemantics(
-                      state: _controlState,
-                      label: widget.titleText,
-                      value: controller.text,
-                      readOnlyHint: widget.readOnlyHint,
-                      expanded: _controlState.canActivate && _overlay.isShowing,
-                      activeOptionHint: CarbonListBoxSemantics.activeHintOf(
-                        context,
-                      ),
-                      focusNode: _focus,
-                      child: _FilterInput(
-                        controller: controller,
-                        focusNode: _focus,
-                        enabled: _controlState.canActivate,
-                        placeholder: widget.filterPlaceholder ?? widget.label,
-                        style: CarbonTypeStyles.bodyCompact01.copyWith(
+                      child: Text(
+                        widget.titleText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: CarbonTypeStyles.label01.copyWith(
                           color: _controlState.isDisabled
                               ? theme.textDisabled
-                              : theme.textPrimary,
-                        ),
-                        placeholderColor: theme.textPlaceholder,
-                        cursorColor: theme.focus,
-                        onChanged: _onFilter,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: CarbonSpacing.spacing03),
-                  ExcludeSemantics(
-                    excluding: !_controlState.canActivate,
-                    child: Semantics(
-                      button: true,
-                      label: widget.titleText,
-                      expanded: _overlay.isShowing,
-                      onTap: _controlState.canActivate ? _toggleOpen : null,
-                      child: GestureDetector(
-                        excludeFromSemantics: true,
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _controlState.canActivate ? _toggleOpen : null,
-                        child: CarbonListBoxMenuIcon(
-                          open: _overlay.isShowing,
-                          disabled: !_controlState.canActivate,
+                              : theme.textSecondary,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 2),
+                  ],
+                  Row(
+                    key: const ValueKey<String>(
+                      'carbon-multi-select-filter-row',
+                    ),
+                    children: <Widget>[
+                      if (count > 0) ...<Widget>[
+                        ExcludeSemantics(
+                          excluding: !_controlState.canActivate,
+                          child: CarbonListBoxSelectionCount(
+                            count: count,
+                            disabled: _controlState.isDisabled,
+                            readOnly: _controlState.isReadOnly,
+                            onClear: _clearAll,
+                          ),
+                        ),
+                        const SizedBox(width: CarbonSpacing.spacing03),
+                      ],
+                      Expanded(
+                        child: CarbonTextControlSemantics(
+                          state: _controlState,
+                          label: widget.titleText,
+                          value: controller.text,
+                          readOnlyHint: widget.readOnlyHint,
+                          expanded:
+                              _controlState.canActivate && _overlay.isShowing,
+                          activeOptionHint: CarbonListBoxSemantics.activeHintOf(
+                            context,
+                          ),
+                          focusNode: _focus,
+                          child: _FilterInput(
+                            controller: controller,
+                            focusNode: _focus,
+                            enabled: _controlState.canActivate,
+                            placeholder:
+                                widget.filterPlaceholder ?? widget.label,
+                            style: CarbonTypeStyles.bodyCompact01.copyWith(
+                              color: _controlState.isDisabled
+                                  ? theme.textDisabled
+                                  : theme.textPrimary,
+                            ),
+                            placeholderColor: theme.textPlaceholder,
+                            cursorColor: theme.focus,
+                            onChanged: _onFilter,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: CarbonSpacing.spacing03),
+                      ExcludeSemantics(
+                        excluding: !_controlState.canActivate,
+                        child: Semantics(
+                          button: true,
+                          label: widget.titleText,
+                          expanded: _overlay.isShowing,
+                          onTap: _controlState.canActivate ? _toggleOpen : null,
+                          child: GestureDetector(
+                            excludeFromSemantics: true,
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _controlState.canActivate
+                                ? _toggleOpen
+                                : null,
+                            child: CarbonListBoxMenuIcon(
+                              open: _overlay.isShowing,
+                              disabled: !_controlState.canActivate,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

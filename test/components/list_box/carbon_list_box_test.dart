@@ -287,7 +287,7 @@ void main() {
           ),
         ),
       );
-      expect(tester.getSize(find.byType(Container)).height, 48);
+      expect(tester.getSize(find.byType(CarbonListBoxMenuItem)).height, 48);
       expect(background(tester), const Color(0x00000000));
       final DefaultTextStyle ds = tester.widget<DefaultTextStyle>(
         find
