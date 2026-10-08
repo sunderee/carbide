@@ -52,7 +52,10 @@ class DemoScaffold extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(title, style: CarbonTypeStyles.productiveHeading05),
+          Semantics(
+            headingLevel: 1,
+            child: Text(title, style: CarbonTypeStyles.productiveHeading05),
+          ),
           if (description != null) ...<Widget>[
             const SizedBox(height: CarbonSpacing.spacing03),
             Text(

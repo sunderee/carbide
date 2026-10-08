@@ -74,6 +74,35 @@ Select and Dropdown also retain their existing support for a multi-character
 single-character cycling. Editable ComboBox and MultiSelect use their text
 query filters; this navigation policy does not change those filters.
 
+## Page headers
+
+`CarbonPageHeader` exposes its full title as a heading even when the visible
+text is ellipsized. `headingLevel` defaults to one and accepts one through
+six; set a deeper level when embedding it beneath an existing page heading,
+as the gallery does. The productive-heading-04 visual style stays fixed.
+Subtitle and body are supporting prose. The container has no generic English
+announcement: the caller's title supplies the accessible name and language.
+
+Flutter 3.47.6 renders native `h1`–`h6` elements on web; browsers expose their
+heading role and numeric level. Its Android
+[bridge](https://github.com/flutter/flutter/blob/5fc346839b5d0eef006ed8404392afb4dfae428d/engine/src/flutter/shell/platform/android/io/flutter/view/BaseRoleConfigurator.java#L141)
+calls `AccessibilityNodeInfo.setHeading` for positive levels on API 28 and
+later, covered by its [native heading regression](https://github.com/flutter/flutter/blob/5fc346839b5d0eef006ed8404392afb4dfae428d/engine/src/flutter/shell/platform/android/test/io/flutter/view/AccessibilityBridgeTest.java#L3256).
+On iOS the [bridge](https://github.com/flutter/flutter/blob/5fc346839b5d0eef006ed8404392afb4dfae428d/engine/src/flutter/shell/platform/darwin/ios/framework/Source/SemanticsObject.mm#L842)
+supplies `UIAccessibilityTraitHeader`. Live iOS 26.5 simulator inspection
+confirmed that trait on the title and ordinary static-text traits on its
+subtitle/body, compared with the missing heading trait before the fix.
+Android evidence is bridge/regression-source inspection; spoken TalkBack
+and VoiceOver output is not claimed. Native traits identify a heading,
+while the numeric hierarchy is exposed by the web mapping.
+
+Responsive actions, tag `+N` disclosure, truncated-title tooltips and the
+hero/content slot are separate visual follow-ups:
+[#395](https://github.com/sunderee/carbide/issues/395),
+[#396](https://github.com/sunderee/carbide/issues/396),
+[#397](https://github.com/sunderee/carbide/issues/397), and
+[#398](https://github.com/sunderee/carbide/issues/398).
+
 ## Code snippets
 
 Single- and multi-line snippets expose their code text. Copy and expand
