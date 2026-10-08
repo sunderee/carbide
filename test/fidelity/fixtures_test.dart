@@ -12,15 +12,16 @@ import 'support/fixtures.dart';
 Future<void> _story(
   WidgetTester tester,
   String slug,
-  void Function() verify,
-) async {
-  await tester.binding.setSurfaceSize(const Size(1280, 720));
+  void Function() verify, {
+  double width = 1280,
+}) async {
+  await tester.binding.setSurfaceSize(Size(width, 720));
   try {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
-          data: const MediaQueryData(size: Size(1280, 720)),
+          data: MediaQueryData(size: Size(width, 720)),
           child: CarbonTheme(
             data: CarbonThemeData.white,
             child: DefaultTextStyle(
@@ -81,12 +82,14 @@ void main() {
   testWidgets('horizontal progress fixture uses intrinsic content height', (
     tester,
   ) async {
+    // Web widget tests use Ahem in place of Plex (#271). Isolate the
+    // intrinsic-height contract from the constrained-width gap tracked in #402.
     await _story(tester, 'progress-indicator', () {
       expect(
         tester.getSize(find.byType(CarbonProgressIndicator)).height,
         lessThan(100),
       );
-    });
+    }, width: 2400);
   });
   testWidgets('Modal story uses Modal and its complete default form', (
     tester,
