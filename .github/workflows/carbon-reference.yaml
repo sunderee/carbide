@@ -11,6 +11,8 @@ on:
       - 'tool/check_upstream_colors.py'
       - 'tool/test_generation_check.py'
       - 'tool/test_upstream_tokens.py'
+      - 'tool/carbon_reference.lock.json'
+      - 'tool/update_carbon_reference.py'
       - 'lib/src/foundations/**'
       - 'lib/src/theme/carbon_theme_data.dart'
       - 'lib/src/icons/generated/**'
@@ -41,6 +43,7 @@ jobs:
           python3 tool/test_generation_check.py
           python3 tool/test_upstream_tokens.py
           python3 tool/test_carbon_generation.py
+          python3 tool/update_carbon_reference.py --check
           for family in colors themes type fluid_type layout motion icons pictograms; do
             python3 "tool/generate_carbon_${family}.py" --check
           done

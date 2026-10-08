@@ -49,6 +49,13 @@ jobs:
           python3 tool/test_overlay_lifetimes.py
           python3 tool/check_overlay_lifetimes.py
 
+      - name: Offline reference freshness and capture provenance
+        run: |
+          dart run tool/check_reference_freshness.dart
+          python3 tool/test_reference_images.py
+          python3 tool/check_reference_images.py
+          node --test tool/fidelity/capture_metadata.test.mjs
+
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
 

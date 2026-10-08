@@ -18,9 +18,9 @@
 // or complete variant coverage. Scores and actual sizes are always emitted for
 // reviewed Linux calibration, with rationales recorded in stories.json.
 //
-// Reference freshness (#230): the manifest stamps the @carbon/react version
-// the live Storybook ran at capture; a check below warns when the submodule
-// pin drifts ≥2 minors ahead of the captured references.
+// Reference freshness (#344) uses committed provenance and the parent gitlink.
+// Missing versions, unreviewed pins and out-of-window batches fail in normal CI
+// without checking out the Carbon sources.
 
 import 'dart:convert';
 import 'dart:io';
@@ -35,6 +35,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/overlay_entries.dart';
 import 'support/fixtures.dart';
+import 'support/freshness.dart';
 import 'support/structural.dart';
 
 const String _mutation = String.fromEnvironment('FIDELITY_MUTATION');
@@ -42,8 +43,6 @@ const String _mutation = String.fromEnvironment('FIDELITY_MUTATION');
 const String _refDir = 'test/fidelity/references';
 const String _outDir = 'test/fidelity/comparisons';
 const String _storiesPath = 'tool/fidelity/stories.json';
-const String _submodulePackage =
-    'documentation/carbon/packages/react/package.json';
 
 /// Capture environment and drift budgets are reviewed with each story.
 final Map<String, Map<String, dynamic>> _stories =
@@ -77,49 +76,30 @@ CarbonThemeData _g90Theme() => CarbonThemeData.gray90;
 CarbonThemeData _g100Theme() => CarbonThemeData.gray100;
 
 void main() {
-  test('references are not stale relative to the submodule pin', () {
-    final File pkg = File(_submodulePackage);
-    if (!pkg.existsSync()) {
-      // CI checks out without the documentation submodules; the check
-      // only runs where the pin is present (local dev, capture time).
-      markTestSkipped('submodule not checked out');
-      return;
-    }
-    final Map<String, dynamic> manifest = jsonDecode(
-      File('$_refDir/manifest.json').readAsStringSync(),
-    ) as Map<String, dynamic>;
-    // Fresh captures stamp a top-level version; the hand-merged manifest
-    // carries per-batch stamps. Use the newest non-null one.
-    final List<String> stamped = <String>[
-      if (manifest['carbonReactVersion'] is String)
-        manifest['carbonReactVersion'] as String,
-      if (manifest['captures'] is List)
-        for (final dynamic c in manifest['captures'] as List<dynamic>)
-          if ((c as Map<String, dynamic>)['carbonReactVersion'] is String)
-            c['carbonReactVersion'] as String,
-    ];
-    if (stamped.isEmpty) {
-      markTestSkipped('no capture version stamped (pre-#230 references)');
-      return;
-    }
-    int minor(String v) => int.parse(v.split('.')[1]);
-    final int captured = stamped.map(minor).reduce(math.max);
-    final String pinVersion =
-        (jsonDecode(pkg.readAsStringSync()) as Map<String, dynamic>)['version']
-            as String;
-    final int pin = minor(pinVersion);
-    if (pin - captured >= 2) {
-      // A warning, not a failure: stale references still detect drift,
-      // they just measure against an older upstream. Re-capture via
-      // tool/fidelity/capture.sh when this fires.
-      debugPrint(
-        'WARNING: fidelity references were captured at @carbon/react '
-        'minor $captured but the submodule pin is at minor $pin — '
-        're-capture (tool/fidelity/capture.sh) to refresh ground truth.',
+  test(
+    'every capture is versioned and reviewed against the parent gitlink',
+    () {
+      final ProcessResult git = Process.runSync('git', <String>[
+        'ls-tree',
+        'HEAD',
+        'documentation/carbon',
+      ]);
+      expect(git.exitCode, 0);
+      final String gitlink = (git.stdout as String).trim().split(
+        RegExp(r'\s+'),
+      )[2];
+      verifyReferenceFreshness(
+        pin: jsonDecode(
+          File('tool/carbon_reference.lock.json').readAsStringSync(),
+        ) as Map<String, dynamic>,
+        manifest: jsonDecode(
+          File('$_refDir/manifest.json').readAsStringSync(),
+        ) as Map<String, dynamic>,
+        gitlink: gitlink,
+        components: _stories.keys.toSet(),
       );
-    }
-    expect(captured, greaterThan(0));
-  });
+    },
+  );
 
   for (final String mutation in <String>['button-color', 'button-spacing']) {
     testWidgets('promoted Button gate rejects $mutation', (tester) async {
