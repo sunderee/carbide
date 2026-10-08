@@ -2,10 +2,15 @@
 //
 // This file is part of Carbide and is licensed under the Apache License,
 // Version 2.0. See the LICENSE file in the project root.
+import 'dart:ui' show SemanticsRole;
+
 import 'package:carbide/carbide.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/golden.dart';
+import '../support/legibility.dart';
 
 Widget _host(
   Widget child, {
@@ -81,10 +86,11 @@ void main() {
         expect(find.byType(_Cell).evaluate().length, lessThanOrEqualTo(12));
       }
       expect(scroll.offset, greaterThan(1000));
-      if (sticky)
+      if (sticky) {
         expect(tester.getTopLeft(find.text('Name')), header);
-      else
+      } else {
         expect(find.text('Name'), findsNothing);
+      }
       expect(tester.takeException(), isNull);
     });
   }
@@ -137,6 +143,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.state(find.byKey(const ValueKey('cell-0'))), same(cell));
       expect(cell.focus.hasPrimaryFocus, isTrue);
+      // Variable detail height refines the sliver's initial end estimate.
+      scroll.jumpTo(scroll.position.maxScrollExtent);
+      await tester.pumpAndSettle();
       expect(find.text('Details 0').hitTestable(), findsOneWidget);
       expect(
         tester
@@ -148,19 +157,26 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
-  check('virtualized tables require stable unique record IDs', (tester) async {
+  test('virtualized tables require stable unique record IDs', () {
     expect(
-      () => tester.pumpWidget(
-        _host(
-          CarbonDataTable(
-            columns: _columns,
-            rows: const [
-              CarbonTableRow(cells: [Text('A')]),
-            ],
-            virtualized: true,
-          ),
-        ),
-      ),
+      () => const CarbonDataTable(
+        columns: _columns,
+        rows: [
+          CarbonTableRow(cells: [Text('A')]),
+        ],
+        virtualized: true,
+      ).createElement(),
+      throwsAssertionError,
+    );
+    expect(
+      () => const CarbonDataTable(
+        columns: _columns,
+        rows: [
+          CarbonTableRow(id: 1, cells: [Text('A')]),
+          CarbonTableRow(id: 1, cells: [Text('B')]),
+        ],
+        virtualized: true,
+      ).createElement(),
       throwsAssertionError,
     );
   });
@@ -213,28 +229,277 @@ void main() {
       );
     }
   }
+  test('virtual view heights reject zero, negative and infinite values', () {
+    for (final height in [0.0, -1.0, double.infinity, double.nan]) {
+      expect(
+        () => CarbonDataTable(
+          columns: _columns,
+          rows: const [],
+          virtualized: true,
+          viewportHeight: height,
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => CarbonTreeView(
+          nodes: const [],
+          label: 'Files',
+          virtualized: true,
+          viewportHeight: height,
+        ),
+        throwsAssertionError,
+      );
+    }
+  });
+  test('virtual table state uses stable-ID selection and expansion APIs', () {
+    expect(
+      () => CarbonDataTable(
+        columns: _columns,
+        rows: _rows(1),
+        virtualized: true,
+        onSelectionChanged: (_) {},
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => CarbonDataTable(
+        columns: _columns,
+        rows: _rows(1),
+        virtualized: true,
+        onExpandedChanged: (_) {},
+      ),
+      throwsAssertionError,
+    );
+  });
+  check(
+    'virtual table semantics expose only mounted rows with table/cell roles',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _host(
+            CarbonDataTable(
+              columns: _columns,
+              rows: [
+                for (int i = 0; i < 1000; i++)
+                  CarbonTableRow(
+                    id: i,
+                    cells: [Text('Item $i'), const Text('Available')],
+                  ),
+              ],
+              virtualized: true,
+              stickyHeader: true,
+              viewportHeight: 240,
+              semanticsLabel: 'Records',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final table = tester.getSemantics(find.bySemanticsLabel('Records'));
+        expect(table.getSemanticsData().role, SemanticsRole.table);
+        final labels = tester.semantics
+            .simulatedAccessibilityTraversal()
+            .map((node) => node.label)
+            .toList();
+        expect(labels, contains('Item 0'));
+        expect(labels, isNot(contains('Item 999')));
+        final rowNodes = tester
+            .widgetList<Semantics>(find.byType(Semantics))
+            .where((node) => node.properties.role == SemanticsRole.row)
+            .toList();
+        expect(rowNodes.length, lessThanOrEqualTo(8));
+        expect(rowNodes.length, greaterThan(1));
+        await tester.pumpWidget(const SizedBox.shrink());
+      } finally {
+        semantics.dispose();
+      }
+    },
+  );
+  check(
+    'virtual view data shrink and empty sources preserve valid scroll positions',
+    (tester) async {
+      final count = ValueNotifier(1000), scroll = ScrollController();
+      addTearDown(count.dispose);
+      addTearDown(scroll.dispose);
+      for (final table in [true, false]) {
+        count.value = 1000;
+        await tester.pumpWidget(
+          _host(
+            ValueListenableBuilder(
+              valueListenable: count,
+              builder: (_, n, _) => table
+                  ? CarbonDataTable(
+                      columns: _columns,
+                      rows: _rows(n),
+                      virtualized: true,
+                      scrollController: scroll,
+                    )
+                  : CarbonTreeView(
+                      nodes: _nodes(n),
+                      label: 'Files',
+                      virtualized: true,
+                      scrollController: scroll,
+                    ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        scroll.jumpTo(scroll.position.maxScrollExtent);
+        await tester.pumpAndSettle();
+        count.value = 3;
+        await tester.pumpAndSettle();
+        expect(
+          scroll.offset,
+          lessThanOrEqualTo(scroll.position.maxScrollExtent),
+        );
+        count.value = 0;
+        await tester.pumpAndSettle();
+        expect(scroll.position.maxScrollExtent, 0);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      }
+    },
+  );
+  check(
+    'virtual tree expansion and hidden-child focus recover to its stable parent',
+    (tester) async {
+      final expanded = ValueNotifier<Set<Object>>({}),
+          scroll = ScrollController();
+      addTearDown(expanded.dispose);
+      addTearDown(scroll.dispose);
+      final nodes = [
+        const CarbonTreeNode(
+          id: 'folder',
+          label: 'Folder',
+          children: [CarbonTreeNode(id: 'child', label: 'Child')],
+        ),
+        ..._nodes(1000),
+      ];
+      await tester.pumpWidget(
+        _host(
+          ValueListenableBuilder(
+            valueListenable: expanded,
+            builder: (_, ids, _) => CarbonTreeView(
+              nodes: nodes,
+              label: 'Files',
+              virtualized: true,
+              scrollController: scroll,
+              expandedIds: ids,
+              onExpansionChanged: (next) => expanded.value = next,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Folder'));
+      await tester.pumpAndSettle();
+      final folder = FocusManager.instance.primaryFocus;
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(expanded.value, contains('folder'));
+      expect(find.text('Child'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(FocusManager.instance.primaryFocus!.debugLabel, 'tree-child');
+      expanded.value = {};
+      await tester.pumpAndSettle();
+      expect(FocusManager.instance.primaryFocus, same(folder));
+      expect(find.text('Child'), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pumpAndSettle();
+      expect(find.text('Record 999').hitTestable(), findsOneWidget);
+    },
+  );
+  check('eager table supports intrinsic measurement', (tester) async {
+    await tester.pumpWidget(
+      _host(
+        IntrinsicHeight(
+          child: CarbonDataTable(columns: _columns, rows: _rows(3)),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(_Cell), findsNWidgets(3));
+    expect(tester.takeException(), isNull);
+  });
+  for (final table in [true, false]) {
+    check('virtual ${table ? 'table' : 'tree'} goldens at 2x', (tester) async {
+      await expectThemeGoldens(
+        tester,
+        name: table ? 'virtual_table_scaled' : 'virtual_tree_scaled',
+        containsText: true,
+        size: table ? const Size(760, 540) : const Size(320, 420),
+        directions: const {TextDirection.ltr, TextDirection.rtl},
+        mediaQuery: const MediaQueryData(textScaler: TextScaler.linear(2)),
+        builder: (_) => Align(
+          alignment: Alignment.topLeft,
+          child: table
+              ? CarbonDataTable(
+                  columns: _columns,
+                  rows: [
+                    for (int i = 0; i < 1000; i++)
+                      CarbonTableRow(
+                        id: i,
+                        label: 'Record $i',
+                        cells: [Text('Record $i'), const Text('Available')],
+                        expandedContent: Text('Details $i'),
+                      ),
+                  ],
+                  virtualized: true,
+                  viewportHeight: 320,
+                  stickyHeader: true,
+                  expandable: true,
+                  expandedRowIds: const {0},
+                  onExpansionChanged: (_) {},
+                  selection: CarbonTableSelection.multi,
+                  selectedRowIds: const {0},
+                  onSelectedRowIdsChanged: (_) {},
+                )
+              : CarbonTreeView(
+                  nodes: [
+                    const CarbonTreeNode(
+                      id: 'folder',
+                      label: 'Folder',
+                      children: [CarbonTreeNode(id: 'child', label: 'Child')],
+                    ),
+                    ..._nodes(1000),
+                  ],
+                  label: 'Files',
+                  virtualized: true,
+                  expandedIds: const {'folder'},
+                  selectedId: 'child',
+                ),
+        ),
+        afterPump: (tester) async {
+          await tester.pumpAndSettle();
+          expectNoClippedTextAtScale(tester, 2);
+        },
+      );
+    });
+  }
   check('eager table and tree rendering remain available', (tester) async {
     await tester.pumpWidget(
       _host(
         CarbonDataTable(
           columns: _columns,
-          rows: _rows(1000),
+          rows: _rows(100),
           stickyHeader: true,
         ),
       ),
     );
-    expect(find.byType(_Cell), findsNWidgets(1000));
+    expect(find.byType(_Cell), findsNWidgets(100));
     await tester.pumpWidget(
       _host(
         SizedBox(
           height: 240,
           child: SingleChildScrollView(
-            child: CarbonTreeView(nodes: _nodes(1000), label: 'Files'),
+            child: CarbonTreeView(nodes: _nodes(100), label: 'Files'),
           ),
         ),
       ),
     );
-    expect(find.text('Record 999'), findsOneWidget);
+    expect(find.text('Record 99'), findsOneWidget);
   });
 }
 

@@ -63,6 +63,7 @@ void main() {
         };
       }
 
+      const virtualized = bool.fromEnvironment('DATA_VIRTUALIZED');
       const count = int.fromEnvironment('DATA_COUNT', defaultValue: 100),
           family = String.fromEnvironment('DATA_FAMILY', defaultValue: 'table');
       final rows = [
@@ -92,6 +93,7 @@ void main() {
       );
       Widget subject(int n) => family == 'table'
           ? CarbonDataTable(
+              virtualized: virtualized,
               columns: const [
                 CarbonTableColumn(title: 'Name'),
                 CarbonTableColumn(title: 'Status'),
@@ -101,6 +103,12 @@ void main() {
               expandable: true,
               selectedRowIds: const {},
               expandedRowIds: const {},
+            )
+          : virtualized
+          ? CarbonTreeView(
+              label: 'Files',
+              nodes: nodes.take(n).toList(),
+              virtualized: true,
             )
           : SizedBox(
               height: 320,
@@ -150,7 +158,7 @@ void main() {
       final after = await snapshot();
       // ignore: avoid_print
       print(
-        'DATA-MEASURE ${jsonEncode({'family': family, 'count': count, 'pumpUs': watch.elapsedMicroseconds, 'buildUs': spans['BUILD'], 'layoutUs': spans['LAYOUT'], 'mountedElements': elements, 'before': before, 'after': after})}',
+        'DATA-MEASURE ${jsonEncode({'family': family, 'virtualized': virtualized, 'count': count, 'pumpUs': watch.elapsedMicroseconds, 'buildUs': spans['BUILD'], 'layoutUs': spans['LAYOUT'], 'mountedElements': elements, 'before': before, 'after': after})}',
       );
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());

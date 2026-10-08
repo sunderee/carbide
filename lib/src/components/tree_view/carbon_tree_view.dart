@@ -21,6 +21,9 @@
 // `--tree-node--active` drives the 4px marker, `--tree-node--selected`
 // the layer-selected background).
 
+import 'dart:math' as math;
+
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -34,6 +37,7 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/keep_focused_row.dart';
 import '../../utils/focus_ring.dart';
 
 /// The tree row heights (`min-block-size`).
@@ -142,6 +146,9 @@ class CarbonTreeView extends StatefulWidget {
     required this.label,
     super.key,
     this.size = CarbonTreeSize.sm,
+    this.virtualized = false,
+    this.viewportHeight = 320,
+    this.scrollController,
     this.selectedId,
     this.onSelect,
     this.multiselect = false,
@@ -152,7 +159,8 @@ class CarbonTreeView extends StatefulWidget {
     Set<Object>? initiallyExpandedIds,
     this.expandedIds,
     this.onExpansionChanged,
-  }) : initiallyExpandedIds = initiallyExpandedIds ?? const <Object>{},
+  }) : assert(viewportHeight > 0 && viewportHeight < double.infinity),
+       initiallyExpandedIds = initiallyExpandedIds ?? const <Object>{},
        assert(
          expandedIds == null || initiallyExpandedIds == null,
          'Provide initiallyExpandedIds or expandedIds, not both.',
@@ -176,6 +184,17 @@ class CarbonTreeView extends StatefulWidget {
 
   /// The row size.
   final CarbonTreeSize size;
+
+  /// Builds a bounded sliver of visible nodes, retaining focused rows while
+  /// offscreen. Metadata and stable focus identities remain separate from the
+  /// mounted rows. Eager rendering remains available for intrinsic layouts.
+  final bool virtualized;
+
+  /// The virtual viewport height, which must be positive and finite.
+  final double viewportHeight;
+
+  /// Optional externally owned virtual viewport scroll controller.
+  final ScrollController? scrollController;
 
   /// The selected node id — the single-select shorthand.
   ///
@@ -287,6 +306,9 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
   final Map<Object, FocusNode> _focusNodes = <Object, FocusNode>{};
   List<_Flat> _visible = <_Flat>[];
   int _focusGeneration = 0;
+  final ScrollController _ownedScroll = ScrollController();
+  ScrollController get _scroll => widget.scrollController ?? _ownedScroll;
+  double _rowExtent = 32;
 
   @override
   void initState() {
@@ -385,7 +407,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       final Object? liveTarget = _available(target)
           ? target
           : _fallback(id, oldData);
-      if (liveTarget != null) _focusFor(liveTarget).requestFocus();
+      if (liveTarget != null) _focusVisible(liveTarget);
     });
   }
 
@@ -396,10 +418,43 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
 
   @override
   void dispose() {
+    _ownedScroll.dispose();
     for (final FocusNode node in _focusNodes.values) {
       node.dispose();
     }
     super.dispose();
+  }
+
+  void _focusVisible(Object id) {
+    final FocusNode node = _focusFor(id);
+    if (!widget.virtualized) {
+      node.requestFocus();
+      return;
+    }
+    final int generation = _focusGeneration;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          generation != _focusGeneration ||
+          !_available(id) ||
+          !_scroll.hasClients) {
+        return;
+      }
+      final int index = _indexOf(id);
+      final ScrollPosition position = _scroll.position;
+      final double start = index * _rowExtent;
+      final double end = start + _rowExtent;
+      final double target = start < position.pixels
+          ? start
+          : end > position.pixels + position.viewportDimension
+          ? end - position.viewportDimension
+          : position.pixels;
+      final double offset = target.clamp(0, position.maxScrollExtent);
+      if (offset != position.pixels) _scroll.jumpTo(offset);
+      // An unattached focus node remembers this request until the sliver
+      // builds its row in the next layout pass.
+      node.requestFocus();
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   FocusNode _focusFor(Object id) =>
@@ -456,7 +511,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     }
 
     _focusGeneration++;
-    _focusFor(node.id).requestFocus();
+    _focusVisible(node.id);
     widget.onSelect?.call(node.id);
     widget.onSelectionChanged?.call(<Object>{node.id});
     widget.onActivate?.call(node.id);
@@ -466,7 +521,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     if (_liveNode(node) == null) return;
 
     _focusGeneration++;
-    _focusFor(node.id).requestFocus();
+    _focusVisible(node.id);
   }
 
   /// Ctrl/Cmd-activation in multiselect: toggles the node's membership
@@ -477,7 +532,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     }
 
     _focusGeneration++;
-    _focusFor(node.id).requestFocus();
+    _focusVisible(node.id);
     final Set<Object> next = <Object>{..._selectedIds};
     if (!next.add(node.id)) {
       next.remove(node.id);
@@ -529,7 +584,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       }
 
       _focusGeneration++;
-      _focusFor(_visible[index].node.id).requestFocus();
+      _focusVisible(_visible[index].node.id);
       return;
     }
   }
@@ -633,32 +688,67 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     _refreshVisible();
 
+    Widget row(_Flat flat) => _TreeRow(
+      key: ValueKey<Object>(flat.node.id),
+      flat: flat,
+      size: widget.size,
+      expanded: _expanded.contains(flat.node.id),
+      selected: _selectedIds.contains(flat.node.id),
+      active: flat.node.id == _activeId,
+      focusNode: _focusFor(flat.node.id),
+      onToggle: () => _toggle(flat.node),
+      onSelect: () => _activate(flat.node),
+      onFocus: () => _requestNodeFocus(flat.node),
+      onKey: (KeyEvent e) => _onKey(flat, e),
+    );
+    final Map<Object, int> indices;
+    if (widget.virtualized) {
+      final TextPainter line = TextPainter(
+        text: const TextSpan(text: 'Hg', style: CarbonTypeStyles.bodyCompact01),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      _rowExtent = math.max(widget.size.height, line.height);
+      line.dispose();
+      indices = <Object, int>{
+        for (int i = 0; i < _visible.length; i++) _visible[i].node.id: i,
+      };
+    } else {
+      indices = const <Object, int>{};
+    }
     return Semantics(
       container: true,
       explicitChildNodes: true,
       label: widget.label,
       child: ColoredBox(
         color: layer.layer,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            for (final _Flat flat in _visible)
-              _TreeRow(
-                key: ValueKey<Object>(flat.node.id),
-                flat: flat,
-                size: widget.size,
-                expanded: _expanded.contains(flat.node.id),
-                selected: _selectedIds.contains(flat.node.id),
-                active: flat.node.id == _activeId,
-                focusNode: _focusFor(flat.node.id),
-                onToggle: () => _toggle(flat.node),
-                onSelect: () => _activate(flat.node),
-                onFocus: () => _requestNodeFocus(flat.node),
-                onKey: (KeyEvent e) => _onKey(flat, e),
+        child: widget.virtualized
+            ? SizedBox(
+                height: widget.viewportHeight,
+                child: ListView.custom(
+                  controller: _scroll,
+                  padding: EdgeInsets.zero,
+                  itemExtent: _rowExtent,
+                  scrollCacheExtent: const ScrollCacheExtent.pixels(0),
+                  childrenDelegate: SliverChildBuilderDelegate(
+                    (_, i) => CarbonKeepFocusedRow(
+                      key: ValueKey<Object>(_visible[i].node.id),
+                      child: row(_visible[i]),
+                    ),
+                    childCount: _visible.length,
+                    addSemanticIndexes: false,
+                    findChildIndexCallback: (key) =>
+                        key is ValueKey<Object> ? indices[key.value] : null,
+                  ),
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  for (final _Flat flat in _visible) row(flat),
+                ],
               ),
-          ],
-        ),
       ),
     );
   }

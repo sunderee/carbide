@@ -78,3 +78,8 @@ unmounts the component and closes the HTTP client.
 Timeline methods follow the [Dart VM service protocol](https://github.com/dart-lang/sdk/blob/main/runtime/vm/service/service.md).
 Results and supported rendering guidance are documented with the component's
 large-data rendering mode.
+
+Repeat the data cases with `--dart-define=DATA_VIRTUALIZED=true` for the bounded
+viewport. Sliver builders execute during layout: `BUILD`/`LAYOUT` spans include
+nested work and can overlap, so do not add them. Use the wall pump duration
+for an overall first-mount observation.
