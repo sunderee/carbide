@@ -4,7 +4,8 @@
 // Apache License, Version 2.0. See the LICENSE file in the project root.
 //
 // Captures full-window screenshots of the gallery for visual review. Generate
-// with `flutter test --update-goldens test/screenshots_test.dart`; the PNGs
+// with `flutter test --dart-define=SCREENSHOTS=true --update-goldens
+// test/screenshots_test.dart`; the PNGs
 // land in test/screenshots/. They are not asserted in CI (glyph rasterization
 // differs across platforms) — they exist for humans to look at.
 
@@ -12,8 +13,9 @@ import 'package:carbide_gallery/src/gallery_app.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Screenshots are a local-only tool. They render macOS-specific glyphs, so
-/// they must not run (and be compared) in CI. Generate with:
+/// Screenshots are opt-in review assets, not CI pixel comparisons. The Linux
+/// regeneration workflow refreshes the committed gallery and README copies.
+/// Generate with:
 ///   flutter test --dart-define=SCREENSHOTS=true --update-goldens \
 ///     test/screenshots_test.dart
 const bool _enabled = bool.fromEnvironment('SCREENSHOTS');
@@ -27,8 +29,9 @@ void main() {
   testWidgets('overview, white theme', skip: !_enabled, (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(1280, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
     await expectLater(
@@ -40,8 +43,9 @@ void main() {
   testWidgets('button page, dark theme', skip: !_enabled, (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(1280, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 
@@ -66,8 +70,9 @@ void main() {
   testWidgets('data table page, white theme', skip: !_enabled, (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(1280, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 

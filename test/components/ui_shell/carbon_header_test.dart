@@ -16,25 +16,28 @@ import '../../support/overlay_entries.dart';
 /// CarbonHeaderMenu's dropdown needs an Overlay + TapRegionSurface + backdrop.
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
-  child: TapRegionSurface(
-    child: CarbonTheme(
-      data: CarbonThemeData.white,
-      child: Overlay(
-        initialEntries: <OverlayEntry>[
-          managedOverlayEntry(
-            builder: (BuildContext context) => Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {},
+  child: MediaQuery(
+    data: const MediaQueryData(size: Size(1200, 800)),
+    child: TapRegionSurface(
+      child: CarbonTheme(
+        data: CarbonThemeData.white,
+        child: Overlay(
+          initialEntries: <OverlayEntry>[
+            managedOverlayEntry(
+              builder: (BuildContext context) => Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {},
+                    ),
                   ),
-                ),
-                Align(alignment: Alignment.topCenter, child: child),
-              ],
+                  Align(alignment: Alignment.topCenter, child: child),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   ),
@@ -410,59 +413,62 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: TapRegionSurface(
-            child: CarbonTheme(
-              data: CarbonThemeData.white,
-              child: Overlay(
-                initialEntries: <OverlayEntry>[
-                  managedOverlayEntry(
-                    builder: (BuildContext context) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        CarbonHeader(
-                          name: const CarbonHeaderName(
-                            prefix: 'IBM',
-                            name: 'Carbide',
-                          ),
-                          navigation: <Widget>[
-                            CarbonHeaderMenuItem(
-                              label: 'Catalog',
-                              onPressed: () {},
+          child: MediaQuery(
+            data: const MediaQueryData(size: Size(1200, 800)),
+            child: TapRegionSurface(
+              child: CarbonTheme(
+                data: CarbonThemeData.white,
+                child: Overlay(
+                  initialEntries: <OverlayEntry>[
+                    managedOverlayEntry(
+                      builder: (BuildContext context) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          CarbonHeader(
+                            name: const CarbonHeaderName(
+                              prefix: 'IBM',
+                              name: 'Carbide',
                             ),
-                          ],
-                          globalActions: <Widget>[
-                            CarbonHeaderGlobalAction(
-                              icon: CarbonIcons.notification,
-                              label: 'Notifications',
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CarbonSideNav(
-                                items: <Widget>[
-                                  CarbonSideNavLink(
-                                    label: 'Dashboard',
-                                    current: true,
-                                    onPressed: () {},
-                                  ),
-                                  CarbonSideNavLink(
-                                    label: 'Documents',
-                                    onPressed: () {},
-                                  ),
-                                ],
+                            navigation: <Widget>[
+                              CarbonHeaderMenuItem(
+                                label: 'Catalog',
+                                onPressed: () {},
                               ),
-                              const Expanded(child: SizedBox()),
+                            ],
+                            globalActions: <Widget>[
+                              CarbonHeaderGlobalAction(
+                                icon: CarbonIcons.notification,
+                                label: 'Notifications',
+                                onPressed: () {},
+                              ),
                             ],
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                CarbonSideNav(
+                                  items: <Widget>[
+                                    CarbonSideNavLink(
+                                      label: 'Dashboard',
+                                      current: true,
+                                      onPressed: () {},
+                                    ),
+                                    CarbonSideNavLink(
+                                      label: 'Documents',
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                                const Expanded(child: SizedBox()),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -624,6 +630,7 @@ void main() {
       await expectThemeGoldens(
         tester,
         name: 'ui_shell_header',
+        mediaQuery: const MediaQueryData(size: Size(1200, 800)),
         containsText: true,
         size: const Size(640, 48),
         builder: (BuildContext context) => CarbonHeader(
