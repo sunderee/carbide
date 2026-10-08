@@ -316,12 +316,14 @@ void main() {
                     body: 'Revenue summary',
                     hero: switch (kind) {
                       'image' => _imageHero(),
-                      'custom' => const ColoredBox(
-                        color: Color(0xff0f62fe),
+                      'custom' => ColoredBox(
+                        color: const Color(0xff0f62fe),
                         child: Center(
                           child: Text(
                             'Custom content',
-                            style: TextStyle(color: Color(0xffffffff)),
+                            style: CarbonTypeStyles.body01.copyWith(
+                              color: const Color(0xffffffff),
+                            ),
                           ),
                         ),
                       ),
