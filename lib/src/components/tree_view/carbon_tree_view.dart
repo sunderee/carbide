@@ -23,7 +23,6 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -38,6 +37,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/keep_focused_row.dart';
+import '../../utils/focus_retaining_sliver.dart';
 import '../../utils/focus_ring.dart';
 
 /// The tree row heights (`min-block-size`).
@@ -431,6 +431,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
       node.requestFocus();
       return;
     }
+    if (node.context != null) node.requestFocus();
     final int generation = _focusGeneration;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted ||
@@ -725,20 +726,27 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
         child: widget.virtualized
             ? SizedBox(
                 height: widget.viewportHeight,
-                child: ListView.custom(
+                child: Scrollable(
                   controller: _scroll,
-                  padding: EdgeInsets.zero,
-                  itemExtent: _rowExtent,
-                  scrollCacheExtent: const ScrollCacheExtent.pixels(0),
-                  childrenDelegate: SliverChildBuilderDelegate(
-                    (_, i) => CarbonKeepFocusedRow(
-                      key: ValueKey<Object>(_visible[i].node.id),
-                      child: row(_visible[i]),
-                    ),
-                    childCount: _visible.length,
-                    addSemanticIndexes: false,
-                    findChildIndexCallback: (key) =>
-                        key is ValueKey<Object> ? indices[key.value] : null,
+                  viewportBuilder: (_, offset) => CarbonFocusRetainingViewport(
+                    offset: offset,
+                    slivers: [
+                      CarbonFocusRetainingFixedSliverList(
+                        itemExtent: _rowExtent,
+                        delegate: SliverChildBuilderDelegate(
+                          (_, i) => CarbonKeepFocusedRow(
+                            key: ValueKey<Object>(_visible[i].node.id),
+                            child: row(_visible[i]),
+                          ),
+                          childCount: _visible.length,
+                          addSemanticIndexes: false,
+                          findChildIndexCallback: (key) =>
+                              key is ValueKey<Object>
+                              ? indices[key.value]
+                              : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )

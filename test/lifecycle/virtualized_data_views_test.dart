@@ -478,6 +478,7 @@ void main() {
       expect(focus.hasPrimaryFocus, isTrue);
       expect(present(), isTrue);
       expect(node.value, 'Retained draft');
+      expect(node.flagsCollection.isHidden, isTrue);
       scroll.jumpTo(0);
       await tester.pumpAndSettle();
       expect(controller.text, 'Retained draft');

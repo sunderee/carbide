@@ -15,7 +15,9 @@ and an optional caller-owned `scrollController`. The viewport mounts its visible
 window and retains a row while one of its descendants has focus. A focused
 editor therefore keeps its widget state when scrolled away and back. Other rows
 can recycle; put durable drafts in the data model or caller-owned controllers.
-The viewport does not support intrinsic measurement.
+The viewport does not support intrinsic measurement. Focused offscreen rows
+retain hidden semantics as well as widget state, keeping native web editing
+connections intact; paint clipping remains unchanged.
 
 Tables require a unique, non-null `CarbonTableRow.id` for every row and the
 ID-based selection/expansion APIs. The same IDs key sliver reconciliation after
@@ -49,7 +51,8 @@ height and the Carbon minimum; text scaling is not clamped. Visited focus-node
 identities remain available until their data IDs are removed. The tree's data
 index/visible-node flattening and the table's ID index remain proportional to
 the supplied model count; virtualization bounds widget mounting, not the data
-itself. Only mounted rows contribute visible accessibility nodes.
+itself. Visible rows contribute accessibility nodes; a kept-alive focused row retains
+its hidden node until focus leaves or its record is removed.
 
 ```dart
 CarbonTreeView(
@@ -89,16 +92,16 @@ The same three-process protocol with `DATA_VIRTUALIZED=true` gave:
 
 | Virtual view | Records | Build spans median | Layout spans median | Retained heap delta | Mounted elements |
 |---|---:|---:|---:|---:|---:|
-| Table | 100 | 28.47ms | 36.75ms | 1.71MB | 595 |
-| Table | 1,000 | 24.62ms | 35.27ms | 1.74MB | 595 |
-| Table | 10,000 | 46.15ms | 37.79ms | 2.21MB | 595 |
-| Tree | 100 | 13.52ms | 18.43ms | 1.17MB | 341 |
-| Tree | 1,000 | 29.52ms | 35.94ms | 1.36MB | 341 |
-| Tree | 10,000 | 30.81ms | 12.72ms | 3.75MB | 341 |
+| Table | 100 | 18.92ms | 25.06ms | 1.71MB | 595 |
+| Table | 1,000 | 22.44ms | 27.40ms | 1.75MB | 595 |
+| Table | 10,000 | 58.59ms | 34.67ms | 2.22MB | 595 |
+| Tree | 100 | 17.43ms | 24.21ms | 1.14MB | 339 |
+| Tree | 1,000 | 18.41ms | 18.87ms | 1.33MB | 339 |
+| Tree | 10,000 | 27.82ms | 14.14ms | 3.72MB | 339 |
 
 Sliver builders run during layout. Timeline build/layout spans can overlap and
 include nested work; their medians are not additive. Wall pump medians for the
-10,000-record virtual views were 72.54ms (table) and 43.94ms (tree), compared to
+10,000-record virtual views were 93.64ms (table) and 39.67ms (tree), compared to
 27,665.77ms and 4,434.89ms for their eager counterparts. Small-case timing
 variation remains visible in these fresh-process measurements.
 

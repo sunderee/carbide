@@ -16,11 +16,7 @@ import 'dart:async';
 import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/rendering.dart'
-    show
-        PipelineOwner,
-        RenderProxyBox,
-        SemanticsConfiguration,
-        ScrollCacheExtent;
+    show PipelineOwner, RenderProxyBox, SemanticsConfiguration;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/semantics.dart' show OrdinalSortKey;
@@ -36,6 +32,7 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/keep_focused_row.dart';
+import '../../utils/focus_retaining_sliver.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
@@ -729,12 +726,11 @@ class _TableBodyState extends State<_TableBody> {
             child: Scrollable(
               controller: _bodyScroll,
               excludeFromSemantics: true,
-              viewportBuilder: (_, offset) => Viewport(
+              viewportBuilder: (_, offset) => CarbonFocusRetainingViewport(
                 offset: offset,
-                scrollCacheExtent: const ScrollCacheExtent.pixels(0),
                 slivers: <Widget>[
                   if (!stickyHeader) SliverToBoxAdapter(child: headerArea),
-                  SliverList(
+                  CarbonFocusRetainingSliverList(
                     delegate: SliverChildBuilderDelegate(
                       (_, i) => CarbonKeepFocusedRow(
                         key: ValueKey<Object>(rows[i].id!),
