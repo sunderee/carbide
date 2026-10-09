@@ -13,6 +13,10 @@ on:
       - 'tool/test_upstream_tokens.py'
       - 'tool/carbon_reference.lock.json'
       - 'tool/update_carbon_reference.py'
+      - 'tool/carbon_parity.py'
+      - 'tool/carbon_parity.json'
+      - 'tool/test_carbon_parity.py'
+      - 'docs/carbon-parity.md'
       - 'lib/src/foundations/**'
       - 'lib/src/theme/carbon_theme_data.dart'
       - 'lib/src/icons/generated/**'
@@ -49,5 +53,6 @@ jobs:
           done
           python3 tool/check_upstream_colors.py
           python3 tool/check_icons_lock.py
+          python3 tool/carbon_parity.py --check-upstream
       - name: Prove checks left the repository unchanged
         run: git diff --exit-code
