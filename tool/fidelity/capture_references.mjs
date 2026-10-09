@@ -8,12 +8,17 @@
 // and a manifest at test/fidelity/references/manifest.json.
 
 import { chromium } from 'playwright';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, copyFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import {versionFromWelcome, validateCapture} from './capture_metadata.mjs';
 import { dirname, join } from 'node:path';
 
 const BASE =
   process.env.STORYBOOK_URL || 'https://react.carbondesignsystem.com';
 const OUT = process.env.OUT || 'test/fidelity/references';
+const STAGE = mkdtempSync(join(tmpdir(), 'carbide-carbon-capture-'));
+const pin = JSON.parse(readFileSync(new URL('../carbon_reference.lock.json', import.meta.url)));
 // Carbon Storybook theme globals.
 const THEMES = ['white', 'g10', 'g90', 'g100'];
 
@@ -21,79 +26,91 @@ const { stories } = JSON.parse(
   readFileSync(new URL('./stories.json', import.meta.url)),
 );
 
-const browser = await chromium.launch();
-const context = await browser.newContext({ deviceScaleFactor: 2 });
-const page = await context.newPage();
+let browser;
+try {
+  browser = await chromium.launch();
+  const context = await browser.newContext({ deviceScaleFactor: 2, viewport: {width: 1280, height: 720} });
+  const page = await context.newPage();
 
-const results = [];
-for (const story of stories) {
-  for (const theme of THEMES) {
-    // The Storybook's theme decorator follows the `backgrounds` global
-    // (mapped to data-carbon-theme); the legacy `theme` global is kept in
-    // the URL for older deployments.
-    const url =
-      `${BASE}/iframe.html?id=${story.storyId}` +
-      `&viewMode=story&globals=theme:${theme};backgrounds.value:${theme}`;
-    const out = join(OUT, story.component, `${theme}.png`);
-    try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
-      const root = page.locator('#storybook-root');
-      await root.waitFor({ state: 'visible', timeout: 15000 });
-      // Let fonts/animations settle.
-      await page.waitForTimeout(700);
-      const box = await root.boundingBox();
-      if (!box || box.width < 2 || box.height < 2) {
-        throw new Error('empty #storybook-root');
+  await page.goto(`${BASE}/iframe.html?id=getting-started-welcome--welcome&viewMode=story`, {waitUntil: 'domcontentloaded', timeout: 45000});
+  const caption = page.locator('.welcome__heading--subtitle');
+  await caption.waitFor({state: 'visible', timeout: 20000});
+  const carbonReactVersion = versionFromWelcome(await caption.textContent());
+  if (carbonReactVersion !== pin.carbonReactVersion) {
+    throw new Error(`Deployed version ${carbonReactVersion} differs from pinned ${pin.carbonReactVersion}`);
+  }
+  console.log(`Observed deployed @carbon/react ${carbonReactVersion}`);
+
+  const results = [];
+  for (const story of stories) {
+    for (const theme of THEMES) {
+      // The Storybook's theme decorator follows the `backgrounds` global
+      // (mapped to data-carbon-theme); the legacy `theme` global is kept in
+      // the URL for older deployments.
+      const url =
+        `${BASE}/iframe.html?id=${story.storyId}` +
+        `&viewMode=story&globals=theme:${theme};backgrounds.value:${theme}`;
+      const out = join(STAGE, story.component, `${theme}.png`);
+      try {
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
+        const root = page.locator('#storybook-root');
+        await root.waitFor({ state: 'visible', timeout: 15000 });
+        // Let fonts/animations settle.
+        await page.waitForTimeout(700);
+        const box = await root.boundingBox();
+        if (!box || box.width < 2 || box.height < 2) {
+          throw new Error('empty #storybook-root');
+        }
+        mkdirSync(dirname(out), { recursive: true });
+        await root.screenshot({ path: out });
+        results.push({ component: story.component, theme, ok: true });
+        console.log(`OK   ${story.component} ${theme}`);
+      } catch (err) {
+        results.push({
+          component: story.component,
+          theme,
+          ok: false,
+          error: String(err).split('\n')[0],
+        });
+        console.log(`FAIL ${story.component} ${theme}: ${String(err).split('\n')[0]}`);
       }
-      mkdirSync(dirname(out), { recursive: true });
-      await root.screenshot({ path: out });
-      results.push({ component: story.component, theme, ok: true });
-      console.log(`OK   ${story.component} ${theme}`);
-    } catch (err) {
-      results.push({
-        component: story.component,
-        theme,
-        ok: false,
-        error: String(err).split('\n')[0],
-      });
-      console.log(`FAIL ${story.component} ${theme}: ${String(err).split('\n')[0]}`);
     }
   }
-}
 
-await browser.close();
+  await browser.close();
 
-// Stamp the @carbon/react version the live Storybook tracks (#230): the
-// published Storybook deploys from the latest release, so the npm registry
-// 'latest' at capture time identifies what the pixels were rendered by.
-// Compared against the submodule pin by the staleness check in
-// test/fidelity/fidelity_test.dart.
-let carbonReactVersion = null;
-try {
-  const res = await fetch('https://registry.npmjs.org/@carbon/react/latest');
-  carbonReactVersion = (await res.json()).version ?? null;
-} catch {
-  console.log('WARN could not resolve @carbon/react version for the stamp');
-}
+  const ok = results.filter((r) => r.ok).length;
+  validateCapture(pin, carbonReactVersion, stories, THEMES, results);
+  const imageSha256 = {};
+  for (const story of stories) for (const theme of THEMES) {
+    const relative = `${story.component}/${theme}.png`;
+    const source = join(STAGE, relative), target = join(OUT, relative);
+    mkdirSync(dirname(target), {recursive: true});
+    copyFileSync(source, target);
+    imageSha256[relative] = createHash('sha256').update(readFileSync(source)).digest('hex');
+  }
+  mkdirSync(OUT, { recursive: true });
+  writeFileSync(
+    join(OUT, 'manifest.json'),
+    JSON.stringify(
+      {
+        source: BASE,
+        capturedAt: new Date().toISOString(),
+        carbonReactVersion,
+        themes: THEMES,
+        stories,
+        results,
+        captures: [{capturedAt: new Date().toISOString(), carbonReactVersion, versionBasis: 'Version observed in deployed Carbon Welcome story', components: stories.map(s => s.component)}],
+        referenceReview: {carbonCommit: pin.carbonCommit, carbonReactVersion, reviewedAt: new Date().toISOString()},
+        imageSha256,
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  console.log(`\n${ok}/${results.length} references captured -> ${OUT}`);
 
-const ok = results.filter((r) => r.ok).length;
-mkdirSync(OUT, { recursive: true });
-writeFileSync(
-  join(OUT, 'manifest.json'),
-  JSON.stringify(
-    {
-      source: BASE,
-      capturedAt: new Date().toISOString(),
-      carbonReactVersion,
-      themes: THEMES,
-      stories,
-      results,
-    },
-    null,
-    2,
-  ) + '\n',
-);
-console.log(`\n${ok}/${results.length} references captured -> ${OUT}`);
-if (ok === 0) {
-  process.exitCode = 1;
+} finally {
+  await browser?.close();
+  rmSync(STAGE, {recursive: true, force: true});
 }

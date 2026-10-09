@@ -15,6 +15,12 @@ theme (`white` / `g10` / `g90` / `g100`), into
 `test/fidelity/references/<component>/<theme>.png`. A `manifest.json` records the
 source URL, capture time, and per-story result.
 
+Capture first observes the package version displayed by the deployed Welcome
+story and requires it to match `tool/carbon_reference.lock.json`. It stages every
+image in temporary storage and replaces repository images/manifest only after
+the complete batch succeeds. The manifest records all capture versions and
+SHA-256 image hashes. A missing/unknown version or partial capture fails.
+
 ```sh
 # Local Playwright (simplest):
 tool/fidelity/capture.sh
@@ -30,6 +36,22 @@ docker run --rm -v "$PWD":/work -w /work/tool/fidelity \
 The captured PNGs **are committed** — they are the ground truth the offline test
 compares against. Re-run capture (and commit the diff) when you bump the
 `documentation/carbon` submodule or add stories.
+
+The offline freshness gate compares the authoritative lock and reference review
+with the parent gitlink, so normal CI needs no Carbon checkout. Every batch must
+use the same React major and be at most one minor behind the pin; newer minors
+and unreviewed pin changes fail. Patch differences within a minor are allowed.
+Run `dart run tool/check_reference_freshness.dart` and
+`python3 tool/check_reference_images.py` before committing.
+
+The historical October 2026 manifest stamped npm latest rather than observing
+the deployed bundle. Its version basis is recorded explicitly. The two retained
+loading animation references are byte-identical to the October 2 capture and
+keep version 1.117.0/date provenance. Their default components/styles were
+reviewed against 1.118: the source changes affect another inline-loading story
+and focus outlines inside an overlay that the default Loading story disables.
+Their version is not rewritten as a new capture. Future batches use the observed
+deployed version and must be reviewed before their images are committed.
 
 ## 2. Compare (offline, runs in CI)
 

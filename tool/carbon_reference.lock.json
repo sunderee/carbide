@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "carbonCommit": "44f90d8d6b24889af06cee1422ceb37f58e40bed",
+  "carbonTag": "v11.118.0",
+  "carbonReactVersion": "1.118.0",
+  "maxCaptureMinorLag": 1
+}

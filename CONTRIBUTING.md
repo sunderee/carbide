@@ -308,6 +308,31 @@ color reader described in [token verification](docs/testing/token-verification.m
 The Carbon reference generation workflow checks token output before a bump can
 merge; update generated files and artwork locks explicitly and review the diff.
 
+### Reference freshness
+
+`dart run tool/check_reference_freshness.dart` runs on every PR without a Carbon
+checkout. The committed reference lock must match the parent gitlink, and the
+manifest must record a review against that exact pin. Every capture batch needs
+a version, date and provenance; no newer batch can hide an older stale one.
+The allowed window is the same React major and at most one minor behind the pin.
+Captures from a newer minor fail. Patch releases within that minor are allowed.
+
+After staging a Carbon gitlink bump, run
+`python3 tool/update_carbon_reference.py --tag <release-tag>`, then capture and
+review references. The capture tool observes the deployed Welcome story's
+package version and requires it to match the pin; it never guesses from npm
+latest or writes a null version. A failed/incomplete batch remains in temporary
+storage and cannot replace repository references. Review all changed images and
+commit their manifest together. `python3 tool/check_reference_images.py` checks
+the recorded image hashes.
+
+Retained animation frames keep their original capture version/date. They can
+remain within the window only after a documented review of the current default
+story, component and styles; updating the pin alone fails. The current two
+loading captures retain the 1.117 phase, while their default source/selector
+behavior has been reviewed against 1.118. See
+[the capture pipeline](tool/fidelity/README.md) for historical version limits.
+
 ### Public surface and layout specimens
 
 Every declaration exported from `lib/carbide.dart` is inventoried in
