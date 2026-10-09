@@ -25,6 +25,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../copy_button/carbon_copy_button.dart';
 import '../popover/carbon_popover.dart';
@@ -343,19 +345,23 @@ class _InlineSnippetState extends State<_InlineSnippet> {
       return chip;
     }
 
-    return Semantics(
-      button: true,
-      label: '${widget.copyLabel}: ${widget.code}',
-      onTap: _activate,
-      child: ExcludeSemantics(
-        child: CarbonPopover(
-          open: _feedback,
-          highContrast: true,
-          onRequestClose: () => setState(() => _feedback = false),
-          content: Padding(
-            padding: const EdgeInsets.all(CarbonSpacing.spacing05),
-            child: Text(widget.feedback, style: CarbonTypeStyles.body01),
-          ),
+    return CarbonPopover(
+      open: _feedback,
+      highContrast: true,
+      onRequestClose: () => setState(() => _feedback = false),
+      content: ExcludeSemantics(
+        child: Padding(
+          padding: const EdgeInsets.all(CarbonSpacing.spacing05),
+          child: Text(widget.feedback, style: CarbonTypeStyles.body01),
+        ),
+      ),
+      child: CarbonControlSemantics(
+        state: CarbonControlState.interactive,
+        button: true,
+        label: '${widget.copyLabel}: ${widget.code}',
+        readOnlyHint: '',
+        onActivate: _activate,
+        builder: (FocusNode focus) => ExcludeSemantics(
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
             onEnter: (_) => setState(() => _hovered = true),
@@ -364,6 +370,7 @@ class _InlineSnippetState extends State<_InlineSnippet> {
               behavior: HitTestBehavior.opaque,
               onTap: _activate,
               child: Focus(
+                focusNode: focus,
                 onKeyEvent: _onKey,
                 onFocusChange: (bool value) => setState(() => _focused = value),
                 child: CarbonFocusRing(
@@ -417,17 +424,21 @@ class _ExpandButtonState extends State<_ExpandButton> {
     final String text = widget.expanded
         ? widget.showLessText
         : widget.showMoreText;
-    return Semantics(
+    return CarbonControlSemantics(
+      state: CarbonControlState.interactive,
       button: true,
       label: text,
-      onTap: widget.onTap,
-      child: ExcludeSemantics(
+      readOnlyHint: '',
+      expanded: widget.expanded,
+      onActivate: widget.onTap,
+      builder: (FocusNode focus) => ExcludeSemantics(
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
             child: Focus(
+              focusNode: focus,
               onKeyEvent: _onKey,
               onFocusChange: (bool value) => setState(() => _focused = value),
               child: CarbonFocusRing(

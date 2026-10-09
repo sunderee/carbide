@@ -7,8 +7,11 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
 import '../demo_scaffold.dart';
+import '../examples/source_literals.dart';
 import '../knobs.dart';
 import '../registry.dart';
+
+part 'tier_b_pages.examples.g.dart';
 
 /// Tier B — form controls.
 final GalleryCategory tierBCategory = GalleryCategory(
@@ -130,9 +133,7 @@ class _TextInputPageState extends State<_TextInputPage> {
           onChanged: (bool value) => setState(() => _readOnly = value),
         ),
       ],
-      code:
-          "CarbonTextInput(labelText: 'Email address', placeholder: '…');\n"
-          "CarbonPasswordInput(labelText: 'Password');",
+      code: exampleSource,
     );
   }
 }
@@ -141,11 +142,11 @@ class _TextAreaPage extends StatelessWidget {
   const _TextAreaPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Text area',
       description: 'A multi-line field with an optional character counter.',
       previewAlignment: Alignment.topCenter,
-      preview: SizedBox(
+      preview: const SizedBox(
         width: 360,
         child: CarbonTextArea(
           labelText: 'Notes',
@@ -154,7 +155,7 @@ class _TextAreaPage extends StatelessWidget {
           maxCount: 200,
         ),
       ),
-      code: "CarbonTextArea(labelText: 'Notes', rows: 4);",
+      code: exampleSource,
     );
   }
 }
@@ -186,7 +187,7 @@ class _NumberInputPageState extends State<_NumberInputPage> {
           onChanged: (num? v) => setState(() => _value = v ?? _value),
         ),
       ),
-      code: "CarbonNumberInput(labelText: 'Quantity', min: 0, max: 10);",
+      code: exampleSource,
     );
   }
 }
@@ -235,7 +236,7 @@ class _SelectPageState extends State<_SelectPage> {
           onChanged: (bool value) => setState(() => _disabled = value),
         ),
       ],
-      code: "CarbonSelect<String>(labelText: 'Size', items: <…>[…]);",
+      code: exampleSource,
     );
   }
 }
@@ -297,7 +298,7 @@ class _SearchPageState extends State<_SearchPage> {
         onChanged: (bool value) => setState(() => _expandable = value),
       ),
     ],
-    code: 'CarbonSearch(readOnly: …, disabled: …);',
+    code: exampleSource,
   );
 }
 
@@ -369,7 +370,7 @@ class _CheckboxPageState extends State<_CheckboxPage> {
           onChanged: (bool v) => setState(() => _ai = v),
         ),
       ],
-      code: 'CarbonCheckbox(label: \'…\', value: true, onChanged: …);',
+      code: exampleSource,
     );
   }
 }
@@ -423,7 +424,7 @@ class _RadioPageState extends State<_RadioPage> {
           onChanged: (bool value) => setState(() => _readOnly = value),
         ),
       ],
-      code: 'CarbonRadioButton(label: \'…\', selected: …, onSelected: …);',
+      code: exampleSource,
     );
   }
 }
@@ -465,7 +466,7 @@ class _TogglePageState extends State<_TogglePage> {
           onChanged: (bool value) => setState(() => _readOnly = value),
         ),
       ],
-      code: "CarbonToggle(labelText: 'Notifications', toggled: true);",
+      code: exampleSource,
     );
   }
 }
@@ -497,7 +498,7 @@ class _SliderPageState extends State<_SliderPage> {
           onChanged: (num v) => setState(() => _value = v),
         ),
       ),
-      code: "CarbonSlider(labelText: 'Volume', value: 60, min: 0, max: 100);",
+      code: exampleSource,
     );
   }
 }

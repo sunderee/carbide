@@ -7,8 +7,11 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
 import '../demo_scaffold.dart';
+import '../examples/source_literals.dart';
 import '../knobs.dart';
 import '../registry.dart';
+
+part 'tier_d_pages.examples.g.dart';
 
 /// Tier D — complex and data-dense components.
 final GalleryCategory tierDCategory = GalleryCategory(
@@ -154,8 +157,7 @@ class _DataTablePageState extends State<_DataTablePage> {
           onChanged: (bool value) => setState(() => _selectionEnabled = value),
         ),
       ],
-      code:
-          'CarbonDataTable(columns: <…>[…], rows: <…>[…], selection: CarbonTableSelection.${_multi ? 'multi' : 'single'}, selectedRowIds: {…}, onSelectedRowIdsChanged: ${_selectionEnabled ? '(rows) { … }' : 'null'});',
+      code: exampleSource,
     );
   }
 }
@@ -218,9 +220,7 @@ class _DatePickerPageState extends State<_DatePickerPage> {
           onChanged: (bool v) => setState(() => _rangeMode = v),
         ),
       ],
-      code: _rangeMode
-          ? 'CarbonDateRangePicker(value: _range, onChanged: …);'
-          : 'CarbonDatePicker(labelText: \'…\', onChanged: …);',
+      code: exampleSource,
     );
   }
 }
@@ -229,21 +229,19 @@ class _TimePickerPage extends StatelessWidget {
   const _TimePickerPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'Time picker',
       description:
           'A compact time field with coordinated AM/PM. Enter or leaving the '
           'field group validates and normalizes the draft.',
       previewAlignment: Alignment.topCenter,
-      preview: CarbonTimePicker(
+      preview: const CarbonTimePicker(
         labelText: 'Start time',
         initialValue: '09:30',
         format: CarbonTimeFormat.twelveHour,
         invalidText: 'Enter an hour from 1 to 12 and minutes from 0 to 59.',
       ),
-      code:
-          'CarbonTimePicker(labelText: \'Start time\', '
-          'format: CarbonTimeFormat.twelveHour);',
+      code: exampleSource,
     );
   }
 }
@@ -252,11 +250,11 @@ class _FileUploaderPage extends StatelessWidget {
   const _FileUploaderPage();
   @override
   Widget build(BuildContext context) {
-    return const DemoScaffold(
+    return DemoScaffold(
       title: 'File uploader',
       description: 'A drop zone plus selected-file rows.',
       previewAlignment: Alignment.topLeft,
-      preview: SizedBox(
+      preview: const SizedBox(
         width: 360,
         child: CarbonFileUploader(
           labelTitle: 'Upload files',
@@ -273,7 +271,7 @@ class _FileUploaderPage extends StatelessWidget {
           ),
         ),
       ),
-      code: 'CarbonFileUploader(labelTitle: \'…\', items: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -344,9 +342,7 @@ class _TreeViewPageState extends State<_TreeViewPage> {
           ),
         ],
       ),
-      code:
-          'CarbonTreeView(label: \'Files\', multiselect: true, '
-          'selectedIds: {…}, nodes: <CarbonTreeNode>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -498,7 +494,7 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
           ),
         ],
       ),
-      code: 'CarbonPageHeader(title: \'Quarterly report\', actions: <CarbonPageHeaderAction>[CarbonPageHeaderAction(id: \'edit\', label: \'Edit\', onPressed: edit)]);',
+      code: exampleSource,
     );
   }
 }

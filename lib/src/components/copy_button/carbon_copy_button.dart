@@ -25,6 +25,8 @@ import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../popover/carbon_popover.dart';
 
@@ -212,20 +214,25 @@ class _CarbonCopyState extends State<CarbonCopy> {
       ),
     );
 
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: _currentLabel.isEmpty ? null : _currentLabel,
-      onTap: enabled ? _activate : null,
-      child: ExcludeSemantics(
-        child: CarbonPopover(
-          open: _open,
-          align: widget.align,
-          highContrast: true,
-          onRequestClose: _close,
-          // The button's Semantics carries the label; exclude the bubble's
-          // duplicate text (it renders in the overlay, outside the button node).
-          content: ExcludeSemantics(child: _CopyFeedback(label: _currentLabel)),
+    return CarbonPopover(
+      open: _open,
+      align: widget.align,
+      highContrast: true,
+      onRequestClose: _close,
+      // Exclude only the feedback and trigger contents. Excluding the portal
+      // itself creates a native overlay region that can intercept other controls.
+      content: ExcludeSemantics(child: _CopyFeedback(label: _currentLabel)),
+      child: CarbonControlSemantics(
+        state: CarbonControlState.resolve(
+          hasCallback: true,
+          disabled: !enabled,
+        ),
+        button: true,
+        label: _currentLabel,
+        readOnlyHint: '',
+        focusNode: widget.focusNode,
+        onActivate: enabled ? _activate : null,
+        builder: (FocusNode focus) => ExcludeSemantics(
           child: MouseRegion(
             cursor: enabled
                 ? SystemMouseCursors.click
@@ -243,7 +250,7 @@ class _CarbonCopyState extends State<CarbonCopy> {
                   ? () => setState(() => _pressed = false)
                   : null,
               child: Focus(
-                focusNode: widget.focusNode,
+                focusNode: focus,
                 autofocus: widget.autofocus,
                 canRequestFocus: enabled,
                 onKeyEvent: _onKey,

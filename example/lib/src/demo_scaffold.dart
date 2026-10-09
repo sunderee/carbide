@@ -84,7 +84,13 @@ class DemoScaffold extends StatelessWidget {
             const SizedBox(height: CarbonSpacing.spacing07),
             const _SectionLabel('Code'),
             const SizedBox(height: CarbonSpacing.spacing05),
-            _CodeBlock(code!),
+            CarbonCodeSnippet(
+              code: code!,
+              type: CarbonCodeSnippetType.multi,
+              maxCollapsedRows: 8,
+              wrapText: true,
+              copyLabel: 'Copy $title example',
+            ),
           ],
         ],
       ),
@@ -129,31 +135,6 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       text,
       style: CarbonTypeStyles.heading01.copyWith(color: theme.textPrimary),
-    );
-  }
-}
-
-/// A monospace code block on a contextual layer surface.
-class _CodeBlock extends StatelessWidget {
-  const _CodeBlock(this.code);
-
-  final String code;
-
-  @override
-  Widget build(BuildContext context) {
-    final CarbonThemeData theme = CarbonTheme.of(context);
-    return DecoratedBox(
-      decoration: BoxDecoration(color: theme.layer01),
-      child: Padding(
-        padding: const EdgeInsets.all(CarbonSpacing.spacing05),
-        child: SizedBox(
-          width: double.infinity,
-          child: Text(
-            code,
-            style: CarbonTypeStyles.code01.copyWith(color: theme.textPrimary),
-          ),
-        ),
-      ),
     );
   }
 }

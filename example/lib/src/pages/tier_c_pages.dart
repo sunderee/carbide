@@ -7,8 +7,11 @@ import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
 import '../demo_scaffold.dart';
+import '../examples/source_literals.dart';
 import '../knobs.dart';
 import '../registry.dart';
+
+part 'tier_c_pages.examples.g.dart';
 
 /// Tier C — composite components.
 final GalleryCategory tierCCategory = GalleryCategory(
@@ -179,7 +182,7 @@ class _DropdownPageState extends State<_DropdownPage> {
           onChanged: (bool v) => setState(() => _fluid = v),
         ),
       ],
-      code: 'CarbonDropdown<String>(titleText: \'…\', items: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -228,7 +231,7 @@ class _ComboBoxPageState extends State<_ComboBoxPage> {
           onChanged: (bool value) => setState(() => _disabled = value),
         ),
       ],
-      code: 'CarbonComboBox<String>(titleText: \'Country\', items: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -285,7 +288,7 @@ class _MultiSelectPageState extends State<_MultiSelectPage> {
           onChanged: (bool value) => setState(() => _filterable = value),
         ),
       ],
-      code: 'CarbonMultiSelect<String>(titleText: \'…\', items: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -301,7 +304,7 @@ class _TooltipPage extends StatelessWidget {
         label: 'Carbide is an unofficial Carbon port.',
         child: CarbonButton(label: 'Hover me', onPressed: () {}),
       ),
-      code: 'CarbonTooltip(label: \'…\', child: CarbonButton(...));',
+      code: exampleSource,
     );
   }
 }
@@ -320,7 +323,7 @@ class _ToggletipPage extends StatelessWidget {
           style: CarbonTypeStyles.body01.copyWith(color: t.textPrimary),
         ),
       ),
-      code: 'CarbonToggletip(content: Text(\'…\'));',
+      code: exampleSource,
     );
   }
 }
@@ -353,7 +356,7 @@ class _OverflowMenuPage extends StatelessWidget {
           ),
         ],
       ),
-      code: 'CarbonOverflowMenu(items: <Widget>[CarbonMenuItem(...)]);',
+      code: exampleSource,
     );
   }
 }
@@ -450,12 +453,7 @@ class _TabsPageState extends State<_TabsPage> {
           onChanged: (bool v) => setState(() => _vertical = v),
         ),
       ],
-      code: _vertical
-          ? 'CarbonTabsVertical(activation: CarbonTabActivationMode.${activation.name}, '
-                'tabs: <CarbonTab>[…], panels: <Widget>[…]);'
-          : 'CarbonTabs(variant: CarbonTabVariant.${_variant.name}, '
-                'activation: CarbonTabActivationMode.${activation.name}, '
-                'tabs: <CarbonTab>[…], panels: <Widget>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -491,7 +489,7 @@ class _AccordionPage extends StatelessWidget {
           ],
         ),
       ),
-      code: 'CarbonAccordion(children: <CarbonAccordionItem>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -572,9 +570,7 @@ class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
           onChanged: (bool value) => setState(() => _disabled = value),
         ),
       ],
-      code: _iconOnly
-          ? "CarbonContentSwitcher(switches: <CarbonSwitch>[\n  CarbonSwitch(icon: CarbonIcons.list, semanticLabel: 'List view'),\n  CarbonSwitch(icon: CarbonIcons.grid, semanticLabel: 'Grid view'),\n]);"
-          : 'CarbonContentSwitcher(switches: <CarbonSwitch>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -672,8 +668,7 @@ class _BreadcrumbPageState extends State<_BreadcrumbPage> {
           onChanged: (CarbonLinkSize value) => setState(() => _size = value),
         ),
       ],
-      code:
-          'CarbonBreadcrumb(items: <CarbonBreadcrumbItem>[…], size: CarbonLinkSize.${_size.name}, noTrailingSlash: ${!_trailing});',
+      code: exampleSource,
     );
   }
 }
@@ -709,7 +704,7 @@ class _PaginationPageState extends State<_PaginationPage> {
           ),
         ),
       ),
-      code: 'CarbonPagination(page: 1, pageSize: 10, totalItems: 248);',
+      code: exampleSource,
     );
   }
 }
@@ -780,10 +775,7 @@ class _ModalPageState extends State<_ModalPage> {
           onChanged: (bool v) => setState(() => _fullWidth = v),
         ),
       ],
-      code:
-          "CarbonModal(open: true, title: '…', "
-          '${_fullWidth ? 'isFullWidth: true, ' : ''}'
-          "child: …);",
+      code: exampleSource,
     );
   }
 }
@@ -858,7 +850,7 @@ class _DialogPageState extends State<_DialogPage> {
           onChanged: (bool v) => setState(() => _modal = v),
         ),
       ],
-      code: 'CarbonDialog(open: true, children: <Widget>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -983,8 +975,7 @@ class _NotificationPageState extends State<_NotificationPage> {
           ),
         ),
       ),
-      code:
-          'CarbonInlineNotification(kind: CarbonNotificationKind.success, …);',
+      code: exampleSource,
     );
   }
 }
@@ -1071,8 +1062,7 @@ class _ProgressIndicatorPageState extends State<_ProgressIndicatorPage> {
           onChanged: (bool value) => setState(() => _interactive = value),
         ),
       ],
-      code:
-          'CarbonProgressIndicator(currentIndex: $_currentIndex, vertical: $_vertical, interactive: $_interactive, onStepSelected: (index) { … }, steps: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -1108,7 +1098,7 @@ class _StructuredListPage extends StatelessWidget {
           ],
         ),
       ),
-      code: 'CarbonStructuredList(headers: <String>[…], rows: <…>[…]);',
+      code: exampleSource,
     );
   }
 }
@@ -1152,7 +1142,7 @@ class _AILabelPageState extends State<_AILabelPage> {
           onChanged: (bool value) => setState(() => _inline = value),
         ),
       ],
-      code: "CarbonAILabel(content: Text('…'));",
+      code: exampleSource,
     );
   }
 }
@@ -1229,7 +1219,7 @@ class _ChatButtonPageState extends State<_ChatButtonPage> {
           onChanged: (bool value) => setState(() => _disabled = value),
         ),
       ],
-      code: "CarbonChatButton(label: 'Ask a question', onPressed: ask);",
+      code: exampleSource,
     );
   }
 }
@@ -1280,7 +1270,7 @@ class _ContainedListPageState extends State<_ContainedListPage> {
           onChanged: (CarbonContainedListSize s) => setState(() => _size = s),
         ),
       ],
-      code: "CarbonContainedList(label: Text('…'), children: <…>[…]);",
+      code: exampleSource,
     );
   }
 }
@@ -1343,9 +1333,7 @@ class _ContextMenuPageState extends State<_ContextMenuPage> {
           ),
         ),
       ),
-      code:
-          'CarbonContextMenu(items: <…>[…], '
-          'child: Focus(child: …));',
+      code: exampleSource,
     );
   }
 }
@@ -1370,7 +1358,7 @@ class _PaginationNavPageState extends State<_PaginationNavPage> {
         itemsShown: 7,
         onChange: (int p) => setState(() => _page = p),
       ),
-      code: 'CarbonPaginationNav(totalItems: 12, page: 0, onChange: …);',
+      code: exampleSource,
     );
   }
 }
