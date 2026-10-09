@@ -215,36 +215,151 @@ class TimePickerExample extends StatelessWidget {
   }
 }
 
-extension _FileUploaderPageSource on _FileUploaderPage {
+extension _FileUploaderPageStateSource on _FileUploaderPageState {
   String get exampleSource {
     final ExampleConfiguration configuration = ExampleConfiguration(
-      <String, String>{},
+      <String, String>{
+        '_hasFile': sourceValue(_hasFile),
+        '_invalid': sourceValue(_invalid),
+        '_dragOver': sourceValue(_dragOver),
+        '_status': 'CarbonFileStatus.${_status.name}',
+        '_progress': sourceValue(_progress),
+      },
     );
     return configuration.fill(r'''import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
 
-class FileUploaderExample extends StatelessWidget {
+class FileUploaderExample extends StatefulWidget {
   const FileUploaderExample();
   @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
-      width: 360,
-      child: CarbonFileUploader(
-        labelTitle: 'Upload files',
-        labelDescription: 'Max 5 files, 500kb each.',
-        items: <CarbonFileUploaderItem>[
-          CarbonFileUploaderItem(
-            name: 'report.pdf',
-            status: CarbonFileStatus.complete,
+  State<FileUploaderExample> createState() => _FileUploaderExampleState();
+}
+
+class _FileUploaderExampleState extends State<FileUploaderExample> {
+  bool _hasFile = @@_hasFile@@;
+  bool _invalid = @@_invalid@@;
+  bool _dragOver = @@_dragOver@@;
+  CarbonFileStatus _status = @@_status@@;
+  int _progress = @@_progress@@;
+
+  void _select() => setState(() {
+    _hasFile = true;
+    _invalid = false;
+    _status = CarbonFileStatus.edit;
+    _progress = 0;
+  });
+  void _start() => setState(() {
+    _invalid = false;
+    _status = CarbonFileStatus.uploading;
+    _progress = 0;
+  });
+  void _advance() => setState(() {
+    _progress += 50;
+    if (_progress >= 100) _status = CarbonFileStatus.complete;
+  });
+  void _fail() => setState(() {
+    _status = CarbonFileStatus.edit;
+    _invalid = true;
+  });
+  void _remove() => setState(() {
+    _hasFile = false;
+    _invalid = false;
+    _progress = 0;
+    _status = CarbonFileStatus.edit;
+  });
+
+  String get _stateLabel => !_hasFile
+      ? 'No file selected'
+      : _invalid
+      ? 'Upload failed'
+      : switch (_status) {
+          CarbonFileStatus.edit => 'Selected (pending upload)',
+          CarbonFileStatus.uploading => 'Uploading: $_progress%',
+          CarbonFileStatus.complete => 'Upload complete',
+        };
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 360,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        CarbonFileUploader(
+          labelTitle: 'Upload a demo report',
+          labelDescription: 'Demo data only; application adapters own file access and transport.',
+          items: <CarbonFileUploaderItem>[
+            if (_hasFile)
+              CarbonFileUploaderItem(
+                key: const ValueKey<String>('demo-report'),
+                name: 'demo-report.pdf',
+                status: _status,
+                invalid: _invalid,
+                errorSubject: 'Upload failed',
+                errorBody: 'Simulated failure. Retry or remove this file.',
+                onDelete: _remove,
+              ),
+          ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              CarbonFileUploaderButton(
+                label: 'Select demo file',
+                onPressed: _select,
+              ),
+              const SizedBox(height: 16),
+              CarbonFileUploaderDropContainer(
+                label: 'Simulate dropping demo-report.pdf',
+                onPressed: _select,
+                dragOver: _dragOver,
+              ),
+            ],
           ),
-          CarbonFileUploaderItem(name: 'draft.pdf'),
-        ],
-        child: CarbonFileUploaderDropContainer(
-          label: 'Drag and drop files here or click to upload',
         ),
-      ),
-    );
-  }
+        const SizedBox(height: 16),
+        Semantics(liveRegion: true, child: CarbonText(_stateLabel)),
+        if (_hasFile && _status == CarbonFileStatus.uploading)
+          CarbonProgressBar(
+            label: 'Demo upload progress',
+            value: _progress.toDouble(),
+            max: 100,
+          ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: <Widget>[
+            CarbonButton(
+              label: _invalid ? 'Retry upload' : 'Start upload',
+              onPressed: _hasFile && _status == CarbonFileStatus.edit
+                  ? _start
+                  : null,
+            ),
+            CarbonButton(
+              label: 'Advance upload',
+              kind: CarbonButtonKind.secondary,
+              onPressed: _hasFile && _status == CarbonFileStatus.uploading
+                  ? _advance
+                  : null,
+            ),
+            CarbonButton(
+              label: 'Simulate failure',
+              kind: CarbonButtonKind.dangerTertiary,
+              onPressed: _hasFile && _status == CarbonFileStatus.uploading
+                  ? _fail
+                  : null,
+            ),
+            CarbonButton(
+              label: 'Remove file',
+              kind: CarbonButtonKind.ghost,
+              onPressed: _hasFile ? _remove : null,
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 ''');
   }

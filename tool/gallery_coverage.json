@@ -565,11 +565,10 @@
       ]
     },
     "CarbonFileUploaderButton": {
-      "mode": "composition",
+      "mode": "demonstrated",
       "routes": [
         "file-uploader"
-      ],
-      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+      ]
     },
     "CarbonFileUploaderDropContainer": {
       "mode": "demonstrated",

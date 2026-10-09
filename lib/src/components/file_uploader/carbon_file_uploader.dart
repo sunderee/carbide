@@ -518,6 +518,20 @@ class _ErrorRequirement extends StatelessWidget {
 /// The labelled file-uploader container: an optional title and description, the
 /// upload control ([CarbonFileUploaderButton] or
 /// [CarbonFileUploaderDropContainer]), and the list of selected files.
+///
+/// This is a presentation container. The application owns file selection,
+/// platform drag-and-drop events, validation, transport, cancellation, retries
+/// and stable file identifiers. Supply each row's [CarbonFileUploaderItem.status],
+/// invalid/error information and removal callback as that application state
+/// changes. [CarbonFileStatus.edit] represents a removable selected file;
+/// uploading shows a spinner and complete shows a checkmark. Errors use the
+/// item's invalid flag, rather than a separate status enum value.
+///
+/// This widget neither reads files nor sends network requests. Client-side
+/// type/size checks improve feedback; a receiving service must independently
+/// validate uploads. The container's [disabled] flag styles its labels; callers
+/// also disable their supplied selection control and item actions.
+/// See the [integration recipes](https://github.com/sunderee/carbide/blob/master/docs/patterns/file-upload.md).
 class CarbonFileUploader extends StatelessWidget {
   /// Creates a file uploader.
   const CarbonFileUploader({
