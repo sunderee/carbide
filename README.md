@@ -167,6 +167,7 @@ code snippets and application-supplied context.
 - [Architecture](docs/ARCHITECTURE.md)
 - Patterns: [Forms](docs/patterns/forms.md) ·
   [Page headers](docs/patterns/page-header.md) ·
+  [Progress indicators](docs/patterns/progress-indicator.md) ·
   [Loading](docs/patterns/loading.md) ·
   [Notifications](docs/patterns/notification.md) ·
   [Status indicators](docs/patterns/status-indicator.md)

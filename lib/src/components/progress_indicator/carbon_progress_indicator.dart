@@ -13,12 +13,13 @@
 
 import 'package:flutter/widgets.dart';
 
-import '../../foundations/layout.dart';
 import '../../foundations/typography.dart';
 import '../../icons/carbon_icon.dart';
 import '../../icons/carbon_icons.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../../utils/focus_ring.dart';
 import '../../utils/interaction.dart';
 
@@ -82,6 +83,11 @@ class CarbonProgressIndicator extends StatelessWidget {
   final int currentIndex;
 
   /// Whether the steps stack vertically.
+  ///
+  /// Horizontal steps use a 128px grid and an 88px single-line label beside
+  /// the glyph. Constrained hosts scroll horizontally instead of shrinking
+  /// labels. Vertical steps wrap labels within 160px and grow beyond a 58px
+  /// minimum when text scaling or supporting labels need more space.
   final bool vertical;
 
   /// Whether steps are clickable.
@@ -107,9 +113,8 @@ class CarbonProgressIndicator extends StatelessWidget {
           step: steps[i],
           state: _stateOf(i),
           vertical: vertical,
-          isLast: i == steps.length - 1,
-          // The line after a complete step is filled.
-          lineComplete: i < currentIndex,
+          // Complete and current steps fill their leading line.
+          lineComplete: i <= currentIndex,
           onTap: interactive && !steps[i].disabled && onStepSelected != null
               ? () => onStepSelected!(i)
               : null,
@@ -125,7 +130,17 @@ class CarbonProgressIndicator extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: children,
             )
-          : Row(mainAxisSize: MainAxisSize.min, children: children),
+          : SizedBox(
+              width: steps.length * 128,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                ),
+              ),
+            ),
     );
   }
 }
@@ -135,7 +150,6 @@ class _Step extends StatelessWidget {
     required this.step,
     required this.state,
     required this.vertical,
-    required this.isLast,
     required this.lineComplete,
     required this.onTap,
   });
@@ -143,7 +157,6 @@ class _Step extends StatelessWidget {
   final CarbonProgressStep step;
   final _StepState state;
   final bool vertical;
-  final bool isLast;
   final bool lineComplete;
   final VoidCallback? onTap;
 
@@ -168,11 +181,18 @@ class _Step extends StatelessWidget {
       children: <Widget>[
         Text(
           step.label,
-          style: CarbonTypeStyles.bodyCompact01.copyWith(color: labelColor),
+          maxLines: vertical ? null : 1,
+          overflow: vertical ? TextOverflow.clip : TextOverflow.ellipsis,
+          style: CarbonTypeStyles.bodyCompact01.copyWith(
+            color: labelColor,
+            height: 1.45,
+          ),
         ),
         if (step.secondaryLabel != null)
           Text(
             step.secondaryLabel!,
+            maxLines: vertical ? null : 1,
+            overflow: vertical ? TextOverflow.clip : TextOverflow.ellipsis,
             style: CarbonTypeStyles.label01.copyWith(
               color: theme.textSecondary,
             ),
@@ -181,96 +201,121 @@ class _Step extends StatelessWidget {
     );
 
     final Widget content = vertical
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  glyph,
-                  if (!isLast)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: SizedBox(
-                        width: 1,
-                        height: 24,
-                        child: ColoredBox(color: lineColor),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(width: CarbonSpacing.spacing03),
-              Padding(padding: const EdgeInsets.only(top: 1), child: label),
-            ],
-          )
-        : Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
+        ? ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 58),
+            child: Stack(
+              children: <Widget>[
+                PositionedDirectional(
+                  start: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  child: ColoredBox(color: lineColor),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      glyph,
-                      const SizedBox(width: CarbonSpacing.spacing03),
-                      if (!isLast)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 7),
-                          child: SizedBox(
-                            width: 64,
-                            height: 1,
-                            child: ColoredBox(color: lineColor),
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1),
+                        child: glyph,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 160),
+                          child: SizedBox(width: 160, child: label),
                         ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: CarbonSpacing.spacing03),
-                  label,
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
+          )
+        : SizedBox(
+            width: 128,
+            child: Stack(
+              children: <Widget>[
+                PositionedDirectional(
+                  start: 0,
+                  end: 0,
+                  top: 0,
+                  height: 2,
+                  child: ColoredBox(color: lineColor),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: glyph,
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(width: 88, child: label),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
 
-    Widget body = ExcludeSemantics(child: content);
+    final String progressState = switch (state) {
+      _StepState.complete => 'Complete',
+      _StepState.current => 'Current',
+      _StepState.incomplete => 'Incomplete',
+      _StepState.invalid => 'Invalid',
+      _StepState.disabled => 'Disabled',
+    };
     if (onTap != null) {
-      body = CarbonInteraction(
-        onPressed: onTap,
-        builder: (BuildContext context, Set<WidgetState> states) =>
-            CarbonFocusRing(
-              visible: states.contains(WidgetState.focused),
-              inset: true,
-              child: ConstrainedBox(
-                // Interactive steps retain their glyph size but offer a full
-                // 48px pointer and assistive-technology activation region.
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                child: ExcludeSemantics(child: content),
-              ),
-            ),
+      return CarbonControlSemantics(
+        state: CarbonControlState.interactive,
+        label: step.label,
+        value: progressState,
+        activeOptionHint: step.secondaryLabel,
+        readOnlyHint: CarbonControlState.defaultReadOnlyHint,
+        selected: state == _StepState.current,
+        button: true,
+        onActivate: onTap,
+        builder: (FocusNode node) => Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          includeSemantics: false,
+          onFocusChange: (bool focused) {
+            if (focused) Scrollable.ensureVisible(context);
+          },
+          child: CarbonInteraction(
+            focusNode: node,
+            includeSemantics: false,
+            onPressed: onTap,
+            builder: (BuildContext context, Set<WidgetState> states) =>
+                CarbonFocusRing(
+                  visible: states.contains(WidgetState.focused),
+                  inset: true,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: ExcludeSemantics(child: content),
+                  ),
+                ),
+          ),
+        ),
       );
     }
-
-    return MergeSemantics(
-      child: Semantics(
-        container: true,
-        label: step.label,
-        value: switch (state) {
-          _StepState.complete => 'Complete',
-          _StepState.current => 'Current',
-          _StepState.incomplete => 'Incomplete',
-          _StepState.invalid => 'Invalid',
-          _StepState.disabled => 'Disabled',
-        },
-        onTap: onTap,
-        button: onTap != null,
-        selected: state == _StepState.current,
-        enabled: state != _StepState.disabled,
-        child: Padding(
-          padding: EdgeInsetsDirectional.only(
-            end: vertical || isLast ? 0 : CarbonSpacing.spacing05,
-            bottom: vertical && !isLast ? CarbonSpacing.spacing03 : 0,
-          ),
-          child: body,
-        ),
-      ),
+    return Semantics(
+      container: true,
+      label: step.label,
+      hint: step.secondaryLabel,
+      value: progressState,
+      selected: state == _StepState.current,
+      enabled: state != _StepState.disabled,
+      child: ExcludeSemantics(child: content),
     );
   }
 }
@@ -300,9 +345,7 @@ class _StepGlyph extends StatelessWidget {
       case _StepState.incomplete:
         return SizedBox.square(
           dimension: 16,
-          child: CustomPaint(
-            painter: _CirclePainter(theme.borderSubtle00, false),
-          ),
+          child: CustomPaint(painter: _CirclePainter(theme.iconPrimary, false)),
         );
       case _StepState.disabled:
         return SizedBox.square(
