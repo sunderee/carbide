@@ -47,7 +47,7 @@ void main() {
 
     // The Button page is shown (title + its description).
     expect(
-      find.text('Eight kinds across six sizes, with an optional icon.'),
+      find.text('Button kinds and sizes, with an optional icon.'),
       findsOneWidget,
     );
   });

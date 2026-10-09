@@ -40,7 +40,7 @@ void main() {
 
     // The Button demo page rendered its description and a live button.
     expect(
-      find.text('Eight kinds across six sizes, with an optional icon.'),
+      find.text('Button kinds and sizes, with an optional icon.'),
       findsOneWidget,
     );
     expect(find.byType(CarbonButton), findsWidgets);

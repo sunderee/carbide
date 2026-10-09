@@ -106,7 +106,7 @@ class _ButtonPageState extends State<_ButtonPage> {
     );
     return DemoScaffold(
       title: 'Button',
-      description: 'Eight kinds across six sizes, with an optional icon.',
+      description: 'Button kinds and sizes, with an optional icon.',
       preview: example.build(),
       controls: <Widget>[
         choiceKnob<CarbonButtonKind>(
