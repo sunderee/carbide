@@ -543,13 +543,17 @@ void main() {
           managedOverlayEntry(
             builder: (_) => Align(
               alignment: Alignment.topLeft,
-              child: CarbonPagination(
-                page: 3,
-                pageSize: 10,
-                totalItems: 95,
-                localizations: labels,
-                onPageChanged: (_) {},
-                onPageSizeChanged: (_) {},
+              // The narrow page host scrolls when localized/scaled content
+              // exceeds its viewport, including Chrome's wider Ahem glyphs.
+              child: SingleChildScrollView(
+                child: CarbonPagination(
+                  page: 3,
+                  pageSize: 10,
+                  totalItems: 95,
+                  localizations: labels,
+                  onPageChanged: (_) {},
+                  onPageSizeChanged: (_) {},
+                ),
               ),
             ),
           ),

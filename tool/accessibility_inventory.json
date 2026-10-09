@@ -1,0 +1,392 @@
+{
+  "accordion": {
+    "suites": [
+      "test/components/accordion/carbon_accordion_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "ai_label": {
+    "suites": [
+      "test/components/ai_label/carbon_ai_label_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "aspect_ratio": {
+    "exemption": "Constraint wrapper; no owned activation."
+  },
+  "breadcrumb": {
+    "suites": [
+      "test/components/breadcrumb/carbon_breadcrumb_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "button": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/button/carbon_button_test.dart"
+    ]
+  },
+  "chat_button": {
+    "suites": [
+      "test/components/chat_button/carbon_chat_button_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "checkbox": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/checkbox/carbon_checkbox_test.dart"
+    ]
+  },
+  "code_snippet": {
+    "suites": [
+      "test/components/code_snippet/carbon_code_snippet_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "combo_box": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/combo_box/carbon_combo_box_test.dart"
+    ]
+  },
+  "contained_list": {
+    "suites": [
+      "test/components/contained_list/carbon_contained_list_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "content_switcher": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/content_switcher/carbon_content_switcher_test.dart"
+    ]
+  },
+  "context_menu": {
+    "suites": [
+      "test/components/context_menu/carbon_context_menu_keyboard_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "copy_button": {
+    "suites": [
+      "test/components/copy_button/carbon_copy_button_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "data_table": {
+    "suites": [
+      "test/components/data_table/carbon_data_table_accessibility_test.dart",
+      "test/components/data_table/carbon_data_table_test.dart",
+      "test/components/data_table/carbon_data_table_semantics_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "date_picker": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/date_picker/carbon_date_picker_test.dart"
+    ]
+  },
+  "dialog": {
+    "suites": [
+      "test/components/dialog/carbon_dialog_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "dropdown": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/dropdown/carbon_dropdown_test.dart"
+    ]
+  },
+  "file_uploader": {
+    "suites": [
+      "test/components/file_uploader/carbon_file_uploader_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "form": {
+    "exemption": "Presentational field, label and grouping scopes; interactive descendants are checked by their control families."
+  },
+  "foundations": {
+    "exemption": "Non-widget tokens, values and motion helper."
+  },
+  "grid": {
+    "exemption": "Layout wrappers; no owned activation."
+  },
+  "heading": {
+    "exemption": "Heading/section semantics, no owned activation."
+  },
+  "icon_button": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/icon_button/carbon_icon_button_test.dart"
+    ]
+  },
+  "icons": {
+    "exemption": "Images and vector painter/data; no owned activation."
+  },
+  "indicator": {
+    "exemption": "Status images/counts; no owned activation."
+  },
+  "link": {
+    "suites": [
+      "test/components/link/carbon_link_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "list": {
+    "exemption": "Ordered/unordered list semantics, no owned activation."
+  },
+  "list_box": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": []
+  },
+  "loading": {
+    "exemption": "Progress/status announcements; no owned activation."
+  },
+  "menu": {
+    "suites": [
+      "test/components/menu/carbon_menu_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "modal": {
+    "suites": [
+      "test/components/modal/carbon_modal_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "multi_select": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/multi_select/carbon_multi_select_test.dart"
+    ]
+  },
+  "notification": {
+    "suites": [
+      "test/components/notification/carbon_notification_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "number_input": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/number_input/carbon_number_input_test.dart"
+    ]
+  },
+  "overflow_menu": {
+    "suites": [
+      "test/components/overflow_menu/carbon_overflow_menu_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "page_header": {
+    "suites": [
+      "test/components/page_header/page_header_actions_test.dart",
+      "test/components/page_header/page_header_tags_test.dart",
+      "test/components/page_header/carbon_page_header_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "pagination": {
+    "suites": [
+      "test/components/pagination/carbon_pagination_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "pagination_nav": {
+    "suites": [
+      "test/components/pagination_nav/carbon_pagination_nav_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "pictograms": {
+    "exemption": "Images/data; no owned activation."
+  },
+  "popover": {
+    "exemption": "Portal/surface primitive; caller owns its trigger action, tested by tooltip/toggletip/date-picker."
+  },
+  "progress_bar": {
+    "exemption": "Progress semantics; no owned activation."
+  },
+  "progress_indicator": {
+    "suites": [
+      "test/components/progress_indicator/carbon_progress_indicator_test.dart",
+      "test/components/progress_indicator/carbon_progress_indicator_activation_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "radio_button": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/radio_button/carbon_radio_button_test.dart"
+    ]
+  },
+  "search": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/search/carbon_search_test.dart"
+    ]
+  },
+  "select": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/select/carbon_select_test.dart"
+    ]
+  },
+  "skeleton": {
+    "exemption": "Decorative busy placeholders; no owned activation."
+  },
+  "slider": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/slider/carbon_slider_test.dart"
+    ]
+  },
+  "stack": {
+    "exemption": "Layout wrapper; no owned activation."
+  },
+  "structured_list": {
+    "suites": [
+      "test/components/structured_list/carbon_structured_list_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "tabs": {
+    "suites": [
+      "test/components/tabs/carbon_tabs_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "tag": {
+    "suites": [
+      "test/components/tag/carbon_tag_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "text": {
+    "exemption": "Styled text; no owned activation."
+  },
+  "text_area": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/text_area/carbon_text_area_test.dart"
+    ]
+  },
+  "text_input": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/text_input/carbon_text_input_test.dart",
+      "test/components/text_input/password_visibility_test.dart"
+    ]
+  },
+  "theme": {
+    "exemption": "Theme and layer propagation scopes; no owned activation."
+  },
+  "tile": {
+    "suites": [
+      "test/components/tile/carbon_tile_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "time_picker": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/time_picker/carbon_time_picker_test.dart"
+    ]
+  },
+  "toggle": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": [
+      "test/components/toggle/carbon_toggle_test.dart"
+    ]
+  },
+  "toggletip": {
+    "suites": [
+      "test/components/toggletip/carbon_toggletip_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "tooltip": {
+    "suites": [
+      "test/components/tooltip/carbon_tooltip_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "tree_view": {
+    "suites": [
+      "test/components/tree_view/carbon_tree_view_test.dart"
+    ],
+    "states": "Dedicated component suites cover the interactive composition and applicable variants."
+  },
+  "ui_shell": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": []
+  },
+  "utils": {
+    "suites": [
+      "test/accessibility/family_guidelines_test.dart"
+    ],
+    "matrix": true,
+    "additional_suites": []
+  }
+}

@@ -677,6 +677,7 @@ void main() {
       // convert.to-rem(32px)` in documentation/carbon/packages/styles/
       // scss/components/notification/_actionable-notification.scss), so
       // 48dp is unattainable. Labels stay gated.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/notification/_actionable-notification.scss
       await expectA11y(tester, tapTargets: false);
 
       // The inline variant's only tap target is the 48px close control,

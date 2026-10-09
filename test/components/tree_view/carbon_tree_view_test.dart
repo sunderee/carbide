@@ -682,6 +682,7 @@ void main() {
       // (`min-block-size: convert.to-rem(32px)` in documentation/carbon/
       // packages/styles/scss/components/treeview/_treeview.scss), so 48dp
       // is unattainable at the default `sm` size.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/treeview/_treeview.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

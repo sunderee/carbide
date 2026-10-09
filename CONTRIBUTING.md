@@ -109,6 +109,20 @@ Two machine-checked gates back the DoD's accessibility bullet (#226):
   assert reading order via
   `tester.semantics.simulatedAccessibilityTraversal()`.
 
+The family inventory in `tool/accessibility_inventory.json` distinguishes
+interactive families from presentation-only primitives and split suites.
+Run `python3 tool/check_accessibility_inventory.py` after changing tests.
+Every guideline-axis override must have an adjacent reason and a pinned
+`// a11y-exception: https://github.com/...` source citation (or a tracked issue).
+Larger densities must keep the full target check when they can satisfy it.
+
+The labeled-target guideline inspects nodes that already have a tap action;
+an action-less node can pass it. Assert the required activation/editing actions
+and exercise callbacks independently. Disabled/read-only states must expose
+their documented focus policy while preventing mutation. The shared family
+matrix checks these states, including named icon controls, alongside each
+component's behavior tests.
+
 ### Text scaling
 
 Spec heights are **minimums**: chrome grows with text under

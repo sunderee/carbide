@@ -290,6 +290,7 @@ void main() {
       // `layout.use('size', $default: 'md')` sizing `block-size:
       // layout.size('height')`), so the 48dp android guideline is
       // unattainable at the default size.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/search/_search.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

@@ -359,7 +359,9 @@ class _IntSelect extends StatelessWidget {
         labelText: label,
         hideLabel: true,
         activeOptionFormatter: activeOptionFormatter,
-        size: CarbonFieldSize.sm,
+        // Upstream pagination stretches its selects to the 48px band. This
+        // also gives the complete trigger the platform's 48dp hit target.
+        size: CarbonFieldSize.lg,
         value: value,
         onChanged: onChanged,
         items: <CarbonSelectEntry<int>>[

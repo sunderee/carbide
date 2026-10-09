@@ -732,6 +732,7 @@ void main() {
       // (`.cds--menu-item { block-size: 2rem }` in documentation/carbon/
       // packages/styles/scss/components/menu/_menu.scss), so 48dp is
       // unattainable at the default `sm` size.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/menu/_menu.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

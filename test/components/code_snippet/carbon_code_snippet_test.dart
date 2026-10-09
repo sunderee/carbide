@@ -480,6 +480,7 @@ void main() {
       // `$spacing-08` (40px), the inline chip to 1.25rem (20px,
       // `--snippet--inline.--btn`), and the Show more toggle to a ~32px
       // ghost control, so 48dp is unattainable at Carbon's spec sizes.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/code-snippet/_code-snippet.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

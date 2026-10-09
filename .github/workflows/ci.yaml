@@ -42,6 +42,8 @@ jobs:
         run: |
           python3 tool/test_public_surface.py
           python3 tool/public_surface.py --check
+          python3 tool/test_accessibility_inventory.py
+          python3 tool/check_accessibility_inventory.py
 
       - name: Verify formatting
         run: dart format --set-exit-if-changed .

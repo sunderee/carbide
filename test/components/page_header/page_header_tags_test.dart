@@ -289,6 +289,7 @@ void main() {
             expectNoClippedTextAtScale(tester, scale);
             // Carbon's md tags/close affordance use 24px density:
             // styles/scss/components/tag/_tag.scss. Keep name checks active.
+            // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/menu/_menu.scss
             await expectA11y(tester, tapTargets: false);
             await tester.sendKeyEvent(LogicalKeyboardKey.escape);
             await tester.pumpAndSettle();

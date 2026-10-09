@@ -350,6 +350,7 @@ void main() {
           Tristate.isFalse,
         ]);
         // List-box rows are 40px in upstream _list-box.scss.
+        // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/list-box/_list-box.scss
         await expectA11y(tester, tapTargets: false);
       });
 

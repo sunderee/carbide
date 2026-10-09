@@ -279,9 +279,10 @@ void main() {
           ),
         ),
       );
-      // Tap-target gate off: every AI label chip is 16–32px by design
-      // (`_ai-label.scss` sizes mini…xl), with a padded 24px hit target —
-      // all below the 48dp guideline.
+      // The default xs AI chip is 24px; slug/_slug.scss defines the compact
+      // sizes from mini (16px) to md (40px), below the 48dp guideline. The
+      // larger lg/xl variants remain eligible for the full target check.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/slug/_slug.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });

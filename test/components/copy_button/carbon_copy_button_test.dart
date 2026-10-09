@@ -346,6 +346,7 @@ void main() {
       // the copy button fills its 40px single-line snippet row —
       // `_code-snippet.scss` `block-size: $spacing-08`), so the 48dp android
       // guideline is unattainable at the default size.
+      // a11y-exception: https://github.com/carbon-design-system/carbon/blob/44f90d8d6b24889af06cee1422ceb37f58e40bed/packages/styles/scss/components/code-snippet/_code-snippet.scss
       await expectA11y(tester, tapTargets: false);
       handle.dispose();
     });
