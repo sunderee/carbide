@@ -1,9 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
 
-Prepared for 0.5.0; see the [adoption guide](docs/releases/0.5.0-adoption.md).
-Version/tag publication remains a separate release action.
+See the [adoption guide](docs/releases/0.5.0-adoption.md).
 
 - Resolve bundled Plex fonts in consuming applications while preserving
   application fallback and custom-family overrides; document the resulting
@@ -265,7 +264,7 @@ Version/tag publication remains a separate release action.
   layouts, including release builds (#294). Tab constructors are no longer
   const because list-length assertions require runtime evaluation.
 
-# 0.4.2
+## 0.4.2
 
 Change repository links to new owner, and adjust analysis options.
 
