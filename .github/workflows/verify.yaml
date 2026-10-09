@@ -1,0 +1,177 @@
+name: Verify release inputs
+
+# CI, publication and rehearsal all consume this gate. Keep release checks here.
+on:
+  workflow_call:
+    inputs:
+      fail-closed-probe:
+        description: Deliberately fail verification for the dry-run rehearsal only
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    name: Format, analyze, test
+    # Pinned to ubuntu so golden tests render deterministically.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # Documentation submodules are large and not needed to build or test the
+      # package, so they are intentionally not checked out here.
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Only the dry-run rehearsal can request this safe failure probe.
+      - name: Fail verification deliberately (rehearsal probe)
+        if: ${{ inputs.fail-closed-probe }}
+        run: |
+          echo "::error::Deliberate verification failure; no publication is allowed."
+          exit 1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Icon lockfile drift guard
+        run: |
+          python3 tool/test_release_verification.py
+          python3 tool/test_carbon_generation.py
+          python3 tool/test_generation_check.py
+          python3 tool/test_upstream_tokens.py
+          python3 tool/test_icons_lock.py
+          python3 tool/check_icons_lock.py
+
+      - name: Public surface and specimen coverage
+        run: |
+          python3 tool/test_public_surface.py
+          python3 tool/public_surface.py --check
+          python3 tool/test_accessibility_inventory.py
+          python3 tool/check_accessibility_inventory.py
+          python3 tool/test_overlay_lifetimes.py
+          python3 tool/check_overlay_lifetimes.py
+
+      - name: Offline reference freshness and capture provenance
+        run: |
+          dart run tool/check_reference_freshness.dart
+          python3 tool/test_reference_images.py
+          python3 tool/check_reference_images.py
+          node --test tool/fidelity/capture_metadata.test.mjs
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Motion policy source guard
+        run: |
+          python3 tool/test_motion_policy.py
+          python3 tool/check_motion_policy.py
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests (with coverage)
+        run: flutter test --coverage
+
+      # Coverage gate (M11, #229): parse the lcov trace, exclude the
+      # generated icon/pictogram registries, publish the percentage to the
+      # job summary, and fail below the floor. The gate script prints the
+      # per-file sub-floor tail for triage.
+      - name: Coverage gate (90% line floor)
+        run: dart run tool/coverage_gate.dart --floor 90
+
+      - name: Upload coverage trace
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: carbide-coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: warn
+
+      # API reference gate (M8): generate the public API docs and fail on any
+      # dartdoc warning — a broken cross-reference or dead link. Coverage (every
+      # public member documented) is enforced by the `public_member_api_docs`
+      # lint in the Analyze step above; this step guards reference/link health.
+      - name: Generate & validate API docs
+        run: |
+          dart doc --output build/api . 2>&1 | tee dartdoc.log
+          if grep -qiE "^[[:space:]]*(warning|error):" dartdoc.log; then
+            echo "::error::dart doc emitted warnings/errors — see the log above."
+            exit 1
+          fi
+
+      # Upstream fidelity (epic W3): the fidelity test renders each Carbide
+      # component beside its committed Carbon Storybook reference. Publish the
+      # side-by-side images for human review on every PR (the test itself only
+      # gates on measured per-story drift budgets, nonblank renders and structural
+      # size/colour/state checks — see test/fidelity/).
+      - name: Upload fidelity comparisons
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: carbide-fidelity-comparisons
+          path: test/fidelity/comparisons/
+          if-no-files-found: warn
+
+  gallery:
+    name: Gallery — analyze & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: example
+        run: flutter analyze
+
+      - name: Run tests
+        working-directory: example
+        run: flutter test
+
+      # Visual review surface (fidelity epic, W2): render every component's
+      # preview per theme and assemble per-theme contact-sheet montages. This
+      # is an artifact for human eyes, not a pixel gate — it surfaces the kind
+      # of rendering defect (clipping, overflow, wrong state) that assertions
+      # can't express. The generator itself fails only if the whole catalog
+      # stops rendering.
+      - name: Generate contact sheet
+        working-directory: example
+        run: flutter test --dart-define=SCREENSHOTS=true test/contact_sheet_test.dart
+
+      - name: Upload contact sheet
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: carbide-contact-sheet
+          path: example/test/screenshots/
+          if-no-files-found: warn
+
+  package:
+    name: Strict package validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: python3 tool/release_verification.py dry-run

@@ -59,22 +59,24 @@ What the number means:
 
 ### CI
 
-Every PR runs on the **latest Flutter stable** (`channel: stable` in
-`.github/workflows/ci.yaml`; other workflows use the same setup):
+PR CI, tag publication and publication rehearsal call the same
+[`verify.yaml`](.github/workflows/verify.yaml) workflow on the **latest Flutter
+stable**. Publication depends on its complete result, including gallery checks:
 
 - **Format, analyze, test** — plus the coverage gate (above), the icon
   lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
   golden comparison is strict and authoritative.
 - **Gallery — analyze & test** — the example app's suite + contact sheet.
+- **Strict package validation** — `python3 tool/release_verification.py dry-run`
+  allows only Pub's complete ignored-reference-gitlinks warning. Additional
+  warnings, hints, errors, unexpected paths or changed diagnostic text fail.
 - **Motion policy source guard** — `python3 tool/test_motion_policy.py` and
   `python3 tool/check_motion_policy.py` enforce duration resolution and the
   documented loading/indeterminate-progress exceptions. See
   [loading accessibility](docs/patterns/loading.md#accessibility).
-- **Publish rehearsal** (`publish-rehearsal.yaml`) — on PRs touching
-  packaging inputs (`pubspec.yaml`, README, LICENSE, NOTICE, …): a strict
-  `dart pub publish --dry-run` that tolerates exactly the known
-  `documentation/` submodule warning and nothing else, so packaging errors
-  are caught before a release tag.
+- **Publish rehearsal** (`publish-rehearsal.yaml`) — on PRs touching packaging
+  inputs: the shared verification followed by a dry-run publication surrogate.
+  It has no OIDC permission and never uploads a package.
 
 Off-PR cadence: **OS matrix** (`os-matrix.yaml`, weekly + on demand via
 `gh workflow run os-matrix.yaml`) runs the full package suite on macOS and
@@ -270,19 +272,27 @@ there are no long-lived credentials — a release is just a tag.
    ```
 
 The [`Publish to pub.dev`](.github/workflows/publish.yaml) workflow triggers on
-any `vX.Y.Z` tag: it first re-runs the format/analyze/test gate, then publishes
-with the OIDC token (`dart-lang/setup-dart` sets up the credential, Flutter
-provides the SDK, and `dart pub publish --force` does the upload). The tag
-pattern is also enforced on the pub.dev trusted-publisher side.
+any matching version tag. An explicit precondition requires the tag to equal
+`v` plus the package version exactly, including prerelease/build suffixes.
+The full shared verification must also pass. The publication job rechecks the
+strict package dry-run before using `dart pub publish --force`; its OIDC token
+is confined to that job. The tag pattern is also enforced on the pub.dev
+trusted-publisher side.
 
 We deliberately do **not** use pub.dev's reusable publish workflow: it checks
 out with `submodules: false` and runs a strict dry-run that fails on the
 expected "the `documentation/` submodules are excluded from the package"
 warning. `--force` publishes through that warning (it is not an error).
-The gap that leaves — a real packaging error surfacing only at tag time — is
-covered by the **Publish rehearsal** workflow, which runs the strict dry-run
-on every PR that touches packaging inputs and fails on anything beyond the
-known submodule warning.
+The strict archive check runs in the shared gate, rehearsal and publication
+runner. Its allowlist validates the complete diagnostic and exact known
+gitlink paths, rather than accepting a log substring.
+
+To prove dependency blocking safely, dispatch the rehearsal with
+`gh workflow run publish-rehearsal.yaml --ref <branch> -f fail-closed-probe=true`.
+The shared package verification deliberately fails; the publication surrogate
+must be **skipped**, and a separate assertion checks both results. That run is
+expected to conclude with failure. Run a normal rehearsal afterwards to verify
+the successful path. Neither dispatch creates a tag or publishes to pub.dev.
 
 **One-time setup (required for the action to work).** Automated publishing only
 works once `carbide` is registered as a trusted publisher: on pub.dev →
