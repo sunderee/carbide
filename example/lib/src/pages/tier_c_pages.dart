@@ -506,41 +506,61 @@ class _ContentSwitcherPageState extends State<_ContentSwitcherPage> {
   int _index = 0;
   bool _iconOnly = false;
   bool _disabled = false;
+  double _width = 360;
+  double _textScale = 1;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Content switcher',
-      description: 'A segmented control for named text and icon-only views.',
+      description: 'Equal text segments keep readable label space and scroll in narrow layouts. Arrow keys, Home and End reveal the chosen view; icon-only views retain intrinsic sizing.',
       previewAlignment: Alignment.topLeft,
-      preview: SizedBox(
-        width: _iconOnly ? null : 360,
-        child: CarbonContentSwitcher(
-          selectedIndex: _index,
-          onChanged: (int i) => setState(() => _index = i),
-          switches: _iconOnly
-              ? <CarbonSwitch>[
-                  const CarbonSwitch(
-                    icon: CarbonIcons.list,
-                    semanticLabel: 'List view',
-                  ),
-                  const CarbonSwitch(
-                    icon: CarbonIcons.grid,
-                    semanticLabel: 'Grid view',
-                  ),
-                  CarbonSwitch(
-                    icon: CarbonIcons.archive,
-                    semanticLabel: 'Archived view',
-                    disabled: _disabled,
-                  ),
-                ]
-              : <CarbonSwitch>[
-                  const CarbonSwitch(text: 'Day'),
-                  const CarbonSwitch(text: 'Week'),
-                  CarbonSwitch(text: 'Month', disabled: _disabled),
-                ],
+      preview: MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(_textScale)),
+        child: SizedBox(
+          width: _iconOnly ? null : _width,
+          child: CarbonContentSwitcher(
+            selectedIndex: _index,
+            onChanged: (int i) => setState(() => _index = i),
+            switches: _iconOnly
+                ? <CarbonSwitch>[
+                    const CarbonSwitch(
+                      icon: CarbonIcons.list,
+                      semanticLabel: 'List view',
+                    ),
+                    const CarbonSwitch(
+                      icon: CarbonIcons.grid,
+                      semanticLabel: 'Grid view',
+                    ),
+                    CarbonSwitch(
+                      icon: CarbonIcons.archive,
+                      semanticLabel: 'Archived view',
+                      disabled: _disabled,
+                    ),
+                  ]
+                : <CarbonSwitch>[
+                    const CarbonSwitch(text: 'Day'),
+                    const CarbonSwitch(text: 'Week'),
+                    CarbonSwitch(text: 'Month', disabled: _disabled),
+                  ],
+          ),
         ),
       ),
       controls: <Widget>[
+        choiceKnob<double>(
+          label: 'Control width',
+          value: _width,
+          options: const <double>[160, 320, 360],
+          labelOf: (double value) => '${value.toInt()}px',
+          onChanged: (double value) => setState(() => _width = value),
+        ),
+        choiceKnob<double>(
+          label: 'Text scale',
+          value: _textScale,
+          options: const <double>[1, 1.3, 2],
+          labelOf: (double value) => '$value×',
+          onChanged: (double value) => setState(() => _textScale = value),
+        ),
         boolKnob(
           label: 'Icon only',
           value: _iconOnly,

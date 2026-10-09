@@ -10,6 +10,8 @@
 // ContentSwitcher: a horizontal segmented single-select. (Carbon's Switch here
 // is the segment, not the M5 Toggle.)
 
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -22,6 +24,8 @@ import '../../theme/carbon_layer.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/focus_ring.dart';
+import '../../utils/control_semantics.dart';
+import '../../utils/control_state.dart';
 import '../form/carbon_form.dart' show CarbonFieldSize;
 
 /// A single segment of a [CarbonContentSwitcher].
@@ -59,6 +63,12 @@ class CarbonSwitch {
 /// When the platform requests reduced motion, the selection transition
 /// completes instantly.
 ///
+/// Bounded text segments share the available width equally. When that would
+/// leave less than one glyph plus an ellipsis, the group scrolls horizontally
+/// with equal minimum widths, retaining scaled labels and complete names.
+/// Keyboard and accessibility focus reveal the selected segment. Icon-only
+/// and unbounded compositions retain their intrinsic sizing.
+///
 /// ```dart
 /// CarbonContentSwitcher(
 ///   switches: const <CarbonSwitch>[
@@ -88,7 +98,10 @@ class CarbonContentSwitcher extends StatefulWidget {
   /// Called when the selection changes.
   final ValueChanged<int>? onChanged;
 
-  /// The control height.
+  /// The minimum control height at the default text scale.
+  ///
+  /// Text-bearing groups grow by the extra scaled line height, preserving
+  /// their density padding. Icon-only groups keep this height.
   final CarbonFieldSize size;
 
   @override
@@ -105,6 +118,29 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
   int get _current => widget.selectedIndex ?? _selected;
 
   @override
+  void initState() {
+    super.initState();
+    PaintingBinding.instance.systemFonts.addListener(_fontsChanged);
+  }
+
+  void _fontsChanged() {
+    if (mounted) setState(() {});
+  }
+
+  double _textWidth(String text, TextScaler scaler) {
+    final TextPainter painter = TextPainter(
+      text: TextSpan(text: text, style: CarbonTypeStyles.bodyCompact01),
+      textScaler: scaler,
+      textDirection: Directionality.of(context),
+      locale: Localizations.maybeLocaleOf(context),
+      maxLines: 1,
+    )..layout();
+    final double width = painter.width;
+    painter.dispose();
+    return width;
+  }
+
+  @override
   void didUpdateWidget(CarbonContentSwitcher oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.switches.length != oldWidget.switches.length) {
@@ -118,6 +154,7 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
 
   @override
   void dispose() {
+    PaintingBinding.instance.systemFonts.removeListener(_fontsChanged);
     for (final FocusNode node in _nodes) {
       node.dispose();
     }
@@ -184,11 +221,27 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
   @override
   Widget build(BuildContext context) {
     final CarbonThemeData theme = CarbonTheme.of(context);
+    final bool hasText = widget.switches.any((segment) => segment.text != null);
+    final TextScaler scaler = MediaQuery.textScalerOf(context);
+    final double glyphSpace = math.max(
+      scaler.scale(32),
+      _textWidth('M…', scaler),
+    );
+    final bool textWithIcon = widget.switches.any(
+      (segment) => segment.text != null && segment.icon != null,
+    );
+    final double minimumWidth = 32 + glyphSpace + (textWithIcon ? 24 : 0) + 1;
+    final double height =
+        widget.size.height +
+        (hasText
+            ? math.max(0, scaler.scale(14) - 14) *
+                  CarbonTypeStyles.bodyCompact01.height!
+            : 0);
     return Semantics(
       container: true,
       explicitChildNodes: true,
       child: SizedBox(
-        height: widget.size.height,
+        height: height,
         child: DecoratedBox(
           // The group outline (_content-switcher.scss: 1px border-inverse,
           // 4px radius).
@@ -200,9 +253,7 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
             borderRadius: BorderRadius.circular(4),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final bool expand =
-                    constraints.hasBoundedWidth &&
-                    widget.switches.any((segment) => segment.text != null);
+                final bool expand = constraints.hasBoundedWidth && hasText;
                 final List<Widget> segments = <Widget>[
                   for (int i = 0; i < widget.switches.length; i++)
                     _SwitchSegment(
@@ -211,19 +262,34 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
                       selected: i == _current,
                       isFirst: i == 0,
                       focusNode: _nodes[i],
+                      revealSelected:
+                          expand &&
+                          minimumWidth * widget.switches.length >
+                              constraints.maxWidth,
+                      hasFocusedSegment: () =>
+                          _nodes.any((node) => node.hasPrimaryFocus),
                       onKey: _onKey,
                       onTap: () => _select(i),
                     ),
                 ];
-                return Row(
-                  mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
-                  children: expand
-                      ? <Widget>[
+                if (expand) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: math.max(
+                        constraints.maxWidth,
+                        minimumWidth * segments.length,
+                      ),
+                      child: Row(
+                        children: <Widget>[
                           for (final Widget segment in segments)
                             Expanded(child: segment),
-                        ]
-                      : segments,
-                );
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return Row(mainAxisSize: MainAxisSize.min, children: segments);
               },
             ),
           ),
@@ -240,6 +306,8 @@ class _SwitchSegment extends StatefulWidget {
     required this.selected,
     required this.isFirst,
     required this.focusNode,
+    required this.revealSelected,
+    required this.hasFocusedSegment,
     required this.onKey,
     required this.onTap,
   });
@@ -249,6 +317,8 @@ class _SwitchSegment extends StatefulWidget {
   final bool selected;
   final bool isFirst;
   final FocusNode focusNode;
+  final bool revealSelected;
+  final bool Function() hasFocusedSegment;
   final KeyEventResult Function(FocusNode, KeyEvent) onKey;
   final VoidCallback onTap;
 
@@ -259,6 +329,48 @@ class _SwitchSegment extends StatefulWidget {
 class _SwitchSegmentState extends State<_SwitchSegment> {
   bool _hovered = false;
   bool _focused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _revealSelection();
+  }
+
+  void _revealSelection() {
+    if (!widget.revealSelected || !widget.selected) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          !widget.revealSelected ||
+          !widget.selected ||
+          widget.hasFocusedSegment()) {
+        return;
+      }
+      // Selection changes scroll this group only; an editor or another
+      // component keeps its focus and the containing page keeps its position.
+      final ScrollableState? scroll = Scrollable.maybeOf(
+        context,
+        axis: Axis.horizontal,
+      );
+      final RenderObject? target = context.findRenderObject();
+      if (scroll != null && target != null) {
+        scroll.position.ensureVisible(target);
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(_SwitchSegment oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.focusNode.hasPrimaryFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.focusNode.hasPrimaryFocus) {
+          Scrollable.ensureVisible(context);
+        }
+      });
+    } else {
+      _revealSelection();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -302,14 +414,18 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
             ],
           );
 
-    return Semantics(
+    return CarbonControlSemantics(
+      state: enabled
+          ? CarbonControlState.interactive
+          : CarbonControlState.disabled,
+      readOnlyHint: CarbonControlState.defaultReadOnlyHint,
+      focusNode: widget.focusNode,
       button: true,
       inMutuallyExclusiveGroup: true,
       selected: widget.selected,
-      enabled: enabled,
-      label: widget.data.semanticLabel ?? widget.data.text,
-      onTap: enabled ? widget.onTap : null,
-      child: ExcludeSemantics(
+      label: (widget.data.semanticLabel ?? widget.data.text)!,
+      onActivate: enabled ? widget.onTap : null,
+      builder: (FocusNode node) => ExcludeSemantics(
         child: MouseRegion(
           cursor: enabled
               ? SystemMouseCursors.click
@@ -320,10 +436,14 @@ class _SwitchSegmentState extends State<_SwitchSegment> {
             behavior: HitTestBehavior.opaque,
             onTap: enabled ? widget.onTap : null,
             child: Focus(
-              focusNode: widget.focusNode,
+              focusNode: node,
+              includeSemantics: false,
               canRequestFocus: enabled,
               onKeyEvent: widget.onKey,
-              onFocusChange: (bool f) => setState(() => _focused = f),
+              onFocusChange: (bool f) {
+                setState(() => _focused = f);
+                if (f) Scrollable.ensureVisible(context);
+              },
               child: CarbonFocusRing(
                 visible: _focused,
                 inset: true,
