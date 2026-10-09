@@ -101,6 +101,8 @@ jobs:
         run: |
           python3 tool/test_public_surface.py
           python3 tool/public_surface.py --check
+          python3 tool/test_gallery_coverage.py
+          python3 tool/gallery_coverage.py --check
           python3 tool/test_accessibility_inventory.py
           python3 tool/check_accessibility_inventory.py
           python3 tool/test_overlay_lifetimes.py

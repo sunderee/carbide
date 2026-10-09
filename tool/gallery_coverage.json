@@ -1,0 +1,1903 @@
+{
+  "schema": 1,
+  "exports": {
+    "AnimatedCarbonTheme": {
+      "mode": "composition",
+      "routes": [
+        "colors",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonAILabel": {
+      "mode": "demonstrated",
+      "routes": [
+        "ai-label"
+      ]
+    },
+    "CarbonAILabelSize": {
+      "mode": "demonstrated",
+      "routes": [
+        "ai-label"
+      ]
+    },
+    "CarbonAISkeletonIcon": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonAISkeletonPlaceholder": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonAISkeletonText": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonAccordion": {
+      "mode": "demonstrated",
+      "routes": [
+        "accordion"
+      ]
+    },
+    "CarbonAccordionAlign": {
+      "mode": "nonvisual",
+      "routes": [
+        "accordion"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonAccordionItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "accordion"
+      ]
+    },
+    "CarbonAccordionSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonActionableNotification": {
+      "mode": "demonstrated",
+      "routes": [
+        "notification"
+      ]
+    },
+    "CarbonAspectRatio": {
+      "mode": "demonstrated",
+      "routes": [
+        "aspect-ratio"
+      ]
+    },
+    "CarbonAspectRatioValue": {
+      "mode": "demonstrated",
+      "routes": [
+        "aspect-ratio"
+      ]
+    },
+    "CarbonBadgeIndicator": {
+      "mode": "demonstrated",
+      "routes": [
+        "indicators"
+      ]
+    },
+    "CarbonBreadcrumb": {
+      "mode": "demonstrated",
+      "routes": [
+        "breadcrumb"
+      ]
+    },
+    "CarbonBreadcrumbItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "breadcrumb"
+      ]
+    },
+    "CarbonBreadcrumbSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonBreakpoint": {
+      "mode": "demonstrated",
+      "routes": [
+        "fluid-type",
+        "layers-and-breakpoints"
+      ]
+    },
+    "CarbonButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "button-set"
+      ],
+      "reason": "Live preview delegates to the shared immutable ButtonExample; compilation checks all 336 enum/boolean configurations."
+    },
+    "CarbonButtonKind": {
+      "mode": "demonstrated",
+      "routes": [
+        "button",
+        "button-set"
+      ]
+    },
+    "CarbonButtonSet": {
+      "mode": "demonstrated",
+      "routes": [
+        "button-set"
+      ]
+    },
+    "CarbonButtonSize": {
+      "mode": "demonstrated",
+      "routes": [
+        "button"
+      ]
+    },
+    "CarbonButtonSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonCalendar": {
+      "mode": "composition",
+      "routes": [
+        "date-picker"
+      ],
+      "reason": "Calendar is the popup content of DatePicker and DateRangePicker; demonstrated by opening these controls."
+    },
+    "CarbonCallout": {
+      "mode": "demonstrated",
+      "routes": [
+        "notification"
+      ]
+    },
+    "CarbonChatButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "chat-button"
+      ]
+    },
+    "CarbonChatButtonSize": {
+      "mode": "demonstrated",
+      "routes": [
+        "chat-button"
+      ]
+    },
+    "CarbonCheckbox": {
+      "mode": "demonstrated",
+      "routes": [
+        "checkbox"
+      ]
+    },
+    "CarbonCheckboxGroup": {
+      "mode": "composition",
+      "routes": [
+        "checkbox"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonCheckboxSkeleton": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonClickableTile": {
+      "mode": "demonstrated",
+      "routes": [
+        "tile"
+      ]
+    },
+    "CarbonCodeSnippet": {
+      "mode": "demonstrated",
+      "routes": [
+        "code-snippet"
+      ]
+    },
+    "CarbonCodeSnippetSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "code-snippet"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonCodeSnippetType": {
+      "mode": "demonstrated",
+      "routes": [
+        "code-snippet"
+      ]
+    },
+    "CarbonColors": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonColumn": {
+      "mode": "demonstrated",
+      "routes": [
+        "grid"
+      ]
+    },
+    "CarbonComboBox": {
+      "mode": "demonstrated",
+      "routes": [
+        "combo-box"
+      ]
+    },
+    "CarbonComboBoxItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "combo-box"
+      ]
+    },
+    "CarbonComboButton": {
+      "mode": "composition",
+      "routes": [
+        "overflow-menu"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonContainedList": {
+      "mode": "demonstrated",
+      "routes": [
+        "contained-list"
+      ]
+    },
+    "CarbonContainedListItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "contained-list"
+      ]
+    },
+    "CarbonContainedListKind": {
+      "mode": "nonvisual",
+      "routes": [
+        "contained-list"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonContainedListSize": {
+      "mode": "demonstrated",
+      "routes": [
+        "contained-list"
+      ]
+    },
+    "CarbonContainer": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonContentSwitcher": {
+      "mode": "demonstrated",
+      "routes": [
+        "content-switcher"
+      ]
+    },
+    "CarbonContextMenu": {
+      "mode": "demonstrated",
+      "routes": [
+        "context-menu"
+      ]
+    },
+    "CarbonCopy": {
+      "mode": "composition",
+      "routes": [
+        "copy-button"
+      ],
+      "reason": "Shared copy trigger is composed by CopyButton and CodeSnippet; those routes expose its feedback and keyboard behavior."
+    },
+    "CarbonCopyButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "copy-button"
+      ]
+    },
+    "CarbonCopySize": {
+      "mode": "demonstrated",
+      "routes": [
+        "copy-button"
+      ]
+    },
+    "CarbonCounterMode": {
+      "mode": "nonvisual",
+      "routes": [
+        "text-area"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDataTable": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonDataTableSkeleton": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonDateFormat": {
+      "mode": "nonvisual",
+      "routes": [
+        "date-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDateFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "date-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDateParser": {
+      "mode": "nonvisual",
+      "routes": [
+        "date-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDatePicker": {
+      "mode": "demonstrated",
+      "routes": [
+        "date-picker"
+      ]
+    },
+    "CarbonDatePickerLocalizations": {
+      "mode": "nonvisual",
+      "routes": [
+        "date-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDatePickerSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonDateRange": {
+      "mode": "demonstrated",
+      "routes": [
+        "date-picker"
+      ]
+    },
+    "CarbonDateRangePicker": {
+      "mode": "demonstrated",
+      "routes": [
+        "date-picker"
+      ]
+    },
+    "CarbonDialog": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogBody": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogCloseButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogControls": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogFooter": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogHeader": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogSubtitle": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDialogTitle": {
+      "mode": "demonstrated",
+      "routes": [
+        "dialog"
+      ]
+    },
+    "CarbonDismissibleTag": {
+      "mode": "demonstrated",
+      "routes": [
+        "tag"
+      ]
+    },
+    "CarbonDropdown": {
+      "mode": "demonstrated",
+      "routes": [
+        "dropdown"
+      ]
+    },
+    "CarbonDropdownDirection": {
+      "mode": "nonvisual",
+      "routes": [
+        "dropdown"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonDropdownItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "dropdown"
+      ]
+    },
+    "CarbonDropdownSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonDuration": {
+      "mode": "demonstrated",
+      "routes": [
+        "motion"
+      ]
+    },
+    "CarbonEasing": {
+      "mode": "demonstrated",
+      "routes": [
+        "motion"
+      ]
+    },
+    "CarbonEasingMode": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonEasingStyle": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonExpandableSearch": {
+      "mode": "demonstrated",
+      "routes": [
+        "search"
+      ]
+    },
+    "CarbonExpandableTile": {
+      "mode": "demonstrated",
+      "routes": [
+        "tile"
+      ]
+    },
+    "CarbonField": {
+      "mode": "demonstrated",
+      "routes": [
+        "form"
+      ]
+    },
+    "CarbonFieldRequirement": {
+      "mode": "composition",
+      "routes": [
+        "form",
+        "fluid-pickers"
+      ],
+      "reason": "Presentational form building block used by the editable controls; not an independent form submission or validation engine."
+    },
+    "CarbonFieldSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "form",
+        "fluid-pickers"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonFieldStatus": {
+      "mode": "nonvisual",
+      "routes": [
+        "form",
+        "fluid-pickers"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonFileStatus": {
+      "mode": "demonstrated",
+      "routes": [
+        "file-uploader"
+      ]
+    },
+    "CarbonFileUploader": {
+      "mode": "demonstrated",
+      "routes": [
+        "file-uploader"
+      ]
+    },
+    "CarbonFileUploaderButton": {
+      "mode": "composition",
+      "routes": [
+        "file-uploader"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonFileUploaderDropContainer": {
+      "mode": "demonstrated",
+      "routes": [
+        "file-uploader"
+      ]
+    },
+    "CarbonFileUploaderItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "file-uploader"
+      ]
+    },
+    "CarbonFileUploaderSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonFluidForm": {
+      "mode": "demonstrated",
+      "routes": [
+        "form",
+        "fluid-pickers"
+      ]
+    },
+    "CarbonFluidSpacing": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonFluidText": {
+      "mode": "demonstrated",
+      "routes": [
+        "fluid-type"
+      ]
+    },
+    "CarbonFluidTextStyle": {
+      "mode": "demonstrated",
+      "routes": [
+        "fluid-type"
+      ]
+    },
+    "CarbonFluidTextWidthSource": {
+      "mode": "demonstrated",
+      "routes": [
+        "fluid-type"
+      ]
+    },
+    "CarbonFluidTypeStyles": {
+      "mode": "demonstrated",
+      "routes": [
+        "fluid-type"
+      ]
+    },
+    "CarbonFocusRing": {
+      "mode": "composition",
+      "routes": [
+        "button",
+        "popover"
+      ],
+      "reason": "Advanced interaction/focus or overlay helper, composed by the demonstrated controls; no standalone product page."
+    },
+    "CarbonFontFamily": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonFontWeight": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonFormGroup": {
+      "mode": "demonstrated",
+      "routes": [
+        "form"
+      ]
+    },
+    "CarbonFormItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "form"
+      ]
+    },
+    "CarbonFormLabel": {
+      "mode": "demonstrated",
+      "routes": [
+        "form"
+      ]
+    },
+    "CarbonGrid": {
+      "mode": "demonstrated",
+      "routes": [
+        "grid"
+      ]
+    },
+    "CarbonGridMode": {
+      "mode": "demonstrated",
+      "routes": [
+        "grid"
+      ]
+    },
+    "CarbonHeader": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonHeaderGlobalAction": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonHeaderMenu": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests."
+    },
+    "CarbonHeaderMenuButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonHeaderMenuItem": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonHeaderName": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonHeaderPanel": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests."
+    },
+    "CarbonHeaderSideNavItems": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonHeading": {
+      "mode": "demonstrated",
+      "routes": [
+        "heading"
+      ]
+    },
+    "CarbonHelperText": {
+      "mode": "demonstrated",
+      "routes": [
+        "form"
+      ]
+    },
+    "CarbonIcon": {
+      "mode": "demonstrated",
+      "routes": [
+        "icons"
+      ]
+    },
+    "CarbonIconArtwork": {
+      "mode": "nonvisual",
+      "routes": [
+        "icons"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonIconButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "icon-button"
+      ]
+    },
+    "CarbonIconData": {
+      "mode": "demonstrated",
+      "routes": [
+        "icons"
+      ]
+    },
+    "CarbonIconIndicator": {
+      "mode": "demonstrated",
+      "routes": [
+        "indicators"
+      ]
+    },
+    "CarbonIconIndicatorKind": {
+      "mode": "demonstrated",
+      "routes": [
+        "indicators"
+      ]
+    },
+    "CarbonIconPainter": {
+      "mode": "nonvisual",
+      "routes": [
+        "icons"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonIconShape": {
+      "mode": "nonvisual",
+      "routes": [
+        "icons"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonIconSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonIcons": {
+      "mode": "demonstrated",
+      "routes": [
+        "icons"
+      ]
+    },
+    "CarbonInlineLoading": {
+      "mode": "demonstrated",
+      "routes": [
+        "loading"
+      ]
+    },
+    "CarbonInlineLoadingStatus": {
+      "mode": "demonstrated",
+      "routes": [
+        "loading"
+      ]
+    },
+    "CarbonInlineNotification": {
+      "mode": "demonstrated",
+      "routes": [
+        "notification"
+      ]
+    },
+    "CarbonInteraction": {
+      "mode": "composition",
+      "routes": [
+        "button",
+        "popover"
+      ],
+      "reason": "Advanced interaction/focus or overlay helper, composed by the demonstrated controls; no standalone product page."
+    },
+    "CarbonInteractionBuilder": {
+      "mode": "nonvisual",
+      "routes": [
+        "button",
+        "popover"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonLayer": {
+      "mode": "demonstrated",
+      "routes": [
+        "layers-and-breakpoints"
+      ]
+    },
+    "CarbonLayerTokens": {
+      "mode": "nonvisual",
+      "routes": [
+        "colors",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonLink": {
+      "mode": "demonstrated",
+      "routes": [
+        "link"
+      ]
+    },
+    "CarbonLinkSize": {
+      "mode": "demonstrated",
+      "routes": [
+        "link"
+      ]
+    },
+    "CarbonListBox": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListBoxActiveOptionFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonListBoxMenu": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListBoxMenuIcon": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListBoxMenuItem": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListBoxSelection": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListBoxSelectionCount": {
+      "mode": "composition",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Advanced picker building block, exercised through Dropdown, ComboBox and MultiSelect rather than a separate user-facing picker."
+    },
+    "CarbonListItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "list"
+      ]
+    },
+    "CarbonLoading": {
+      "mode": "demonstrated",
+      "routes": [
+        "loading"
+      ]
+    },
+    "CarbonLoadingPainter": {
+      "mode": "nonvisual",
+      "routes": [
+        "loading"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonMenu": {
+      "mode": "demonstrated",
+      "routes": [
+        "menu"
+      ]
+    },
+    "CarbonMenuAlignment": {
+      "mode": "nonvisual",
+      "routes": [
+        "overflow-menu"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonMenuButton": {
+      "mode": "composition",
+      "routes": [
+        "overflow-menu"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonMenuItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "menu"
+      ]
+    },
+    "CarbonMenuItemDivider": {
+      "mode": "demonstrated",
+      "routes": [
+        "menu"
+      ]
+    },
+    "CarbonMenuItemGroup": {
+      "mode": "composition",
+      "routes": [
+        "menu"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonMenuItemKind": {
+      "mode": "nonvisual",
+      "routes": [
+        "menu"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonMenuItemRadioGroup": {
+      "mode": "demonstrated",
+      "routes": [
+        "menu"
+      ]
+    },
+    "CarbonMenuItemSelectable": {
+      "mode": "demonstrated",
+      "routes": [
+        "menu"
+      ]
+    },
+    "CarbonMenuSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "menu"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonModal": {
+      "mode": "demonstrated",
+      "routes": [
+        "modal"
+      ]
+    },
+    "CarbonModalAction": {
+      "mode": "demonstrated",
+      "routes": [
+        "modal"
+      ]
+    },
+    "CarbonModalSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "modal"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonMultiSelect": {
+      "mode": "demonstrated",
+      "routes": [
+        "multi-select",
+        "fluid-pickers"
+      ]
+    },
+    "CarbonMultiSelectItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "multi-select",
+        "fluid-pickers"
+      ]
+    },
+    "CarbonNotificationKind": {
+      "mode": "demonstrated",
+      "routes": [
+        "notification"
+      ]
+    },
+    "CarbonNumberInput": {
+      "mode": "demonstrated",
+      "routes": [
+        "number-input"
+      ]
+    },
+    "CarbonNumberInputSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonOperationalTag": {
+      "mode": "demonstrated",
+      "routes": [
+        "tag"
+      ]
+    },
+    "CarbonOrderedList": {
+      "mode": "demonstrated",
+      "routes": [
+        "list"
+      ]
+    },
+    "CarbonOverflowMenu": {
+      "mode": "demonstrated",
+      "routes": [
+        "overflow-menu"
+      ]
+    },
+    "CarbonOverlaySide": {
+      "mode": "nonvisual",
+      "routes": [
+        "button",
+        "popover"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonPageHeader": {
+      "mode": "demonstrated",
+      "routes": [
+        "page-header"
+      ]
+    },
+    "CarbonPageHeaderAction": {
+      "mode": "demonstrated",
+      "routes": [
+        "page-header"
+      ]
+    },
+    "CarbonPagination": {
+      "mode": "demonstrated",
+      "routes": [
+        "pagination"
+      ]
+    },
+    "CarbonPaginationLocalizations": {
+      "mode": "nonvisual",
+      "routes": [
+        "pagination"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonPaginationNav": {
+      "mode": "demonstrated",
+      "routes": [
+        "pagination-nav"
+      ]
+    },
+    "CarbonPaginationNavSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "pagination-nav"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonPaginationNumberFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "pagination"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonPaginationRangeFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "pagination"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonPaginationSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonPasswordInput": {
+      "mode": "demonstrated",
+      "routes": [
+        "text-input"
+      ]
+    },
+    "CarbonPictogram": {
+      "mode": "demonstrated",
+      "routes": [
+        "pictograms"
+      ]
+    },
+    "CarbonPictograms": {
+      "mode": "demonstrated",
+      "routes": [
+        "pictograms"
+      ]
+    },
+    "CarbonPopover": {
+      "mode": "demonstrated",
+      "routes": [
+        "popover"
+      ]
+    },
+    "CarbonPopoverAlignment": {
+      "mode": "nonvisual",
+      "routes": [
+        "popover"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonProgressBar": {
+      "mode": "demonstrated",
+      "routes": [
+        "progress-bar"
+      ]
+    },
+    "CarbonProgressBarSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "progress-bar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonProgressBarStatus": {
+      "mode": "nonvisual",
+      "routes": [
+        "progress-bar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonProgressBarType": {
+      "mode": "nonvisual",
+      "routes": [
+        "progress-bar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonProgressIndicator": {
+      "mode": "demonstrated",
+      "routes": [
+        "progress-indicator"
+      ]
+    },
+    "CarbonProgressIndicatorSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonProgressStep": {
+      "mode": "demonstrated",
+      "routes": [
+        "progress-indicator"
+      ]
+    },
+    "CarbonRadioButton": {
+      "mode": "demonstrated",
+      "routes": [
+        "radio"
+      ]
+    },
+    "CarbonRadioButtonGroup": {
+      "mode": "composition",
+      "routes": [
+        "radio"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonRadioButtonSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonRadioLabelPosition": {
+      "mode": "nonvisual",
+      "routes": [
+        "radio"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonRadioTile": {
+      "mode": "demonstrated",
+      "routes": [
+        "tile"
+      ]
+    },
+    "CarbonSearch": {
+      "mode": "demonstrated",
+      "routes": [
+        "search"
+      ]
+    },
+    "CarbonSearchSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSection": {
+      "mode": "demonstrated",
+      "routes": [
+        "heading"
+      ]
+    },
+    "CarbonSelect": {
+      "mode": "demonstrated",
+      "routes": [
+        "select"
+      ]
+    },
+    "CarbonSelectEntry": {
+      "mode": "nonvisual",
+      "routes": [
+        "select"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonSelectItem": {
+      "mode": "demonstrated",
+      "routes": [
+        "select"
+      ]
+    },
+    "CarbonSelectItemGroup": {
+      "mode": "nonvisual",
+      "routes": [
+        "select"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonSelectSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSelectableTag": {
+      "mode": "demonstrated",
+      "routes": [
+        "tag"
+      ]
+    },
+    "CarbonSelectableTile": {
+      "mode": "demonstrated",
+      "routes": [
+        "tile"
+      ]
+    },
+    "CarbonShapeIndicator": {
+      "mode": "demonstrated",
+      "routes": [
+        "indicators"
+      ]
+    },
+    "CarbonShapeIndicatorKind": {
+      "mode": "demonstrated",
+      "routes": [
+        "indicators"
+      ]
+    },
+    "CarbonShellContent": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonSideNav": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonSideNavDivider": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonSideNavLink": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonSideNavMenu": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonSideNavMenuItem": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests.",
+      "shell_reference": true
+    },
+    "CarbonSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSkeletonIcon": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSkeletonPhase": {
+      "mode": "nonvisual",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonSkeletonPlaceholder": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSkeletonText": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSkipToContent": {
+      "mode": "demonstrated",
+      "routes": [
+        "ui-shell"
+      ]
+    },
+    "CarbonSlider": {
+      "mode": "demonstrated",
+      "routes": [
+        "slider"
+      ]
+    },
+    "CarbonSliderSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSortDirection": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonSpacing": {
+      "mode": "demonstrated",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion"
+      ]
+    },
+    "CarbonStack": {
+      "mode": "demonstrated",
+      "routes": [
+        "stack"
+      ]
+    },
+    "CarbonStructuredList": {
+      "mode": "demonstrated",
+      "routes": [
+        "structured-list"
+      ]
+    },
+    "CarbonStructuredListRow": {
+      "mode": "demonstrated",
+      "routes": [
+        "structured-list"
+      ]
+    },
+    "CarbonStructuredListSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonSwitch": {
+      "mode": "demonstrated",
+      "routes": [
+        "content-switcher"
+      ]
+    },
+    "CarbonSwitcher": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests."
+    },
+    "CarbonSwitcherDivider": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests."
+    },
+    "CarbonSwitcherItem": {
+      "mode": "composition",
+      "routes": [
+        "ui-shell"
+      ],
+      "reason": "Shell composition building block; the contained recipe and gallery shell show the principal layout. Optional panel/switcher/menu variants have separate component tests."
+    },
+    "CarbonTab": {
+      "mode": "demonstrated",
+      "routes": [
+        "tabs"
+      ]
+    },
+    "CarbonTabActivationMode": {
+      "mode": "demonstrated",
+      "routes": [
+        "tabs"
+      ]
+    },
+    "CarbonTabVariant": {
+      "mode": "demonstrated",
+      "routes": [
+        "tabs"
+      ]
+    },
+    "CarbonTableBatchAction": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonTableColumn": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonTableRow": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonTableSelection": {
+      "mode": "demonstrated",
+      "routes": [
+        "data-table"
+      ]
+    },
+    "CarbonTableSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "data-table",
+        "table-toolbar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTableSortDirectionFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "data-table",
+        "table-toolbar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTableToolbar": {
+      "mode": "demonstrated",
+      "routes": [
+        "table-toolbar"
+      ]
+    },
+    "CarbonTabs": {
+      "mode": "demonstrated",
+      "routes": [
+        "tabs"
+      ]
+    },
+    "CarbonTabsSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonTabsVertical": {
+      "mode": "demonstrated",
+      "routes": [
+        "tabs"
+      ]
+    },
+    "CarbonTabsVerticalSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "tabs"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTag": {
+      "mode": "demonstrated",
+      "routes": [
+        "tag"
+      ]
+    },
+    "CarbonTagColors": {
+      "mode": "nonvisual",
+      "routes": [
+        "tag"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTagSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "tag"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTagSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonTagType": {
+      "mode": "demonstrated",
+      "routes": [
+        "tag"
+      ]
+    },
+    "CarbonText": {
+      "mode": "demonstrated",
+      "routes": [
+        "form",
+        "button-set",
+        "layers-and-breakpoints"
+      ]
+    },
+    "CarbonTextArea": {
+      "mode": "demonstrated",
+      "routes": [
+        "text-area"
+      ]
+    },
+    "CarbonTextAreaSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonTextInput": {
+      "mode": "demonstrated",
+      "routes": [
+        "text-input"
+      ]
+    },
+    "CarbonTextInputSkeleton": {
+      "mode": "demonstrated",
+      "routes": [
+        "skeletons"
+      ]
+    },
+    "CarbonTheme": {
+      "mode": "demonstrated",
+      "routes": [
+        "colors"
+      ]
+    },
+    "CarbonThemeData": {
+      "mode": "demonstrated",
+      "routes": [
+        "colors"
+      ]
+    },
+    "CarbonTile": {
+      "mode": "demonstrated",
+      "routes": [
+        "tile"
+      ]
+    },
+    "CarbonTileGroup": {
+      "mode": "composition",
+      "routes": [
+        "tile"
+      ],
+      "reason": "Optional composition building block or family variant; this family page provides discovery. Component contracts and family specimens are separate from a dedicated variant demo."
+    },
+    "CarbonTileSpec": {
+      "mode": "nonvisual",
+      "routes": [
+        "tile"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTimeFormat": {
+      "mode": "demonstrated",
+      "routes": [
+        "time-picker"
+      ]
+    },
+    "CarbonTimeFormatter": {
+      "mode": "nonvisual",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTimeHourCycle": {
+      "mode": "nonvisual",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTimeParser": {
+      "mode": "nonvisual",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTimePeriod": {
+      "mode": "nonvisual",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTimePicker": {
+      "mode": "demonstrated",
+      "routes": [
+        "time-picker"
+      ]
+    },
+    "CarbonTimePickerSelect": {
+      "mode": "composition",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "TimePicker composes period selectors; its route demonstrates the coordinated time input."
+    },
+    "CarbonTimeValue": {
+      "mode": "nonvisual",
+      "routes": [
+        "time-picker"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonToastNotification": {
+      "mode": "demonstrated",
+      "routes": [
+        "notification"
+      ]
+    },
+    "CarbonToggle": {
+      "mode": "demonstrated",
+      "routes": [
+        "toggle"
+      ]
+    },
+    "CarbonToggleSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "toggle"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonToggleSkeleton": {
+      "mode": "composition",
+      "routes": [
+        "skeletons"
+      ],
+      "reason": "Component-specific loading variant; generic skeleton demo and public specimen registry provide its discovery and rendering coverage."
+    },
+    "CarbonToggletip": {
+      "mode": "demonstrated",
+      "routes": [
+        "toggletip"
+      ]
+    },
+    "CarbonTooltip": {
+      "mode": "demonstrated",
+      "routes": [
+        "tooltip"
+      ]
+    },
+    "CarbonTreeNode": {
+      "mode": "demonstrated",
+      "routes": [
+        "tree-view"
+      ]
+    },
+    "CarbonTreeSize": {
+      "mode": "nonvisual",
+      "routes": [
+        "tree-view"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTreeView": {
+      "mode": "demonstrated",
+      "routes": [
+        "tree-view"
+      ]
+    },
+    "CarbonTypeScale": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "CarbonTypeStyles": {
+      "mode": "demonstrated",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "spacing"
+      ]
+    },
+    "CarbonUnorderedList": {
+      "mode": "demonstrated",
+      "routes": [
+        "list"
+      ]
+    },
+    "TagSurface": {
+      "mode": "composition",
+      "routes": [
+        "tag"
+      ],
+      "reason": "Exported tag surface implementation; gallery demonstrates the supported tag variants. Stability classification is tracked in #354."
+    },
+    "carbonDuration": {
+      "mode": "nonvisual",
+      "routes": [
+        "typography",
+        "fluid-type",
+        "colors",
+        "spacing",
+        "motion",
+        "layers-and-breakpoints"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "carbonListBoxActiveOptionLabel": {
+      "mode": "nonvisual",
+      "routes": [
+        "dropdown",
+        "combo-box",
+        "multi-select"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    },
+    "carbonTableSortDirectionLabel": {
+      "mode": "nonvisual",
+      "routes": [
+        "data-table",
+        "table-toolbar"
+      ],
+      "reason": "Configuration, value, token, formatter or artwork data used with the family demo; no standalone interactive page."
+    }
+  }
+}

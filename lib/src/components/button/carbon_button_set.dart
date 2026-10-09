@@ -88,10 +88,12 @@ class CarbonButtonSet extends StatelessWidget {
           }
           laidOut.add(SizedBox(width: width, child: children[i]));
         }
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: laidOut,
+        return IntrinsicHeight(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: laidOut,
+          ),
         );
       },
     );

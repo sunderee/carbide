@@ -569,6 +569,46 @@ void main() {
   });
 
   group('CarbonButtonSet (_button.scss .cds--btn-set)', () {
+    testWidgets(
+      'a scrollable form gives adjacent buttons finite equal height',
+      (WidgetTester tester) async {
+        for (final double scale in <double>[1, 2]) {
+          await tester.pumpWidget(
+            _host(
+              MediaQuery(
+                data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: 320,
+                    child: CarbonButtonSet(
+                      children: <CarbonButton>[
+                        CarbonButton(
+                          label: 'Cancel',
+                          size: CarbonButtonSize.sm,
+                          kind: CarbonButtonKind.secondary,
+                          onPressed: () {},
+                        ),
+                        CarbonButton(label: 'Save', onPressed: () {}),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          await tester.pump();
+          expect(tester.takeException(), isNull);
+          final Size first = tester.getSize(find.byType(CarbonButton).first);
+          final Size last = tester.getSize(find.byType(CarbonButton).last);
+          expect(first.height, last.height);
+          expect(first.height, greaterThanOrEqualTo(48));
+          expect(first.height.isFinite, isTrue);
+          expect(first.width, closeTo(159.5, .01));
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+
     testWidgets('equal widths capped at 196 with a 1px separator', (
       WidgetTester tester,
     ) async {

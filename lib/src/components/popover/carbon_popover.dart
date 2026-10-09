@@ -20,11 +20,14 @@
 // left/right themselves from Directionality.of(context).
 
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../theme/carbon_layer.dart';
 import '../../utils/anchored_overlay.dart';
+import '../../utils/native_control_focus.dart';
+import '../../utils/overlay_focus_repair.dart';
 import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 
@@ -213,6 +216,10 @@ class _CarbonPopoverState extends State<CarbonPopover> {
       widget.portalController ?? _internalOverlay;
   final LayerLink _link = LayerLink();
   final GlobalKey _triggerKey = GlobalKey();
+  static int _nextIdentifier = 0;
+  final String _triggerIdentifier =
+      'carbide-popover-trigger-${_nextIdentifier++}';
+  final OverlayFocusRepair _focusRepair = OverlayFocusRepair();
 
   // The resolved alignment after any autoAlign flip.
   late CarbonPopoverAlignment _resolved = widget.align;
@@ -232,9 +239,37 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     if (widget.align != oldWidget.align) _resolved = widget.align;
     if (widget.open != oldWidget.open ||
         widget.portalController != oldWidget.portalController) {
+      _focusRepair.cancel();
+      final FocusNode? focused = FocusManager.instance.primaryFocus;
+      if (kIsWeb && _insideTrigger(focused)) {
+        final bool expectedOpen = widget.open;
+        _focusRepair.schedule(
+          focused,
+          () => restoreNativeControlFocus(_triggerIdentifier),
+          isCurrent: () => mounted && widget.open == expectedOpen,
+        );
+      }
       if (widget.open) _resolved = widget.align;
       _syncOverlay();
     }
+  }
+
+  bool _insideTrigger(FocusNode? node) {
+    final BuildContext? target = node?.context;
+    final BuildContext? trigger = _triggerKey.currentContext;
+    if (target == null || trigger == null) return false;
+    bool found = identical(target, trigger);
+    target.visitAncestorElements((Element element) {
+      if (identical(element, trigger)) found = true;
+      return !found;
+    });
+    return found;
+  }
+
+  @override
+  void dispose() {
+    _focusRepair.dispose();
+    super.dispose();
   }
 
   /// Brings the overlay in line with [CarbonPopover.open].
@@ -326,7 +361,10 @@ class _CarbonPopoverState extends State<CarbonPopover> {
         child: OverlayPortal(
           controller: _overlay,
           overlayChildBuilder: _buildSurface,
-          child: KeyedSubtree(key: _triggerKey, child: widget.child),
+          child: Semantics(
+            identifier: _triggerIdentifier,
+            child: KeyedSubtree(key: _triggerKey, child: widget.child),
+          ),
         ),
       ),
     );
@@ -372,7 +410,11 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     // A feedback-only surface can exclude every text descendant. Keep a
     // boundary at the painted surface so its empty native semantics region
     // cannot expand to the entire Overlay and intercept unrelated controls.
-    surface = Semantics(container: true, child: surface);
+    surface = Semantics(
+      container: true,
+      explicitChildNodes: true,
+      child: surface,
+    );
 
     return CarbonAnchoredOverlay(
       link: _link,
