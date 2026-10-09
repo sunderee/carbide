@@ -156,16 +156,35 @@ class CarbonMenu extends StatefulWidget {
 
 class _CarbonMenuState extends State<CarbonMenu> {
   final _MenuRegistry _registry = _MenuRegistry();
-  final FocusNode _key = FocusNode(skipTraversal: true, canRequestFocus: false);
+  final FocusNode _key = FocusNode(skipTraversal: true);
 
   @override
   void initState() {
     super.initState();
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _registry.entries.isNotEmpty) {
-          _registry.entries.first.node.requestFocus();
-        }
+        if (mounted) _focusFirst();
+      });
+    }
+  }
+
+  void _focusFirst() {
+    if (_registry.entries.isEmpty) {
+      _key.requestFocus();
+    } else {
+      _registry.entries.first.node.requestFocus();
+    }
+  }
+
+  @override
+  void didUpdateWidget(CarbonMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A responsive owner may remove the focused row while keeping its menu.
+    // Wait for registry updates, then retain keyboard ownership even if the
+    // remaining actions are all disabled (Escape must still dismiss).
+    if (widget.autofocus && oldWidget.children != widget.children) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _focusedIndex < 0) _focusFirst();
       });
     }
   }
@@ -184,6 +203,10 @@ class _CarbonMenuState extends State<CarbonMenu> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      widget.onClose?.call();
+      return KeyEventResult.handled;
+    }
     final List<({FocusNode node, String label})> items = _registry.entries;
     if (items.isEmpty) return KeyEventResult.ignored;
     final int current = _focusedIndex;
@@ -200,9 +223,6 @@ class _CarbonMenuState extends State<CarbonMenu> {
         return KeyEventResult.handled;
       case LogicalKeyboardKey.end:
         items.last.node.requestFocus();
-        return KeyEventResult.handled;
-      case LogicalKeyboardKey.escape:
-        widget.onClose?.call();
         return KeyEventResult.handled;
     }
 
@@ -234,6 +254,7 @@ class _CarbonMenuState extends State<CarbonMenu> {
 
     return Focus(
       focusNode: _key,
+      includeSemantics: false,
       onKeyEvent: _onKey,
       child: _MenuScope(
         size: widget.size,

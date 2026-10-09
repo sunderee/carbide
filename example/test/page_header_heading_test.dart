@@ -40,7 +40,9 @@ void main() {
       );
       expect(
         tester
-            .getSemantics(find.text('Quarterly report'))
+            .getSemantics(
+              find.text('Quarterly report with a deliberately long title'),
+            )
             .getSemanticsData()
             .headingLevel,
         2,
@@ -52,15 +54,17 @@ void main() {
         await tester.pumpAndSettle();
         expect(
           tester
-              .getSemantics(find.text('Quarterly report'))
+              .getSemantics(
+                find.text('Quarterly report with a deliberately long title'),
+              )
               .getSemanticsData()
               .headingLevel,
           level,
         );
-        expect(find.text('Edits: 0'), findsOneWidget);
+        expect(find.text('Edits: 0 · Downloads: 0'), findsOneWidget);
       }
       final SemanticsNode edit = tester.getSemantics(
-        find.bySemanticsLabel('Edit'),
+        find.bySemanticsLabel('Edit report'),
       );
       tester.binding.platformDispatcher.onSemanticsActionEvent!(
         SemanticsActionEvent(
@@ -70,7 +74,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Edits: 1'), findsOneWidget);
+      expect(find.text('Edits: 1 · Downloads: 0'), findsOneWidget);
     } finally {
       handle.dispose();
     }

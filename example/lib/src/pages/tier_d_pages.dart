@@ -360,11 +360,13 @@ class _PageHeaderPage extends StatefulWidget {
 class _PageHeaderPageState extends State<_PageHeaderPage> {
   int _headingLevel = 2;
   int _edits = 0;
+  int _downloads = 0;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
       title: 'Page header',
-      description: 'A page-level header band with breadcrumb and actions.',
+      description:
+          'Resize to disclose hidden actions while preserving the title.',
       previewAlignment: Alignment.topLeft,
       controls: <Widget>[
         choiceKnob<int>(
@@ -378,9 +380,9 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
       preview: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text('Edits: $_edits'),
+          Text('Edits: $_edits · Downloads: $_downloads'),
           CarbonPageHeader(
-            title: 'Quarterly report',
+            title: 'Quarterly report with a deliberately long title',
             headingLevel: _headingLevel,
             subtitle: 'Finance',
             body: 'A summary of revenue and spend for the quarter.',
@@ -388,15 +390,28 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
               CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
               CarbonBreadcrumbItem(label: 'Finance', onPressed: () {}),
             ],
-            pageActions: CarbonButton(
-              label: 'Edit',
-              kind: CarbonButtonKind.tertiary,
-              onPressed: () => setState(() => _edits++),
-            ),
+            actions: <CarbonPageHeaderAction>[
+              CarbonPageHeaderAction(
+                id: 'edit',
+                label: 'Edit report',
+                onPressed: () => setState(() => _edits++),
+              ),
+              CarbonPageHeaderAction(
+                id: 'download',
+                label: 'Download report',
+                kind: CarbonButtonKind.secondary,
+                onPressed: () => setState(() => _downloads++),
+              ),
+              const CarbonPageHeaderAction(
+                id: 'archive',
+                label: 'Archive report',
+                kind: CarbonButtonKind.tertiary,
+              ),
+            ],
           ),
         ],
       ),
-      code: 'CarbonPageHeader(title: \'…\', headingLevel: 2, breadcrumbs: <…>[…]);',
+      code: 'CarbonPageHeader(title: \'Quarterly report\', actions: <CarbonPageHeaderAction>[CarbonPageHeaderAction(id: \'edit\', label: \'Edit\', onPressed: edit)]);',
     );
   }
 }

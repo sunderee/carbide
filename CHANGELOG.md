@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add opt-in responsive PageHeader actions with stable identities, measured
+  button widths, narrow title/action rows and accessible overflow menus.
+  Preserve custom action slots and keep keyboard focus during menu reflow (#395).
+
 - Tables and trees offer optional virtual viewports with stable-ID recycling,
   focused-row retention, scrolling semantics and keyboard reveal for unmounted
   tree nodes. Eager intrinsic rendering remains available, with a measured

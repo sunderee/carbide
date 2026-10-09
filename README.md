@@ -166,6 +166,7 @@ code snippets and application-supplied context.
 - [Theming & layers](docs/theming-and-layers.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - Patterns: [Forms](docs/patterns/forms.md) ·
+  [Page headers](docs/patterns/page-header.md) ·
   [Loading](docs/patterns/loading.md) ·
   [Notifications](docs/patterns/notification.md) ·
   [Status indicators](docs/patterns/status-indicator.md)
