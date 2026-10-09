@@ -107,6 +107,8 @@ jobs:
           python3 tool/documentation_facts.py --check
           python3 tool/test_carbon_parity.py
           python3 tool/carbon_parity.py --check
+          python3 tool/test_platform_support.py
+          python3 tool/platform_support.py --check
           python3 tool/test_gallery_coverage.py
           python3 tool/gallery_coverage.py --check
           python3 tool/test_accessibility_inventory.py

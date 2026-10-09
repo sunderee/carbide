@@ -137,6 +137,11 @@ uploader, Tree view, Page header, and the UI Shell (header, side nav, switcher).
 
 ## Accessibility & testing
 
+The [checked platform support matrix](docs/platform-support.md) distinguishes
+platform targets, PR gates, scheduled host/browser canaries and native-device
+evidence, including fonts, golden authority, input, target sizes, contrast and
+localization boundaries.
+
 See the [semantics policy](docs/accessibility.md) for static tags, nested lists,
 code snippets and application-supplied context.
 
