@@ -38,6 +38,78 @@ Widget _trigger(FocusNode node) => Focus(
 );
 
 void main() {
+  testWidgets(
+    'Escape stays dismissed through ancestor parking and trigger repair',
+    (WidgetTester tester) async {
+      final FocusNode node = FocusNode();
+      final FocusNode other = FocusNode();
+      final FocusScopeNode scope = FocusScopeNode();
+      addTearDown(node.dispose);
+      addTearDown(other.dispose);
+      addTearDown(scope.dispose);
+      await tester.pumpWidget(
+        _host(
+          FocusScope(
+            node: scope,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CarbonTooltip(label: 'Information', child: _trigger(node)),
+                _trigger(other),
+              ],
+            ),
+          ),
+        ),
+      );
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Information'), findsNothing);
+      node.unfocus();
+      await tester.pumpAndSettle();
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(find.text('Information'), findsNothing);
+      other.requestFocus();
+      await tester.pumpAndSettle();
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(find.text('Information'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'visibility callback coordinates changes without duplicate events',
+    (WidgetTester tester) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      final List<bool> changes = <bool>[];
+      await tester.pumpWidget(
+        _host(
+          CarbonTooltip(
+            label: 'Information',
+            onOpenChanged: changes.add,
+            child: _trigger(node),
+          ),
+        ),
+      );
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(changes, <bool>[true]);
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(changes, <bool>[true]);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(changes, <bool>[true, false]);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(changes, <bool>[true, false]);
+    },
+  );
+
   setUp(() {
     FocusManager.instance.highlightStrategy =
         FocusHighlightStrategy.alwaysTraditional;

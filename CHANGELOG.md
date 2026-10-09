@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Recover truncated PageHeader titles through pointer/keyboard tooltips while
+  preserving one complete accessible heading. Fitting titles add no focus stop;
+  long disclosures support keyboard scrolling and viewport placement (#397).
+
 - Add opt-in measured PageHeader tag collapse with a named `+N` popover,
   original keyed child state, interactive tag actions and localized disclosure
   labels. Preserve wrapping custom tags and caller controller ownership (#396).

@@ -112,3 +112,37 @@ moving keyed content between inline and popup layouts. Ordinary popovers need
 only `open`; advanced owners call the controller outside build and update
 `open` together. `CarbonOperationalTag` accepts a caller-owned `focusNode`; the
 count uses shared control semantics and guarded native focus restoration.
+
+## Truncated titles
+
+The title measures its actual ellipsis layout with the current Plex style,
+locale, direction, width, line count and text scale. A fitting title remains
+plain heading text. A truncated title becomes a keyboard focus stop and shows
+the complete title through the existing inverse `CarbonTooltip` on hover or
+focus. Escape closes it; pointer users can move onto the bubble to keep reading.
+Escape also dismisses a pointer-only tooltip while an editor elsewhere retains
+focus. The temporary key observer is removed on close or disposal.
+
+The heading's complete name and `headingLevel` remain available even when the
+visible text ellipsizes. The tooltip adds no duplicate accessibility annotation
+or second heading. Width, label, font and scale changes recalculate truncation;
+fitting again removes the tooltip and its focus stop. Flutter 3.47 leaves native
+`tabindex` behind when a node stops being focusable, so the native heading node
+is replaced when focusability changes, as well as when its h1–h6 level changes.
+Its widget focus ownership and the surrounding controls remain stable.
+
+Use `titleFocusNode` when an application needs to direct focus to the disclosure;
+the caller retains disposal ownership. Keyboard focus paints Carbon's 2 px
+outline with a 2 px outward offset, without changing title layout. Long tooltips
+scroll inside the available viewport; Arrow/Page Up/Down and Home/End scroll
+their text while focus remains on the heading. The complete heading name stays
+available to assistive technology throughout.
+
+`CarbonTooltip` exposes optional `autoAlign`, `scrollable` and
+`excludeFromSemantics` controls for this composition. Their defaults preserve
+ordinary tooltips. Omit duplicate tooltip semantics only when the trigger
+already supplies the complete accessible name.
+
+`onOpenChanged` reports actual visibility transitions, allowing the heading
+owner to coordinate guarded focus repair after popup removal in a nested
+router. It does not fire again for events that keep the same visibility.

@@ -19,12 +19,13 @@
 // scope. The SCSS above remains in core and stays our citation. Re-evaluate
 // only if a PageHeader re-stabilizes inside Carbon core (checked at each
 // knowledge-base bump, per ADR 0002's cadence). The upstream-web behaviors
-// not ported — the truncated-title tooltip, the hero-image slot (callers compose
-// CarbonAspectRatio) — are catalogued in the #222 gap table. No
+// not ported — the hero-image slot (callers compose CarbonAspectRatio) — is
+// catalogued in the #222 gap table. No
 // sticky/condensed collapse-on-scroll exists upstream in core either.
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -38,6 +39,8 @@ import '../../theme/carbon_theme.dart';
 import '../../theme/carbon_theme_data.dart';
 import '../../utils/control_semantics.dart';
 import '../../utils/control_state.dart';
+import '../../utils/native_control_focus.dart';
+import '../../utils/overlay_focus_repair.dart';
 import '../breadcrumb/carbon_breadcrumb.dart';
 import '../button/carbon_button.dart';
 import '../menu/carbon_menu.dart';
@@ -45,8 +48,10 @@ import '../overflow_menu/carbon_overflow_menu.dart';
 import '../popover/carbon_popover.dart';
 import '../tag/carbon_tag.dart';
 import '../tag/carbon_interactive_tags.dart';
+import '../tooltip/carbon_tooltip.dart';
 
 part 'page_header_tags.dart';
+part 'page_header_title.dart';
 
 /// A named action in a [CarbonPageHeader]'s responsive action area.
 ///
@@ -90,9 +95,10 @@ class CarbonPageHeaderAction {
 /// description, wrapping tags and a tabs slot. Opt into [actions] for measured
 /// responsive buttons and an overflow menu; [pageActions] preserves arbitrary
 /// caller composition. Opt into [collapseTags] for measured `+N` disclosure.
-/// A truncated-title tooltip and a hero/content slot are separate follow-ups:
-/// [tooltip](https://github.com/sunderee/carbide/issues/397), and
-/// [hero](https://github.com/sunderee/carbide/issues/398).
+/// Ellipsized titles reveal their complete text on hover or keyboard focus,
+/// while keeping one accessible heading with its complete name. Fitting titles
+/// add no focus stop. The [hero](https://github.com/sunderee/carbide/issues/398)
+/// slot remains a separate follow-up.
 /// The former core React preview was deprecated and moved to IBM Products;
 /// this constructor intentionally preserves Carbide's composition API.
 ///
@@ -130,6 +136,7 @@ class CarbonPageHeader extends StatelessWidget {
     this.tagsDisclosureLabel = 'Hidden tags',
     this.tabs,
     this.headingLevel = 1,
+    this.titleFocusNode,
   }) : assert(headingLevel >= 1 && headingLevel <= 6),
        assert(pageActions == null || actions == null);
 
@@ -141,6 +148,13 @@ class CarbonPageHeader extends StatelessWidget {
   /// Defaults to the page-level heading. Set a deeper level when composing
   /// the header inside an existing document hierarchy; styling stays fixed.
   final int headingLevel;
+
+  /// An optional caller-owned focus node for truncated-title disclosure.
+  ///
+  /// Fitting titles remain outside focus traversal. The complete title is
+  /// always the accessible heading name; focus reveals its visual tooltip
+  /// only while the title is ellipsized.
+  final FocusNode? titleFocusNode;
 
   /// An optional leading title icon.
   final CarbonIconData? icon;
@@ -334,19 +348,9 @@ class _Content extends StatelessWidget {
                             constraints: const BoxConstraints(
                               maxWidth: CarbonPageHeader.maxTextWidth,
                             ),
-                            child: Semantics(
-                              // Flutter 3.47 creates the native h1–h6 tag once.
-                              // Replace just this node when its hierarchy changes.
-                              key: ValueKey<int>(header.headingLevel),
-                              header: true,
-                              headingLevel: header.headingLevel,
-                              child: Text(
-                                header.title,
-                                maxLines: header.pageActions != null ? 1 : 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: CarbonTypeStyles.productiveHeading04
-                                    .copyWith(color: theme.textPrimary),
-                              ),
+                            child: _PageTitle(
+                              header,
+                              maxLines: header.pageActions != null ? 1 : 2,
                             ),
                           ),
                         ),
@@ -583,17 +587,7 @@ class _StructuredTitleRowState extends State<_StructuredTitleRow> {
                       constraints: const BoxConstraints(
                         maxWidth: CarbonPageHeader.maxTextWidth,
                       ),
-                      child: Semantics(
-                        key: ValueKey<int>(header.headingLevel),
-                        header: true,
-                        headingLevel: header.headingLevel,
-                        child: Text(
-                          header.title,
-                          maxLines: stacked ? 2 : 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: titleStyle,
-                        ),
-                      ),
+                      child: _PageTitle(header, maxLines: stacked ? 2 : 1),
                     ),
                   ),
                 ),
