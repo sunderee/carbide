@@ -150,6 +150,12 @@ static goldens by construction.
 
 ### Leak testing
 
+Portal owners must be classified in `tool/overlay_lifetimes.json` and exercised
+by the parameterized open/close/dispose harness. Run
+`python3 tool/check_overlay_lifetimes.py` after adding an overlay; see
+[the lifetime contract](docs/testing/overlay-lifetimes.md) for delegated portals,
+owned test resources and the leak-tracker oracle.
+
 `LeakTesting.enable()` runs in `test/flutter_test_config.dart`, so **every
 `testWidgets` case doubles as a leak test** (#234): an undisposed
 `FocusNode`/controller or an overlay entry that outlives its trigger fails
