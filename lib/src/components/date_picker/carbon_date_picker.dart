@@ -872,6 +872,7 @@ class _CarbonDatePickerState extends State<CarbonDatePicker> {
     final Widget trigger = CarbonPopover(
       open: _open,
       align: CarbonPopoverAlignment.bottomStart,
+      autoAlign: true,
       caret: false,
       tapRegionGroupId: _group,
       onRequestClose: () => _closeAndRefocus(deferred: true),
@@ -1291,6 +1292,7 @@ class _CarbonDateRangePickerState extends State<CarbonDateRangePicker> {
     final Widget trigger = CarbonPopover(
       open: _open,
       align: CarbonPopoverAlignment.bottomStart,
+      autoAlign: true,
       caret: false,
       tapRegionGroupId: _group,
       onRequestClose: () => _cancel(session, deferred: true),

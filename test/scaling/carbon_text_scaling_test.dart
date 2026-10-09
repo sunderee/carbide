@@ -17,26 +17,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/golden.dart';
 import '../support/legibility.dart';
 import '../support/specimens.dart';
-import '../support/overlay_entries.dart';
 
-Widget _host(double scale, Widget child) => Directionality(
-  textDirection: TextDirection.ltr,
-  child: MediaQuery(
-    data: MediaQueryData(textScaler: TextScaler.linear(scale)),
-    child: CarbonTheme(
-      data: CarbonThemeData.white,
-      // Overlay so portal-based specimens (dialog) can mount.
-      child: Overlay(
-        initialEntries: <OverlayEntry>[
-          managedOverlayEntry(
-            builder: (BuildContext context) =>
-                Align(alignment: AlignmentDirectional.topStart, child: child),
-          ),
-        ],
-      ),
-    ),
-  ),
-);
+Widget _host(double scale, Widget child) =>
+    carbideSpecimenHost(scale: scale, child: child);
 
 void main() {
   for (final double scale in <double>[1.3, 2.0]) {
@@ -58,6 +41,47 @@ void main() {
         });
       }
     });
+  }
+
+  for (final double scale in <double>[1.3, 2.0]) {
+    for (final TextDirection direction in TextDirection.values) {
+      for (final entry in carbideOpenSpecimens.entries) {
+        testWidgets('${entry.key} open at ${scale}x $direction', (
+          tester,
+        ) async {
+          await tester.pumpWidget(
+            carbideSpecimenHost(
+              scale: scale,
+              direction: direction,
+              child: Builder(builder: carbideSpecimens[entry.key]!),
+            ),
+          );
+          await tester.pump();
+          await entry.value.$1?.call(tester);
+          await tester.pump(const Duration(milliseconds: 300));
+          await tester.pump();
+          expect(
+            entry.value.$2,
+            findsWidgets,
+            reason: 'The popup must actually be open.',
+          );
+          final Rect popupMarker = tester.getRect(entry.value.$2.first);
+          expect(
+            popupMarker.left,
+            greaterThanOrEqualTo(-0.5),
+            reason: '${entry.key}: $popupMarker',
+          );
+          expect(popupMarker.top, greaterThanOrEqualTo(-0.5));
+          expect(popupMarker.right, lessThanOrEqualTo(1400.5));
+          expect(popupMarker.bottom, lessThanOrEqualTo(1000.5));
+          expect(tester.takeException(), isNull);
+          expectNoClippedTextAtScale(tester, scale);
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pump(const Duration(milliseconds: 500));
+          expect(tester.takeException(), isNull);
+        });
+      }
+    }
   }
 
   group('goldens', () {

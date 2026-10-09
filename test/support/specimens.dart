@@ -7,16 +7,17 @@
 /// repo-wide sweeps (text scaling #228, RTL crash guard #227, leak
 /// tracking #234).
 ///
-/// Each entry builds a self-contained, inline-renderable configuration —
-/// no Overlay-dependent popups (those components appear via their trigger
-/// chrome, which is what a layout sweep can exercise). Keep entries
-/// representative rather than exhaustive: one specimen per family, biased
-/// toward text-bearing, fixed-height chrome (that is what breaks under
-/// scaling and mirroring).
+/// Export classifications live in `tool/public_surface.json`, checked by
+/// `tool/public_surface.py`. Composite families cover their building blocks;
+/// the open-state actions below also exercise popup geometry. The host provides
+/// an Overlay, MediaQuery, focus traversal and the requested logical viewport.
 library;
 
 import 'package:carbide/carbide.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'overlay_entries.dart';
 
 /// The registry: family name → specimen builder.
 final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
@@ -160,7 +161,10 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
     child: CarbonMenu(
       autofocus: false,
       children: <Widget>[
-        CarbonMenuItem(label: 'Open document', onPressed: () {}),
+        const CarbonMenuItem(
+          label: 'Open document',
+          submenu: <Widget>[CarbonMenuItem(label: 'Open recent document')],
+        ),
         CarbonMenuItem(label: 'Close document', onPressed: () {}),
       ],
     ),
@@ -296,7 +300,10 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
     ),
   ),
   'data table': (_) => const SizedBox(
-    width: 420,
+    // Includes selected-row batch chrome. Chrome's Ahem placeholder is wider
+    // than Plex, so the broad sweep supplies the full composition's width;
+    // narrow real-font tables are covered by the component/browser contracts.
+    width: 760,
     child: CarbonDataTable(
       selection: CarbonTableSelection.multi,
       selectedRows: <int>{0},
@@ -372,4 +379,279 @@ final Map<String, WidgetBuilder> carbideSpecimens = <String, WidgetBuilder>{
       ],
     ),
   ),
+  'date picker': (_) => SizedBox(
+    width: 320,
+    child: CarbonDatePicker(labelText: 'Start date', onChanged: (_) {}),
+  ),
+  'file uploader': (_) => SizedBox(
+    width: 320,
+    child: CarbonFileUploader(
+      labelTitle: 'Attachments',
+      labelDescription: 'Choose a document',
+      items: <CarbonFileUploaderItem>[
+        CarbonFileUploaderItem(name: 'report.pdf', onDelete: () {}),
+      ],
+      child: CarbonFileUploaderButton(onPressed: () {}),
+    ),
+  ),
+  'page header': (_) => SizedBox(
+    width: 760,
+    child: CarbonPageHeader(
+      title: 'Resource overview',
+      body: 'Manage the resources in your project.',
+      actions: <CarbonPageHeaderAction>[
+        CarbonPageHeaderAction(
+          id: 'add',
+          label: 'Add resource',
+          onPressed: () {},
+        ),
+      ],
+      tags: const <Widget>[CarbonTag(label: 'Production')],
+      hero: const ColoredBox(color: Color(0xFF0F62FE)),
+      heroDecorative: true,
+    ),
+  ),
+  'form': (_) => const SizedBox(
+    width: 320,
+    child: CarbonFormGroup(
+      legend: 'Contact details',
+      child: CarbonFormItem(
+        children: <Widget>[
+          CarbonFormLabel('Name'),
+          CarbonField(child: CarbonText('Ada Lovelace')),
+          CarbonHelperText('Enter your full name'),
+        ],
+      ),
+    ),
+  ),
+  'fluid form': (_) => const SizedBox(
+    width: 320,
+    child: CarbonFluidForm(child: CarbonTextInput(labelText: 'Name')),
+  ),
+  'password input': (_) => const SizedBox(
+    width: 320,
+    child: CarbonPasswordInput(labelText: 'Password'),
+  ),
+  'table toolbar': (_) => SizedBox(
+    width: 600,
+    child: CarbonTableToolbar(
+      onSearchChanged: (_) {},
+      actions: <Widget>[CarbonButton(label: 'Add', onPressed: () {})],
+      overflowItems: const <Widget>[CarbonMenuItem(label: 'Settings')],
+    ),
+  ),
+  'ui shell': (_) => SizedBox(
+    width: 1200,
+    child: CarbonHeader(
+      name: const CarbonHeaderName(prefix: 'IBM', name: 'Carbide'),
+      navigation: <Widget>[
+        CarbonHeaderMenuItem(label: 'Catalog', onPressed: () {}),
+        const CarbonHeaderMenu(
+          label: 'Resources',
+          items: <Widget>[CarbonHeaderMenuItem(label: 'Documentation')],
+        ),
+      ],
+      globalActions: <Widget>[
+        CarbonHeaderGlobalAction(
+          icon: CarbonIcons.notification,
+          label: 'Notifications',
+          onPressed: () {},
+        ),
+      ],
+    ),
+  ),
+  'switcher': (_) => SizedBox(
+    width: 256,
+    child: CarbonSwitcher(
+      children: <Widget>[
+        CarbonSwitcherItem(label: 'Product catalog', onPressed: () {}),
+        const CarbonSwitcherDivider(),
+        CarbonSwitcherItem(label: 'Administration', onPressed: () {}),
+      ],
+    ),
+  ),
+  'ai label': (_) => const CarbonAILabel(
+    textLabel: 'AI suggested',
+    content: Text('Review the suggested content.'),
+  ),
+  'aspect ratio': (_) => const SizedBox(
+    width: 320,
+    child: CarbonAspectRatio(
+      ratio: CarbonAspectRatioValue.r16x9,
+      child: ColoredBox(color: Color(0xFF0F62FE)),
+    ),
+  ),
+  'grid': (_) => const SizedBox(
+    width: 760,
+    child: CarbonGrid(
+      children: <Widget>[
+        CarbonColumn(sm: 4, md: 4, lg: 8, child: Text('Main content')),
+        CarbonColumn(sm: 4, md: 4, lg: 8, child: Text('Supporting content')),
+      ],
+    ),
+  ),
+  'heading': (_) => const CarbonSection(child: CarbonHeading('Overview')),
+  'stack': (_) => const CarbonStack(
+    gapStep: 5,
+    children: <Widget>[Text('First item'), Text('Second item')],
+  ),
+  'list': (_) => const CarbonOrderedList(
+    children: <CarbonListItem>[
+      CarbonListItem(child: Text('Create a project')),
+      CarbonListItem(child: Text('Invite a collaborator')),
+    ],
+  ),
+  'indicators': (_) => const Row(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      CarbonBadgeIndicator(),
+      CarbonIconIndicator(
+        kind: CarbonIconIndicatorKind.succeeded,
+        label: 'Ready',
+      ),
+    ],
+  ),
+  'loading': (_) => const CarbonInlineLoading(
+    status: CarbonInlineLoadingStatus.finished,
+    description: 'Upload complete',
+  ),
+  'skeleton': (_) =>
+      const SizedBox(width: 320, child: CarbonSkeletonText(paragraph: true)),
+  'text': (_) => const CarbonText('A readable paragraph.'),
+  'icon': (_) => const CarbonIcon(CarbonIcons.add, semanticLabel: 'Add'),
+  'pictogram': (_) => const CarbonPictogram(
+    CarbonPictograms.cloud,
+    semanticLabel: 'Cloud services',
+  ),
+  'layer': (_) =>
+      const CarbonLayer(child: CarbonTile(child: Text('Nested surface'))),
+  'focus ring': (_) => const CarbonFocusRing(
+    visible: true,
+    child: Padding(padding: EdgeInsets.all(8), child: Text('Focused content')),
+  ),
+  'overflow menu': (_) => const CarbonOverflowMenu(
+    items: <Widget>[
+      CarbonMenuItem(label: 'Edit resource'),
+      CarbonMenuItem(label: 'Delete resource'),
+    ],
+  ),
+  'context menu': (_) => const CarbonContextMenu(
+    items: <Widget>[CarbonMenuItem(label: 'Copy resource')],
+    child: SizedBox(
+      width: 320,
+      height: 80,
+      child: Center(child: Text('Context-menu target')),
+    ),
+  ),
+  'popover': (_) => CarbonPopover(
+    open: true,
+    autoAlign: true,
+    align: CarbonPopoverAlignment.bottomStart,
+    content: const Padding(
+      padding: EdgeInsets.all(16),
+      child: Text('Popover information'),
+    ),
+    child: CarbonButton(label: 'Popover anchor', onPressed: () {}),
+  ),
+  'tooltip': (_) => CarbonTooltip(
+    label: 'Duplicate this resource',
+    defaultOpen: true,
+    autoAlign: true,
+    child: CarbonButton(label: 'Duplicate', onPressed: () {}),
+  ),
+  'toggletip': (_) => const CarbonToggletip(
+    defaultOpen: true,
+    autoAlign: true,
+    content: Text('Additional context about this field.'),
+  ),
+  'modal': (_) => const CarbonModal(
+    open: true,
+    title: 'Confirm changes',
+    passiveModal: true,
+    child: Text('Review the details before continuing.'),
+  ),
 };
+
+/// Actions that reveal a family's overlay before geometry assertions run.
+/// The marker is asserted visible, preventing a closed trigger from counting
+/// as open-state coverage. Already-open controlled specimens need no action.
+final Map<String, (Future<void> Function(WidgetTester)?, Finder)>
+carbideOpenSpecimens = <String, (Future<void> Function(WidgetTester)?, Finder)>{
+  'dropdown': (
+    (tester) => tester.tap(find.text('White')),
+    find.text('Gray 100'),
+  ),
+  'select': ((tester) => tester.tap(find.text('Normal')), find.text('Compact')),
+  'combo box': (
+    (tester) => tester.tap(find.byType(CarbonListBoxMenuIcon)),
+    find.text('Berlin'),
+  ),
+  'multi select': (
+    (tester) => tester.tap(find.text('Choose cities')),
+    find.byType(CarbonListBoxMenu),
+  ),
+  'filterable multi select': (
+    (tester) => tester.tap(find.byType(CarbonListBoxMenuIcon)),
+    find.text('Berlin'),
+  ),
+  'date picker': (
+    (tester) => tester.tap(find.byType(CarbonDatePicker)),
+    find.byType(CarbonCalendar),
+  ),
+  'time picker': ((tester) => tester.tap(find.text('AM')), find.text('PM')),
+  'menu': (
+    (tester) => tester.tap(find.text('Open document')),
+    find.text('Open recent document'),
+  ),
+  'overflow menu': (
+    (tester) => tester.tap(find.byType(CarbonOverflowMenu)),
+    find.text('Edit resource'),
+  ),
+  'context menu': (
+    (tester) => tester.longPress(find.text('Context-menu target')),
+    find.text('Copy resource'),
+  ),
+  'popover': (null, find.text('Popover information')),
+  'tooltip': (null, find.text('Duplicate this resource')),
+  'toggletip': (null, find.text('Additional context about this field.')),
+  'modal': (null, find.text('Confirm changes')),
+};
+
+/// Mounts the same logical viewport on the VM and Chrome test engines.
+/// Chrome can constrain its physical canvas to 800×600; OverflowBox gives the
+/// geometry sweep its declared surface without pretending to check web pixels.
+Widget carbideSpecimenHost({
+  required Widget child,
+  double scale = 1,
+  TextDirection direction = TextDirection.ltr,
+  Size size = const Size(1400, 1000),
+}) => Directionality(
+  textDirection: direction,
+  child: MediaQuery(
+    data: MediaQueryData(
+      size: size,
+      textScaler: TextScaler.linear(scale),
+      disableAnimations: true,
+    ),
+    child: CarbonTheme(
+      data: CarbonThemeData.white,
+      child: OverflowBox(
+        minWidth: size.width,
+        maxWidth: size.width,
+        minHeight: size.height,
+        maxHeight: size.height,
+        alignment: Alignment.topLeft,
+        child: FocusTraversalGroup(
+          child: Overlay(
+            initialEntries: <OverlayEntry>[
+              managedOverlayEntry(
+                builder: (_) =>
+                    Align(alignment: Alignment.topLeft, child: child),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ),
+);

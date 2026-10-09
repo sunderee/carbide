@@ -1,0 +1,2050 @@
+{
+  "schema": 1,
+  "exports": {
+    "AnimatedCarbonTheme": {
+      "source": "lib/src/theme/carbon_theme.dart",
+      "kind": "class",
+      "base": "ImplicitlyAnimatedWidget",
+      "visual": true
+    },
+    "CarbonAILabel": {
+      "source": "lib/src/components/ai_label/carbon_ai_label.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonAILabelSize": {
+      "source": "lib/src/components/ai_label/carbon_ai_label.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonAISkeletonIcon": {
+      "source": "lib/src/components/skeleton/carbon_ai_skeleton.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAISkeletonPlaceholder": {
+      "source": "lib/src/components/skeleton/carbon_ai_skeleton.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAISkeletonText": {
+      "source": "lib/src/components/skeleton/carbon_ai_skeleton.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAccordion": {
+      "source": "lib/src/components/accordion/carbon_accordion.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAccordionAlign": {
+      "source": "lib/src/components/accordion/carbon_accordion.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonAccordionItem": {
+      "source": "lib/src/components/accordion/carbon_accordion.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonAccordionSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonActionableNotification": {
+      "source": "lib/src/components/notification/carbon_notification.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAspectRatio": {
+      "source": "lib/src/components/aspect_ratio/carbon_aspect_ratio.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonAspectRatioValue": {
+      "source": "lib/src/components/aspect_ratio/carbon_aspect_ratio.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonBadgeIndicator": {
+      "source": "lib/src/components/indicator/carbon_indicators.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonBreadcrumb": {
+      "source": "lib/src/components/breadcrumb/carbon_breadcrumb.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonBreadcrumbItem": {
+      "source": "lib/src/components/breadcrumb/carbon_breadcrumb.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonBreadcrumbSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonBreakpoint": {
+      "source": "lib/src/foundations/layout.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonButton": {
+      "source": "lib/src/components/button/carbon_button.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonButtonKind": {
+      "source": "lib/src/components/button/carbon_button.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonButtonSet": {
+      "source": "lib/src/components/button/carbon_button_set.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonButtonSize": {
+      "source": "lib/src/components/button/carbon_button.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonButtonSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_skeleton_shapes.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCalendar": {
+      "source": "lib/src/components/date_picker/carbon_date_picker.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonCallout": {
+      "source": "lib/src/components/notification/carbon_notification.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonChatButton": {
+      "source": "lib/src/components/chat_button/carbon_chat_button.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonChatButtonSize": {
+      "source": "lib/src/components/chat_button/carbon_chat_button.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonCheckbox": {
+      "source": "lib/src/components/checkbox/carbon_checkbox.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCheckboxGroup": {
+      "source": "lib/src/components/checkbox/carbon_checkbox.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCheckboxSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonClickableTile": {
+      "source": "lib/src/components/tile/carbon_tile.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCodeSnippet": {
+      "source": "lib/src/components/code_snippet/carbon_code_snippet.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonCodeSnippetSkeleton": {
+      "source": "lib/src/components/code_snippet/carbon_code_snippet.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCodeSnippetType": {
+      "source": "lib/src/components/code_snippet/carbon_code_snippet.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonColors": {
+      "source": "lib/src/foundations/colors.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonColumn": {
+      "source": "lib/src/components/grid/carbon_grid.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonComboBox": {
+      "source": "lib/src/components/combo_box/carbon_combo_box.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonComboBoxItem": {
+      "source": "lib/src/components/combo_box/carbon_combo_box.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonComboButton": {
+      "source": "lib/src/components/overflow_menu/carbon_overflow_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonContainedList": {
+      "source": "lib/src/components/contained_list/carbon_contained_list.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonContainedListItem": {
+      "source": "lib/src/components/contained_list/carbon_contained_list.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonContainedListKind": {
+      "source": "lib/src/components/contained_list/carbon_contained_list.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonContainedListSize": {
+      "source": "lib/src/components/contained_list/carbon_contained_list.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonContainer": {
+      "source": "lib/src/foundations/layout.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonContentSwitcher": {
+      "source": "lib/src/components/content_switcher/carbon_content_switcher.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonContextMenu": {
+      "source": "lib/src/components/context_menu/carbon_context_menu.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonCopy": {
+      "source": "lib/src/components/copy_button/carbon_copy_button.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonCopyButton": {
+      "source": "lib/src/components/copy_button/carbon_copy_button.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonCopySize": {
+      "source": "lib/src/components/copy_button/carbon_copy_button.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonCounterMode": {
+      "source": "lib/src/components/text_area/carbon_text_area.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonDataTable": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDataTableSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDateFormat": {
+      "source": "lib/src/components/date_picker/date_picker_localizations.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonDateFormatter": {
+      "source": "lib/src/components/date_picker/date_picker_localizations.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonDateParser": {
+      "source": "lib/src/components/date_picker/date_picker_localizations.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonDatePicker": {
+      "source": "lib/src/components/date_picker/carbon_date_picker.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonDatePickerLocalizations": {
+      "source": "lib/src/components/date_picker/date_picker_localizations.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonDatePickerSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDateRange": {
+      "source": "lib/src/components/date_picker/carbon_date_picker.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonDateRangePicker": {
+      "source": "lib/src/components/date_picker/carbon_date_picker.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonDialog": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonDialogBody": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogCloseButton": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogControls": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogFooter": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogHeader": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogSubtitle": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDialogTitle": {
+      "source": "lib/src/components/dialog/carbon_dialog.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDismissibleTag": {
+      "source": "lib/src/components/tag/carbon_interactive_tags.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDropdown": {
+      "source": "lib/src/components/dropdown/carbon_dropdown.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonDropdownDirection": {
+      "source": "lib/src/components/dropdown/carbon_dropdown.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonDropdownItem": {
+      "source": "lib/src/components/dropdown/carbon_dropdown.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonDropdownSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonDuration": {
+      "source": "lib/src/foundations/motion.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonEasing": {
+      "source": "lib/src/foundations/motion.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonEasingMode": {
+      "source": "lib/src/foundations/motion.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonEasingStyle": {
+      "source": "lib/src/foundations/motion.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonExpandableSearch": {
+      "source": "lib/src/components/search/carbon_search.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonExpandableTile": {
+      "source": "lib/src/components/tile/carbon_expandable_tile.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonField": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFieldRequirement": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFieldSize": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonFieldStatus": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonFileStatus": {
+      "source": "lib/src/components/file_uploader/carbon_file_uploader.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonFileUploader": {
+      "source": "lib/src/components/file_uploader/carbon_file_uploader.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFileUploaderButton": {
+      "source": "lib/src/components/file_uploader/carbon_file_uploader.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFileUploaderDropContainer": {
+      "source": "lib/src/components/file_uploader/carbon_file_uploader.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonFileUploaderItem": {
+      "source": "lib/src/components/file_uploader/carbon_file_uploader.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonFileUploaderSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFluidForm": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "InheritedWidget",
+      "visual": true
+    },
+    "CarbonFluidSpacing": {
+      "source": "lib/src/foundations/fluid_spacing.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonFluidText": {
+      "source": "lib/src/components/text/carbon_fluid_text.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFluidTextStyle": {
+      "source": "lib/src/foundations/fluid_text_style.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonFluidTextWidthSource": {
+      "source": "lib/src/components/text/carbon_fluid_text.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonFluidTypeStyles": {
+      "source": "lib/src/foundations/fluid_typography.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonFocusRing": {
+      "source": "lib/src/utils/focus_ring.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFontFamily": {
+      "source": "lib/src/foundations/fonts.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonFontWeight": {
+      "source": "lib/src/foundations/typography.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonFormGroup": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFormItem": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonFormLabel": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonGrid": {
+      "source": "lib/src/components/grid/carbon_grid.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonGridMode": {
+      "source": "lib/src/components/grid/carbon_grid.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonHeader": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonHeaderGlobalAction": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonHeaderMenu": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonHeaderMenuButton": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonHeaderMenuItem": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonHeaderName": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonHeaderPanel": {
+      "source": "lib/src/components/ui_shell/carbon_switcher.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonHeaderSideNavItems": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonHeading": {
+      "source": "lib/src/components/heading/carbon_heading.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonHelperText": {
+      "source": "lib/src/components/form/carbon_form.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonIcon": {
+      "source": "lib/src/icons/carbon_icon.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonIconArtwork": {
+      "source": "lib/src/icons/carbon_icon_data.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonIconButton": {
+      "source": "lib/src/components/icon_button/carbon_icon_button.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonIconData": {
+      "source": "lib/src/icons/carbon_icon_data.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonIconIndicator": {
+      "source": "lib/src/components/indicator/carbon_indicators.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonIconIndicatorKind": {
+      "source": "lib/src/components/indicator/carbon_indicators.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonIconPainter": {
+      "source": "lib/src/icons/carbon_icon_painter.dart",
+      "kind": "class",
+      "base": "CustomPainter",
+      "visual": false
+    },
+    "CarbonIconShape": {
+      "source": "lib/src/icons/carbon_icon_data.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonIconSize": {
+      "source": "lib/src/foundations/layout.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonIcons": {
+      "source": "lib/src/icons/carbon_icons.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonInlineLoading": {
+      "source": "lib/src/components/loading/carbon_inline_loading.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonInlineLoadingStatus": {
+      "source": "lib/src/components/loading/carbon_inline_loading.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonInlineNotification": {
+      "source": "lib/src/components/notification/carbon_notification.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonInteraction": {
+      "source": "lib/src/utils/interaction.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonInteractionBuilder": {
+      "source": "lib/src/utils/interaction.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonLayer": {
+      "source": "lib/src/theme/carbon_layer.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonLayerTokens": {
+      "source": "lib/src/theme/carbon_layer.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonLink": {
+      "source": "lib/src/components/link/carbon_link.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonLinkSize": {
+      "source": "lib/src/components/link/carbon_link.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonListBox": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonListBoxActiveOptionFormatter": {
+      "source": "lib/src/components/list_box/list_box_semantics.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonListBoxMenu": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonListBoxMenuIcon": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonListBoxMenuItem": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonListBoxSelection": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonListBoxSelectionCount": {
+      "source": "lib/src/components/list_box/carbon_list_box.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonListItem": {
+      "source": "lib/src/components/list/carbon_list.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonLoading": {
+      "source": "lib/src/components/loading/carbon_loading.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonLoadingPainter": {
+      "source": "lib/src/components/loading/carbon_loading.dart",
+      "kind": "class",
+      "base": "CustomPainter",
+      "visual": false
+    },
+    "CarbonMenu": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonMenuAlignment": {
+      "source": "lib/src/components/overflow_menu/carbon_overflow_menu.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonMenuButton": {
+      "source": "lib/src/components/overflow_menu/carbon_overflow_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonMenuItem": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonMenuItemDivider": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonMenuItemGroup": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonMenuItemKind": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonMenuItemRadioGroup": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonMenuItemSelectable": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonMenuSize": {
+      "source": "lib/src/components/menu/carbon_menu.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonModal": {
+      "source": "lib/src/components/modal/carbon_modal.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonModalAction": {
+      "source": "lib/src/components/modal/carbon_modal.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonModalSize": {
+      "source": "lib/src/components/modal/carbon_modal.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonMultiSelect": {
+      "source": "lib/src/components/multi_select/carbon_multi_select.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonMultiSelectItem": {
+      "source": "lib/src/components/multi_select/carbon_multi_select.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonNotificationKind": {
+      "source": "lib/src/components/notification/carbon_notification.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonNumberInput": {
+      "source": "lib/src/components/number_input/carbon_number_input.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonNumberInputSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonOperationalTag": {
+      "source": "lib/src/components/tag/carbon_interactive_tags.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonOrderedList": {
+      "source": "lib/src/components/list/carbon_list.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonOverflowMenu": {
+      "source": "lib/src/components/overflow_menu/carbon_overflow_menu.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonOverlaySide": {
+      "source": "lib/src/utils/anchored_overlay.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonPageHeader": {
+      "source": "lib/src/components/page_header/carbon_page_header.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonPageHeaderAction": {
+      "source": "lib/src/components/page_header/carbon_page_header.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonPagination": {
+      "source": "lib/src/components/pagination/carbon_pagination.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonPaginationLocalizations": {
+      "source": "lib/src/components/pagination/pagination_localizations.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonPaginationNav": {
+      "source": "lib/src/components/pagination_nav/carbon_pagination_nav.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonPaginationNavSize": {
+      "source": "lib/src/components/pagination_nav/carbon_pagination_nav.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonPaginationNumberFormatter": {
+      "source": "lib/src/components/pagination/pagination_localizations.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonPaginationRangeFormatter": {
+      "source": "lib/src/components/pagination/pagination_localizations.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonPaginationSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonPasswordInput": {
+      "source": "lib/src/components/text_input/carbon_text_input.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonPictogram": {
+      "source": "lib/src/pictograms/carbon_pictogram.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonPictograms": {
+      "source": "lib/src/pictograms/carbon_pictograms.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonPopover": {
+      "source": "lib/src/components/popover/carbon_popover.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonPopoverAlignment": {
+      "source": "lib/src/components/popover/carbon_popover.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonProgressBar": {
+      "source": "lib/src/components/progress_bar/carbon_progress_bar.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonProgressBarSize": {
+      "source": "lib/src/components/progress_bar/carbon_progress_bar.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonProgressBarStatus": {
+      "source": "lib/src/components/progress_bar/carbon_progress_bar.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonProgressBarType": {
+      "source": "lib/src/components/progress_bar/carbon_progress_bar.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonProgressIndicator": {
+      "source": "lib/src/components/progress_indicator/carbon_progress_indicator.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonProgressIndicatorSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonProgressStep": {
+      "source": "lib/src/components/progress_indicator/carbon_progress_indicator.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonRadioButton": {
+      "source": "lib/src/components/radio_button/carbon_radio_button.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonRadioButtonGroup": {
+      "source": "lib/src/components/radio_button/carbon_radio_button.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonRadioButtonSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonRadioLabelPosition": {
+      "source": "lib/src/components/radio_button/carbon_radio_button.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonRadioTile": {
+      "source": "lib/src/components/tile/carbon_radio_tile.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSearch": {
+      "source": "lib/src/components/search/carbon_search.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSearchSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSection": {
+      "source": "lib/src/components/heading/carbon_heading.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSelect": {
+      "source": "lib/src/components/select/carbon_select.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSelectEntry": {
+      "source": "lib/src/components/select/carbon_select.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonSelectItem": {
+      "source": "lib/src/components/select/carbon_select.dart",
+      "kind": "class",
+      "base": "CarbonSelectEntry",
+      "visual": false
+    },
+    "CarbonSelectItemGroup": {
+      "source": "lib/src/components/select/carbon_select.dart",
+      "kind": "class",
+      "base": "CarbonSelectEntry",
+      "visual": false
+    },
+    "CarbonSelectSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSelectableTag": {
+      "source": "lib/src/components/tag/carbon_interactive_tags.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSelectableTile": {
+      "source": "lib/src/components/tile/carbon_tile.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonShapeIndicator": {
+      "source": "lib/src/components/indicator/carbon_indicators.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonShapeIndicatorKind": {
+      "source": "lib/src/components/indicator/carbon_indicators.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonShellContent": {
+      "source": "lib/src/components/ui_shell/carbon_switcher.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSideNav": {
+      "source": "lib/src/components/ui_shell/carbon_side_nav.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSideNavDivider": {
+      "source": "lib/src/components/ui_shell/carbon_side_nav.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSideNavLink": {
+      "source": "lib/src/components/ui_shell/carbon_side_nav.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSideNavMenu": {
+      "source": "lib/src/components/ui_shell/carbon_side_nav.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSideNavMenuItem": {
+      "source": "lib/src/components/ui_shell/carbon_side_nav.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSize": {
+      "source": "lib/src/foundations/layout.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_skeleton.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSkeletonIcon": {
+      "source": "lib/src/components/skeleton/carbon_skeleton_shapes.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSkeletonPhase": {
+      "source": "lib/src/components/skeleton/carbon_skeleton.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonSkeletonPlaceholder": {
+      "source": "lib/src/components/skeleton/carbon_skeleton_shapes.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSkeletonText": {
+      "source": "lib/src/components/skeleton/carbon_skeleton_text.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSkipToContent": {
+      "source": "lib/src/components/ui_shell/carbon_header.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSlider": {
+      "source": "lib/src/components/slider/carbon_slider.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonSliderSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSortDirection": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonSpacing": {
+      "source": "lib/src/foundations/layout.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonStack": {
+      "source": "lib/src/components/stack/carbon_stack.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonStructuredList": {
+      "source": "lib/src/components/structured_list/carbon_structured_list.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonStructuredListRow": {
+      "source": "lib/src/components/structured_list/carbon_structured_list.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonStructuredListSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSwitch": {
+      "source": "lib/src/components/content_switcher/carbon_content_switcher.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonSwitcher": {
+      "source": "lib/src/components/ui_shell/carbon_switcher.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSwitcherDivider": {
+      "source": "lib/src/components/ui_shell/carbon_switcher.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonSwitcherItem": {
+      "source": "lib/src/components/ui_shell/carbon_switcher.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTab": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTabActivationMode": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTabVariant": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTableBatchAction": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTableColumn": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTableRow": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTableSelection": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTableSize": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTableSortDirectionFormatter": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonTableToolbar": {
+      "source": "lib/src/components/data_table/carbon_table_toolbar.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTabs": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTabsSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTabsVertical": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTabsVerticalSize": {
+      "source": "lib/src/components/tabs/carbon_tabs.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTag": {
+      "source": "lib/src/components/tag/carbon_tag.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTagColors": {
+      "source": "lib/src/components/tag/carbon_tag.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTagSize": {
+      "source": "lib/src/components/tag/carbon_tag.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTagSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_skeleton_shapes.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTagType": {
+      "source": "lib/src/components/tag/carbon_tag.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonText": {
+      "source": "lib/src/components/text/carbon_text.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTextArea": {
+      "source": "lib/src/components/text_area/carbon_text_area.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTextAreaSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTextInput": {
+      "source": "lib/src/components/text_input/carbon_text_input.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTextInputSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTheme": {
+      "source": "lib/src/theme/carbon_theme.dart",
+      "kind": "class",
+      "base": "InheritedWidget",
+      "visual": true
+    },
+    "CarbonThemeData": {
+      "source": "lib/src/theme/carbon_theme_data.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTile": {
+      "source": "lib/src/components/tile/carbon_tile.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTileGroup": {
+      "source": "lib/src/components/tile/carbon_radio_tile.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTileSpec": {
+      "source": "lib/src/components/tile/carbon_tile.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTimeFormat": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTimeFormatter": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonTimeHourCycle": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTimeParser": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "typedef",
+      "visual": false
+    },
+    "CarbonTimePeriod": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTimePicker": {
+      "source": "lib/src/components/time_picker/carbon_time_picker.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTimePickerSelect": {
+      "source": "lib/src/components/time_picker/carbon_time_picker.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonTimeValue": {
+      "source": "lib/src/components/time_picker/time_format.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonToastNotification": {
+      "source": "lib/src/components/notification/carbon_notification.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonToggle": {
+      "source": "lib/src/components/toggle/carbon_toggle.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonToggleSize": {
+      "source": "lib/src/components/toggle/carbon_toggle.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonToggleSkeleton": {
+      "source": "lib/src/components/skeleton/carbon_component_skeletons.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "CarbonToggletip": {
+      "source": "lib/src/components/toggletip/carbon_toggletip.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTooltip": {
+      "source": "lib/src/components/tooltip/carbon_tooltip.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTreeNode": {
+      "source": "lib/src/components/tree_view/carbon_tree_view.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTreeSize": {
+      "source": "lib/src/components/tree_view/carbon_tree_view.dart",
+      "kind": "enum",
+      "visual": false
+    },
+    "CarbonTreeView": {
+      "source": "lib/src/components/tree_view/carbon_tree_view.dart",
+      "kind": "class",
+      "base": "StatefulWidget",
+      "visual": true
+    },
+    "CarbonTypeScale": {
+      "source": "lib/src/foundations/typography.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonTypeStyles": {
+      "source": "lib/src/foundations/typography.dart",
+      "kind": "class",
+      "base": "",
+      "visual": false
+    },
+    "CarbonUnorderedList": {
+      "source": "lib/src/components/list/carbon_list.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "TagSurface": {
+      "source": "lib/src/components/tag/carbon_tag.dart",
+      "kind": "class",
+      "base": "StatelessWidget",
+      "visual": true
+    },
+    "carbonDuration": {
+      "source": "lib/src/foundations/motion.dart",
+      "kind": "function",
+      "visual": false
+    },
+    "carbonListBoxActiveOptionLabel": {
+      "source": "lib/src/components/list_box/list_box_semantics.dart",
+      "kind": "function",
+      "visual": false
+    },
+    "carbonTableSortDirectionLabel": {
+      "source": "lib/src/components/data_table/carbon_data_table.dart",
+      "kind": "function",
+      "visual": false
+    }
+  },
+  "families": {
+    "accordion": {
+      "specimens": [
+        "accordion"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "ai_label": {
+      "specimens": [
+        "ai label"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "aspect_ratio": {
+      "specimens": [
+        "aspect ratio"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "breadcrumb": {
+      "specimens": [
+        "breadcrumb"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "button": {
+      "specimens": [
+        "button"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "chat_button": {
+      "specimens": [
+        "chat button"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "checkbox": {
+      "specimens": [
+        "checkbox"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "code_snippet": {
+      "specimens": [
+        "code snippet"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "combo_box": {
+      "specimens": [
+        "combo box"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "combo box"
+      ]
+    },
+    "contained_list": {
+      "specimens": [
+        "contained list"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "content_switcher": {
+      "specimens": [
+        "content switcher"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "context_menu": {
+      "specimens": [
+        "context menu"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "context menu"
+      ]
+    },
+    "copy_button": {
+      "specimens": [
+        "copy button"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "data_table": {
+      "specimens": [
+        "data table",
+        "table toolbar"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "date_picker": {
+      "specimens": [
+        "date picker"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "date picker"
+      ]
+    },
+    "dialog": {
+      "specimens": [
+        "dialog (non-modal)"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "dropdown": {
+      "specimens": [
+        "dropdown"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "dropdown"
+      ]
+    },
+    "file_uploader": {
+      "specimens": [
+        "file uploader"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "form": {
+      "specimens": [
+        "form",
+        "fluid form"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "foundations": {
+      "exemption": "Non-widget token constants, enums, value types and motion helper. Visual typography/layout usage is exercised by text, grid, stack and all themed specimens."
+    },
+    "grid": {
+      "specimens": [
+        "grid"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "heading": {
+      "specimens": [
+        "heading"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "icon_button": {
+      "specimens": [
+        "icon button"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "icons": {
+      "specimens": [
+        "icon"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "indicator": {
+      "specimens": [
+        "indicators"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "link": {
+      "specimens": [
+        "link"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "list": {
+      "specimens": [
+        "list"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "list_box": {
+      "specimens": [
+        "list box"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "loading": {
+      "specimens": [
+        "loading"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "menu": {
+      "specimens": [
+        "menu"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "menu"
+      ]
+    },
+    "modal": {
+      "specimens": [
+        "modal"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "modal"
+      ]
+    },
+    "multi_select": {
+      "specimens": [
+        "multi select",
+        "filterable multi select"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "multi select",
+        "filterable multi select"
+      ]
+    },
+    "notification": {
+      "specimens": [
+        "notification"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "number_input": {
+      "specimens": [
+        "number input"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "overflow_menu": {
+      "specimens": [
+        "overflow menu"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "overflow menu"
+      ]
+    },
+    "page_header": {
+      "specimens": [
+        "page header"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "pagination": {
+      "specimens": [
+        "pagination"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "pagination_nav": {
+      "specimens": [
+        "pagination nav"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "pictograms": {
+      "specimens": [
+        "pictogram"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "popover": {
+      "specimens": [
+        "popover"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "popover"
+      ]
+    },
+    "progress_bar": {
+      "specimens": [
+        "progress bar"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "progress_indicator": {
+      "specimens": [
+        "progress indicator"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "radio_button": {
+      "specimens": [
+        "radio group"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "search": {
+      "specimens": [
+        "search"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "select": {
+      "specimens": [
+        "select"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "select"
+      ]
+    },
+    "skeleton": {
+      "specimens": [
+        "skeleton"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "slider": {
+      "specimens": [
+        "slider"
+      ],
+      "coverage": "Scaled label/value chrome and mirrored track; keyboard and pointer variants have component behavior tests."
+    },
+    "stack": {
+      "specimens": [
+        "stack"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "structured_list": {
+      "specimens": [
+        "structured list"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "tabs": {
+      "specimens": [
+        "tabs (contained)"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "tag": {
+      "specimens": [
+        "tag",
+        "dismissible tag"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "text": {
+      "specimens": [
+        "text",
+        "fluid text"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "text_area": {
+      "specimens": [
+        "text area"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "text_input": {
+      "specimens": [
+        "text input",
+        "password input"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "theme": {
+      "specimens": [
+        "layer"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "tile": {
+      "specimens": [
+        "tile"
+      ],
+      "coverage": "Base tile geometry; dedicated component suites cover clickable, selectable, radio and expandable variants."
+    },
+    "time_picker": {
+      "specimens": [
+        "time picker"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "time picker"
+      ]
+    },
+    "toggle": {
+      "specimens": [
+        "toggle"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "toggletip": {
+      "specimens": [
+        "toggletip"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "toggletip"
+      ]
+    },
+    "tooltip": {
+      "specimens": [
+        "tooltip"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants.",
+      "open": [
+        "tooltip"
+      ]
+    },
+    "tree_view": {
+      "specimens": [
+        "tree view"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "ui_shell": {
+      "specimens": [
+        "ui shell",
+        "side nav",
+        "switcher"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    },
+    "utils": {
+      "specimens": [
+        "focus ring"
+      ],
+      "coverage": "Representative composition exercises the family and its visual building blocks; component suites cover individual variants."
+    }
+  }
+}

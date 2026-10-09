@@ -60,7 +60,7 @@ class CarbonTableToolbar extends StatelessWidget {
   /// Trailing action widgets (typically buttons).
   final List<Widget>? actions;
 
-  /// The toolbar height.
+  /// The minimum toolbar height. Scaled actions can make the toolbar taller.
   final CarbonFieldSize size;
 
   @override
@@ -68,8 +68,8 @@ class CarbonTableToolbar extends StatelessWidget {
     final CarbonLayerTokens layer = CarbonLayer.of(context);
     return ColoredBox(
       color: layer.layer,
-      child: SizedBox(
-        height: size.height,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: size.height),
         child: Row(
           children: <Widget>[
             Expanded(

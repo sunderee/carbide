@@ -12,6 +12,8 @@
 // AI-tinted callout — a CarbonPopover whose surface uses the ai-* tokens. When
 // `revertActive`, it instead shows a ghost Undo button to revert AI input.
 
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -298,30 +300,41 @@ class _AILabelButtonState extends State<_AILabelButton> {
   Widget _buildDefault(CarbonThemeData theme) {
     final CarbonAILabelSize size = widget.size;
     final bool filled = _hovered || _pressed;
+    final TextStyle style = _textStyle(
+      size.fontSize,
+      size.lineHeight,
+      filled ? theme.textInverse : theme.textPrimary,
+    );
+    final TextPainter painter = TextPainter(
+      text: TextSpan(text: widget.aiText, style: style),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      locale: Localizations.maybeLocaleOf(context),
+    )..layout();
+    // Preserve the compact spec size while admitting the actual scaled glyph
+    // line and the two border pixels. Custom AI text also retains its width.
+    final double dimension = math.max(
+      size.dimension,
+      math.max(painter.width, painter.height) + 2,
+    );
+    painter.dispose();
     // reset border 1px border-inverse; hover fills border-inverse + text-inverse.
     // `_slug.scss`: color/border/background $duration-fast-01
     // motion(entrance, productive); instant under reduced motion.
     final Widget box = AnimatedContainer(
       duration: carbonDuration(context, CarbonDuration.fast01),
       curve: CarbonEasing.entranceProductive,
-      width: size.dimension,
-      height: size.dimension,
+      width: dimension,
+      height: dimension,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: filled ? theme.borderInverse : const Color(0x00000000),
         border: Border.all(color: theme.borderInverse),
       ),
-      child: Text(
-        widget.aiText,
-        style: _textStyle(
-          size.fontSize,
-          size.lineHeight,
-          filled ? theme.textInverse : theme.textPrimary,
-        ),
-      ),
+      child: Text(widget.aiText, style: style),
     );
     // mini / 2xs keep a 24px hit target around the smaller visual.
-    final double hit = size.dimension < 24 ? 24 : size.dimension;
+    final double hit = math.max(24, dimension);
     return SizedBox.square(
       dimension: hit,
       child: Center(
@@ -358,9 +371,11 @@ class _AILabelButtonState extends State<_AILabelButton> {
           // The AI dot (icon-primary square), centered with the text.
           Container(width: dot, height: dot, color: theme.iconPrimary),
           const SizedBox(width: 4),
-          Text(
-            text,
-            style: _textStyle(fontSize, fontSize * 1.3, theme.textPrimary),
+          Flexible(
+            child: Text(
+              text,
+              style: _textStyle(fontSize, fontSize * 1.3, theme.textPrimary),
+            ),
           ),
         ],
       ),

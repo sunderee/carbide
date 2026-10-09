@@ -280,3 +280,13 @@ can only configure a trusted publisher for a package that already exists):
 ```sh
 dart pub publish        # authenticates via your pub.dev account in a browser
 ```
+
+### Public surface and layout specimens
+
+Every declaration exported from `lib/carbide.dart` is inventoried in
+`tool/public_surface.json`. Run `python3 tool/test_public_surface.py` and
+`python3 tool/public_surface.py --check` when changing exports or specimens.
+Review the classification rather than updating the inventory blindly. Visual
+families need representative scaling/RTL builders and open-state actions where
+popup geometry differs. See [the specimen policy](docs/testing/public-surface.md)
+for the coverage contract and Chrome font limitations.
