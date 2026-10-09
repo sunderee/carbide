@@ -12,16 +12,11 @@
 // and an optional tabs row. Background `layer-01`, 1px `border-subtle-01`
 // bottom rule. Reuses Breadcrumb (#102) and a Tabs (#99) slot.
 //
-// API posture (#222): this simpler constructor API is intentional. Upstream's
-// composable preview PageHeader (BreadcrumbBar/Content/HeroImage/TabBar) was
-// deprecated in @carbon/react at v11.111.0 and moved to @carbon/ibm-products
-// (carbon-design-system/carbon#21926), which is outside Carbide's porting
-// scope. The SCSS above remains in core and stays our citation. Re-evaluate
-// only if a PageHeader re-stabilizes inside Carbon core (checked at each
-// knowledge-base bump, per ADR 0002's cadence). The upstream-web behaviors
-// not ported — the hero-image slot (callers compose CarbonAspectRatio) — is
-// catalogued in the #222 gap table. No
-// sticky/condensed collapse-on-scroll exists upstream in core either.
+// API posture (#222): this constructor API is intentional. The former React
+// preview moved to IBM Products at v11.111.0 (carbon#21926). The pinned
+// v11.118.0 core now also exposes a compound PageHeader.Root with scroll and
+// collapse behavior. This port retains its constructor composition and
+// historical band styling; it does not port that sticky/collapsing root.
 
 import 'dart:math' as math;
 
@@ -52,6 +47,7 @@ import '../tooltip/carbon_tooltip.dart';
 
 part 'page_header_tags.dart';
 part 'page_header_title.dart';
+part 'page_header_hero.dart';
 
 /// A named action in a [CarbonPageHeader]'s responsive action area.
 ///
@@ -97,10 +93,11 @@ class CarbonPageHeaderAction {
 /// caller composition. Opt into [collapseTags] for measured `+N` disclosure.
 /// Ellipsized titles reveal their complete text on hover or keyboard focus,
 /// while keeping one accessible heading with its complete name. Fitting titles
-/// add no focus stop. The [hero](https://github.com/sunderee/carbide/issues/398)
-/// slot remains a separate follow-up.
-/// The former core React preview was deprecated and moved to IBM Products;
-/// this constructor intentionally preserves Carbide's composition API.
+/// add no focus stop. Optional [hero] content shares the band or stacks below
+/// it, with responsive aspect ratio and caller-owned child state.
+/// The former React preview moved to IBM Products; current core's compound
+/// PageHeader has scroll/collapse behavior beyond this constructor port.
+/// This header intentionally preserves Carbide's composition API.
 ///
 /// ```dart
 /// CarbonPageHeader(
@@ -137,8 +134,43 @@ class CarbonPageHeader extends StatelessWidget {
     this.tabs,
     this.headingLevel = 1,
     this.titleFocusNode,
+    this.hero,
+    this.heroAspectRatio,
+    this.heroDecorative = false,
+    this.heroLabel,
   }) : assert(headingLevel >= 1 && headingLevel <= 6),
-       assert(pageActions == null || actions == null);
+       assert(pageActions == null || actions == null),
+       assert(
+         heroAspectRatio == null ||
+             (heroAspectRatio > 0 && heroAspectRatio < double.infinity),
+       ),
+       assert(!heroDecorative || heroLabel == null);
+
+  /// An optional image or custom content alongside the text band.
+  ///
+  /// At 672px and above, text and hero use equal columns; narrower headers
+  /// stack the hero after the text. The child fills a clipped aspect-ratio
+  /// box with 16px gutters. Images choose their own fit, such as BoxFit.cover.
+  /// Custom state and caller-owned controllers survive responsive reflow.
+  final Widget? hero;
+
+  /// The positive, finite hero ratio, overriding the responsive default.
+  ///
+  /// Defaults to 2:1 from a header width of 1056px, and 3:2 below it.
+  final double? heroAspectRatio;
+
+  /// Whether to omit decorative hero content from semantics and focus.
+  ///
+  /// Mutually exclusive with [heroLabel]. Keep this false for interactive
+  /// custom content; by default, the child retains its own semantics.
+  final bool heroDecorative;
+
+  /// The informative image name, replacing the hero child's semantics.
+  ///
+  /// Leave null to preserve an Image's semanticLabel or a custom child's
+  /// controls and accessible names. Interactive content must supply its own
+  /// semantics rather than use this whole-image label.
+  final String? heroLabel;
 
   /// The page title (`productive-heading-04`).
   final String title;
@@ -249,7 +281,7 @@ class CarbonPageHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             if (breadcrumbs != null) _BreadcrumbBar(this),
-            _Content(this),
+            if (hero == null) _Content(this) else _HeroContent(this),
             if (tabs != null)
               Padding(
                 // `margin-inline-start: -spacing-05` pulls the tab list to the
@@ -544,6 +576,7 @@ class _StructuredTitleRowState extends State<_StructuredTitleRow> {
             hidden.isEmpty &&
             (_overflowFocus.hasFocus ||
                 (focusedContext != null &&
+                    _overflowKey.currentWidget != null &&
                     focusedContext
                             .findAncestorWidgetOfExactType<
                               CarbonOverflowMenu

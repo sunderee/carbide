@@ -130,6 +130,42 @@ void main() {
           .onToggled!(false);
       await tester.pumpAndSettle();
       expect(find.text('Report'), findsOneWidget);
+      final CarbonDropdown<String> hero = tester.widget<CarbonDropdown<String>>(
+        find.byType(CarbonDropdown<String>),
+      );
+      hero.onChanged!('Image');
+      await tester.pumpAndSettle();
+      expect(
+        find.bySemanticsLabel('Manufacturing presentation'),
+        findsOneWidget,
+      );
+      tester
+          .widgetList<CarbonToggle>(find.byType(CarbonToggle))
+          .singleWhere(
+            (CarbonToggle toggle) => toggle.labelText == 'Decorative image',
+          )
+          .onToggled!(true);
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Manufacturing presentation'), findsNothing);
+      hero.onChanged!('Custom');
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(EditableText),
+        'Keep the gallery draft',
+      );
+      final TextEditingController controller = tester
+          .widget<EditableText>(find.byType(EditableText))
+          .controller;
+      tester.view.physicalSize = const Size(1200, 1000);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller,
+        same(controller),
+      );
+      expect(controller.text, 'Keep the gallery draft');
+      tester.view.physicalSize = const Size(320, 1000);
+      await tester.pumpAndSettle();
+      expect(controller.text, 'Keep the gallery draft');
     } finally {
       handle.dispose();
     }
