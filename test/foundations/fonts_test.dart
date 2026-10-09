@@ -15,6 +15,8 @@ void main() {
   test('font family names match the Carbon families', () {
     expect(CarbonFontFamily.sans, 'IBM Plex Sans');
     expect(CarbonFontFamily.mono, 'IBM Plex Mono');
+    expect(CarbonFontFamily.serif, 'IBM Plex Serif');
+    expect(CarbonFontFamily.package, 'carbide');
   });
 
   test('bundled Plex fonts load from the asset bundle', () async {
@@ -22,6 +24,32 @@ void main() {
     // pubspec font declaration honest.
     await loadCarbidePlexFonts();
   });
+
+  test(
+    'built-in styles preserve application fallback and override families',
+    () {
+      for (final TextStyle style in <TextStyle>[
+        CarbonTypeStyles.body01,
+        CarbonTypeStyles.code01,
+        CarbonFluidTypeStyles.display01.base,
+      ]) {
+        final TextStyle merged = const TextStyle(
+          fontFamilyFallback: <String>[
+            'Application Japanese',
+            'Application Arabic',
+          ],
+        ).merge(style);
+        expect(merged.fontFamilyFallback, <String>[
+          'Application Japanese',
+          'Application Arabic',
+        ]);
+        expect(
+          style.copyWith(fontFamily: 'Application Font').fontFamily,
+          'Application Font',
+        );
+      }
+    },
+  );
 
   testWidgets('text renders in the bundled Plex families', (
     WidgetTester tester,
@@ -35,11 +63,17 @@ void main() {
           children: <Widget>[
             Text(
               'Carbide',
-              style: TextStyle(fontFamily: CarbonFontFamily.sans),
+              style: TextStyle(
+                fontFamily: CarbonFontFamily.sans,
+                package: CarbonFontFamily.package,
+              ),
             ),
             Text(
               'const x = 1;',
-              style: TextStyle(fontFamily: CarbonFontFamily.mono),
+              style: TextStyle(
+                fontFamily: CarbonFontFamily.mono,
+                package: CarbonFontFamily.package,
+              ),
             ),
           ],
         ),
@@ -50,7 +84,7 @@ void main() {
     expect(find.text('const x = 1;'), findsOneWidget);
 
     final Text sans = tester.widget<Text>(find.text('Carbide'));
-    expect(sans.style?.fontFamily, CarbonFontFamily.sans);
+    expect(sans.style?.fontFamily, 'packages/carbide/${CarbonFontFamily.sans}');
 
     // The paragraph lays out with real glyph metrics, so it has a non-zero size.
     final Size size = tester.getSize(find.text('Carbide'));

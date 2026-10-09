@@ -11,8 +11,19 @@
 /// Carbon uses IBM Plex Sans for interface text and IBM Plex Mono for code.
 /// Only the weights Carbon relies on are bundled — Light (300), Regular (400),
 /// and SemiBold (600). The names match the families declared in `pubspec.yaml`,
-/// so they resolve to the bundled fonts without any additional configuration.
+/// and [package] supplies Flutter's dependency font namespace. Built-in Carbon
+/// styles supply it automatically. Custom styles should supply both values:
+///
+/// ```dart
+/// const TextStyle(
+///   fontFamily: CarbonFontFamily.mono,
+///   package: CarbonFontFamily.package,
+/// )
+/// ```
 abstract final class CarbonFontFamily {
+  /// The package that declares and bundles the Plex font assets.
+  static const String package = 'carbide';
+
   /// IBM Plex Sans — the family used for all interface text.
   static const String sans = 'IBM Plex Sans';
 

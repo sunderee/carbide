@@ -14,7 +14,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading01.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -24,7 +25,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading01.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -34,7 +36,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading01.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -44,7 +47,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading01.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -54,7 +58,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading01.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -67,7 +72,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading02.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -77,7 +83,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading02.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -87,7 +94,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading02.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -97,7 +105,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading02.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -107,7 +116,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading02.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.5,
@@ -120,7 +130,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading03.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.4,
@@ -130,7 +141,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading03.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.4,
@@ -140,7 +152,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading03.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.4,
@@ -150,7 +163,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading03.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.4,
@@ -160,7 +174,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading03.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 24,
         fontWeight: FontWeight.w400,
         height: 1.334,
@@ -173,7 +188,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading04.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 28,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -183,7 +199,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading04.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 28,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -193,7 +210,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading04.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 28,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -203,7 +221,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading04.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 32,
         fontWeight: FontWeight.w400,
         height: 1.25,
@@ -213,7 +232,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading04.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 32,
         fontWeight: FontWeight.w400,
         height: 1.25,
@@ -226,7 +246,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading05.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 32,
         fontWeight: FontWeight.w400,
         height: 1.25,
@@ -236,7 +257,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading05.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 36,
         fontWeight: FontWeight.w300,
         height: 1.22,
@@ -246,7 +268,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading05.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -256,7 +279,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading05.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 48,
         fontWeight: FontWeight.w300,
         height: 1.17,
@@ -266,7 +290,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading05.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 60,
         fontWeight: FontWeight.w300,
         height: 1.17,
@@ -279,7 +304,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading06.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 32,
         fontWeight: FontWeight.w600,
         height: 1.25,
@@ -289,7 +315,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading06.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 36,
         fontWeight: FontWeight.w600,
         height: 1.22,
@@ -299,7 +326,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading06.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w600,
         height: 1.19,
@@ -309,7 +337,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading06.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 48,
         fontWeight: FontWeight.w600,
         height: 1.17,
@@ -319,7 +348,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveHeading06.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 60,
         fontWeight: FontWeight.w600,
         height: 1.17,
@@ -332,7 +362,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveParagraph01.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 24,
         fontWeight: FontWeight.w300,
         height: 1.334,
@@ -342,7 +373,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveParagraph01.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 24,
         fontWeight: FontWeight.w300,
         height: 1.334,
@@ -352,7 +384,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveParagraph01.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 28,
         fontWeight: FontWeight.w300,
         height: 1.28572,
@@ -362,7 +395,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveParagraph01.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 28,
         fontWeight: FontWeight.w300,
         height: 1.28572,
@@ -372,7 +406,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.expressiveParagraph01.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 32,
         fontWeight: FontWeight.w300,
         height: 1.25,
@@ -385,7 +420,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation01.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.3,
@@ -395,7 +431,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation01.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         height: 1.3,
@@ -405,7 +442,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation01.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 24,
         fontWeight: FontWeight.w400,
         height: 1.334,
@@ -415,7 +453,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation01.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 28,
         fontWeight: FontWeight.w400,
         height: 1.28572,
@@ -425,7 +464,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation01.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 32,
         fontWeight: FontWeight.w400,
         height: 1.25,
@@ -438,7 +478,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation02.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 32,
         fontWeight: FontWeight.w300,
         height: 1.25,
@@ -448,7 +489,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation02.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 36,
         fontWeight: FontWeight.w300,
         height: 1.22,
@@ -458,7 +500,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation02.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -468,7 +511,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation02.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 48,
         fontWeight: FontWeight.w300,
         height: 1.17,
@@ -478,7 +522,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.quotation02.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.serif,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.serif}',
         fontSize: 60,
         fontWeight: FontWeight.w300,
         height: 1.17,
@@ -491,7 +536,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display01.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -501,7 +547,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display01.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -511,7 +558,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display01.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 54,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -521,7 +569,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display01.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 60,
         fontWeight: FontWeight.w300,
         height: 1.17,
@@ -531,7 +580,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display01.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 76,
         fontWeight: FontWeight.w300,
         height: 1.13,
@@ -544,7 +594,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display02.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w600,
         height: 1.19,
@@ -554,7 +605,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display02.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w600,
         height: 1.19,
@@ -564,7 +616,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display02.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 54,
         fontWeight: FontWeight.w600,
         height: 1.19,
@@ -574,7 +627,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display02.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 60,
         fontWeight: FontWeight.w600,
         height: 1.16,
@@ -584,7 +638,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display02.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 76,
         fontWeight: FontWeight.w600,
         height: 1.13,
@@ -597,7 +652,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display03.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -607,7 +663,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display03.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 54,
         fontWeight: FontWeight.w300,
         height: 1.18,
@@ -617,7 +674,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display03.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 60,
         fontWeight: FontWeight.w300,
         height: 1.16,
@@ -627,7 +685,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display03.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 76,
         fontWeight: FontWeight.w300,
         height: 1.13,
@@ -637,7 +696,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display03.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 84,
         fontWeight: FontWeight.w300,
         height: 1.11,
@@ -650,7 +710,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display04.resolve(320),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 42,
         fontWeight: FontWeight.w300,
         height: 1.19,
@@ -660,7 +721,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display04.resolve(672),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 68,
         fontWeight: FontWeight.w300,
         height: 1.15,
@@ -670,7 +732,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display04.resolve(1056),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 92,
         fontWeight: FontWeight.w300,
         height: 1.11,
@@ -680,7 +743,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display04.resolve(1312),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 122,
         fontWeight: FontWeight.w300,
         height: 1.07,
@@ -690,7 +754,8 @@ void main() {
     expect(
       CarbonFluidTypeStyles.display04.resolve(1584),
       const TextStyle(
-        fontFamily: CarbonFontFamily.sans,
+        fontFamily:
+            'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
         fontSize: 156,
         fontWeight: FontWeight.w300,
         height: 1.05,

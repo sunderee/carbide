@@ -74,6 +74,10 @@ stable**. Publication depends on its complete result, including gallery checks:
   builders, with immutable snapshots of current demo fields. The separate Button
   configuration is checked across every enum/boolean combination. No sample
   depends on the gallery scaffold or knob helpers.
+- **Consumer fonts** — the gallery's dependency manifest check and native glyph
+  contract verify the package-qualified font names without test aliases. See
+  [font resolution](docs/testing/font-resolution.md); real Plex VM goldens do
+  not establish correct font selection in a consuming app.
 - **Browser component contracts** — the explicit `tool/pr_chrome_suites.json`
   subset runs in Chrome on every PR, including component focus, state,
   semantics, scaling, RTL and overlay lifetimes. Run

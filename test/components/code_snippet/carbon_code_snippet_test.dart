@@ -78,7 +78,10 @@ void main() {
       await tester.pumpWidget(_host(const CarbonCodeSnippet(code: code)));
       expect(tester.getSize(find.byType(CarbonCodeSnippet)).height, 40);
       final Text text = tester.widget<Text>(find.text(code));
-      expect(text.style!.fontFamily, CarbonFontFamily.mono);
+      expect(
+        text.style!.fontFamily,
+        'packages/carbide/${CarbonFontFamily.mono}',
+      );
       expect(text.style!.color, CarbonThemeData.white.textPrimary);
       expect(find.byType(CarbonCopyButton), findsOneWidget);
     });

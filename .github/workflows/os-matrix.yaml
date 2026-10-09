@@ -220,6 +220,7 @@ jobs:
               drive_native --release --target=integration_test/binary_control_state_test.dart
               drive_native --release --target=integration_test/password_visibility_test.dart
               drive_native --release --target=integration_test/code_snippet_focus_test.dart
+              drive_native --release --target=integration_test/font_resolution_test.dart
               drive_native --release --target=integration_test/content_switcher_names_test.dart
               drive_native --release --target=integration_test/unicode_typeahead_test.dart
               ;;

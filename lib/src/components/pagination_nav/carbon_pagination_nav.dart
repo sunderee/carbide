@@ -276,7 +276,8 @@ class _PageButton extends StatelessWidget {
                   '$number',
                   semanticsLabel: 'Page $number',
                   style: TextStyle(
-                    fontFamily: CarbonFontFamily.sans,
+                    fontFamily:
+                        'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
                     fontSize: 14,
                     height: 1,
                     fontWeight: active ? FontWeight.w600 : FontWeight.w400,
@@ -308,7 +309,8 @@ class _EllipsisButton extends StatelessWidget {
         child: Text(
           '…',
           style: TextStyle(
-            fontFamily: CarbonFontFamily.sans,
+            fontFamily:
+                'packages/${CarbonFontFamily.package}/${CarbonFontFamily.sans}',
             fontSize: 14,
             color: theme.textPrimary,
           ),

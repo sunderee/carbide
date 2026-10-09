@@ -32,11 +32,16 @@ const Map<String, List<String>> _fonts = <String, List<String>>{
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   for (final MapEntry<String, List<String>> family in _fonts.entries) {
-    final FontLoader loader = FontLoader(family.key);
-    for (final String asset in family.value) {
-      loader.addFont(rootBundle.load(asset));
+    for (final String name in <String>[
+      family.key,
+      'packages/${CarbonFontFamily.package}/${family.key}',
+    ]) {
+      final FontLoader loader = FontLoader(name);
+      for (final String asset in family.value) {
+        loader.addFont(rootBundle.load(asset));
+      }
+      await loader.load();
     }
-    await loader.load();
   }
   await testMain();
 }

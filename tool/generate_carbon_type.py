@@ -115,7 +115,7 @@ def dart_style(s: dict[str, object]) -> str:
     family = "CarbonFontFamily.mono" if s["family"] == "mono" else "CarbonFontFamily.sans"
     return (
         "TextStyle(\n"
-        f"    fontFamily: {family},\n"
+        f"    fontFamily: 'packages/${{CarbonFontFamily.package}}/${{{family}}}',\n"
         f"    fontSize: {s['size']},\n"
         f"    fontWeight: FontWeight.w{s['weight']},\n"
         f"    height: {s['height']},\n"
@@ -213,7 +213,7 @@ def emit_test(scale, wmap, styles) -> str:
         "  });",
         "",
         "  test('every style names a bundled Plex family', () {",
-        "    const families = <String>{CarbonFontFamily.sans, CarbonFontFamily.mono};",
+        "    const families = <String>{'packages/carbide/${CarbonFontFamily.sans}', 'packages/carbide/${CarbonFontFamily.mono}'};",
         "    for (final TextStyle style in <TextStyle>[",
     ]
     for name in OBJECTS:
