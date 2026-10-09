@@ -1,0 +1,40 @@
+name: Verify gallery browser and build
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-and-build:
+    name: Gallery routes and WASM build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Fetch both independent packages
+        run: |
+          flutter pub get
+          (cd example && flutter pub get)
+      - name: Start chromedriver
+        run: chromedriver --port=4444 &
+      - name: Visit every catalog route in a release browser
+        working-directory: example
+        run: >
+          flutter drive --release
+          --driver=test_driver/integration_test.dart
+          --target=integration_test/gallery_smoke_test.dart
+          -d web-server
+      - name: Build deployed configuration
+        working-directory: example
+        run: flutter build web --release --wasm --base-href /carbide/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: carbide-gallery-web
+          path: example/build/web
+          if-no-files-found: error

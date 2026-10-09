@@ -67,6 +67,20 @@ stable**. Publication depends on its complete result, including gallery checks:
   lockfile drift guard, and the dartdoc reference gate. Ubuntu only, so
   golden comparison is strict and authoritative.
 - **Gallery — analyze & test** — the example app's suite + contact sheet.
+- **Browser component contracts** — the explicit `tool/pr_chrome_suites.json`
+  subset runs in Chrome on every PR, including component focus, state,
+  semantics, scaling, RTL and overlay lifetimes. Run
+  `python3 tool/run_pr_chrome.py` locally with Chrome available. These are
+  behavior checks: browser test fonts are placeholders and their pixels are
+  excluded from golden comparison.
+- **Native gallery browser** — every catalog route must render its registered
+  page and preview in a release browser; the same job builds the deployed WASM
+  configuration. Deployment downloads that verified artifact and depends on
+  the complete verification result.
+- **Minimum SDK** — `tool/sdk_floor.py` cross-checks both independent packages,
+  installs their declared Flutter floor and verifies its bundled Dart version.
+  Both packages are analyzed and tested at that floor (currently Flutter
+  3.47.6 / Dart 3.13.5). Latest-stable jobs remain separate checks.
 - **Strict package validation** — `python3 tool/release_verification.py dry-run`
   allows only Pub's complete ignored-reference-gitlinks warning. Additional
   warnings, hints, errors, unexpected paths or changed diagnostic text fail.
@@ -78,7 +92,8 @@ stable**. Publication depends on its complete result, including gallery checks:
   inputs: the shared verification followed by a dry-run publication surrogate.
   It has no OIDC permission and never uploads a package.
 
-Off-PR cadence: **OS matrix** (`os-matrix.yaml`, weekly + on demand via
+Off-PR cadence: **OS matrix** is a broader scheduled canary
+(`os-matrix.yaml`, weekly + on demand via
 `gh workflow run os-matrix.yaml`) runs the full package suite on macOS and
 Windows (text goldens get the lenient off-Linux bound), the dart:io-free
 suites on the web platform (`--platform chrome`, goldens skipped), and the
@@ -87,6 +102,12 @@ configuration the deployed gallery ships. Native web contracts run in six
 parallel groups (gallery, lifecycle, data, controls, pickers, preferences),
 each preserving its debug/release modes and limited to 15 minutes. A failing
 group does not cancel the others, so the full matrix remains visible.
+It also runs when its workflow changes. Its macOS/Windows hosts run widget
+tests; they do not prove native Android/iOS runners. The PR Chrome subset,
+native route smoke and minimum-SDK jobs are in the shared verification graph,
+so both publication and gallery deployment depend on them. CI runs on all PR
+bases, including stacked branches; branch-protection configuration is separate
+from these workflow definitions.
 
 ### Accessibility gates
 

@@ -14,14 +14,17 @@ on:
       - "example/**"
       - "lib/**"
       - "fonts/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tool/**"
+      - ".github/workflows/verify.yaml"
+      - ".github/workflows/gallery-web.yaml"
       - ".github/workflows/deploy-gallery.yml"
   workflow_dispatch:
 
-# Allow the deploy job to publish to Pages via OIDC.
+# Read-only until the deploy job explicitly opts into Pages/OIDC.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # One in-flight deploy at a time; let a newer one supersede a queued one.
 concurrency:
@@ -29,36 +32,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  verify:
+    name: Verification before deployment
+    uses: ./.github/workflows/verify.yaml
+
   build:
-    name: Build gallery (WASM)
+    name: Prepare verified gallery artifact
+    needs: verify
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Download the browser-verified WASM build
+        uses: actions/download-artifact@v8
         with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        working-directory: example
-        run: flutter pub get
-
-      - name: Build web (WASM)
-        working-directory: example
-        run: flutter build web --release --wasm --base-href /carbide/
+          name: carbide-gallery-web
+          path: gallery-web
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: example/build/web
+          path: gallery-web
 
   deploy:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

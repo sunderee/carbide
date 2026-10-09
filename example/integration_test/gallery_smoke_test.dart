@@ -4,9 +4,9 @@
 // Apache License, Version 2.0. See the LICENSE file in the project root.
 //
 // End-to-end smoke of the deployed configuration (#233): boots the real
-// gallery app and walks the primary user journey — shell renders, side-nav
-// category expands, a component page loads. Driven on the web in CI
-// (os-matrix.yaml) because the gallery ships as a web app; the same test
+// gallery app, navigates through the side nav and visits every catalog route.
+// Driven on the web by shared PR/release verification and the OS canary because
+// the gallery ships as a web app; the same test
 // runs on any device `flutter drive` supports.
 
 import 'package:carbide/carbide.dart';
@@ -14,8 +14,13 @@ import 'package:carbide_gallery/main.dart' as app;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'support/gallery_routes.dart';
+import 'support/failure_diagnostics.dart';
+
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  retainIntegrationFailureDetails(
+    IntegrationTestWidgetsFlutterBinding.ensureInitialized(),
+  );
 
   testWidgets('gallery boots and navigates to the Button page', (
     WidgetTester tester,
@@ -39,5 +44,13 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(CarbonButton), findsWidgets);
+  });
+
+  testWidgets('every real gallery route renders in the browser', (
+    WidgetTester tester,
+  ) async {
+    app.main();
+    await tester.pumpAndSettle();
+    await verifyGalleryRoutes(tester);
   });
 }

@@ -1,0 +1,20 @@
+{
+  "suites": [
+    "test/lifecycle/form_ownership_test.dart",
+    "test/components/button/carbon_button_test.dart",
+    "test/components/dropdown/carbon_dropdown_test.dart",
+    "test/components/date_picker/carbon_picker_open_focus_test.dart",
+    "test/components/date_picker/carbon_date_range_session_test.dart",
+    "test/components/text_input/password_visibility_test.dart",
+    "test/components/content_switcher/content_switcher_readability_test.dart",
+    "test/components/data_table/carbon_data_table_identity_test.dart",
+    "test/components/data_table/carbon_data_table_accessibility_test.dart",
+    "test/components/modal/dialog_focus_test.dart",
+    "test/components/ui_shell/responsive_shell_test.dart",
+    "test/components/pagination/pagination_policy_test.dart",
+    "test/scaling/expanded_chrome_test.dart",
+    "test/rtl/carbon_rtl_test.dart",
+    "test/leaks/overlay_lifetime_test.dart",
+    "test/accessibility/family_guidelines_test.dart"
+  ]
+}
