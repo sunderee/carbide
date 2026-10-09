@@ -24,6 +24,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 import icons_lock
 from carbon_svg import extract
 from generate_carbon_icons import (
@@ -92,9 +94,9 @@ def main() -> None:
     for entry in entries:
         buckets.setdefault(bucket_of(entry[0]), []).append(entry)
 
-    GEN_DIR.mkdir(parents=True, exist_ok=True)
+    # Output directories are created only after generation is verified.
     for old in GEN_DIR.glob("pictograms_*.dart"):
-        old.unlink()
+        remove_generated(old)
     for bucket, items in sorted(buckets.items()):
         lines = [
             HEADER.replace("generate_carbon_icons", "generate_carbon_pictograms")
@@ -113,7 +115,7 @@ def main() -> None:
             lines.append("  ],")
             lines.append(");")
             lines.append("")
-        (GEN_DIR / f"pictograms_{bucket}.dart").write_text("\n".join(lines))
+        write_generated(GEN_DIR / f"pictograms_{bucket}.dart", "\n".join(lines))
 
     lines = [
         HEADER.replace("generate_carbon_icons", "generate_carbon_pictograms")
@@ -145,7 +147,7 @@ def main() -> None:
         )
         lines.append("")
     lines.append("}")
-    INDEX.write_text("\n".join(lines))
+    write_generated(INDEX, "\n".join(lines))
 
     lines = [
         HEADER.replace("lib/", "test/")
@@ -170,12 +172,12 @@ def main() -> None:
     for ident, _, _ in entries:
         lines.append(f"  {bucket_of(ident)}_.{ident},")
     lines += ["];", ""]
-    ALL_LIST.parent.mkdir(parents=True, exist_ok=True)
-    ALL_LIST.write_text("\n".join(lines))
+    # Output directories are created by the deferred writer.
+    write_generated(ALL_LIST, "\n".join(lines))
 
     previous = icons_lock.read_lock(LOCKFILE)
     lock = icons_lock.compute_lock(pictograms, deprecated)
-    icons_lock.write_lock(lock, LOCKFILE)
+    icons_lock.write_lock(lock, LOCKFILE, writer=write_generated)
     if previous is not None:
         print(icons_lock.format_report(icons_lock.diff_locks(previous, lock)))
 
@@ -187,4 +189,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

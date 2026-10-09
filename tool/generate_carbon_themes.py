@@ -16,6 +16,8 @@ import json
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 from generate_carbon_colors import parse as parse_colors
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -653,11 +655,11 @@ HIGH_CONTRAST_FACTORY = """
 
 def main() -> None:
     order, brightness, resolved = build()
-    LIB_OUT.write_text(emit_lib(order, brightness, resolved))
-    TEST_OUT.write_text(emit_test(order, brightness, resolved))
+    write_generated(LIB_OUT, emit_lib(order, brightness, resolved))
+    write_generated(TEST_OUT, emit_test(order, brightness, resolved))
     print(f"parsed {len(order)} semantic tokens across {len(THEMES)} themes")
-    print(f"wrote {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
+    print(f"prepared {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

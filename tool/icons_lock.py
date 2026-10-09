@@ -109,5 +109,9 @@ def read_lock(lockfile: Path = LOCKFILE) -> dict | None:
     return None
 
 
-def write_lock(lock: dict, lockfile: Path = LOCKFILE) -> None:
-    lockfile.write_text(json.dumps(lock, indent=2) + "\n")
+def write_lock(lock: dict, lockfile: Path = LOCKFILE, *, writer=None) -> None:
+    text = json.dumps(lock, indent=2) + "\n"
+    if writer is None:
+        lockfile.write_text(text)
+    else:
+        writer(lockfile, text)

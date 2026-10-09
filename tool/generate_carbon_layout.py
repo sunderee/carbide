@@ -9,8 +9,11 @@ breakpoints and containers remain in layout.dart; no values are hand-copied.
 from __future__ import annotations
 
 import json
+import math
 import re
 from pathlib import Path
+
+from generation_check import run_generation, write_generated, remove_generated
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "documentation/carbon/packages/layout/src/dtcg/layout.json"
@@ -109,10 +112,81 @@ def emit_test(values: dict[str, float]) -> str:
 
 def main() -> None:
     values = parse()
-    LIB_OUT.write_text(emit_lib(values))
-    TEST_OUT.write_text(emit_test(values))
-    print(f"generated {len(values)} viewport spacing tokens from DTCG layout")
+    write_generated(LIB_OUT, emit_lib(values))
+    write_generated(TEST_OUT, emit_test(values))
+    fixed = ROOT / 'lib/src/foundations/layout.dart'
+    write_generated(fixed, emit_fixed_layout(fixed.read_text()))
+    print(f"prepared {len(values)} viewport spacing tokens from DTCG layout")
+
+
+def camel(name):
+    return re.sub(r'-([a-z0-9]+)', lambda match: match[1].capitalize(), name)
+
+
+def dimension(token):
+    if token['$type'] != 'dimension':
+        raise ValueError('Expected layout dimension')
+    value = token['$value']
+    if type(value) in (int, float) and (not math.isfinite(value) or value < 0):
+        raise ValueError(f'Unsupported layout number: {value}')
+    converter = token.get('$extensions', {}).get('carbon.layout', {}).get('converter')
+    if converter == 'miniUnits' and type(value) in (int, float):
+        return float(value) * 8
+    if converter == 'rem' and type(value) in (int, float):
+        return float(value)
+    match = re.fullmatch(r'(\d+(?:\.\d+)?)rem', str(value))
+    if match and converter is None:
+        return float(match[1]) * 16
+    raise ValueError(f'Unsupported layout conversion: {value}/{converter}')
+
+
+def emit_fixed_layout(source, layout_source=SOURCE, grid_source=ROOT / 'documentation/carbon/packages/grid/scss/_config.scss'):
+    data = json.loads(layout_source.read_text())
+    size_names = {'size-xs': 'xSmall', 'size-sm': 'small', 'size-md': 'medium', 'size-lg': 'large', 'size-xl': 'xLarge', 'size-2xl': 'xxLarge'}
+    groups = {'spacing': 'CarbonSpacing', 'container': 'CarbonContainer', 'size': 'CarbonSize', 'icon-size': 'CarbonIconSize'}
+    for group, class_name in groups.items():
+        values = {(size_names[name] if group == 'size' else camel(name)): dimension(token)
+                  for name, token in data[group].items() if not name.startswith('$')}
+        pattern = rf'(abstract final class {class_name} \{{)(.*?)(\n\}})'
+        body = re.search(pattern, source, re.S)
+        if body is None:
+            raise ValueError(f'Missing layout class {class_name}')
+        fields = r'static const double (\w+) = ([\d.]+);'
+        if {name for name, _ in re.findall(fields, body[2])} != set(values):
+            raise ValueError(f'{class_name} family changed; review the public API')
+        generated = re.sub(fields, lambda m: f'static const double {m[1]} = {number(values[m[1]])};', body[2])
+        source = source[:body.start(2)] + generated + source[body.end(2):]
+    scss = grid_source.read_text()
+    grid = re.search(r'\$grid-breakpoints:\s*\((.*?)\n\) !default;', scss, re.S)
+    if grid is None:
+        raise ValueError('Grid breakpoint source format changed')
+    breakpoints = {}
+    for name, body in re.findall(r'^  (\w+): \(\n(.*?)^  \),', grid[1], re.M | re.S):
+        values = {}
+        for key, expression in re.findall(r'^    (\w+): (.*),$', body, re.M):
+            pixels = re.fullmatch(r'convert\.to-rem\((\d+)px\)', expression)
+            if pixels:
+                value = int(pixels[1])
+            elif re.fullmatch(r'\d+', expression):
+                value = int(expression)
+            else:
+                raise ValueError(f'Unsupported breakpoint expression: {expression}')
+            values[key] = value
+        if set(values) != {'columns', 'margin', 'width'}:
+            raise ValueError(f'Breakpoint fields changed: {name}')
+        breakpoints[name] = values
+    pattern = r'static const CarbonBreakpoint (\w+) = CarbonBreakpoint\((.*?)\n  \);'
+    if {name for name, _ in re.findall(pattern, source, re.S)} != set(breakpoints):
+        raise ValueError('Breakpoint family changed; review the public API')
+    def replace(match):
+        body = match[2]
+        for key, value in breakpoints[match[1]].items():
+            body, count = re.subn(rf'({key}: )\d+', lambda m: m[1] + str(value), body)
+            if count != 1:
+                raise ValueError(f'Missing/duplicated breakpoint field: {key}')
+        return f'static const CarbonBreakpoint {match[1]} = CarbonBreakpoint({body}\n  );'
+    return re.sub(pattern, replace, source, flags=re.S)
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

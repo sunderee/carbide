@@ -24,6 +24,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 import icons_lock
 from carbon_svg import IDENTITY, extract, fnum
 
@@ -252,9 +254,9 @@ def main() -> None:
     for entry in entries:
         buckets.setdefault(bucket_of(entry[0]), []).append(entry)
 
-    GEN_DIR.mkdir(parents=True, exist_ok=True)
+    # Output directories are created only after generation is verified.
     for old in GEN_DIR.glob("icons_*.dart"):
-        old.unlink()
+        remove_generated(old)
     for bucket, items in sorted(buckets.items()):
         lines = [
             HEADER,
@@ -271,7 +273,7 @@ def main() -> None:
             lines.append("  ],")
             lines.append(");")
             lines.append("")
-        (GEN_DIR / f"icons_{bucket}.dart").write_text("\n".join(lines))
+        write_generated(GEN_DIR / f"icons_{bucket}.dart", "\n".join(lines))
 
     # The light index class.
     lines = [
@@ -301,7 +303,7 @@ def main() -> None:
         )
         lines.append("")
     lines.append("}")
-    INDEX.write_text("\n".join(lines))
+    write_generated(INDEX, "\n".join(lines))
 
     # The exhaustive list, for tests only (would defeat tree-shaking in lib).
     lines = [
@@ -324,13 +326,13 @@ def main() -> None:
     for ident, _, _ in entries:
         lines.append(f"  {bucket_of(ident)}_.{ident},")
     lines += ["];", ""]
-    ALL_LIST.write_text("\n".join(lines))
+    write_generated(ALL_LIST, "\n".join(lines))
 
     # Lockfile: record what this generation was produced from, and report
     # what changed relative to the previous generation (see icons_lock.py).
     previous = icons_lock.read_lock()
     lock = icons_lock.compute_lock(icons, deprecated)
-    icons_lock.write_lock(lock)
+    icons_lock.write_lock(lock, writer=write_generated)
     if previous is not None:
         print(icons_lock.format_report(icons_lock.diff_locks(previous, lock)))
 
@@ -346,4 +348,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

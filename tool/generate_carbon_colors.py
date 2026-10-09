@@ -16,6 +16,8 @@ import json
 import re
 from pathlib import Path
 
+from generation_check import run_generation, write_generated, remove_generated
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "documentation/carbon/packages/colors/src/dtcg/colors.json"
 LIB_OUT = ROOT / "lib/src/foundations/colors.dart"
@@ -164,12 +166,12 @@ void main() {
 
 def main() -> None:
     entries = parse()
-    LIB_OUT.write_text(emit_lib(entries))
-    TEST_OUT.write_text(emit_test(entries))
+    write_generated(LIB_OUT, emit_lib(entries))
+    write_generated(TEST_OUT, emit_test(entries))
     fams = sorted({family_of(n) for n, _ in entries})
     print(f"parsed {len(entries)} colors across families: {', '.join(fams)}")
-    print(f"wrote {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
+    print(f"prepared {LIB_OUT.relative_to(ROOT)} and {TEST_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main()
+    run_generation(main)

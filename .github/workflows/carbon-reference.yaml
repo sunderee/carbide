@@ -1,0 +1,50 @@
+name: Carbon reference generation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'documentation/carbon'
+      - '.gitmodules'
+      - 'tool/generate_carbon_*.py'
+      - 'tool/generation_check.py'
+      - 'tool/check_upstream_colors.py'
+      - 'tool/test_generation_check.py'
+      - 'tool/test_upstream_tokens.py'
+      - 'lib/src/foundations/**'
+      - 'lib/src/theme/carbon_theme_data.dart'
+      - 'lib/src/icons/generated/**'
+      - 'lib/src/pictograms/generated/**'
+      - '.github/workflows/carbon-reference.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: carbon-reference-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generated-tokens:
+    name: Pinned tokens and independent colors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fetch only the authoritative Carbon reference
+        run: git submodule update --init --depth 1 documentation/carbon
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Verify generators and independent reader
+        run: |
+          python3 tool/test_generation_check.py
+          python3 tool/test_upstream_tokens.py
+          python3 tool/test_carbon_generation.py
+          for family in colors themes type fluid_type layout motion icons pictograms; do
+            python3 "tool/generate_carbon_${family}.py" --check
+          done
+          python3 tool/check_upstream_colors.py
+          python3 tool/check_icons_lock.py
+      - name: Prove checks left the repository unchanged
+        run: git diff --exit-code
