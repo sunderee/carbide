@@ -296,6 +296,12 @@ Use clear, imperative messages (Conventional Commits encouraged:
 
 ## Releasing
 
+Review the [0.5.0 adoption guide](docs/releases/0.5.0-adoption.md),
+[release metadata decisions](docs/release-metadata.md), and checked parity,
+platform, stability and README outputs before the version/tag steps below.
+Keep the Unreleased changelog consistent with the final API and regenerate
+Linux listing screenshots when their gallery inputs change.
+
 Carbide publishes to [pub.dev](https://pub.dev/packages/carbide) automatically
 from CI. The repository is a **trusted publisher** (pub.dev's OIDC flow), so
 there are no long-lived credentials — a release is just a tag.

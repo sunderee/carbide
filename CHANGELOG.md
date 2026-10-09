@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+Prepared for 0.5.0; see the [adoption guide](docs/releases/0.5.0-adoption.md).
+Version/tag publication remains a separate release action.
+
+- Resolve bundled Plex fonts in consuming applications while preserving
+  application fallback and custom-family overrides; document the resulting
+  width changes and verify actual native glyph metrics (#427).
+- Classify supported stable/advanced APIs, hide the accidental TagSurface
+  export, and name the unexported scroll helper according to its visibility
+  (#354). Named Carbon tag widgets remain public.
+- Add a caller-owned responsive PageHeader hero slot, preserve keyed content
+  through reflow, and define its image/decorative semantics (#398).
+- Match ProgressIndicator's 128px horizontal grid and growing vertical step
+  geometry, with complete semantic names and narrow scrolling (#402).
+- Keep text ContentSwitcher segments readable through minimum widths, scrolling
+  and keyboard/controlled-selection reveal (#404).
+- Give scrolling ButtonSet layouts finite natural shared height; preserve
+  popover action names and native trigger focus across semantics changes.
+- Supply compiled copy/expand gallery examples, missing composition recipes,
+  full table/slider demo states and an in-memory upload lifecycle (#348, #349,
+  #353). Copy feedback no longer intercepts unrelated native pointer targets.
+- Check public surface/specimens, accessibility and overlay lifetimes; add
+  independent token readers and reference provenance guards (#341–#344, #351).
+- Share complete verification across PRs, deployment, publication and rehearsal,
+  including native Chromium and minimum-SDK checks (#345, #346).
+- Publish checked parity/platform/README facts and compatibility policy, correct
+  stale architecture/ADR claims, prepare listing/gallery/security metadata, and
+  document the final adoption path (#347, #350, #352, #354–#356, #413).
+
 - Recover truncated PageHeader titles through pointer/keyboard tooltips while
   preserving one complete accessible heading. Fitting titles add no focus stop;
   long disclosures support keyboard scrolling and viewport placement (#397).
