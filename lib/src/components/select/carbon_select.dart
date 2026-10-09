@@ -678,7 +678,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
     final bool selected = item.value == widget.value;
     final bool highlighted = index == _highlighted;
     // The keyboard-roved row keeps itself inside the popup fold (#279).
-    return CarbonScrollIntoView(
+    return ScrollIntoView(
       active: highlighted,
       child: CarbonListBoxOptionSemantics(
         selected: selected,

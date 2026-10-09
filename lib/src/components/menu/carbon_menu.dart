@@ -124,6 +124,8 @@ class _MenuScope extends InheritedWidget {
 ///   ],
 /// )
 /// ```
+/// **Stable API.** This standalone menu and its exported item widgets are
+/// supported composition APIs. See the gallery Menu recipe.
 class CarbonMenu extends StatefulWidget {
   /// Creates an action menu.
   const CarbonMenu({
@@ -491,7 +493,7 @@ class _CarbonMenuItemState extends State<CarbonMenuItem> {
           canRequestFocus: enabled,
           onKeyEvent: _onKey,
           onFocusChange: (bool f) => setState(() => _focused = f),
-          child: CarbonScrollIntoView(
+          child: ScrollIntoView(
             active: _focused && isCarbonOverlaySurface(context),
             child: CarbonFocusRing(visible: _focused, inset: true, child: row),
           ),

@@ -4,6 +4,8 @@
 // Version 2.0. See the LICENSE file in the project root.
 
 import 'package:carbide/carbide.dart';
+// Rendering assertions inspect the internal shared surface.
+import 'package:carbide/src/components/tag/carbon_tag.dart' show TagSurface;
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
