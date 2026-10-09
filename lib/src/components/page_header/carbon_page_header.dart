@@ -14,8 +14,8 @@
 //
 // API posture (#222): this constructor API is intentional. The former React
 // preview moved to IBM Products at v11.111.0 (carbon#21926). The pinned
-// v11.118.0 core now also exposes a compound PageHeader.Root with scroll and
-// collapse behavior. This port retains its constructor composition and
+// v11.118.0 core contains a compound PageHeader.Root implementation with
+// scroll/collapse behavior, whose entrypoint export is deferred to v12. This port retains its constructor composition and
 // historical band styling; it does not port that sticky/collapsing root.
 
 import 'dart:math' as math;

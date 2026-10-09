@@ -6,7 +6,11 @@
 
 ## Context
 
-Carbide must render all 2,673 Carbon icons (plus 1,564 pictograms) with
+Current counts are checked in [reference facts](../reference-facts.md). The
+measurements below describe the original spike, not a portable performance
+guarantee or the current registry count.
+
+Carbide must render the full pinned Carbon icon and pictogram registries with
 pixel fidelity to the upstream artwork, under these constraints:
 
 - No Material/Cupertino and no new runtime dependencies.

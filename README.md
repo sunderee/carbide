@@ -3,9 +3,9 @@
 **An unofficial Flutter port of the IBM Carbon Design System.**
 
 Carbide brings the [IBM Carbon Design System][carbon] to Flutter, built
-**strictly on Flutter's base widgets** — no Material, no Cupertino. Every design
-token, theme, and component is implemented from `package:flutter/widgets.dart`,
-so the result follows Carbon's specification rather than Material's.
+**on Flutter's base widgets and SDK rendering libraries** — no Material, no
+Cupertino in library code. Tokens and component behavior are ported from
+Carbon's pinned reference sources.
 
 [**▶ Explore the live gallery**](https://sunderee.github.io/carbide/) —
 every component, every theme, with live controls and copyable code.

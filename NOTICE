@@ -53,8 +53,8 @@ https://github.com/carbon-design-system/carbon/blob/v11.118.0/packages/react/src
 IBM Plex typeface
 --------------------------------------------------------------------------------
 
-Carbide bundles and/or references the IBM Plex font family (Sans, Mono, Serif,
-and Condensed variants).
+Carbide bundles seven IBM Plex font files: Sans Light/Regular/SemiBold, Mono
+Regular/SemiBold, and Serif Light/Regular.
 
     Copyright IBM Corp. with Reserved Font Name "Plex".
     Licensed under the SIL Open Font License, Version 1.1.
