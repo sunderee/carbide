@@ -361,6 +361,10 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
   int _headingLevel = 2;
   int _edits = 0;
   int _downloads = 0;
+  int _tagViews = 0;
+  int _tagDismissals = 0;
+  bool _showDraft = true;
+  bool _collapseTags = true;
   @override
   Widget build(BuildContext context) {
     return DemoScaffold(
@@ -369,6 +373,11 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
           'Resize to disclose hidden actions while preserving the title.',
       previewAlignment: Alignment.topLeft,
       controls: <Widget>[
+        boolKnob(
+          label: 'Collapse tags',
+          value: _collapseTags,
+          onChanged: (bool value) => setState(() => _collapseTags = value),
+        ),
         choiceKnob<int>(
           label: 'Heading level',
           value: _headingLevel,
@@ -381,11 +390,39 @@ class _PageHeaderPageState extends State<_PageHeaderPage> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text('Edits: $_edits · Downloads: $_downloads'),
+          Text('Tag views: $_tagViews · Dismissals: $_tagDismissals'),
           CarbonPageHeader(
             title: 'Quarterly report with a deliberately long title',
             headingLevel: _headingLevel,
             subtitle: 'Finance',
             body: 'A summary of revenue and spend for the quarter.',
+            collapseTags: _collapseTags,
+            tags: <Widget>[
+              const CarbonTag(
+                key: ValueKey<String>('finance'),
+                label: 'Finance report',
+                type: CarbonTagType.blue,
+              ),
+              CarbonOperationalTag(
+                key: const ValueKey<String>('region'),
+                label: 'View regional report',
+                onPressed: () => setState(() => _tagViews++),
+              ),
+              if (_showDraft)
+                CarbonDismissibleTag(
+                  key: const ValueKey<String>('draft'),
+                  label: 'Draft',
+                  onClose: () => setState(() {
+                    _showDraft = false;
+                    _tagDismissals++;
+                  }),
+                ),
+              const CarbonTag(
+                key: ValueKey<String>('reviewed'),
+                label: 'Reviewed',
+                type: CarbonTagType.green,
+              ),
+            ],
             breadcrumbs: <CarbonBreadcrumbItem>[
               CarbonBreadcrumbItem(label: 'Home', onPressed: () {}),
               CarbonBreadcrumbItem(label: 'Finance', onPressed: () {}),

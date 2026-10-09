@@ -75,6 +75,22 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Edits: 1 · Downloads: 0'), findsOneWidget);
+      tester.view.physicalSize = const Size(390, 1000);
+      await tester.pumpAndSettle();
+      final Finder count = find.bySemanticsLabel(RegExp(r'^\d+ more tags$'));
+      expect(count, findsOneWidget);
+      await tester.tap(count);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('View regional report'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tag views: 1 · Dismissals: 0'), findsOneWidget);
+      if (find.bySemanticsLabel('Dismiss Draft').evaluate().isEmpty) {
+        await tester.tap(count);
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.bySemanticsLabel('Dismiss Draft'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tag views: 1 · Dismissals: 1'), findsOneWidget);
     } finally {
       handle.dispose();
     }
