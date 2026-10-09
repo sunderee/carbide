@@ -111,6 +111,7 @@ jobs:
           python3 tool/platform_support.py --check
           python3 tool/test_readme_catalog.py
           python3 tool/readme_catalog.py --check
+          python3 tool/package_metadata.py
           python3 tool/test_gallery_coverage.py
           python3 tool/gallery_coverage.py --check
           python3 tool/test_accessibility_inventory.py
